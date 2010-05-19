@@ -2,15 +2,47 @@
 	name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
 	email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
 [alias]
+	a = add
+	ae = add -e
+	alias = "!git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'"
+	c = commit
+	ci = commit
+	ca = commit -a
 	co = checkout
+	cob = checkout -b
+	com = checkout master
+	br = branch
+	d = diff
+	dc = diff --cached
+	f = fetch
+	l = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n'
+	rbi = rebase -i
+	s = status
+	st = status
+	g = log -p
 [color]
 	diff = auto
 	status = auto
 	branch = auto
+	ui = true
+
+[color "diff"]
+	whitespace = red reverse
 [core]
 	excludesfile = ~/.gitignore
 	editor = vim
+	whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
 [apply]
 	whitespace = nowarn
 [format]
 	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
+
+[push]
+	default = matching
+[interactive]
+	singlekey = true
+
+[url "git@github.com:"]
+	insteadOf = github:
+[url "git://github.com/"]
+	insteadOf = gitpub:

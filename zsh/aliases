@@ -30,3 +30,15 @@ alias rst='touch tmp/restart.txt'
 
 # commands starting with % for pasting from web
 alias %=' '
+
+
+# Custom aliases (from ~/.bash_aliases)
+alias sdebuild='debuild -S -k3FE63E00'
+alias bts='DEBEMAIL=debian-bugs@thequod.de bts --sendmail "/usr/sbin/sendmail -f$DEBEMAIL -t"'
+# alias m=less
+alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git'
+alias connect-to-moby='ssh -t hahler.de "su -c \"screen -RD\""'
+alias o=xdg-open
+alias 7zpwd="7z a -mx0 -mhe=on -p"
+alias ag="ack-grep"
+alias lh="ls -alt | head"

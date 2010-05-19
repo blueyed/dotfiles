@@ -168,8 +168,8 @@ endif
 " highlight NonText guibg=#060606
 " highlight Folded  guibg=#0A0A0A guifg=#9090D0
 
-" Numbers
-set number
+" Line numbers
+set nonumber
 set numberwidth=5
 
 " Snippets are activated by Shift+Tab

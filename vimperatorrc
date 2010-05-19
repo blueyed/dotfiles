@@ -1,0 +1,35 @@
+"2.3.1 (created: 2010/04/07 18:25:13)
+
+command! -nargs=* google open google <args>
+map s :google
+nmap s :google
+vmap s :google
+set guioptions=rbN
+set popups=tab,resized
+set runtimepath=/home/daniel/.vimperator
+set wildoptions=sort
+
+
+" A builtin bit.ly shortener.
+" Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
+javascript <<EOF
+shortenURLBitLy = function (url) {
+	var req = new XMLHttpRequest();
+		req.open("GET", "http://api.bit.ly/v3/shorten?login=blueyed&apiKey=R_a405dd06737e888ca6971b295b0b7a13&format=txt&longUrl=" + escape(url), true)
+		req.onreadystatechange = function (ev) {
+			if (req.readyState == 4) {
+				if (req.status == 200) {
+					util.copyToClipboard(req.responseText, true);
+				} else {
+					liberator.echo(req.responseText);
+				}
+			}
+		}
+		req.send(null);
+	}
+EOF
+map <silent> gy :javascript shortenURLBitLy(buffer.URL);<CR>
+
+source! ~/.vimperatorrc.local
+
+" vim: set ft=vimperator:

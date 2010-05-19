@@ -83,6 +83,7 @@ set expandtab
 
 " Always display the status line
 set laststatus=2
+set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
 " \ is the leader character
 let mapleader = ","
@@ -192,3 +193,16 @@ let g:fuf_splitPathMatching=1
 
 " Open URL
 command -bar -nargs=1 OpenURL :!open <args>
+
+
+set cursorline
+"highlight CursorLine guibg=lightblue ctermbg=lightgray
+
+" Look for tags file in parent directories, upto "/"
+set tags+=tags;/
+
+filetype plugin indent on
+
+" via
+" http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
+" :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet

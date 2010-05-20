@@ -56,3 +56,14 @@ alias ll3='tree --dirsfirst -ChFupDaL 3'
 
 alias l='l1'
 alias ll='ll1'
+
+
+# wget + dpatch
+wpatch() {
+	PATCH_URL="$1"; shift
+	echo "wget $PATCH_URL -O- | zless | cat | patch -p1 $@"
+	wget $PATCH_URL -O- | zless | patch -p1 "$@"
+}
+# auto ssh-add key
+alias ssh='if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi; ssh'
+

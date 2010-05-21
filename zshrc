@@ -1,5 +1,5 @@
 . ~/.zsh/config
-. ~/.zsh/aliases
+. ~/.sh/aliases
 . ~/.zsh/completion
 
 # source files (no dirs)

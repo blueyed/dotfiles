@@ -3,7 +3,7 @@
 . ~/.zsh/completion
 
 # source files (no dirs)
-. ~/.zsh/source.d/*(.)
+. ~/.sh/source.d/*(.)
 
 
 # Options

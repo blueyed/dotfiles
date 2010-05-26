@@ -73,7 +73,7 @@ _apt_cache_madison_grep_wrapper() {
 #echo "CAND_VERS=\"$CAND_VERS\""
 			if [ -n "$CAND_VERS" ]; then
 				# build regexp for versions:
-				CAND_VERS=$( echo $CAND_VERS | sed 's/ /|/g' | sed 's/\+/\\+/g' | sort -ru | head -n 1 )
+				CAND_VERS=$( echo $CAND_VERS | sed 's/ /|/g' | sed 's/\+/\\+/g' | sort -run | head -n 1 )
 #echo "CAND_VERS=\"$CAND_VERS\""
 				# Now filter madison output by matching version
 				# and Sources or Packages:

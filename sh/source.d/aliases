@@ -2,10 +2,13 @@
 alias ..='cd ..'
 
 # ls
-alias ls="ls -F"
-alias l="ls -lAh"
-alias ll="ls -l"
-alias la='ls -A'
+export LS_OPTIONS='--color=auto'
+alias ls='ls $LS_OPTIONS'
+alias l='ls $LS_OPTIONS -FA'
+alias ll='ls $LS_OPTIONS -lAF'
+alias la='ls $LS_OPTIONS -aF'
+alias lll='ll --color | less -R'
+
 
 # git
 alias ga='git add'
@@ -52,14 +55,9 @@ alias lh="ls -alt | head"
 alias l1='tree --dirsfirst -ChFL 1'
 alias l2='tree --dirsfirst -ChFL 2'
 alias l3='tree --dirsfirst -ChFL 3'
-
 alias ll1='tree --dirsfirst -ChFupDaL 1'
 alias ll2='tree --dirsfirst -ChFupDaL 2'
 alias ll3='tree --dirsfirst -ChFupDaL 3'
-
-alias l='l1'
-alias ll='ll1'
-
 
 # wget + dpatch
 wpatch() {
@@ -70,3 +68,15 @@ wpatch() {
 # auto ssh-add key
 alias ssh='if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi; ssh'
 
+# make file operations interactive by default
+alias rm="rm -i"
+alias cp="cp -i"
+alias mv="mv -i"
+
+mdc() {
+	mkdir $@ && cd $1
+}
+alias verynice="nice ionice -c 2 -n 7"
+
+# setup LS_COLORS
+eval `dircolors -b`

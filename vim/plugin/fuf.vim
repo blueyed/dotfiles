@@ -8,7 +8,7 @@
 if exists('g:loaded_fuf')
   finish
 elseif v:version < 702
-  echoerr 'FuzzyFinder does not support this version of vim (' . v:version . ').'
+  " echoerr 'FuzzyFinder does not support this version of vim (' . v:version . ').'
   finish
 endif
 let g:loaded_fuf = 1

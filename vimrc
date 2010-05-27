@@ -84,7 +84,6 @@ set noexpandtab
 set laststatus=2
 set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
-" \ is the leader character
 let mapleader = ","
 
 " Edit the README_FOR_APP (makes :R commands work)
@@ -182,8 +181,7 @@ set wildmode=list:longest,list:full
 set complete=.,t
 
 " case only matters with mixed case expressions
-set ignorecase
-set smartcase
+set ignorecase smartcase
 
 " Tags
 let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"

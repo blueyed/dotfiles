@@ -32,10 +32,9 @@
 	excludesfile = ~/.gitignore
 	editor = vim
 	whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
-[apply]
-	whitespace = nowarn
+	autocrlf = input
 [format]
-	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
+#	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
 [push]
 	default = matching
@@ -46,3 +45,7 @@
 	insteadOf = github:
 [url "git://github.com/"]
 	insteadOf = gitpub:
+
+[github]
+	user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
+	token = <%= print("GitHub API Token: "); STDOUT.flush; STDIN.gets.chomp %>

@@ -183,6 +183,9 @@ set complete=.,t
 " case only matters with mixed case expressions
 set ignorecase smartcase
 
+" being smart helps
+set smarttab smartindent
+
 " Tags
 let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
 

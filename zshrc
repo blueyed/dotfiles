@@ -1,1 +1,1 @@
-oh-my-zsh/templates/zshrc.zsh-template
+oh-my-zsh/zshrc

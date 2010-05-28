@@ -29,7 +29,10 @@ alias %=' '
 
 
 # Custom aliases (from ~/.bash_aliases)
-alias sdebuild='debuild -S -k3FE63E00'
+# Get previous ubuntu version from changelog (the one to use with -v for e.g. debuild)
+alias debverprevubuntu="dpkg-parsechangelog --format rfc822 --count 1000 | grep '^Version: ' | grep ubuntu | head -n2 | tail -n1 | sed 's/^Version: //'"
+# Sponsored debuild
+alias sdebuild='debuild -S -k3FE63E00 -v$(debverprevubuntu)'
 alias bts='DEBEMAIL=debian-bugs@thequod.de bts --sendmail "/usr/sbin/sendmail -f$DEBEMAIL -t"'
 # alias m=less
 alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git'

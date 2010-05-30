@@ -19,7 +19,7 @@
 	dc = diff --cached
 	dv = '!git diff -w "$@" | vim -R -'
 	f = fetch
-	l = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n'
+	l = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n'
 	rbi = rebase -i
 	s = status
 	st = status

@@ -9,21 +9,6 @@ alias ll='ls $LS_OPTIONS -lAF'
 alias la='ls $LS_OPTIONS -aF'
 alias lll='ll --color | less -R'
 
-
-# git
-alias ga='git add'
-alias gae='git add --edit'
-alias gl='git pull'
-alias gp='git push'
-alias gd='git diff'
-alias gdc='git diff --cached'
-alias gc='git commit -v'
-alias gca='git commit -a -v'
-alias gco='git checkout'
-alias gb='git branch'
-alias gs='git status'
-alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
-
 # commands starting with % for pasting from web
 alias %=' '
 
@@ -36,6 +21,7 @@ alias sdebuild='debuild -S -k3FE63E00 -v$(debverprevubuntu)'
 alias bts='DEBEMAIL=debian-bugs@thequod.de bts --sendmail "/usr/sbin/sendmail -f$DEBEMAIL -t"'
 # alias m=less
 alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git'
+xrgrep() { xgrep -R "$@" . }
 alias connect-to-moby='ssh -t hahler.de "su -c \"screen -RD\""'
 alias o=xdg-open
 alias 7zpwd="7z a -mx0 -mhe=on -p"
@@ -70,6 +56,3 @@ mdc() {
 	mkdir $@ && cd $1
 }
 alias verynice="nice ionice -c 2 -n 7"
-
-# setup LS_COLORS
-eval `dircolors -b`

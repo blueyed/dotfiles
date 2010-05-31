@@ -3,48 +3,71 @@ require 'erb'
 
 desc "install the dot files into user's home directory"
 task :install do
-  replace_all = false
+  base = ENV['HOME']
+  if not base
+    puts "Fatal error: no base path given.\nPlease make sure that HOME is set in your environment.\nAborting."
+    exit 1
+  end
+
+  $replace_all = false
   Dir['*'].each do |file|
     next if %w[Rakefile README.rdoc LICENSE].include? file
-    
-    if File.exist?(File.join(ENV['HOME'], ".#{file.sub('.erb', '')}"))
-      if File.identical? file, File.join(ENV['HOME'], ".#{file.sub('.erb', '')}")
-        puts "identical ~/.#{file.sub('.erb', '')}"
-      elsif replace_all
-        replace_file(file)
-      else
-        print "overwrite ~/.#{file.sub('.erb', '')}? [ynaq] "
-        case $stdin.gets.chomp
-        when 'a'
-          replace_all = true
-          replace_file(file)
-        when 'y'
-          replace_file(file)
-        when 'q'
-          exit
-        else
-          puts "skipping ~/.#{file.sub('.erb', '')}"
-        end
+
+    # Install files in "config" separately
+    if 'config' == file
+      Dir[File.join(file, '*')].each do |file|
+        clean_name = file.sub(/\.erb$/, '')
+        install_file(file, File.join(base, "."+clean_name))
       end
     else
-      link_file(file)
+      clean_name = file.sub(/\.erb$/, '')
+      install_file(file, File.join(base, "."+clean_name))
     end
+  end
+
+end
+
+
+def install_file(file, target)
+  nice_target = target.sub(/#{ENV['HOME']}/, '~') # for display: collapse "~"
+  if File.exist?(target)
+    if File.identical? file, target
+      puts "identical #{nice_target}"
+    elsif $replace_all
+      replace_file(file, target)
+    else
+      print "overwrite #{nice_target}? [ynaq] "
+      case $stdin.gets.chomp
+      when 'a'
+        $replace_all = true
+        replace_file(file, target)
+      when 'y'
+        replace_file(file, target)
+      when 'q'
+        exit
+      else
+        puts "skipping #{nice_target}"
+      end
+    end
+  else
+    link_file(file, target)
   end
 end
 
-def replace_file(file)
-  system %Q{rm -rf "$HOME/.#{file.sub('.erb', '')}"}
-  link_file(file)
+def replace_file(file, target)
+  system %Q{rm -rf "#{target}"}
+  link_file(file, target)
 end
 
-def link_file(file)
+def link_file(file, target)
+  nice_target = target.sub(/#{ENV['HOME']}/, '~') # for display: collapse "~"
   if file =~ /.erb$/
-    puts "generating ~/.#{file.sub('.erb', '')}"
-    File.open(File.join(ENV['HOME'], ".#{file.sub('.erb', '')}"), 'w') do |new_file|
+    puts "generating #{nice_target}"
+    File.open(target, 'w') do |new_file|
       new_file.write ERB.new(File.read(file)).result(binding)
     end
   else
-    puts "linking ~/.#{file}"
-    system %Q{ln -s "$PWD/#{file}" "$HOME/.#{file}"}
+    puts "linking #{nice_target}"
+    system %Q{ln -s "$PWD/#{file}" "#{target}"}
   end
 end

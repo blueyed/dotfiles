@@ -1,0 +1,11 @@
+# from http://www.debian-administration.org/articles/205#comment_17
+
+# Caption  (use lastline for tabs)
+caption always "%?%F%{-b gk}%:%{-b bb}%?%C | %D | %M %d |%H |%?%F%{-b gk}%? %L=%-Lw%45>%{-b kg}%n%f* %t%{-}%+Lw%-0<"
+
+# Hardstatus (update xterm title)
+hardstatus string "SCREEN @ %H: %-n - %t"
+
+# Do not leave old content (e.g. from less/vim) on the screen, when exiting
+altscreen on
+

@@ -73,7 +73,7 @@ _apt_cache_madison_grep_wrapper() {
 #echo "CAND_VERS=\"$CAND_VERS\""
 			if [ -n "$CAND_VERS" ]; then
 				# build regexp for versions:
-				CAND_VERS=$( echo $CAND_VERS | sed 's/ /|/g' | sed 's/\+/\\+/g' | sort -run | head -n 1 )
+				CAND_VERS=$( echo $CAND_VERS | sed 's/ /|/g' | sed 's/\+/\\+/g' | sort -un | head -n 1 )
 #echo "CAND_VERS=\"$CAND_VERS\""
 				# Now filter madison output by matching version
 				# and Sources or Packages:
@@ -114,7 +114,7 @@ _apt_cache_madison_grep_wrapper() {
 alias asearch="apt-cache search"
 alias amad="apt-cache madison"
 alias apol="apt-cache policy"
-alias aup="sudo apt-get update"
+alias aup="LANG=C sudo apt-get update"
 alias aupgrade="sudo apt-get upgrade -V"
 alias apurge="sudo apt-get purge"
 alias afs="apt-file search"

@@ -68,6 +68,6 @@ def link_file(file, target)
     end
   else
     puts "linking #{nice_target}"
-    system %Q{ln -s "$PWD/#{file}" "#{target}"}
+    system %Q{ln -sfn "$PWD/#{file}" "#{target}"}
   end
 end

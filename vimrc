@@ -209,3 +209,5 @@ filetype plugin indent on
 " via
 " http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
+
+set hidden

@@ -118,7 +118,7 @@ alias aup="LANG=C sudo apt-get update"
 alias aupgrade="sudo apt-get upgrade -V"
 alias apurge="sudo apt-get purge"
 alias afs="apt-file search"
-alias asup="LANG=C sudo apt-get update -qq ; sudo aptitude safe-upgrade"
+alias asup="LANG=C sudo apt-get update -qq ; sudo aptitude safe-upgrade -V"
 
 # Install source package, supports grepping in $2 to fetch a specific version
 # E.g. "asrc -g gutsy hello" will become "apt-get source hello=2.2-2"

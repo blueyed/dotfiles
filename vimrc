@@ -211,3 +211,7 @@ filetype plugin indent on
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
 
 set hidden
+
+" source ~/.vim/source.d/*.vim
+exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
+

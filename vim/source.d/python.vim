@@ -41,9 +41,9 @@ au BufRead,BufNewFile Makefile* set noexpandtab
 highlight BadWhitespace ctermbg=red guibg=red
 
 " Display tabs at the beginning of a line in Python mode as bad.
-au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+au BufRead,BufNewFile *.py,*.pyw call matchadd("BadWhitespace", '^\t\+')
 " Make trailing whitespace be flagged as bad.
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h call matchadd("BadWhitespace", '\s\+$')
 
 " Wrap text after a certain number of characters
 " Python: 79 

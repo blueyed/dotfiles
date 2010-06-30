@@ -150,6 +150,10 @@ ashow() {
 ashowsrc() {
 	_apt_cache_madison_grep_wrapper "apt-cache showsrc" "" $* | less
 }
+# Display currently installed version of a package
+apv() {
+	apol $* | grep '^ \*\*\*'
+}
 
 # Bash completion for the above functions:
 # Completing package names or filenames
@@ -165,6 +169,7 @@ complete -F _complete_apt_cache_package -o filenames apol
 complete -F _complete_apt_cache_package -o filenames ashow
 complete -F _complete_apt_cache_package -o filenames ashowsrc
 complete -F _complete_apt_cache_package -o filenames asrc
+complete -F _complete_apt_cache_package -o filenames apv
 
 # complete function for apt-cache packages
 # (extracted from /etc/bash/bash_completion)

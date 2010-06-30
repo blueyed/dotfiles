@@ -4,10 +4,13 @@ command! -nargs=* google open google <args>
 map s :google
 nmap s :google
 vmap s :google
-set guioptions=rbN
+" "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
+set guioptions=rb
 set popups=tab,resized
 set runtimepath=/home/daniel/.vimperator
 set wildoptions=sort
+" show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
+set showtabline=1
 
 
 " A builtin bit.ly shortener.

@@ -213,5 +213,6 @@ filetype plugin indent on
 set hidden
 
 " source ~/.vim/source.d/*.vim
-exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
+" exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
+:runtime! source.d/*.vim
 

@@ -1,17 +1,30 @@
 "2.3.1 (created: 2010/04/07 18:25:13)
 
-command! -nargs=* google open google <args>
-map s :google
-nmap s :google
-vmap s :google
+let mapleader=","
+
+" search shortcuts (without completion)
+command! -nargs=* gg open google <args>
+map s :gg<Space>
+nmap s :gg<Space>
+vmap s :gg<Space>
+
+" command to clear history
+command! clearhist js storage["history-command"].truncate(0)
+
+" Esc: abort request
+noremap <Esc> <C-c><Esc>
+
+noremap <F1> :tab<Space>:help<Space>
+
+set "nextpattern=\\bnext\\b,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b,nächste Seite,weiter"
+set "previouspattern=\\bprev|previous\\b,^<$,^(<<|«)$,^(<|«),(<|«)$,vorige Seite,zurück"
+
 " "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
 set guioptions=rb
 set popups=tab,resized
-set runtimepath=/home/daniel/.vimperator
-set wildoptions=sort
+set wildoptions=auto
 " show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
 set showtabline=1
-
 
 " A builtin bit.ly shortener.
 " Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
@@ -32,6 +45,17 @@ shortenURLBitLy = function (url) {
 	}
 EOF
 map <silent> gy :javascript shortenURLBitLy(buffer.URL);<CR>
+
+" Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
+autocmd VimperatorEnter .* emenu Tools.Sync.Connect
+autocmd VimperatorEnter .* emenu Tools.Sync.Sync Now
+autocmd VimperatorLeavePre .* emenu Tools.Sync.Sync Now
+
+" Pimp colors/layout
+hi! -append Hint font-size:11px;font-weight:bold;background:#fff;border:1px solid red;color:#000;font-family:monospace
+hi! -append StatusLine background-color:#ddd; color:#000; border-bottom:1px solid #666; border-top:1px solid #666;
+
+set errorbells visualbell
 
 source! ~/.vimperatorrc.local
 

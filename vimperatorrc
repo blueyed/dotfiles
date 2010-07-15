@@ -31,7 +31,7 @@ set showtabline=1
 javascript <<EOF
 shortenURLBitLy = function (url) {
 	var req = new XMLHttpRequest();
-		req.open("GET", "http://api.bit.ly/v3/shorten?login=blueyed&apiKey=R_a405dd06737e888ca6971b295b0b7a13&format=txt&longUrl=" + escape(url), true)
+		req.open("GET", "http://api.bit.ly/v3/shorten?login=blueyed&apiKey=R_a405dd06737e888ca6971b295b0b7a13&format=txt&longUrl=" + encodeURIComponent(url), true)
 		req.onreadystatechange = function (ev) {
 			if (req.readyState == 4) {
 				if (req.status == 200) {

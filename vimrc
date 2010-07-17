@@ -79,6 +79,8 @@ endif " has("autocmd")
 set tabstop=2
 set shiftwidth=2
 set noexpandtab
+" Expand tabs for Debian changelog. This is probably not the correct way.
+au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
 
 " Always display the status line
 set laststatus=2

@@ -69,6 +69,9 @@ javascript <<EOF
 })();
 EOF
 
+" reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
+nmap e :js events.feedkeys(":o http://reddit.com/" + document.getElementById("urlbar").value + "\<CR\>")<CR>
+bma -k=r http://reddit.com/r/%s/
 
 source! ~/.vimperatorrc.local
 

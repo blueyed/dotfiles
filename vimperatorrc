@@ -70,8 +70,16 @@ javascript <<EOF
 EOF
 
 " reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
-nmap e :js events.feedkeys(":o http://reddit.com/" + document.getElementById("urlbar").value + "\<CR\>")<CR>
-bma -k=r http://reddit.com/r/%s/
+" open current page with reddit toolbar (allows submitting)
+nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(document.getElementById("urlbar").value) + "\<CR\>")<CR>
+" add bookmark for subreddits (":o r")
+"bma -k=r http://reddit.com/r/%s/
+
+" focus content frame (workaround for FF4?! - does not work properly)
+"autocmd PageLoad ^http://www.reddit.com/tb/.* :js window.content.frames["inner_toolbar"].frames["reddit_link"].focus()
+
+" search leo.org in a new tab
+map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 
 source! ~/.vimperatorrc.local
 

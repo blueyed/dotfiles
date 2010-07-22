@@ -81,6 +81,9 @@ nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(docume
 " search leo.org in a new tab
 map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 
+" Clear mapping for Ubiquity
+map <C-k> <Nop>
+
 source! ~/.vimperatorrc.local
 
 " vim: set ft=vimperator:

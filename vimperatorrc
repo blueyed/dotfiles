@@ -81,6 +81,9 @@ nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(docume
 " XXX: content.wrappedJSObject.frames["inner_toolbar"] ...
 "autocmd PageLoad ^http://www.reddit.com/tb/.* js content.window.frames[1].window.frames[1].focus()
 
+" command to replace all image links with the actual image (most useful with post-a-picture threads)
+command! inlineimages js (function($) {var x=$(".content").find("a").each(function(){var href=$(this).attr("href");if((!$(this).hasClass("drowsapMorphed")) && ($(this).next(".drowsapMorphed").length==0) && href && (href.indexOf('imgur')>=0 || href.indexOf('jpeg')>=0 || href.indexOf('jpg')>=0  || href.indexOf('png')>=0)){var ext =(href.indexOf('imgur')>=0 && href.indexOf('jpg')<0 && href.indexOf('png')<0) ? '.jpg' :''; var img = $("<a class='drowsapMorphed' href='"+href+"' target='blank' style='display:block'><img style='display:block;max-width:780px;' src='"+href+ ext+"' /></a>");$(this).after(img);}}); alert(2);})(Buffer.focusedWindow.wrappedJSObject.$ || $);
+
 " search leo.org in a new tab
 map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 

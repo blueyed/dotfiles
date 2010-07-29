@@ -2,16 +2,16 @@
 #
 # asearch:   apt-cache search
 # aup:       apt-get update
-# aupgrade:  apt-get upgrade -V
+# aupgrade:  aptitude upgrade -V
 # asup:      apt-get update -qq ; aptitude safe-upgrade
-# apurge:    apt-get purge
+# apurge:    aptitude purge
 # afs:       apt-file search
 # amad:      apt-cache madison
 # apol:      apt-cache policy
 #
 # The following support '-g PATTERN' (via apt-cache madison).
 # "asrc -g lucid hello" => "apt-get source hello=2.4-3"
-# ainst:     apt-get install
+# ainst:     aptitude install
 # asrc:      apt-get source
 # ashow:     apt-cache show
 # ashowsrc:  apt-cache showsrc
@@ -131,8 +131,8 @@ alias asearch="apt-cache search"
 alias amad="apt-cache madison"
 alias apol="apt-cache policy"
 alias aup="LANG=C sudo apt-get update"
-alias aupgrade="sudo apt-get upgrade -V"
-alias apurge="sudo apt-get purge"
+alias aupgrade="sudo aptitude upgrade -V"
+alias apurge="sudo aptitude purge"
 alias afs="apt-file search"
 alias asup="LANG=C sudo apt-get update -qq ; sudo aptitude safe-upgrade -V"
 
@@ -142,7 +142,7 @@ asrc() {
 	_apt_cache_madison_grep_wrapper "apt-get source" "Sources" $*
 }
 ainst() {
-	_apt_cache_madison_grep_wrapper "sudo apt-get install" "Packages" $*
+	_apt_cache_madison_grep_wrapper "sudo aptitude install" "Packages" $*
 }
 ashow() {
 	_apt_cache_madison_grep_wrapper "apt-cache show" "" $* | less

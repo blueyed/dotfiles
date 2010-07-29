@@ -20,7 +20,7 @@ alias debverprevubuntu="dpkg-parsechangelog --format rfc822 --count 1000 | grep 
 alias sdebuild='debuild -S -k3FE63E00 -v$(debverprevubuntu)'
 alias bts='DEBEMAIL=debian-bugs@thequod.de bts --sendmail "/usr/sbin/sendmail -f$DEBEMAIL -t"'
 # alias m=less
-alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git'
+alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git --exclude-dir=.hg'
 xrgrep() { xgrep -R "$@" . }
 alias connect-to-moby='ssh -t hahler.de "su -c \"screen -RD\""'
 alias o=xdg-open

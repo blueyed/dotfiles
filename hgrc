@@ -1,0 +1,8 @@
+[ui]
+username = Daniel Hahler <hg@thequod.de>
+
+[extensions]
+hgext.patchbomb =
+
+[email]
+method = /usr/sbin/sendmail

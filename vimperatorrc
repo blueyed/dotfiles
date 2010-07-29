@@ -77,8 +77,9 @@ nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(docume
 " add bookmark for subreddits (":o r")
 "bma -k=r http://reddit.com/r/%s/
 
-" focus content frame (workaround for FF4?! - does not work properly)
-"autocmd PageLoad ^http://www.reddit.com/tb/.* :js window.content.frames["inner_toolbar"].frames["reddit_link"].focus()
+" focus content frame (workaround for FF4?!)
+" XXX: content.wrappedJSObject.frames["inner_toolbar"] ...
+"autocmd PageLoad ^http://www.reddit.com/tb/.* js content.window.frames[1].window.frames[1].focus()
 
 " search leo.org in a new tab
 map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=

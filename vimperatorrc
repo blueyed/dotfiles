@@ -51,9 +51,10 @@ EOF
 map <silent> gy :javascript shortenURLBitLy(buffer.URL);<CR>
 
 " Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
-autocmd VimperatorEnter .* emenu Tools.Sync.Connect
-autocmd VimperatorEnter .* emenu Tools.Sync.Sync Now
-autocmd VimperatorLeavePre .* emenu Tools.Sync.Sync Now
+" NOTE: gets triggered when opening a new window, too. With some Sync UI again in the status bar, this is not necessary anymore.
+"autocmd VimperatorEnter .* emenu Tools.Sync.Connect
+"autocmd VimperatorEnter .* emenu Tools.Sync.Sync Now
+"autocmd VimperatorLeavePre .* emenu Tools.Sync.Sync Now
 
 colorscheme blueyed
 

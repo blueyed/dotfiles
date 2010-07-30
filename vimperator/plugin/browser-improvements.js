@@ -1,4 +1,4 @@
-var INFO = 
+var INFO =
 <plugin name="browser-improvements" version="0.1"
         href="http://ticket.vimperator.org/131"
         summary="Browser Consistency Improvements"
@@ -65,11 +65,11 @@ function parseForm(submit)
 function clickListener(event)
 {
     let elem = event.target;
-    if (elem instanceof HTMLAnchorElement) {
-        if (/^_/.test(elem.getAttribute("target")))
-            elem.removeAttribute("target");
-	return;
-    }
+//  if (elem instanceof HTMLAnchorElement) {
+//      if (/^_/.test(elem.getAttribute("target")))
+//          elem.removeAttribute("target");
+//      return;
+//  }
     if (!(elem instanceof HTMLInputElement) || elem.type != "submit")
         return;
     if (elem.ownerDocument.defaultView.top != content)

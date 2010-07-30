@@ -40,6 +40,17 @@
 	editor = vim
 	whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
 	autocrlf = input
+[diff]
+	tool = bc3
+[difftool "bc3"]
+	cmd = bcomp $LOCAL $REMOTE
+[difftool]
+	prompt = false
+[merge]
+	tool = bc3
+[mergetool "bc3"]
+	cmd = bcomp $LOCAL $REMOTE $BASE $MERGED
+	trustExitCode = true
 [format]
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 

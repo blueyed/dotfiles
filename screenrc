@@ -9,3 +9,4 @@ hardstatus string "SCREEN @ %H: %-n - %t"
 # Do not leave old content (e.g. from less/vim) on the screen, when exiting
 altscreen on
 
+bindkey -m ^[w eval "stuff ' '" writebuf "exec sh -c 'xsel < /tmp/screen-exchange'"

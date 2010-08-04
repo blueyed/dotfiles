@@ -88,6 +88,9 @@ command! inlineimages js (function($) {var x=$(".content").find("a").each(functi
 " search leo.org in a new tab
 map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 
+" Open current location via Coral CDN
+map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace(/(\.\w{2,4})\//, "$1.nyud.net/")<CR>
+
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 

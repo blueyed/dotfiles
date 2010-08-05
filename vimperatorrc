@@ -17,8 +17,8 @@ noremap <Esc> <C-c><Esc>
 noremap <F1> :tab<Space>:help<Space>
 
 " prev/next for german keyboard layout
-nmap <silent> ö :js events.feedkeys("[[")<CR>
-nmap <silent> ä :js events.feedkeys("]]")<CR>
+nmap <silent> ö :js buffer.followDocumentRelationship("previous")<CR>
+nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
 
 set nextpattern="\\bnext\\b,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b,nächste Seite,weiter,\\bvor(wärts)?\\b"
 set previouspattern="\\bprev|previous\\b,^<$,^(<<|«)$,^(<|«),(<|«)$,vorige Seite,zurück"

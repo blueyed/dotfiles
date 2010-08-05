@@ -8,6 +8,7 @@
 # afs:       apt-file search
 # amad:      apt-cache madison
 # apol:      apt-cache policy
+# apv:       Display currently installed version of a package (via apol)
 #
 # The following support '-g PATTERN' (via apt-cache madison).
 # "asrc -g lucid hello" => "apt-get source hello=2.4-3"

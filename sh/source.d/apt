@@ -1,9 +1,9 @@
 # Aliases and functions for apt-* command expansion.
 #
 # asearch:   apt-cache search
-# aup:       apt-get update
+# aup:       aptitude update
 # aupgrade:  aptitude upgrade -V
-# asup:      apt-get update -qq ; aptitude safe-upgrade
+# asup:      aptitude update -q2 ; aptitude safe-upgrade
 # apurge:    aptitude purge
 # afs:       apt-file search
 # amad:      apt-cache madison
@@ -131,11 +131,11 @@ _apt_cache_madison_grep_wrapper() {
 alias asearch="apt-cache search"
 alias amad="apt-cache madison"
 alias apol="apt-cache policy"
-alias aup="LANG=C sudo apt-get update"
+alias aup="LANG=C sudo aptitude update"
 alias aupgrade="sudo aptitude upgrade -V"
 alias apurge="sudo aptitude purge"
 alias afs="apt-file search"
-alias asup="LANG=C sudo apt-get update -qq ; sudo aptitude safe-upgrade -V"
+alias asup="LANG=C sudo aptitude update -q2 ; sudo aptitude safe-upgrade -V"
 
 # Install source package, supports grepping in $2 to fetch a specific version
 # E.g. "asrc -g gutsy hello" will become "apt-get source hello=2.2-2"

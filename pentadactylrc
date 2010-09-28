@@ -1,0 +1,102 @@
+"2.3.1 (created: 2010/04/07 18:25:13)
+
+let mapleader=","
+
+" search shortcuts (without completion)
+command! -nargs=* gg open google <args>
+map s :gg<Space>
+nmap s :gg<Space>
+vmap s :gg<Space>
+
+" command to clear history
+command! clearhist js storage["history-command"].truncate(0)
+
+" Esc: abort request
+noremap <Esc> <C-c><Esc>
+
+noremap <F1> :tab<Space>:help<Space>
+
+" prev/next for german keyboard layout
+nmap <silent> ö :js buffer.followDocumentRelationship("previous")<CR>
+nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
+
+set nextpattern="\^>$,^(>>|»)$,^(>|»),(>|»)$,\bnext\\b,\\bmore\\b,nächste Seite,weiter,\\bvor(wärts)?\\b"
+set previouspattern="\^<$,^(<<|«)$,^(<|«),(<|«)$,\bprev|previous\\b,vorige Seite,zurück"
+
+" "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
+set guioptions=rb
+set popups=tab,resized
+" show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
+set showtabline=1
+
+" A builtin bit.ly shortener.
+" Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
+javascript <<EOF
+shortenURLBitLy = function (url) {
+	var req = new XMLHttpRequest();
+		req.open("GET", "http://api.bit.ly/v3/shorten?login=blueyed&apiKey=R_a405dd06737e888ca6971b295b0b7a13&format=txt&longUrl=" + encodeURIComponent(url), true)
+		req.onreadystatechange = function (ev) {
+			if (req.readyState == 4) {
+				if (req.status == 200) {
+					util.copyToClipboard(req.responseText, true);
+				} else {
+					liberator.echo(req.responseText);
+				}
+			}
+		}
+		req.send(null);
+	}
+EOF
+map <silent> gy :javascript shortenURLBitLy(buffer.URL);<CR>
+
+" Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
+" NOTE: gets triggered when opening a new window, too. With some Sync UI again in the status bar, this is not necessary anymore.
+"autocmd VimperatorEnter .* emenu Tools.Sync.Connect
+"autocmd VimperatorEnter .* emenu Tools.Sync.Sync Now
+"autocmd VimperatorLeavePre .* emenu Tools.Sync.Sync Now
+
+colorscheme blueyed
+
+set errorbells visualbell
+
+" rss-icon in statusbar, via http://code.google.com/p/vimperator-labs/issues/detail?id=237
+javascript <<EOF
+(function(){
+	var feedPanel = document.createElement("statusbarpanel");
+	feedPanel.setAttribute("id", "feed-panel-clone");
+	feedPanel.appendChild(document.getElementById("feed-button"));
+	feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
+	document.getElementById("status-bar")
+	.insertBefore(feedPanel, document.getElementById("security-button"));
+})();
+EOF
+
+" reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
+" open current page with reddit toolbar (allows submitting)
+nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(document.getElementById("urlbar").value) + "\<CR\>")<CR>
+" add bookmark for subreddits (":o r")
+"bma -k=r http://reddit.com/r/%s/
+
+" focus content frame (workaround for FF4?!)
+" XXX: content.wrappedJSObject.frames["inner_toolbar"] ...
+"autocmd PageLoad ^http://www.reddit.com/tb/.* js content.window.frames[1].window.frames[1].focus()
+
+" command to replace all image links with the actual image (most useful with post-a-picture threads)
+" based on some snippet from reddit, but adopted for Vimperator; add allFrames and maxHeight handling
+command! inlineimages js (function($) {orig$=$; $.each(buffer.allFrames, function(){win=this.wrappedJSObject; $=function(sel){return orig$(sel, win.document)} ; win.document.ondragstart=function(){return false};dst=function(e){return (p=Math.pow)(p(e.clientX-(rc=e.target.getBoundingClientRect()).left,2)+p(e.clientY-rc.top,2),.5)};$("[href~=imgur]").not($(t="[href$=jpeg],[href$=gif],[href$=png],[href$=jpg]")).each(function(){this.href+='.jpg'});void($(t).not(".EGraw").attr({'class':'EGraw',target:'blank'}).each(function(){$(this).append($('<span />').toggle(function(e){$(this).html(' [-]').next().show();return false},function(e){$(this).html(' [+]').next().hide();return false}).click()).append($('<img>').attr({src:this.href,style:'display:block;max-width:500px;max-height:500px',title:'Drag to resize'}).mousedown(function(e){(t=this.wrappedJSObject).iw=t.width;t.d=dst(e);t.dr=false;t.style.maxHeight="none";e.preventDefault();}).mousemove(function(e){if((t=this.wrappedJSObject).d){t.style.maxWidth=t.style.width=((dst(e))*t.iw/t.d)+"px";t.dr=true}}).mouseout(f=function(e){(t=this.wrappedJSObject).d=false;if(t.dr)return false}).click(f))}))})})(content.wrappedJSObject.$ || $);
+
+
+" search leo.org in a new tab
+map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
+
+" Open current location via Coral CDN
+map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace(/(\.\w{2,4})\//, "$1.nyud.net/")<CR>
+
+" Clear mapping for Ubiquity
+map <C-k> <Nop>
+
+qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
+
+source! ~/.vimperatorrc.local
+
+" vim: set ft=vimperator:

@@ -135,7 +135,7 @@ alias aup="LANG=C sudo aptitude update"
 alias aupgrade="sudo aptitude upgrade -V"
 alias apurge="sudo aptitude purge"
 alias afs="apt-file search"
-alias asup="LANG=C sudo aptitude update -q2 && sudo aptitude safe-upgrade -V"
+alias asup="LANG=C verynice sudo aptitude update -q2 && verynice sudo aptitude safe-upgrade -V"
 
 # Install source package, supports grepping in $2 to fetch a specific version
 # E.g. "asrc -g gutsy hello" will become "apt-get source hello=2.2-2"

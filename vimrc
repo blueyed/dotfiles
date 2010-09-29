@@ -214,6 +214,9 @@ filetype plugin indent on
 
 set hidden
 
+" consider existing windows and tabs when opening files, e.g. from quickfix
+set switchbuf=usetab
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 :runtime! source.d/*.vim

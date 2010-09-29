@@ -26,7 +26,6 @@ set previouspattern="\^<$,^(<<|«)$,^(<|«),(<|«)$,\bprev|previous\\b,vorige Se
 " "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
 set guioptions=rb
 set popups=tab,resized
-set wildoptions=auto
 " show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
 set showtabline=1
 
@@ -63,12 +62,15 @@ set errorbells visualbell
 " rss-icon in statusbar, via http://code.google.com/p/vimperator-labs/issues/detail?id=237
 javascript <<EOF
 (function(){
-	var feedPanel = document.createElement("statusbarpanel");
-	feedPanel.setAttribute("id", "feed-panel-clone");
-	feedPanel.appendChild(document.getElementById("feed-button"));
-	feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
-	document.getElementById("status-bar")
-	.insertBefore(feedPanel, document.getElementById("security-button"));
+	var feedButton = document.getElementById("feed-button");
+	if ( feedButton ) {
+		var feedPanel = document.createElement("statusbarpanel");
+		feedPanel.setAttribute("id", "feed-panel-clone");
+		feedPanel.appendChild(feedButton);
+		feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
+		document.getElementById("status-bar")
+			.insertBefore(feedPanel, document.getElementById("security-button"));
+	}
 })();
 EOF
 

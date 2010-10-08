@@ -1,6 +1,9 @@
 "2.3.1 (created: 2010/04/07 18:25:13)
 
-let mapleader=","
+set mapleader=","
+set urlseparator=",\\s"
+
+" set! browser.dom.window.dump.enabled=true
 
 " search shortcuts (without completion)
 command! -nargs=* gg open google <args>
@@ -20,8 +23,8 @@ noremap <F1> :tab<Space>:help<Space>
 nmap <silent> ö :js buffer.followDocumentRelationship("previous")<CR>
 nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
 
-set nextpattern="\^>$,^(>>|»)$,^(>|»),(>|»)$,\bnext\\b,\\bmore\\b,nächste Seite,weiter,\\bvor(wärts)?\\b"
-set previouspattern="\^<$,^(<<|«)$,^(<|«),(<|«)$,\bprev|previous\\b,vorige Seite,zurück"
+set previouspattern=^<$,^(<<|«)$,^(<|«),(<|«)$,'\bprev|previous\b','vorige Seite',zurück
+set nextpattern=^>$,^(>>|»)$,^(>|»),(>|»)$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b'
 
 " "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
 set guioptions=rb
@@ -98,7 +101,7 @@ map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 
-qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
+silent qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
 
 source! ~/.vimperatorrc.local
 

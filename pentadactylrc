@@ -100,7 +100,7 @@ map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 
-qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
+silent qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
 
 source! ~/.vimperatorrc.local
 

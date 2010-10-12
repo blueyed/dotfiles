@@ -217,6 +217,10 @@ set hidden
 " consider existing windows and tabs when opening files, e.g. from quickfix
 set switchbuf=usetab
 
+" Maps for jj to act as Esc
+ino jj <esc>
+cno jj <c-c>
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 :runtime! source.d/*.vim

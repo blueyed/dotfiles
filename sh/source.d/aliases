@@ -52,7 +52,7 @@ alias rm="rm -i"
 alias cp="cp -i"
 alias mv="mv -i"
 
-c() {	cd "$@" ; ls }
+c() {	j "$@" ; ls }
 mdc() { mkdir "$@" && cd "$1" }
 
 alias verynice="nice ionice -c 2 -n 7"

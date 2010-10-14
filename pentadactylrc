@@ -5,6 +5,9 @@
 set mapleader=","
 set urlseparator=",\\s"
 
+" do not activate middle- or ctrl-clicked links
+set activate-=links
+
 " set! browser.dom.window.dump.enabled=true
 
 " search shortcuts (without completion)

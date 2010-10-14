@@ -1,5 +1,7 @@
 "2.3.1 (created: 2010/04/07 18:25:13)
 
+" set browser.dom.window.dump.enabled=true
+
 set mapleader=","
 set urlseparator=",\\s"
 

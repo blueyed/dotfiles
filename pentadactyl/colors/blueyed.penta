@@ -1,10 +1,10 @@
 " TODO: seet TabVisited extension: https://bugzilla.mozilla.org/show_bug.cgi?id=487242
 
 " Pimp colors/layout
-hi -append Hint font-size:11px;font-weight:bold;background:#fff;border:1px solid red;color:#000;font-family:monospace
-hi -append StatusLine background-color:#ddd; color:#000; border-bottom:1px solid #666; border-top:1px solid #666;
+hi -append Hint font-size:11px !important;font-weight:bold !important;background:#fff !important;border:1px solid red !important;color:#000 !important;font-family:monospace !important
+hi -append StatusLine background-color:#ddd !important; color:#000 !important; border-bottom:1px solid #666 !important; border-top:1px solid #666 !important
 
 
 style -name blueyedchrome chrome://* <<EOM
-	tab.tabbrowser-tab[selected="true"] { font-size:1.2em; font-weight:bold; }
+	tab.tabbrowser-tab[selected="true"] { font-size:1.2em !important; font-weight:bold !important; color:#000 !important }
 EOM

@@ -8,6 +8,9 @@ set urlseparator=",\\s"
 set! browser.dom.window.dump.enabled=true
 set! devtools.errorconsole.enabled=true
 
+" do not activate middle- or ctrl-clicked links
+set activate-=links
+
 " search shortcuts (without completion)
 command! -nargs=* gg open google <args>
 map s :gg<Space>

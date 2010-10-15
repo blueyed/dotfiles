@@ -5,7 +5,8 @@
 set mapleader=","
 set urlseparator=",\\s"
 
-" set! browser.dom.window.dump.enabled=true
+set! browser.dom.window.dump.enabled=true
+set! devtools.errorconsole.enabled=true
 
 " search shortcuts (without completion)
 command! -nargs=* gg open google <args>

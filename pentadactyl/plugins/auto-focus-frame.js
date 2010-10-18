@@ -65,7 +65,7 @@ let PLUGIN_INFO =
 
     let targetFrames = [
       frame
-      for (frame in util.Array.itervalues(content.frames))
+      for (frame in util.Array.iterValues(content.frames))
       if (frame.frameElement instanceof HTMLFrameElement)
     ];
 

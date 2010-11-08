@@ -1,11 +1,13 @@
 "2.3.1 (created: 2010/04/07 18:25:13)
 
-" set browser.dom.window.dump.enabled=true
+set mapleader=','
+set urlseparator='\|'
 
-set mapleader=","
-set urlseparator=",\\s"
+set! browser.dom.window.dump.enabled=true
+set! devtools.errorconsole.enabled=true
 
-" set! browser.dom.window.dump.enabled=true
+" do not activate middle- or ctrl-clicked links
+set activate-=links
 
 " search shortcuts (without completion)
 command! -nargs=* gg open google <args>
@@ -103,7 +105,7 @@ map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 
-silent qmark n blog.fefe.de, reddit.com, planet.ubuntu.com, planet.kde.org, planet.debian.org, heise.de, golem.de, spiegel.de, twitter.com, hahler.de
+silent qmark n blog.fefe.de | reddit.com | planet.ubuntu.com | planet.kde.org | planet.debian.org | heise.de | golem.de | spiegel.de | twitter.com | hahler.de
 
 source! ~/.vimperatorrc.local
 

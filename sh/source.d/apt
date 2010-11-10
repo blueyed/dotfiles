@@ -85,13 +85,9 @@ _apt_cache_madison_grep_wrapper() {
 				# Sort $PACKAGE using Dpkg::Version::version_compare on the version column
 				PACKAGE=$( echo "$PACKAGE" | perl -e '
 					use Dpkg::Version qw(version_compare);
-					@idx = (); @data = (<>);
-					for (@data) {
-						($item) = /\|\s+(\S+)/;
-						push @idx, uc($item);
-					}
-					@data = @data[ sort version_compare 0 .. $#idx ];
-					@parts = split(/\s+\|\s+/, @data[0]);
+					@data = (<>);
+					@sorted = map $_->[0], sort { version_compare($a->[1], $b->[1]) } map [$_, /\|\s+(\S+)/], @data;
+					@parts = split(/\s+\|\s+/, @sorted[-1]);
 					$s = "$parts[0]=$parts[1]";
 					$s =~ s/^\s+//;
 					print $s' )

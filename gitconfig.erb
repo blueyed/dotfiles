@@ -43,13 +43,13 @@
 [diff]
 	tool = bc3
 [difftool "bc3"]
-	cmd = bcomp $LOCAL $REMOTE
+	cmd = bcompare $LOCAL $REMOTE
 [difftool]
 	prompt = false
 [merge]
 	tool = bc3
 [mergetool "bc3"]
-	cmd = bcomp $LOCAL $REMOTE $BASE $MERGED
+	cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
 	trustExitCode = true
 [format]
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset

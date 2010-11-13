@@ -65,7 +65,7 @@ hints.addMode('C', "Generate curl command for", function(elem) {
 
     function escape(str) '"' + str.replace(/[\\"$]/g, "\\$&") + '"';
 
-    util.copyToClipboard(["curl"].concat(
+    dactyl.clipboardWrite(["curl"].concat(
         [].concat(
             [["--form-string", escape(datum)] for ([n, datum] in Iterator(elems || []))],
             data != null && !elems.length ? [["-d", escape("")]] : [],

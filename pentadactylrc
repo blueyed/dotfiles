@@ -45,9 +45,9 @@ shortenURLBitLy = function (url) {
 		req.onreadystatechange = function (ev) {
 			if (req.readyState == 4) {
 				if (req.status == 200) {
-					util.copyToClipboard(req.responseText, true);
+					dactyl.clipboardWrite(req.responseText, true);
 				} else {
-					liberator.echo(req.responseText);
+					dactyl.echo(req.responseText);
 				}
 			}
 		}

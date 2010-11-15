@@ -30,8 +30,6 @@ nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
 set previouspattern=^<$,^(<<|«)$,^(<|«),(<|«)$,'\bprev|previous\b','vorige Seite',zurück
 set nextpattern=^>$,^(>>|»)$,^(>|»),(>|»)$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b'
 
-" "N"/"n" broken with Tree Style Tab(http://code.google.com/p/vimperator-labs/issues/detail?id=340): set guioptions=rbN
-set guioptions=rb
 set popups=tab,resized
 " show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
 set showtabline=1

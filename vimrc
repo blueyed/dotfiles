@@ -1,5 +1,13 @@
 " based on http://github.com/jferris/config_files/blob/master/vimrc
 
+set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
+
+
+" enable pathogen, which allows bundles in vim/bundle
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+
+
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible

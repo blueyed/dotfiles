@@ -4,3 +4,6 @@
 [submodule "autojump"]
 	path = autojump
 	url = git@github.com:blueyed/autojump.git
+[submodule "vim/bundle/xmledit"]
+	path = vim/bundle/xmledit
+	url = http://github.com/sukima/xmledit.git

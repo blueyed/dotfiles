@@ -55,6 +55,15 @@ alias mv="mv -i"
 c() {	j "$@" ; ls }
 mdc() { mkdir "$@" && cd "$1" }
 
-alias verynice="nice ionice -c 2 -n 7"
+# verynice: wrap with ionice (if possible) and "nice -n19"
+_verynice_ionice=
+verynice() {
+  if [[ -z $_verynice_ionice && -x ${commands[ionice]} ]]; then
+    _verynice_ionice="ionice -c3" && $=_verynice_ionice true 2>/dev/null && echo "1" \
+    || ( _verynice_ionice="ionice -c2 -n7" && $=_verynice_ionice true 2>/dev/null ) \
+    || _verynice_ionice=
+  fi
+  nice -n 19 $=_verynice_ionice $@
+}
 
 alias hgu="hg pull -u"

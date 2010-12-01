@@ -56,3 +56,5 @@ c() {	j "$@" ; ls }
 mdc() { mkdir "$@" && cd "$1" }
 
 alias verynice="nice ionice -c 2 -n 7"
+
+alias hgu="hg pull -u"

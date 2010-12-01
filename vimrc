@@ -12,6 +12,8 @@ call pathogen#helptags()
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
+set encoding=utf8
+
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
@@ -97,24 +99,24 @@ set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ li
 let mapleader = ","
 
 " Edit the README_FOR_APP (makes :R commands work)
-map <Leader>R :e doc/README_FOR_APP<CR>
+"map <Leader>R :e doc/README_FOR_APP<CR>
 
 " Leader shortcuts for Rails commands
-map <Leader>m :Rmodel 
-map <Leader>c :Rcontroller 
-map <Leader>v :Rview 
-map <Leader>u :Runittest 
-map <Leader>f :Rfunctionaltest 
-map <Leader>tm :RTmodel 
-map <Leader>tc :RTcontroller 
-map <Leader>tv :RTview 
-map <Leader>tu :RTunittest 
-map <Leader>tf :RTfunctionaltest 
-map <Leader>sm :RSmodel 
-map <Leader>sc :RScontroller 
-map <Leader>sv :RSview 
-map <Leader>su :RSunittest 
-map <Leader>sf :RSfunctionaltest 
+"map <Leader>m :Rmodel
+"map <Leader>c :Rcontroller
+"map <Leader>v :Rview
+"map <Leader>u :Runittest
+"map <Leader>f :Rfunctionaltest
+"map <Leader>tm :RTmodel
+"map <Leader>tc :RTcontroller
+"map <Leader>tv :RTview
+"map <Leader>tu :RTunittest
+"map <Leader>tf :RTfunctionaltest
+"map <Leader>sm :RSmodel
+"map <Leader>sc :RScontroller
+"map <Leader>sv :RSview
+"map <Leader>su :RSunittest
+"map <Leader>sf :RSfunctionaltest
 
 " Hide search highlighting
 map <Leader>h :set invhls <CR>
@@ -161,8 +163,8 @@ imap <C-L> <Space>=><Space>
 " set list listchars=tab:»·,trail:·
 
 " Edit routes
-command! Rroutes :e config/routes.rb
-command! Rschema :e db/schema.rb
+"command! Rroutes :e config/routes.rb
+"command! Rschema :e db/schema.rb
 
 " Local config
 if filereadable(".vimrc.local")
@@ -216,8 +218,7 @@ set tags+=tags;/
 
 filetype plugin indent on
 
-" via
-" http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
+" via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
 
 set hidden
@@ -228,6 +229,9 @@ set switchbuf=usetab
 " Maps for jj to act as Esc
 ino jj <esc>
 cno jj <c-c>
+
+" close tags (useful for html)
+imap <Leader>/ </<C-X><C-O>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

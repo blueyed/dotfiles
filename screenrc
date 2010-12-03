@@ -10,3 +10,7 @@ hardstatus string "SCREEN @ %H: %-n - %t"
 altscreen on
 
 bindkey -m ^[w eval "stuff ' '" writebuf "exec sh -c 'xsel < /tmp/screen-exchange'"
+
+# Change to home directory (this is used for new windows by default)
+# for more/related discussion about this see: http://stackoverflow.com/questions/1517414/how-to-make-gnu-screen-start-a-new-window-at-the-current-working-directory
+chdir $HOME

@@ -127,11 +127,18 @@ _apt_cache_madison_grep_wrapper() {
 alias asearch="apt-cache search"
 alias amad="apt-cache madison"
 alias apol="apt-cache policy"
-alias aup="LANG=C sudo aptitude update"
-alias aupgrade="sudo aptitude upgrade -V"
-alias apurge="sudo aptitude purge"
 alias afs="apt-file search"
-alias asup="LANG=C verynice sudo aptitude update -q2 && verynice sudo aptitude safe-upgrade -V"
+if [[ $UID = 0 ]]; then
+	alias aup="LANG=C aptitude update"
+	alias aupgrade="aptitude upgrade -V"
+	alias apurge="aptitude purge"
+	alias asup="LANG=C verynice aptitude update -q2 && verynice aptitude safe-upgrade -V"
+else
+	alias aup="LANG=C sudo aptitude update"
+	alias aupgrade="sudo aptitude upgrade -V"
+	alias apurge="sudo aptitude purge"
+	alias asup="LANG=C verynice sudo aptitude update -q2 && verynice sudo aptitude safe-upgrade -V"
+fi
 
 # Install source package, supports grepping in $2 to fetch a specific version
 # E.g. "asrc -g gutsy hello" will become "apt-get source hello=2.2-2"
@@ -139,7 +146,11 @@ asrc() {
 	_apt_cache_madison_grep_wrapper "apt-get source" "Sources" $*
 }
 ainst() {
-	_apt_cache_madison_grep_wrapper "sudo aptitude install" "Packages" $*
+	if [[ $UID = 0 ]]; then
+		_apt_cache_madison_grep_wrapper "aptitude install" "Packages" $*
+  else
+		_apt_cache_madison_grep_wrapper "sudo aptitude install" "Packages" $*
+  fi
 }
 ashow() {
 	_apt_cache_madison_grep_wrapper "apt-cache show" "" $* | less

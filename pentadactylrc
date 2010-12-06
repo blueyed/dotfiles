@@ -106,6 +106,6 @@ map <C-k> <Nop>
 silent qmark n blog.fefe.de | reddit.com | planet.ubuntu.com | planet.kde.org | planet.debian.org | heise.de | golem.de | spiegel.de | twitter.com | hahler.de
 silent qmark r reddit.com
 
-source! ~/.vimperatorrc.local
+source! ~/.pentadactylrc.local
 
 " vim: set ft=vimperator:

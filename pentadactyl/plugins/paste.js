@@ -44,9 +44,9 @@ function pasteBin(arg) {
 	var url = "http://pastebin.com/api_public.php";
 	var http = new XMLHttpRequest();
 	var params = arg + "paste_code=";
-	var paste = util.readFromClipboard();
+	var paste = dactyl.clipboardRead();
 	if(!paste) {
-		liberator.echoerr("The clipboard is empty.\n"); 
+		dactyl.echoerr("The clipboard is empty.\n"); 
 		return;
 	} else {
 		params += paste;
@@ -61,8 +61,8 @@ function pasteBin(arg) {
 	http.send(params);
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
-			util.copyToClipboard(http.responseText);
-			liberator.echo("Yanked " + http.responseText);
+			dactyl.clipboardWrite(http.responseText);
+			dactyl.echo("Yanked " + http.responseText);
 		} 		
 	}
 }
@@ -212,7 +212,7 @@ var langlist = [    // looooooongcat, he's rather long.
 	['z80', 'z80 Assembler']];
 
 commands.addUserCommand(
-	"past[ebin]", 
+	["past[ebin]"], 
 	"pastebin the clipboard, store the address in clipboard",
 	function(args) { 
 		var prefix = "";
@@ -228,7 +228,7 @@ commands.addUserCommand(
 					break;
 				}
 			}
-			if(ok == 0) liberator.echo("language argument not recognized, defaulting to none");
+			if(ok == 0) dactyl.echo("language argument not recognized, defaulting to none");
 		}
 		if(args["-expire"]) {
 			var ok = 0;
@@ -240,7 +240,7 @@ commands.addUserCommand(
 				}
 			}
 			if(ok == 0) { 
-				liberator.echo("expire argument not recognized, defaulting to minutes");
+				dactyl.echo("expire argument not recognized, defaulting to minutes");
 				prefix += "paste_expire_date=10M&";
 			}
 		}

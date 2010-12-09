@@ -105,10 +105,33 @@ map <C-k> <Nop>
 
 silent qmark n blog.fefe.de | reddit.com | planet.ubuntu.com | planet.kde.org | planet.debian.org | heise.de | golem.de | spiegel.de | twitter.com | hahler.de
 silent qmark r reddit.com
+silent qmark t twitter.com
 
 autocmd LocationChange .* :set editor='gvim -f -c ''set ft=html'''
 autocmd LocationChange mail\\.google\\.com :set editor='gvim -f -c ''set ft=mail'''
 " autocmd LocationChange /phpmyadmin/ :set editor=gvim -f -c 'set ft=html'
+
+" use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
+set hintkeys=asdfgöälkjh
+
+" center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
+nnoremap <silent> zz :centerselect<CR>
+"nnoremap <silent> zz :centerselect "border: 5px solid orange;"<CR>
+nnoremap <silent> n n:norm zz<CR>
+nnoremap <silent> N N:norm zz<CR>
+nnoremap zH 10h
+nnoremap zL 10l
+nnoremap j 5j
+nnoremap k 5k
+nnoremap l 5l
+nnoremap h 5h
+nnoremap <silent> zt :topselect<CR>
+nnoremap <silent> zb :bottomselect<CR>
+nnoremap <silent> zc :removeselect<CR>
+
+" tab-options plugin:
+set tabclose=opener,previous,left,right
+
 
 source! ~/.pentadactylrc.local
 

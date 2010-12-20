@@ -15,6 +15,8 @@
 " Only basic settings needed to enforce the style guidelines are set.
 " Some suggested options are listed but commented out at the end of this file.
 
+if has("autocmd")
+
 " Number of spaces that a pre-existing tab is equal to.
 " For the amount of space used for a new tab use shiftwidth.
 au BufRead,BufNewFile *py,*pyw,*.c,*.h set tabstop=8
@@ -66,6 +68,7 @@ au BufRead,BufNewFile *.c,*.h set formatoptions-=c formatoptions-=o formatoption
 " C: yes
 au BufNewFile *.py,*.pyw,*.c,*.h set fileformat=unix
 
+endif
 
 " ----------------------------------------------------------------------------
 " The following section contains suggested settings.  While in no way required

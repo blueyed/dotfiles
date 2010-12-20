@@ -1,11 +1,14 @@
+"use strict";
+XML.ignoreWhitespace = false;
+XML.prettyPrinting   = false;
 var INFO =
 <plugin name="browser-improvements" version="0.1"
-        href="http://ticket.vimperator.org/131"
+        href="http://dactyl.sf.net/pentadactyl/plugins#browser-improvements-plugin"
         summary="Browser Consistency Improvements"
-        xmlns="http://vimperator.org/namespaces/liberator">
+        xmlns={NS}>
     <author email="maglione.k@gmail.com">Kris Maglione</author>
     <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Vimperator" minVersion="2.0"/>
+    <project name="Pentadactyl" minVersion="1.0"/>
     <p>
         This plugin provides various browser consistency improvements, including:
     </p>
@@ -15,24 +18,8 @@ var INFO =
     </ul>
 </plugin>;
 
-function isinstance(targ, src) {
-    const types = {
-        boolean: Boolean, string: String, function: Function, number: Number,
-    }
-    src = Array.concat(src);
-    for (var i=0; i < src.length; i++) {
-        if (targ instanceof src[i])
-            return true;
-        var type = types[typeof targ];
-        if (type && src[i] == type)
-            return true;
-    }
-    return false;
-}
-
 // Nuances gleaned from browser.jar/content/browser/browser.js
-function parseForm(submit)
-{
+function parseForm(submit) {
     function encode(name, value) {
         if (post)
             return name + "=" + value;
@@ -42,14 +29,16 @@ function parseForm(submit)
     let form = submit.form;
     let doc = form.ownerDocument;
     let charset = doc.charset;
-    let uri = window.makeURI(String(doc.URL), charset);
+    let uri = window.makeURI(String(doc.URL.replace(/\?.*/, "")), charset);
     let url = window.makeURI(form.getAttribute("action"), charset, uri).spec;
 
     let post = form.method.toUpperCase() == "POST";
 
     let elems = [encode(submit.name, submit.value)];
     for (let [,elem] in Iterator(form.elements)) {
-        if (/^(?:text|hidden|textarea)$/.test(elem.type) || elem.checked && /^(?:checkbox|radio)$/.test(elem.type))
+        if (set.has(Events.editableInputs, elem.type)
+                || /^(?:hidden|textarea)$/.test(elem.type)
+                || elem.checked && /^(?:checkbox|radio)$/.test(elem.type))
             elems.push(encode(elem.name, elem.value));
         else if (elem instanceof HTMLSelectElement) {
             for (let [,opt] in Iterator(elem.options))
@@ -62,14 +51,13 @@ function parseForm(submit)
     return [url + "?" + elems.join('&'), null];
 }
 
-function clickListener(event)
-{
+function clickListener(event) {
     let elem = event.target;
-//  if (elem instanceof HTMLAnchorElement) {
-//      if (/^_/.test(elem.getAttribute("target")))
-//          elem.removeAttribute("target");
-//      return;
-//  }
+    if (elem instanceof HTMLAnchorElement) {
+        if (/^_(?!top$)/.test(elem.getAttribute("target")))
+            elem.removeAttribute("target");
+        return;
+    }
     if (!(elem instanceof HTMLInputElement) || elem.type != "submit")
         return;
     if (elem.ownerDocument.defaultView.top != content)
@@ -80,8 +68,7 @@ function clickListener(event)
     liberator.open([parseForm(elem)], liberator.NEW_TAB);
 }
 
-function keypressListener(event)
-{
+function keypressListener(event) {
     let elem = event.target;
     let key = events.toString(event);
     function submit(form) {
@@ -95,8 +82,7 @@ function keypressListener(event)
 }
 
 let appContent = document.getElementById("appcontent");
-function onUnload()
-{
+function onUnload() {
     appContent.removeEventListener("click", clickListener, true);
     appContent.removeEventListener("keypress", keypressListener, true);
 }

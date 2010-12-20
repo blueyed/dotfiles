@@ -63,11 +63,7 @@ let PLUGIN_INFO =
     if (!(window.content.document instanceof HTMLDocument) || (content.frames.length <= 1))
       return;
 
-    let targetFrames = [
-      frame
-      for (frame in util.Array.iterValues(content.frames))
-      if (frame.frameElement instanceof HTMLFrameElement)
-    ];
+    let targetFrames = buffer.allFrames();
 
     let [maxSize, maxFrame] = [-1, null];
     targetFrames.forEach(function(frame) {

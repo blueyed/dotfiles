@@ -27,8 +27,8 @@ noremap <F1> :tab<Space>:help<Space>
 nmap <silent> ö :js buffer.followDocumentRelationship("previous")<CR>
 nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
 
-set previouspattern=^<$,^(<<|«)$,^(<|«),(<|«)$,'\bprev|previous\b','vorige Seite',zurück
-set nextpattern=^>$,^(>>|»)$,^(>|»),(>|»)$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b'
+set previouspattern=^<$,^<(?!<),[^<]<$,'\bprev|previous\b','vorige Seite',zurück,^(<<|«)$,^«,«$
+set nextpattern=^>$,^>(?!>),[^>]>$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b',^(>>|»)$,^»,»$
 
 set popups=tab,resized
 " show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)

@@ -202,6 +202,12 @@ CenterSelect.Selector.bottom = function(mystyle){
 	} catch(e) {
 		};
 };
+CenterSelect.Selector.remove = function(){
+	// var sf = content.document.getElementById("selectFocus");
+	if( selectFocus ) {
+		selectFocus.parentNode.removeChild(selectFocus);
+	}
+}
 
 // cannot use "_" in the command name; that is, center_select will not work
 commands.add(['centerselect'],
@@ -220,6 +226,12 @@ commands.add(['bottomselect'],
 		'run topselect from within vimperator.',
 		function(mystyle) {
 			CenterSelect.Selector.bottom(mystyle);
+		}
+		);
+commands.add(['removeselect'],
+		'run removeselect from within vimperator.',
+		function() {
+			CenterSelect.Selector.remove();
 		}
 		);
 

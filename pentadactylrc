@@ -27,12 +27,12 @@ noremap <F1> :tab<Space>:help<Space>
 nmap <silent> ö :js buffer.followDocumentRelationship("previous")<CR>
 nmap <silent> ä :js buffer.followDocumentRelationship("next")<CR>
 
-set previouspattern=^<$,^(<<|«)$,^(<|«),(<|«)$,'\bprev|previous\b','vorige Seite',zurück
-set nextpattern=^>$,^(>>|»)$,^(>|»),(>|»)$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b'
+set previouspattern=^<$,^<(?!<),[^<]<$,'\bprev|previous\b','vorige Seite',zurück,^(<<|«)$,^«,«$
+set nextpattern=^>$,^>(?!>),[^>]>$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b',^(>>|»)$,^»,»$
 
 set popups=tab,resized
-" show tab list only with 1+ tabs (makes much sense with Tree Style Tab, on the left)
-set showtabline=1
+" show tab line always (contains page loading indicator)
+set showtabline=2
 
 " A builtin bit.ly shortener.
 " Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
@@ -105,10 +105,35 @@ map <C-k> <Nop>
 
 silent qmark n blog.fefe.de | reddit.com | planet.ubuntu.com | planet.kde.org | planet.debian.org | heise.de | golem.de | spiegel.de | twitter.com | hahler.de
 silent qmark r reddit.com
+silent qmark t twitter.com
 
 autocmd LocationChange .* :set editor='gvim -f -c ''set ft=html'''
 autocmd LocationChange mail\\.google\\.com :set editor='gvim -f -c ''set ft=mail'''
 " autocmd LocationChange /phpmyadmin/ :set editor=gvim -f -c 'set ft=html'
+
+" use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
+set hintkeys=asdfgöälkjh
+
+" center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
+nnoremap <silent> zz :centerselect<CR>
+"nnoremap <silent> zz :centerselect "border: 5px solid orange;"<CR>
+nnoremap <silent> n n:norm zz<CR>
+nnoremap <silent> N N:norm zz<CR>
+nnoremap zH 10h
+nnoremap zL 10l
+nnoremap j 5j
+nnoremap k 5k
+nnoremap l 5l
+nnoremap h 5h
+nnoremap <silent> zt :topselect<CR>
+nnoremap <silent> zb :bottomselect<CR>
+nnoremap <silent> zc :removeselect<CR>
+
+loadplugins
+
+" tab-options plugin:
+set tabclose=opener,previous,left,right
+
 
 source! ~/.pentadactylrc.local
 

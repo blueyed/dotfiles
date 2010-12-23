@@ -3,9 +3,11 @@
 set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 
 
-" enable pathogen, which allows bundles in vim/bundle
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+if has("call")
+	" enable pathogen, which allows bundles in vim/bundle
+	call pathogen#runtime_append_all_bundles()
+	call pathogen#helptags()
+endif
 
 
 " Use Vim settings, rather then Vi settings (much better!).
@@ -89,14 +91,18 @@ endif " has("autocmd")
 set tabstop=2
 set shiftwidth=2
 set noexpandtab
-" Expand tabs for Debian changelog. This is probably not the correct way.
-au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
+if has("autocmd")
+	" Expand tabs for Debian changelog. This is probably not the correct way.
+	au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
+endif
 
 " Always display the status line
 set laststatus=2
 set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
-let mapleader = ","
+if has("let")
+	let mapleader = ","
+endif
 
 " Edit the README_FOR_APP (makes :R commands work)
 "map <Leader>R :e doc/README_FOR_APP<CR>
@@ -145,8 +151,9 @@ vmap D y'>p
 " overwriting the default register
 vmap P p :call setreg('"', getreg('0')) <CR>
 
-" For Haml
-au! BufRead,BufNewFile *.haml         setfiletype haml
+if has("autocmd")
+	au! BufRead,BufNewFile *.haml         setfiletype haml
+endif
 
 " No Help, please
 nmap <F1> <Esc>
@@ -155,7 +162,7 @@ nmap <F1> <Esc>
 imap <C-F> <C-R>=expand("%")<CR>
 
 " Maps autocomplete to tab
-imap <Tab> <C-N>
+" imap <Tab> <C-N>
 
 imap <C-L> <Space>=><Space>
 
@@ -177,7 +184,7 @@ if executable("ack")
 endif
 
 " Color scheme
-colorscheme desert
+silent! colorscheme desert
 " highlight NonText guibg=#060606
 " highlight Folded  guibg=#0A0A0A guifg=#9090D0
 
@@ -186,7 +193,7 @@ set nonumber
 set numberwidth=5
 
 " Snippets are activated by Shift+Tab
-let g:snippetsEmu_key = "<S-Tab>"
+" let g:snippetsEmu_key = "<S-Tab>"
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
@@ -201,13 +208,19 @@ set ignorecase smartcase
 set smarttab smartindent
 
 " Tags
-let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
+if has("let")
+	let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
+endif
 set tags=./tags;
 
-let g:fuf_splitPathMatching=1
+if has("let")
+	let g:fuf_splitPathMatching=1
+endif
 
-" Open URL
-command -bar -nargs=1 OpenURL :!open <args>
+if has("command")
+	" Open URL
+	command -bar -nargs=1 OpenURL :!open <args>
+endif
 
 
 set cursorline
@@ -216,7 +229,9 @@ set cursorline
 " Look for tags file in parent directories, upto "/"
 set tags+=tags;/
 
-filetype plugin indent on
+if has("filetype")
+	filetype plugin indent on
+endif
 
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
@@ -235,5 +250,5 @@ imap <Leader>/ </<C-X><C-O>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
-:runtime! source.d/*.vim
+runtime! source.d/*.vim
 

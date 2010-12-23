@@ -30,6 +30,10 @@ defscrollback 30000
 bindkey "^[[1;5C" next
 bindkey "^[[1;5D" prev
 
+# bind Shift+PgUp/PgDn
+bindkey -m "^[[5;2~" stuff ^b
+bindkey -m "^[[6;2~" stuff ^f
+
 # Change to home directory (this is used for new windows by default)
 # for more/related discussion about this see: http://stackoverflow.com/questions/1517414/how-to-make-gnu-screen-start-a-new-window-at-the-current-working-directory
 chdir $HOME

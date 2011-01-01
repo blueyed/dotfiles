@@ -23,12 +23,11 @@ alias bts='DEBEMAIL=debian-bugs@thequod.de bts --sendmail "/usr/sbin/sendmail -f
 alias xgrep='grep --exclude-dir=CVS --exclude-dir=.svn --exclude-dir=.bzr --exclude-dir=.git --exclude-dir=.hg'
 # xrgrep: recursive xgrep, path is optional (defaults to current dir)
 xrgrep() {
-	local p
-	if [ $# -gt 1 ]; then
-		p=$1
-		shift
+	local dir
+	if [ $# -lt 2 ]; then
+		dir=.
 	fi
-	xgrep -R ${p:-$@} $@
+	xgrep -R $@ ${dir:-}
 }
 alias connect-to-moby='ssh -t hahler.de "su -c \"screen -RD\""'
 alias o=xdg-open

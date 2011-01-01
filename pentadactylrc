@@ -127,10 +127,10 @@ nnoremap <silent> zt :topselect<CR>
 nnoremap <silent> zb :bottomselect<CR>
 nnoremap <silent> zc :removeselect<CR>
 
-loadplugins
+"loadplugins
 
 " tab-options plugin:
-set tabclose=opener,previous,left,right
+"set tabclose=opener,previous,left,right
 
 
 source! ~/.pentadactylrc.local

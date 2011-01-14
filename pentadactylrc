@@ -31,8 +31,6 @@ set previouspattern=^<$,^<(?!<),[^<]<$,'\bprev|previous\b','vorige Seite',zurüc
 set nextpattern=^>$,^>(?!>),[^>]>$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b',^(>>|»)$,^»,»$
 
 set popups=tab,resized
-" show tab line always (contains page loading indicator)
-set showtabline=2
 
 " A builtin bit.ly shortener.
 " Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
@@ -129,10 +127,10 @@ nnoremap <silent> zt :topselect<CR>
 nnoremap <silent> zb :bottomselect<CR>
 nnoremap <silent> zc :removeselect<CR>
 
-loadplugins
+"loadplugins
 
 " tab-options plugin:
-set tabclose=opener,previous,left,right
+"set tabclose=opener,previous,left,right
 
 
 source! ~/.pentadactylrc.local

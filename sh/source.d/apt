@@ -1,9 +1,9 @@
 # Aliases and functions for apt-* command expansion.
 #
 # asearch:   apt-cache search
-# aup:       aptitude update
+# aup:       apt-get update
 # aupgrade:  aptitude upgrade -V
-# asup:      aptitude update -q2 && aptitude safe-upgrade
+# asup:      apt-get update -qq && aptitude safe-upgrade
 # apurge:    aptitude purge
 # afs:       apt-file search
 # amad:      apt-cache madison
@@ -132,15 +132,15 @@ alias amad="apt-cache madison"
 alias apol="apt-cache policy"
 alias afs="apt-file search"
 if [[ $UID = 0 ]]; then
-	alias aup="LANG=C aptitude update"
+	alias aup="LANG=C apt-get update"
 	alias aupgrade="aptitude upgrade -V"
 	alias apurge="aptitude purge"
-	alias asup="LANG=C verynice aptitude update -q2 && verynice aptitude safe-upgrade -V"
+	alias asup="LANG=C verynice apt-get update -qq && verynice aptitude safe-upgrade -V"
 else
-	alias aup="LANG=C sudo aptitude update"
+	alias aup="LANG=C sudo apt-get update"
 	alias aupgrade="sudo aptitude upgrade -V"
 	alias apurge="sudo aptitude purge"
-	alias asup="LANG=C verynice sudo aptitude update -q2 && verynice sudo aptitude safe-upgrade -V"
+	alias asup="LANG=C verynice sudo apt-get update -q2 && verynice sudo aptitude safe-upgrade -V"
 fi
 
 # Install source package, supports grepping in $2 to fetch a specific version

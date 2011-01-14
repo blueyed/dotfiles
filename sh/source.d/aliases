@@ -29,7 +29,7 @@ xrgrep() {
 	fi
 	xgrep -R $@ ${dir:-}
 }
-alias connect-to-moby='ssh -t hahler.de "su -c \"screen -RD\""'
+alias connect-to-moby='ssh -t hahler.de "su -c \"screen -x byobu || { sleep 2 && byobu -S byobu }\""'
 alias o=xdg-open
 alias 7zpwd="7z a -mx0 -mhe=on -p"
 alias ag="ack-grep"

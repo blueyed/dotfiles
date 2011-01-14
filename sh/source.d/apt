@@ -49,10 +49,11 @@ _apt_cache_madison_grep_wrapper() {
 	done
 	shift $((OPTIND-1))
 
-	if [ -z $GREP_FOR ]; then
+	if [[ -z $GREP_FOR ]]; then
 		# Nothing to grep for, just execute:
-		echo "$COMMAND $@"
-		/bin/sh -c "$COMMAND $@"
+		echo $COMMAND $@
+		args=${*:q}
+		/bin/sh -c "$COMMAND $args"
 		return
 	fi
 
@@ -63,8 +64,10 @@ _apt_cache_madison_grep_wrapper() {
 		APT_MADISON="$( apt-cache madison "$ARG" )"
 		CANDIDATES=$( echo "$APT_MADISON" | grep "$GREP_FOR" )
 		[ $DEBUG ] && echo "CANDIDATES=\"$CANDIDATES\""
-		if [ -z $SELECTION ]; then
-			PACKAGE=$( echo "$CANDIDATES" | head -n 1 | awk '{print $1"="$3}' )
+		if [[ -z $SELECTION ]]; then
+			if [[ -n $CANDIDATES ]]; then
+				PACKAGE=$( echo "$CANDIDATES" | head -n 1 | awk '{print $1"="$3}' )
+			fi
 		else
 			# e.g. there is a Sources line for 2.2 in edgy, but
 			# no Packages for it. But the 2.2 Package in hardy is
@@ -73,7 +76,7 @@ _apt_cache_madison_grep_wrapper() {
 			# Get all versions of the candidates:
 			CAND_VERS="$( echo "$CANDIDATES" | awk '{ print $3 }' )"
 			[ $DEBUG ] && echo "CAND_VERS=\"$CAND_VERS\""
-			if [ -n "$CAND_VERS" ]; then
+			if [[ -n $CAND_VERS ]]; then
 				# build regexp for versions:
 				CAND_VERS=${(j:|:)${(f)${CAND_VERS//./\\.}//+/\\+}}
 				[ $DEBUG ] && echo "CAND_VERS=\"$CAND_VERS\""
@@ -94,7 +97,7 @@ _apt_cache_madison_grep_wrapper() {
 				[ $DEBUG ] && echo "PACKAGE=\"$PACKAGE\""
 			fi
 		fi
-		if [ -z $PACKAGE ]; then
+		if [[ -z $PACKAGE ]]; then
 			echo "No matching package found for '$ARG'. Aborting."
 
 			# split APT_MADISON by newline only:
@@ -103,7 +106,7 @@ _apt_cache_madison_grep_wrapper() {
 '
 			for line in $APT_MADISON; do
 				# If we need Packages|Sources, highlight both:
-				if [ -n "$SELECTION" ]; then
+				if [[ -n $SELECTION ]]; then
 					if echo "  $line" | grep --color=auto "$GREP_FOR" | grep --color=auto "$SELECTION"; then continue; fi
 					if echo "  $line" | grep --color=auto "$SELECTION"; then continue; fi
 				fi

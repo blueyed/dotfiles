@@ -115,8 +115,8 @@ set hintkeys=asdfgöälkjh
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
 nnoremap <silent> zz :centerselect<CR>
 "nnoremap <silent> zz :centerselect "border: 5px solid orange;"<CR>
-nnoremap <silent> n n:norm zz<CR>
-nnoremap <silent> N N:norm zz<CR>
+"nnoremap <silent> n n:norm zz<CR>
+"nnoremap <silent> N N:norm zz<CR>
 nnoremap zH 10h
 nnoremap zL 10l
 nnoremap j 5j

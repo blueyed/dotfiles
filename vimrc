@@ -184,7 +184,7 @@ if executable("ack")
 endif
 
 " Color scheme
-silent! colorscheme desert
+silent! colorscheme desert256
 " highlight NonText guibg=#060606
 " highlight Folded  guibg=#0A0A0A guifg=#9090D0
 

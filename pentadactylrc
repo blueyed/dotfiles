@@ -79,7 +79,7 @@ EOF
 
 " reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
 " open current page with reddit toolbar (allows submitting)
-nmap e :js events.feedkeys(":o http://reddit.com/s/" + encodeURIComponent(document.getElementById("urlbar").value) + "\<CR\>")<CR>
+nmap e -js dactyl.open("http://reddit.com/s/" + encodeURIComponent(buffer.uri.spec))
 " add bookmark for subreddits (":o r")
 "bma -k=r http://reddit.com/r/%s/
 

@@ -55,8 +55,7 @@ wpatch() {
 # auto ssh-add key
 alias ssh='if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi; ssh'
 
-# make file operations interactive by default
-alias rm="rm -i"
+# make (overwriting) file operations interactive by default
 alias cp="cp -i"
 alias mv="mv -i"
 

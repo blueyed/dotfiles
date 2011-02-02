@@ -3,7 +3,7 @@
 set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 
 
-if has("call")
+if has("user_commands")
 	" enable pathogen, which allows bundles in vim/bundle
 	call pathogen#runtime_append_all_bundles()
 	call pathogen#helptags()
@@ -103,7 +103,7 @@ endif
 set laststatus=2
 set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
-if has("let")
+if 1 " has('eval')
 	let mapleader = ","
 endif
 
@@ -207,18 +207,13 @@ set ignorecase smartcase
 set smarttab smartindent
 
 " Tags
-if has("let")
+if 1 " has('eval')
 	let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
 endif
 set tags=./tags;
 
-if has("let")
+if 1 " has('eval')
 	let g:fuf_splitPathMatching=1
-endif
-
-if has("command")
-	" Open URL
-	command -bar -nargs=1 OpenURL :!open <args>
 endif
 
 
@@ -228,7 +223,7 @@ set cursorline
 " Look for tags file in parent directories, upto "/"
 set tags+=tags;/
 
-if has("filetype")
+if has("osfiletype")
 	filetype plugin indent on
 endif
 
@@ -252,6 +247,7 @@ imap <Leader>/ </<C-X><C-O>
 runtime! source.d/*.vim
 
 " Open URL
+if has("user_commands")
 command -bar -nargs=1 OpenURL :!open <args>
 function! OpenURL()
   let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
@@ -263,4 +259,4 @@ function! OpenURL()
   endif
 endfunction
 map <Leader>w :call OpenURL()<CR>
-
+endif

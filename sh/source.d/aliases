@@ -57,7 +57,7 @@ alias ssh='if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi; ssh'
 
 # make (overwriting) file operations interactive by default
 alias cp="cp -i"
-alias mv="mv -i"
+alias mv="nocorrect mv -i"
 
 c() {	j "$@" ; ls }
 mdc() { mkdir "$@" && cd "$1" }

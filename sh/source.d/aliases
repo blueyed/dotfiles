@@ -65,7 +65,11 @@ alias ssh='if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi; ssh'
 alias cp="cp -i"
 alias mv="nocorrect mv -i"
 
-c() {	j "$@" ; ls }
+c() {
+	local prev=$PWD
+	[[ -d "$@" ]] && cd "$@" || j "$@"
+	[[ $PWD != $prev ]] && ls
+}
 mdc() { mkdir "$@" && cd "$1" }
 
 # verynice: wrap with ionice (if possible) and "nice -n19"

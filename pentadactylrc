@@ -35,7 +35,7 @@ set popups=tab,resized
 " A builtin bit.ly shortener.
 " Based on http://github.com/scy/dotscy/commit/4526f23a09b2ae51fb7f4b1e2ed3aec84f318fa5
 javascript <<EOF
-shortenURLBitLy = function (url) {
+function shortenURLBitLy (url) {
 	var req = new XMLHttpRequest();
 		req.open("GET", "http://api.bit.ly/v3/shorten?login=blueyed&apiKey=R_a405dd06737e888ca6971b295b0b7a13&format=txt&longUrl=" + encodeURIComponent(url), true)
 		req.onreadystatechange = function (ev) {
@@ -50,7 +50,7 @@ shortenURLBitLy = function (url) {
 		req.send(null);
 	}
 EOF
-map <silent> gy :javascript shortenURLBitLy(buffer.URL);<CR>
+map -silent gy -js shortenURLBitLy(buffer.URL)
 
 " Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
 " NOTE: gets triggered when opening a new window, too. With some Sync UI again in the status bar, this is not necessary anymore.

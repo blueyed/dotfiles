@@ -16,7 +16,7 @@ nmap s :gg<Space>
 vmap s :gg<Space>
 
 " command to clear history
-command! clearhist js storage["history-command"].truncate(0)
+" command! clearhist sanitize commandline
 
 " Esc: abort request
 noremap <Esc> <C-c><Esc>

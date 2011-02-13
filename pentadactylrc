@@ -132,7 +132,8 @@ nnoremap <silent> zc :removeselect<CR>
 " tab-options plugin:
 "set tabclose=opener,previous,left,right
 
-
-source! ~/.pentadactylrc.local
+if io.File("~/.pentadactylrc.local").exists()
+	source ~/.pentadactylrc.local
+endif
 
 " vim: set ft=vimperator:

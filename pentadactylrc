@@ -96,7 +96,8 @@ command! inlineimages js (function($) {orig$=$; $.each(buffer.allFrames, functio
 map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 
 " Open current location via Coral CDN
-map gp <silent> :js content.wrappedJSObject.document.location=buffer.URL.replace(/(\.\w{2,4})\//, "$1.nyud.net/")<CR>
+" String.replace is a workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=633830
+map gp -js dactyl.open( String.replace(buffer.URL, /(\.\w{2,4})\//, "$1.nyud.net/") )
 
 " Clear mapping for Ubiquity
 map <C-k> <Nop>

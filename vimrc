@@ -248,7 +248,7 @@ runtime! source.d/*.vim
 
 " Open URL
 if has("user_commands")
-command -bar -nargs=1 OpenURL :!open <args>
+command! -bar -nargs=1 OpenURL :!open <args>
 function! OpenURL()
   let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
   echo s:uri

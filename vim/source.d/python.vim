@@ -27,7 +27,7 @@ au BufRead,BufNewFile *py,*pyw,*.c,*.h set tabstop=8
 " C: tabs (pre-existing files) or 4 spaces (new files)
 au BufRead,BufNewFile *.py,*pyw set shiftwidth=4
 au BufRead,BufNewFile *.py,*.pyw set expandtab
-fu Select_c_style()
+fu! Select_c_style()
     if search('^\t', 'n', 150)
         set shiftwidth=8
         set noexpandtab

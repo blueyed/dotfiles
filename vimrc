@@ -101,7 +101,7 @@ endif
 
 " Always display the status line
 set laststatus=2
-set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+set statusline=%F%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
 if 1 " has('eval')
 	let mapleader = ","

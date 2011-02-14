@@ -16,7 +16,7 @@ hi Title               ctermfg=39              "
 hi Normal              ctermfg=153              " DEFAULT font color that will be used on all non-special characters
 
 hi Cursor              cterm=bold ctermfg=231 ctermbg=82
-hi CursorLine          cterm=reverse
+hi CursorLine          cterm=underline
 
 hi PreProc             ctermfg=220               " term after an identifier, ex: =bold
 hi Type                ctermfg=83              " any variable or characters being assigned a value, ex: style=, height=, etc...

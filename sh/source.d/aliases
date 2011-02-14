@@ -4,10 +4,12 @@ alias ..='cd ..'
 # ls
 export LS_OPTIONS='--color=auto'
 alias ls='ls $LS_OPTIONS'
-alias l='ls $LS_OPTIONS -FA'
-alias ll='ls $LS_OPTIONS -lAF'
+alias l='ls $LS_OPTIONS -F'
 alias la='ls $LS_OPTIONS -aF'
-alias lll='ll --color | less -R'
+alias ll='ls $LS_OPTIONS -lF'
+alias lla='ls $LS_OPTIONS -laF'
+alias lll='ll -a --color | less -R'
+alias lth='ll -t | head'
 
 # commands starting with % for pasting from web
 alias %=' '

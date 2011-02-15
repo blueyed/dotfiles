@@ -27,8 +27,8 @@ noremap <F1> :tab<Space>:help<Space>
 nmap -s -b ö [[
 nmap -s -b ä ]]
 
-set previouspattern=^<$,^<(?!<),[^<]<$,'\bprev|previous\b','vorige Seite',zurück,^(<<|«)$,^«,«$
-set nextpattern=^>$,^>(?!>),[^>]>$,'\bnext\b','\bmore\b','nächste Seite',weiter,'\bvor(wärts)?\b',^(>>|»)$,^»,»$
+set previouspattern=^<$,^<(?!<),[^<]<$,'vorige Seite',zurück,'^prev|previous$','\bprev|previous\b',^(<<|«)$,^«,«$
+set nextpattern=^>$,^>(?!>),[^>]>$,weiter,'nächste Seite','\bvor(wärts)?\b','^next|more$','\bnext|more\b',^(>>|»)$,^»,»$
 
 set popups=tab,resized
 
@@ -102,13 +102,16 @@ map gp -js dactyl.open( String.replace(buffer.URL, /(\.\w{2,4})\//, "$1.nyud.net
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 
-silent qmark n blog.fefe.de | reddit.com | planet.ubuntu.com | planet.kde.org | planet.debian.org | heise.de | golem.de | spiegel.de | twitter.com | hahler.de
+silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark r reddit.com
 silent qmark t twitter.com
 
 autocmd LocationChange .* :set editor='gvim -f -c ''set ft=html'''
 autocmd LocationChange ^mail\\..* :set editor='gvim -f -c ''set ft=mail'''
 " autocmd LocationChange /phpmyadmin/ :set editor=gvim -f -c 'set ft=html'
+
+" passthrough certain keys, see "h key-sequence" for a list
+set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
 
 " use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
 set hintkeys=asdfgöälkjh

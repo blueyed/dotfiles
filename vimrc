@@ -1,10 +1,12 @@
 " based on http://github.com/jferris/config_files/blob/master/vimrc
 
+" TODO: install https://github.com/vim-scripts/xterm-color-table.vim
+
 set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 
 " Local dirs
 set backupdir=~/.vim/backups
-set directory=~/.vim/swaps
+set directory=~/.vim/swaps,.
 set undodir=~/.vim/undo
 set shellslash
 "exec '!mkdir ' . shellescape(&backupdir)
@@ -279,14 +281,6 @@ endif
 
 " Sudo write (,W)
 noremap <leader>W :w !sudo tee %<CR>
-
-" Remap keys for auto-completion, disable arrow keys
-inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
-"inoremap <expr> <Down> pumvisible() ? "\<C-n>" : "\<NOP>"
-"inoremap <expr> <Up> pumvisible() ? "\<C-p>" : "\<NOP>"
-"inoremap <Left> <NOP>
-"inoremap <Right> <NOP>
 
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.

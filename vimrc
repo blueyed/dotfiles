@@ -2,6 +2,15 @@
 
 set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 
+" Local dirs
+set backupdir=~/.vim/backups
+set directory=~/.vim/swaps
+set undodir=~/.vim/undo
+set shellslash
+"exec '!mkdir ' . shellescape(&backupdir)
+"exec '!mkdir ' . shellescape(&directory)
+"exec '!mkdir ' . shellescape(&undodir)
+
 
 if has("user_commands")
 	" enable pathogen, which allows bundles in vim/bundle
@@ -166,11 +175,15 @@ imap <C-F> <C-R>=expand("%")<CR>
 imap <C-L> <Space>=><Space>
 
 " Display extra whitespace
-" set list listchars=tab:»·,trail:·
+set list listchars=tab:»·,trail:·,eol:¬,nbsp:_
+set fillchars=fold:-
+nnoremap <silent> <leader>c :set nolist!<CR>
+set nolist
 
-" Edit routes
-"command! Rroutes :e config/routes.rb
-"command! Rschema :e db/schema.rb
+" Paste toggle (,p)
+set pastetoggle=<leader>p
+map <leader>p :set invpaste paste?<CR>
+
 
 " Local config
 if filereadable(".vimrc.local")
@@ -242,9 +255,63 @@ cno jj <c-c>
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
 
+set undofile
+
+
+" Strip trailing whitespace (,ss)
+function! StripWhitespace ()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    :%s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfunction
+noremap <leader>ss :call StripWhitespace ()<CR>
+
+set relativenumber " Use relative line numbers. Current line is still in status bar.
+au BufReadPost * set relativenumber
+
+" Faster split resizing (+,-)
+if bufwinnr(1)
+  map + <C-W>+
+  map - <C-W>-
+endif
+
+" Sudo write (,W)
+noremap <leader>W :w !sudo tee %<CR>
+
+" Remap keys for auto-completion, disable arrow keys
+inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+"inoremap <expr> <Down> pumvisible() ? "\<C-n>" : "\<NOP>"
+"inoremap <expr> <Up> pumvisible() ? "\<C-p>" : "\<NOP>"
+"inoremap <Left> <NOP>
+"inoremap <Right> <NOP>
+
+" Easy indentation in visual mode
+" This keeps the visual selection active after indenting.
+" Usually the visual selection is lost after you indent it.
+vmap > >gv
+vmap < <gv
+
+" Syntax Checking entire file (Python)
+" Usage: :make (check file)
+" :clist (view list of errors)
+" :cn, :cp (move around list of errors)
+autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
+autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+
+" add semicolon to end of line if there is none
+noremap ; :s/\([^;]\)$/\1;/<cr>
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 runtime! source.d/*.vim
+
+
+" defined in php-doc.vim
+nnoremap <Leader>d :call PhpDocSingle()<CR>
+
 
 " Open URL
 if has("user_commands")

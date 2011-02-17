@@ -6,7 +6,6 @@ set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 
 " Local dirs
 set backupdir=~/.vim/backups
-set directory=~/.vim/swaps,.
 if has('persistent_undo')
 	set undodir=~/.vim/undo
 	set undofile

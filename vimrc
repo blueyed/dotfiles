@@ -7,7 +7,10 @@ set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
 " Local dirs
 set backupdir=~/.vim/backups
 set directory=~/.vim/swaps,.
-set undodir=~/.vim/undo
+if has('persistent_undo')
+	set undodir=~/.vim/undo
+	set undofile
+endif
 set shellslash
 "exec '!mkdir ' . shellescape(&backupdir)
 "exec '!mkdir ' . shellescape(&directory)
@@ -263,7 +266,6 @@ cno jj <c-c>
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
 
-set undofile
 
 
 " Strip trailing whitespace (,ss)
@@ -276,8 +278,10 @@ function! StripWhitespace ()
 endfunction
 noremap <leader>ss :call StripWhitespace ()<CR>
 
-set relativenumber " Use relative line numbers. Current line is still in status bar.
-au BufReadPost * set relativenumber
+if exists('+relativenumber')
+	set relativenumber " Use relative line numbers. Current line is still in status bar.
+	au BufReadPost * set relativenumber
+endif
 
 " Faster split resizing (+,-)
 if bufwinnr(1)

@@ -65,6 +65,9 @@ if has("autocmd")
   " Set File type to 'text' for files ending in .txt
   autocmd BufNewFile,BufRead *.txt setfiletype text
 
+  " Typoscript file type
+  au BufNewFile,BufRead *.ts setfiletype=typoscript
+
   " Enable soft-wrapping for text files
   autocmd FileType text,markdown,html,xhtml,eruby setlocal wrap linebreak nolist
 
@@ -195,6 +198,9 @@ endif
 " Use Ack instead of Grep when available
 if executable("ack")
   set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
+else
+	" this is for Windows/cygwin and to add -H
+	set grepprg=grep\ -nH\ $*\ /dev/null
 endif
 
 " Color scheme
@@ -306,6 +312,13 @@ runtime! source.d/*.vim
 " defined in php-doc.vim
 nnoremap <Leader>d :call PhpDocSingle()<CR>
 
+" Open Windows explorer and select current file
+command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
+
+noremap <Leader>n :NERDTreeToggle<cr>
+
+set wildmenu
+set sessionoptions+=unix,slash " for unix/windows compatibility
 
 " Open URL
 if has("user_commands")
@@ -320,4 +333,8 @@ function! OpenURL()
   endif
 endfunction
 map <Leader>w :call OpenURL()<CR>
+endif
+
+if filereadable("~/.vimrc.local")
+	source "~/.vimrc.local"
 endif

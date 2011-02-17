@@ -322,6 +322,7 @@ noremap <Leader>n :NERDTreeToggle<cr>
 
 set wildmenu
 set sessionoptions+=unix,slash " for unix/windows compatibility
+set nostartofline " do not go to start of line automatically when moving
 
 " Open URL
 if has("user_commands")

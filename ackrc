@@ -1,1 +1,2 @@
 --type-add=php=.inc
+--type-set=typoscript=.ts

@@ -2,6 +2,7 @@
 
 set mapleader=','
 set urlseparator='\|'
+set guioptions+=N
 
 set! browser.dom.window.dump.enabled=true
 set! devtools.errorconsole.enabled=true
@@ -136,8 +137,7 @@ nnoremap -silent zc :removeselect<CR>
 " tab-options plugin:
 "set tabclose=opener,previous,left,right
 
-if io.File("~/.pentadactylrc.local").exists()
-	source ~/.pentadactylrc.local
-endif
+
+source! ~/.pentadactylrc.local
 
 " vim: set ft=vimperator:

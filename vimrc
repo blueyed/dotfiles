@@ -328,6 +328,7 @@ noremap	<F1> :tab<Space>:help<Space>
 set wildmenu
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
+set scrolloff=3
 
 " Open URL
 if has("user_commands")

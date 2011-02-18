@@ -267,6 +267,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
     call <SID>X("Title", "cd5c5c", "", "")
     call <SID>X("Visual", "6b8e23", "f0e68c", "reverse")
     "VisualNOS
+    call <SID>X("Pmenu", "6b8e23", "f0e68c", "reverse")
     call <SID>X("WarningMsg", "fa8072", "", "")
     "WildMenu
     "Menu
@@ -315,6 +316,7 @@ else
     hi Title         ctermfg=5
     hi Visual        cterm=reverse
     hi VisualNOS     cterm=bold,underline
+    hi Pmenu         cterm=reverse
     hi WarningMsg    ctermfg=1
     hi WildMenu      ctermfg=0 ctermbg=3
     hi Folded        ctermfg=darkgrey ctermbg=NONE

@@ -213,6 +213,10 @@ silent! colorscheme desert256
 " Line numbers
 set nonumber
 set numberwidth=5
+if exists('+relativenumber') " 7.3
+	set relativenumber " Use relative line numbers. Current line is still in status bar.
+	au BufReadPost * set relativenumber
+endif
 
 " Snippets are activated by Shift+Tab
 " let g:snippetsEmu_key = "<S-Tab>"
@@ -255,8 +259,8 @@ endif
 
 set hidden
 
-" consider existing windows and tabs when opening files, e.g. from quickfix
-set switchbuf=usetab
+" consider existing windows (but not tabs) when opening files, e.g. from quickfix
+set switchbuf=useopen
 
 " Maps for jj to act as Esc
 ino jj <esc>
@@ -276,11 +280,6 @@ function! StripWhitespace ()
     call setreg('/', old_query)
 endfunction
 noremap <leader>ss :call StripWhitespace ()<CR>
-
-if exists('+relativenumber')
-	set relativenumber " Use relative line numbers. Current line is still in status bar.
-	au BufReadPost * set relativenumber
-endif
 
 " Faster split resizing (+,-)
 if bufwinnr(1)
@@ -311,6 +310,11 @@ noremap ; :s/\([^;]\)$/\1;/<cr>
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 runtime! source.d/*.vim
 
+" via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
+"nnoremap  <Down> <C-W>j<C-W>_
+"nnoremap  <Up> <C-W>k<C-W>_
+"nnoremap  <Right> <C-PageDown>_
+"nnoremap  <Left> <C-PageUp>_
 
 " defined in php-doc.vim
 nnoremap <Leader>d :call PhpDocSingle()<CR>
@@ -319,6 +323,7 @@ nnoremap <Leader>d :call PhpDocSingle()<CR>
 command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
 
 noremap <Leader>n :NERDTreeToggle<cr>
+noremap	<F1> :tab<Space>:help<Space>
 
 set wildmenu
 set sessionoptions+=unix,slash " for unix/windows compatibility

@@ -21,7 +21,7 @@
 	url = git://github.com/vim-scripts/grep.vim.git
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
-	url = git://github.com/xolox/vim-session.git
+	url = git://github.com/vim-scripts/session.vim--Odding.git
 [submodule "vim/bundle/command-t"]
 	path = vim/bundle/command-t
 	url = git://github.com/wincent/Command-T.git

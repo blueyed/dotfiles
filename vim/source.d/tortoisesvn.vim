@@ -23,4 +23,5 @@ endfunction
 map <silent> <Leader>tc :w<CR>:silent !start TortoiseProc.exe /command:commit /path:"%:p" /logmsg:"%:t: " /notempfile /closeonend<CR>
 
 " update
+map <silent> <Leader>tu :w<CR>:silent !start TortoiseProc.exe /command:update /path:"%:p" /notempfile /closeonend<CR>
 

@@ -93,6 +93,7 @@ if has("autocmd")
 
   augroup END
 
+	au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
 else
 
   set autoindent		" always set autoindenting on
@@ -293,8 +294,8 @@ noremap <leader>W :w !sudo tee %<CR>
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.
 " Usually the visual selection is lost after you indent it.
-vmap > >gv
-vmap < <gv
+"vmap > >gv
+"vmap < <gv
 
 " Syntax Checking entire file (Python)
 " Usage: :make (check file)

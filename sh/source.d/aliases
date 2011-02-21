@@ -14,6 +14,7 @@ alias lth='ll -t | head'
 # commands starting with % for pasting from web
 alias %=' '
 
+alias g='gvim --remote-silent'
 
 # Custom aliases (from ~/.bash_aliases)
 # Get previous ubuntu version from changelog (the one to use with -v for e.g. debuild)

@@ -22,3 +22,6 @@
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
 	url = git://github.com/xolox/vim-session.git
+[submodule "vim/bundle/command-t"]
+	path = vim/bundle/command-t
+	url = git://github.com/wincent/Command-T.git

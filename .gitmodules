@@ -28,3 +28,6 @@
 [submodule "vim/bundle/VimCalc"]
 	path = vim/bundle/VimCalc
 	url = git://github.com/gregsexton/VimCalc.git
+[submodule "vim/bundle/indent-guides"]
+	path = vim/bundle/indent-guides
+	url = git://github.com/nathanaelkane/vim-indent-guides.git

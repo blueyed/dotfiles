@@ -25,3 +25,6 @@
 [submodule "vim/bundle/command-t"]
 	path = vim/bundle/command-t
 	url = git://github.com/wincent/Command-T.git
+[submodule "vim/bundle/VimCalc"]
+	path = vim/bundle/VimCalc
+	url = git://github.com/gregsexton/VimCalc.git

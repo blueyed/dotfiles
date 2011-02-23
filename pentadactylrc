@@ -107,9 +107,9 @@ silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twit
 silent qmark r reddit.com
 silent qmark t twitter.com
 
-autocmd LocationChange .* :set editor='gvim -f -c ''set ft=html'''
-autocmd LocationChange ^mail\\..* :set editor='gvim -f -c ''set ft=mail'''
-" autocmd LocationChange /phpmyadmin/ :set editor=gvim -f -c 'set ft=html'
+autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
+autocmd LocationChange ^mail\\..*   :set editor='gvim -f -c ''set ft=mail | call cursor(<line>, <column>)'''
+autocmd LocationChange /phpmyadmin/ :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
 
 " passthrough certain keys, see "h key-sequence" for a list
 set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>

@@ -19,7 +19,7 @@ set shellslash
 if has("user_commands")
 	" enable pathogen, which allows bundles in vim/bundle
 	call pathogen#runtime_append_all_bundles()
-	call pathogen#helptags()
+	command! Mkhelptags call pathogen#helptags()
 endif
 
 
@@ -93,7 +93,7 @@ if has("autocmd")
 
   augroup END
 
-	au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
+  au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
 else
 
   set autoindent		" always set autoindenting on
@@ -114,6 +114,29 @@ set noexpandtab
 if has("autocmd")
 	" Expand tabs for Debian changelog. This is probably not the correct way.
 	au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
+
+	" Python
+	au FileType python setlocal tabstop=2 shiftwidth=4 expandtab textwidth=79 autoindent
+
+	" C
+	au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r
+	fu! Select_c_style()
+		if search('^\t', 'n', 150)
+			setlocal shiftwidth=8 noexpandtab
+    el 
+      setlocal shiftwidth=4 expandtab
+    en
+	endf
+	au FileType c call Select_c_style()
+	au FileType makefile setlocal noexpandtab
+
+	" Use the below highlight group when displaying bad whitespace is desired.
+	au FileType python highlight BadWhitespace ctermbg=red guibg=red
+
+	" Display tabs at the beginning of a line in Python mode as bad.
+	au FileType python call matchadd("BadWhitespace", '^\t\+')
+	" Make trailing whitespace be flagged as bad.
+	au FileType python call matchadd("BadWhitespace", '\s\+$')
 endif
 
 " Always display the status line
@@ -228,6 +251,11 @@ set completeopt=longest,menu
 set wildmode=list:longest,list:full
 set complete=.,t
 
+set wildmenu
+" move cursor instead of selecting entries (wildmenu)
+cnoremap <Left> <Space><BS><Left>
+cnoremap <Right> <Space><BS><Right>
+
 " case only matters with mixed case expressions
 set ignorecase smartcase
 
@@ -325,11 +353,41 @@ command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
 
 noremap <Leader>n :NERDTreeToggle<cr>
 noremap	<F1> :tab<Space>:help<Space>
+" ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
+noremap <F2> <C-]>
 
-set wildmenu
+
+" taglist plugin
+nnoremap <silent> <F8> :TlistToggle<CR>
+"let Tlist_Process_File_Always = 1
+
+set showmatch
+set matchtime=3
+inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
 set scrolloff=3
+set sidescroll=1
+
+" command-t plugin
+let g:CommandTMaxFiles=50000
+if has("autocmd")
+	" this is required for Command-T to pickup the setting(s)
+	au VimEnter * CommandTFlush
+endif
+
+" Smart way to move btw. windows
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" setup b:VCSCommandVCSType
+au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+
 
 " Open URL
 if has("user_commands")

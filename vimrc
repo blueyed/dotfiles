@@ -2,7 +2,8 @@
 
 " TODO: install https://github.com/vim-scripts/xterm-color-table.vim
 
-set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
+" replace ~/vimfiles with ~/.vim in runtimepath
+let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
 
 " Local dirs
 set backupdir=~/.vim/backups

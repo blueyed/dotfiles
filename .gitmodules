@@ -22,6 +22,9 @@
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
 	url = git://github.com/vim-scripts/session.vim--Odding.git
+[submodule "vim/bundle/bufkill"]
+	path = vim/bundle/bufkill
+	url = git://github.com/vim-scripts/bufkill.vim.git
 [submodule "vim/bundle/command-t"]
 	path = vim/bundle/command-t
 	url = git://github.com/wincent/Command-T.git
@@ -46,3 +49,6 @@
 [submodule "vim/bundle/vcscommand"]
 	path = vim/bundle/vcscommand
 	url = git://github.com/vim-scripts/vcscommand.vim.git
+[submodule "vim/bundle/gundo"]
+	path = vim/bundle/gundo
+	url = http://github.com/sjl/gundo.vim.git

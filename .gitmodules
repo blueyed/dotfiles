@@ -52,3 +52,12 @@
 [submodule "vim/bundle/gundo"]
 	path = vim/bundle/gundo
 	url = http://github.com/sjl/gundo.vim.git
+[submodule "vim/bundle/Rainbow-Parenthsis-Bundle"]
+	path = vim/bundle/Rainbow-Parenthsis-Bundle
+	url = git://github.com/vim-scripts/Rainbow-Parenthsis-Bundle.git
+[submodule "vim/bundle/ingretu"]
+	path = vim/bundle/ingretu
+	url = git://github.com/gmarik/ingretu.git
+[submodule "vim/bundle/xterm16"]
+	path = vim/bundle/xterm16
+	url = git://github.com/vim-scripts/xterm16.vim.git

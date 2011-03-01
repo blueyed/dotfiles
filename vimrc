@@ -396,8 +396,17 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " setup b:VCSCommandVCSType
+function! SetupVCSType()
+	try
+		call VCSCommandGetVCSType(bufnr('%'))
+	catch /No suitable plugin/
+	endtry
+endfunction
+" do not call it automatically for now: vcscommands behaves weird (changing
+" dirs), and slows simple scrolling (?) down (that might be quickfixsigns
+" though)
 if exists("*VCSCommandVCSType")
-	au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+"au BufRead * call SetupVCSType()
 endif
 
 

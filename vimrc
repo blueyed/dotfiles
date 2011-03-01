@@ -17,6 +17,7 @@ set shellslash
 
 
 if has("user_commands")
+	filetype off " just in case it was activated before
 	" enable pathogen, which allows bundles in vim/bundle
 	call pathogen#runtime_append_all_bundles()
 	command! Mkhelptags call pathogen#helptags()
@@ -89,8 +90,7 @@ if has("autocmd")
     \ endif
 
   " Automatically load .vimrc source when saved
-  autocmd BufWritePost .vimrc source $MYVIMRC
-
+  autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc source $MYVIMRC
   augroup END
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
@@ -362,6 +362,7 @@ noremap <F2> <C-]>
 nnoremap <silent> <F8> :TlistToggle<CR>
 "let Tlist_Process_File_Always = 1
 
+" handling of matches items, like braces
 set showmatch
 set matchtime=3
 inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a

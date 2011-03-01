@@ -383,6 +383,11 @@ if has("autocmd") && exists(":CommandTFlush")
 	" this is required for Command-T to pickup the setting(s)
 	au VimEnter * CommandTFlush
 endif
+if (has("gui_running"))
+	" use Alt-T in GUI mode
+	map <M-t> :CommandT<CR>
+	map <leader>t :CommandT<CR>
+endif
 
 " Smart way to move btw. windows
 map <C-j> <C-W>j

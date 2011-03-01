@@ -231,8 +231,10 @@ else
 endif
 
 " Color scheme
-silent! colorscheme desert256
-set background=dark " gets messed up by desert256 scheme
+"silent! colorscheme desert256
+silent! colorscheme xoria256
+"silent! colorscheme xterm16
+"set background=dark " gets messed up by desert256 scheme
 " highlight NonText guibg=#060606
 " highlight Folded  guibg=#0A0A0A guifg=#9090D0
 

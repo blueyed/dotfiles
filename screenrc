@@ -34,6 +34,10 @@ bindkey "^[[1;5D" prev
 bindkey -m "^[[5;2~" stuff ^b
 bindkey -m "^[[6;2~" stuff ^f
 
+# workaround https://bugs.launchpad.net/byobu/+bug/727466
+# if this causes problems try/use ".i" instead
+attrcolor b ""
+
 # Change to home directory (this is used for new windows by default)
 # for more/related discussion about this see: http://stackoverflow.com/questions/1517414/how-to-make-gnu-screen-start-a-new-window-at-the-current-working-directory
 chdir $HOME

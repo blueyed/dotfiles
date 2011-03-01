@@ -51,6 +51,9 @@
 [mergetool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
 	trustExitCode = true
+[merge "dpkg-mergechangelogs"]
+	name = debian/changelog merge driver
+	driver = dpkg-mergechangelogs -m %O %A %B %A
 [format]
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 

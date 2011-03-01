@@ -375,7 +375,7 @@ set sidescroll=1
 
 " command-t plugin
 let g:CommandTMaxFiles=50000
-if has("autocmd")
+if has("autocmd") && exists(":CommandTFlush")
 	" this is required for Command-T to pickup the setting(s)
 	au VimEnter * CommandTFlush
 endif
@@ -387,7 +387,9 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " setup b:VCSCommandVCSType
-au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+if exists("*VCSCommandVCSType")
+	au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+endif
 
 
 " Open URL

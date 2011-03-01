@@ -397,7 +397,7 @@ function! OpenURL()
   let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
   echo s:uri
   if s:uri != ""
-	  exec "!open \"" . s:uri . "\""
+	  exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
   else
 	  echo "No URI found in line."
   endif

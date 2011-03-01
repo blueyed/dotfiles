@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# switch from qwertz to neo layout and back (depending on command name)
+
+cmd=$(basename $0)
+
+local VARIANT OPTION
+
+case $cmd in
+	asdf) VARIANT=neo;;
+	uiae) VARIANT=basic; OPTION="-option ctrl:nocaps -option lv3:ralt_switch_multikey";;
+	*) exit 1;;
+esac
+	
+# empty option to reset
+echo setxkbmap -layout de -variant $VARIANT -option $OPTION
+setxkbmap -layout de -variant $VARIANT -option $OPTION
+

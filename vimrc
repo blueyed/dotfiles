@@ -2,7 +2,8 @@
 
 " TODO: install https://github.com/vim-scripts/xterm-color-table.vim
 
-set runtimepath=~/.vim,$VIMRUNTIME  "Use instead of "vimfiles" on windows
+" replace ~/vimfiles with ~/.vim in runtimepath
+let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
 
 " Local dirs
 set backupdir=~/.vim/backups
@@ -376,7 +377,7 @@ set sidescroll=1
 
 " command-t plugin
 let g:CommandTMaxFiles=50000
-if has("autocmd")
+if has("autocmd") && exists(":CommandTFlush")
 	" this is required for Command-T to pickup the setting(s)
 	au VimEnter * CommandTFlush
 endif
@@ -388,7 +389,9 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " setup b:VCSCommandVCSType
-au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+if exists("*VCSCommandVCSType")
+	au BufRead * try | call VCSCommandGetVCSType(bufnr('%')) | catch /No suitable plugin/ | endtry 
+endif
 
 
 " Open URL

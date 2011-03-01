@@ -409,6 +409,16 @@ if exists("*VCSCommandVCSType")
 "au BufRead * call SetupVCSType()
 endif
 
+" make search very magic by default (more PCRE style)
+nnoremap / /\v
+vnoremap / /\v
+
+nnoremap <tab> %
+vnoremap <tab> %
+
+" edit vimrc shortcut
+nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
+
 
 " Open URL
 if has("user_commands")

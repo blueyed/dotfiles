@@ -61,3 +61,6 @@
 [submodule "vim/bundle/xterm16"]
 	path = vim/bundle/xterm16
 	url = git://github.com/vim-scripts/xterm16.vim.git
+[submodule "vim/bundle/matchit"]
+	path = vim/bundle/matchit
+	url = git://github.com/vim-scripts/matchit.zip.git

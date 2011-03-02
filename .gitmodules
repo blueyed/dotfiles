@@ -1,72 +1,96 @@
 [submodule "oh-my-zsh"]
 	path = oh-my-zsh
 	url = git://github.com/blueyed/oh-my-zsh.git
+	ignore = untracked
 [submodule "autojump"]
 	path = autojump
 	url = git@github.com:blueyed/autojump.git
+	ignore = untracked
 [submodule "vim/bundle/xmledit"]
 	path = vim/bundle/xmledit
 	url = http://github.com/sukima/xmledit.git
+	ignore = untracked
 [submodule "vim/bundle/ack"]
 	path = vim/bundle/ack
 	url = git://github.com/mileszs/ack.vim.git
+	ignore = untracked
 [submodule "vim/bundle/taglist"]
 	path = vim/bundle/taglist
 	url = git://github.com/vim-scripts/taglist.vim.git
+	ignore = untracked
 [submodule "vim/bundle/occur"]
 	path = vim/bundle/occur
 	url = git://github.com/vim-scripts/occur.vim.git
+	ignore = untracked
 [submodule "vim/bundle/grep"]
 	path = vim/bundle/grep
 	url = git://github.com/vim-scripts/grep.vim.git
+	ignore = untracked
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
 	url = git://github.com/vim-scripts/session.vim--Odding.git
+	ignore = untracked
 [submodule "vim/bundle/bufkill"]
 	path = vim/bundle/bufkill
 	url = git://github.com/vim-scripts/bufkill.vim.git
+	ignore = untracked
 [submodule "vim/bundle/command-t"]
 	path = vim/bundle/command-t
 	url = git://github.com/wincent/Command-T.git
+	ignore = untracked
 [submodule "vim/bundle/VimCalc"]
 	path = vim/bundle/VimCalc
 	url = git://github.com/gregsexton/VimCalc.git
+	ignore = untracked
 [submodule "vim/bundle/indent-guides"]
 	path = vim/bundle/indent-guides
 	url = git://github.com/nathanaelkane/vim-indent-guides.git
+	ignore = untracked
 [submodule "vim/bundle/checksyntax"]
 	path = vim/bundle/checksyntax
 	url = git://github.com/tomtom/checksyntax_vim.git
+	ignore = untracked
 [submodule "vim/bundle/quickfixsigns"]
 	path = vim/bundle/quickfixsigns
 	url = git://github.com/tomtom/quickfixsigns_vim.git
+	ignore = untracked
 [submodule "vim/bundle/tlib"]
 	path = vim/bundle/tlib
 	url = git://github.com/tomtom/tlib_vim.git
+	ignore = untracked
 [submodule "vim/bundle/tmru"]
 	path = vim/bundle/tmru
 	url = git://github.com/tomtom/tmru_vim.git
+	ignore = untracked
 [submodule "vim/bundle/vcscommand"]
 	path = vim/bundle/vcscommand
 	url = git://github.com/vim-scripts/vcscommand.vim.git
+	ignore = untracked
 [submodule "vim/bundle/gundo"]
 	path = vim/bundle/gundo
 	url = http://github.com/sjl/gundo.vim.git
+	ignore = untracked
 [submodule "vim/bundle/Rainbow-Parenthsis-Bundle"]
 	path = vim/bundle/Rainbow-Parenthsis-Bundle
 	url = git://github.com/vim-scripts/Rainbow-Parenthsis-Bundle.git
+	ignore = untracked
 [submodule "vim/bundle/ingretu"]
 	path = vim/bundle/ingretu
 	url = git://github.com/gmarik/ingretu.git
+	ignore = untracked
 [submodule "vim/bundle/xterm16"]
 	path = vim/bundle/xterm16
 	url = git://github.com/vim-scripts/xterm16.vim.git
+	ignore = untracked
 [submodule "vim/bundle/matchit"]
 	path = vim/bundle/matchit
 	url = git://github.com/vim-scripts/matchit.zip.git
+	ignore = untracked
 [submodule "vim/bundle/extradite"]
 	path = vim/bundle/extradite
 	url = git://github.com/int3/vim-extradite.git
+	ignore = untracked
 [submodule "vim/bundle/supertab"]
 	path = vim/bundle/supertab
 	url = git://github.com/ervandew/supertab.git
+	ignore = untracked

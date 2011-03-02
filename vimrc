@@ -231,9 +231,6 @@ if exists('+relativenumber') " 7.3
   au BufReadPost * set relativenumber
 endif
 
-" Snippets are activated by Shift+Tab
-let g:snippetsEmu_key = "<S-Tab>"
-
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
 set completeopt=longest,menu
@@ -394,11 +391,12 @@ nnoremap / /\v
 vnoremap / /\v
 
 nmap <tab> %
-vmap <tab> %
+" conflicts with snipMate: vmap <tab> %
 
 " edit vimrc shortcut
 nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
 
+let g:snips_author = "Daniel Hahler"
 
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc

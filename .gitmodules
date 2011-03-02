@@ -64,3 +64,6 @@
 [submodule "vim/bundle/matchit"]
 	path = vim/bundle/matchit
 	url = git://github.com/vim-scripts/matchit.zip.git
+[submodule "vim/bundle/extradite"]
+	path = vim/bundle/extradite
+	url = git://github.com/int3/vim-extradite.git

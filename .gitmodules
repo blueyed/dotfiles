@@ -94,3 +94,6 @@
 	path = vim/bundle/snipmate
 	url = git://github.com/msanders/snipmate.vim.git
 	ignore = untracked
+[submodule "vim/bundle/tcomment"]
+	path = vim/bundle/tcomment
+	url = git://github.com/tomtom/tcomment_vim.git

@@ -312,8 +312,8 @@ noremap <leader>W :w !sudo tee % > /dev/null<CR>
 " :clist (view list of errors)
 " :cn, :cp (move around list of errors)
 " NOTE: should be provided by checksyntax plugin
-" autocmd BufRead *.py set makeprg=python\\\\\\\\ -c\\\\\\\\ \\\\\\\\"import\\\\\\\\ py_compile,sys;\\\\\\\\ sys.stderr=sys.stdout;\\\\\\\\ py_compile.compile(r'%')\\\\\\\\"
-" autocmd BufRead *.py set efm=%C\\ %.%#,%A\\ \\ File\\ \\"%f\\"\\\\,\\ line\\ %l%.%#,%Z%[%^\\ ]%\\\\@=%m
+" autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
+" autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 " add semicolon to end of line if there is none
 noremap ; :s/\([^;]\)$/\1;/<cr>

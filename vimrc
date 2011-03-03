@@ -8,20 +8,21 @@ let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand
 " Local dirs
 set backupdir=~/.vim/backups
 if has('persistent_undo')
-	set undodir=~/.vim/undo
-	set undofile
+  set undodir=~/.vim/undo
+  set undofile
+  if ! isdirectory(expand(&undodir))
+    echo "Creating undodir ".&undodir
+    call mkdir( shellescape(expand(&undodir)), "", 0700 )
+  endif
 endif
 set shellslash
-"exec '!mkdir ' . shellescape(&backupdir)
-"exec '!mkdir ' . shellescape(&directory)
-"exec '!mkdir ' . shellescape(&undodir)
 
 
 if has("user_commands")
-	filetype off " just in case it was activated before
-	" enable pathogen, which allows bundles in vim/bundle
-	call pathogen#runtime_append_all_bundles()
-	command! Mkhelptags call pathogen#helptags()
+  filetype off " just in case it was activated before
+  " enable pathogen, which allows bundles in vim/bundle
+  call pathogen#runtime_append_all_bundles()
+  command! Mkhelptags call pathogen#helptags()
 endif
 
 
@@ -36,10 +37,10 @@ set backspace=indent,eol,start
 
 set nobackup
 set nowritebackup
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
+set history=50    " keep 50 lines of command line history
+set ruler   " show the cursor position all the time
+set showcmd   " display incomplete commands
+set incsearch   " do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -54,6 +55,14 @@ if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   syntax on
   set hlsearch
 endif
+
+" Color scheme
+"silent! colorscheme desert256
+silent! colorscheme xoria256
+"silent! colorscheme xterm16
+"set background=dark " gets messed up by desert256 scheme
+" highlight NonText guibg=#060606
+" highlight Folded  guibg=#0A0A0A guifg=#9090D0
 
 " Switch wrap off for everything
 set nowrap
@@ -97,7 +106,7 @@ if has("autocmd")
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
 else
 
-  set autoindent		" always set autoindenting on
+  set autoindent    " always set autoindenting on
 
 endif " has("autocmd")
 
@@ -113,31 +122,46 @@ set tabstop=2
 set shiftwidth=2
 set noexpandtab
 if has("autocmd")
-	" Expand tabs for Debian changelog. This is probably not the correct way.
-	au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
+  " Expand tabs for Debian changelog. This is probably not the correct way.
+  au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
 
-	" Python
-	au FileType python setlocal tabstop=2 shiftwidth=4 expandtab textwidth=79 autoindent
+  " Python
+  au FileType python setlocal tabstop=2 shiftwidth=4 expandtab textwidth=79 autoindent
 
-	" C
-	au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r
-	fu! Select_c_style()
-		if search('^\t', 'n', 150)
-			setlocal shiftwidth=8 noexpandtab
-    el 
+  " C
+  au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r
+  fu! Select_c_style()
+    if search('^\t', 'n', 150)
+      setlocal shiftwidth=8 noexpandtab
+    el
       setlocal shiftwidth=4 expandtab
     en
-	endf
-	au FileType c call Select_c_style()
-	au FileType makefile setlocal noexpandtab
+  endf
+  au FileType c call Select_c_style()
+  au FileType makefile setlocal noexpandtab
 
-	" Use the below highlight group when displaying bad whitespace is desired.
-	au FileType python highlight BadWhitespace ctermbg=red guibg=red
+  " Whitespace highlighting
+  augroup vimrcExEOLWS
+    au!
+    highlight EOLWS ctermbg=red guibg=red
+    autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+    " highlight trailing whitespace, space before tab and tab not at the
+    " beginning of the line (except in comments):
+    autocmd InsertLeave,BufWinEnter *
+          \ if &ft != "diff" && &ft != "help" |
+          \ syn clear EOLWS |
+          \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
+          \ endif
+      " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
+    " add this for Python:
+    highlight PEP8WS ctermbg=red guibg=red
+    autocmd FileType python syn match PEP8WS excludenl /^\t\+/ containedin=ALL
+  augroup END
 
-	" Display tabs at the beginning of a line in Python mode as bad.
-	au FileType python call matchadd("BadWhitespace", '^\t\+')
-	" Make trailing whitespace be flagged as bad.
-	au FileType python call matchadd("BadWhitespace", '\s\+$')
+  " syntax mode setup
+  let python_highlight_all = 1
+  let php_sql_query = 1
+  let php_htmlInStrings = 1
 endif
 
 " Always display the status line
@@ -145,28 +169,8 @@ set laststatus=2
 set statusline=%F%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
 if 1 " has('eval')
-	let mapleader = ","
+  let mapleader = ","
 endif
-
-" Edit the README_FOR_APP (makes :R commands work)
-"map <Leader>R :e doc/README_FOR_APP<CR>
-
-" Leader shortcuts for Rails commands
-"map <Leader>m :Rmodel
-"map <Leader>c :Rcontroller
-"map <Leader>v :Rview
-"map <Leader>u :Runittest
-"map <Leader>f :Rfunctionaltest
-"map <Leader>tm :RTmodel
-"map <Leader>tc :RTcontroller
-"map <Leader>tv :RTview
-"map <Leader>tu :RTunittest
-"map <Leader>tf :RTfunctionaltest
-"map <Leader>sm :RSmodel
-"map <Leader>sc :RScontroller
-"map <Leader>sv :RSview
-"map <Leader>su :RSunittest
-"map <Leader>sf :RSfunctionaltest
 
 " Hide search highlighting
 map <Leader>h :set invhls <CR>
@@ -192,22 +196,16 @@ vmap D y'>p
 vmap P p :call setreg('"', getreg('0')) <CR>
 
 if has("autocmd")
-	au! BufRead,BufNewFile *.haml         setfiletype haml
+  au! BufRead,BufNewFile *.haml         setfiletype haml
 endif
-
-" No Help, please
-nmap <F1> <Esc>
 
 " Press ^F from insert mode to insert the current file name
 imap <C-F> <C-R>=expand("%")<CR>
 
-" Maps autocomplete to tab
-" imap <Tab> <C-N>
-
 imap <C-L> <Space>=><Space>
 
 " Display extra whitespace
-set list listchars=tab:»·,trail:·,eol:¬,nbsp:_
+set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 nnoremap <silent> <leader>c :set nolist!<CR>
 set nolist
@@ -217,37 +215,21 @@ set pastetoggle=<leader>p
 map <leader>p :set invpaste paste?<CR>
 
 
-" Local config
-if filereadable(".vimrc.local")
-  source .vimrc.local
-endif
-
 " Use Ack instead of Grep when available
 if executable("ack")
   set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
 else
-	" this is for Windows/cygwin and to add -H
-	set grepprg=grep\ -nH\ $*\ /dev/null
+  " this is for Windows/cygwin and to add -H
+  set grepprg=grep\ -nH\ $*\ /dev/null
 endif
-
-" Color scheme
-"silent! colorscheme desert256
-silent! colorscheme xoria256
-"silent! colorscheme xterm16
-"set background=dark " gets messed up by desert256 scheme
-" highlight NonText guibg=#060606
-" highlight Folded  guibg=#0A0A0A guifg=#9090D0
 
 " Line numbers
 set nonumber
 set numberwidth=5
 if exists('+relativenumber') " 7.3
-	set relativenumber " Use relative line numbers. Current line is still in status bar.
-	au BufReadPost * set relativenumber
+  set relativenumber " Use relative line numbers. Current line is still in status bar.
+  au BufReadPost * set relativenumber
 endif
-
-" Snippets are activated by Shift+Tab
-" let g:snippetsEmu_key = "<S-Tab>"
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
@@ -264,28 +246,25 @@ cnoremap <Right> <Space><BS><Right>
 set ignorecase smartcase
 
 " being smart helps
-set smarttab smartindent
+set smarttab
+"set smartindent
+" experimental: use cindent instead of smartindent
+set cindent
 
 " Tags
 if 1 " has('eval')
-	let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
+  let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
 endif
 set tags=./tags;
-
-if 1 " has('eval')
-	let g:fuf_splitPathMatching=1
-endif
-
-
-set cursorline
-"highlight CursorLine guibg=lightblue ctermbg=lightgray
-
 " Look for tags file in parent directories, upto "/"
 set tags+=tags;/
 
-if has("osfiletype")
-	filetype plugin indent on
+if 1 " has('eval')
+  let g:fuf_splitPathMatching=1
 endif
+
+set cursorline
+"highlight CursorLine guibg=lightblue ctermbg=lightgray
 
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
@@ -301,7 +280,6 @@ cno jj <c-c>
 
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
-
 
 
 " Strip trailing whitespace (,ss)
@@ -321,7 +299,7 @@ if bufwinnr(1)
 endif
 
 " Sudo write (,W)
-noremap <leader>W :w !sudo tee %<CR>
+noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.
@@ -333,21 +311,19 @@ noremap <leader>W :w !sudo tee %<CR>
 " Usage: :make (check file)
 " :clist (view list of errors)
 " :cn, :cp (move around list of errors)
-autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
-autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+" NOTE: should be provided by checksyntax plugin
+" autocmd BufRead *.py set makeprg=python\\\\\\\\ -c\\\\\\\\ \\\\\\\\"import\\\\\\\\ py_compile,sys;\\\\\\\\ sys.stderr=sys.stdout;\\\\\\\\ py_compile.compile(r'%')\\\\\\\\"
+" autocmd BufRead *.py set efm=%C\\ %.%#,%A\\ \\ File\\ \\"%f\\"\\\\,\\ line\\ %l%.%#,%Z%[%^\\ ]%\\\\@=%m
 
 " add semicolon to end of line if there is none
 noremap ; :s/\([^;]\)$/\1;/<cr>
 
-" source ~/.vim/source.d/*.vim
-" exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
-runtime! source.d/*.vim
-
+" Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
-"nnoremap  <Down> <C-W>j<C-W>_
-"nnoremap  <Up> <C-W>k<C-W>_
-"nnoremap  <Right> <C-PageDown>_
-"nnoremap  <Left> <C-PageUp>_
+nnoremap  <Down> <C-W>j
+nnoremap  <Up> <C-W>k
+nnoremap  <Right> <C-PageDown>_
+nnoremap  <Left> <C-PageUp>_
 
 " defined in php-doc.vim
 nnoremap <Leader>d :call PhpDocSingle()<CR>
@@ -356,7 +332,7 @@ nnoremap <Leader>d :call PhpDocSingle()<CR>
 command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
 
 noremap <Leader>n :NERDTreeToggle<cr>
-noremap	<F1> :tab<Space>:help<Space>
+noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> <C-]>
 
@@ -379,14 +355,15 @@ set sidescroll=1
 
 " command-t plugin
 let g:CommandTMaxFiles=50000
+let g:CommandTMaxHeight=20
 if has("autocmd") && exists(":CommandTFlush")
-	" this is required for Command-T to pickup the setting(s)
-	au VimEnter * CommandTFlush
+  " this is required for Command-T to pickup the setting(s)
+  au VimEnter * CommandTFlush
 endif
 if (has("gui_running"))
-	" use Alt-T in GUI mode
-	map <M-t> :CommandT<CR>
-	map <leader>t :CommandT<CR>
+  " use Alt-T in GUI mode
+  map <M-t> :CommandT<CR>
+  map <leader>t :CommandT<CR>
 endif
 
 " Smart way to move btw. windows
@@ -397,10 +374,10 @@ map <C-l> <C-W>l
 
 " setup b:VCSCommandVCSType
 function! SetupVCSType()
-	try
-		call VCSCommandGetVCSType(bufnr('%'))
-	catch /No suitable plugin/
-	endtry
+  try
+    call VCSCommandGetVCSType(bufnr('%'))
+  catch /No suitable plugin/
+  endtry
 endfunction
 " do not call it automatically for now: vcscommands behaves weird (changing
 " dirs), and slows simple scrolling (?) down (that might be quickfixsigns
@@ -413,11 +390,19 @@ endif
 nnoremap / /\v
 vnoremap / /\v
 
-nnoremap <tab> %
-vnoremap <tab> %
+nmap <tab> %
+" conflicts with snipMate: vmap <tab> %
 
 " edit vimrc shortcut
 nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
+
+let g:snips_author = "Daniel Hahler"
+
+" Utility functions to create file commands
+" Source: https://github.com/carlhuda/janus/blob/master/gvimrc
+" function! s:CommandCabbr(abbreviation, expansion)
+"   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
+" endfunction
 
 
 " Open URL
@@ -427,14 +412,22 @@ function! OpenURL()
   let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
   echo s:uri
   if s:uri != ""
-	  exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
+    exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
   else
-	  echo "No URI found in line."
+    echo "No URI found in line."
   endif
 endfunction
 map <Leader>w :call OpenURL()<CR>
 endif
 
-if filereadable("~/.vimrc.local")
-	source "~/.vimrc.local"
+
+" source ~/.vim/source.d/*.vim
+" exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
+" TODO: move to plugins
+runtime! source.d/*.vim
+
+
+" Local config
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
 endif

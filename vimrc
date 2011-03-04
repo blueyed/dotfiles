@@ -421,6 +421,18 @@ map <Leader>w :call OpenURL()<CR>
 endif
 
 
+let vimcachedir=expand('~/.cache/vim')
+if ! isdirectory(vimcachedir)
+	call mkdir( vimcachedir, 'p', 0700 )
+endif
+let g:tlib_cache = vimcachedir . '/tlib'
+
+let vimconfigdir=expand('~/.config/vim')
+if ! isdirectory(vimconfigdir)
+	call mkdir( vimconfigdir, 'p', 0700 )
+endif
+let g:session_directory = vimconfigdir . '/sessions'
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 " TODO: move to plugins

@@ -228,7 +228,12 @@ set nonumber
 set numberwidth=5
 if exists('+relativenumber') " 7.3
   set relativenumber " Use relative line numbers. Current line is still in status bar.
-  au BufReadPost * set relativenumber
+	" do not use relative number for quickfix window
+  au BufReadPost * if &ft == "qf" |
+				\	  set number |
+				\ else |
+				\	  set relativenumber |
+				\ endif
 endif
 
 " Tab completion options

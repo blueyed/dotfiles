@@ -409,6 +409,12 @@ let g:snips_author = "Daniel Hahler"
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
+" Swap ' and ` keys (` is much more useful)
+no ` '
+no ' `
+
+set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
+
 
 " Open URL
 if has("user_commands")

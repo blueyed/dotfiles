@@ -325,10 +325,10 @@ noremap ; :s/\([^;]\)$/\1;/<cr>
 
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
-nnoremap  <Down> <C-W>j
-nnoremap  <Up> <C-W>k
-nnoremap  <Right> <C-PageDown>_
-nnoremap  <Left> <C-PageUp>_
+" nnoremap  <Down> <C-W>j
+" nnoremap  <Up> <C-W>k
+" nnoremap  <Right> <C-PageDown>
+" nnoremap  <Left> <C-PageUp>
 
 " defined in php-doc.vim
 nnoremap <Leader>d :call PhpDocSingle()<CR>

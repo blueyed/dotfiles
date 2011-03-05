@@ -102,7 +102,7 @@
 	url = git://github.com/scrooloose/nerdtree.git
 [submodule "vim/bundle/DBGp-Remote-Debugger-Interface"]
 	path = vim/bundle/DBGp-Remote-Debugger-Interface
-	url = git://github.com/vim-scripts/DBGp-Remote-Debugger-Interface.git
+	url = git@github.com:blueyed/DBGp-Remote-Debugger-Interface.git
 [submodule "vim/bundle/lusty"]
 	path = vim/bundle/lusty
 	url = git://github.com/sjbach/lusty.git

@@ -87,3 +87,13 @@ verynice() {
 }
 
 alias hgu="hg pull -u"
+
+# Quickly lookup entry in Wikipedia.
+# Source: https://github.com/msanders/dotfiles/blob/master/.aliases
+wiki() {
+	if [[ $1 == "" ]]; then
+		echo "usage: wiki [term]";
+	else
+		dig +short txt $1.wp.dg.cx;
+	fi
+}

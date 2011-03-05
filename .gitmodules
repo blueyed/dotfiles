@@ -92,7 +92,7 @@
 	ignore = untracked
 [submodule "vim/bundle/snipmate"]
 	path = vim/bundle/snipmate
-	url = git://github.com/msanders/snipmate.vim.git
+	url = git@github.com:blueyed/snipmate.vim.git
 	ignore = untracked
 [submodule "vim/bundle/tcomment"]
 	path = vim/bundle/tcomment

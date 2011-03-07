@@ -109,3 +109,6 @@
 [submodule "vim/bundle/atom"]
 	path = vim/bundle/atom
 	url = git://github.com/vim-scripts/Atom.git
+[submodule "vim/bundle/vim-addon-mw-utils"]
+	path = vim/bundle/vim-addon-mw-utils
+	url = git://github.com/MarcWeber/vim-addon-mw-utils.git

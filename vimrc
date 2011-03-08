@@ -15,8 +15,7 @@ if has('persistent_undo')
     call mkdir( shellescape(expand(&undodir)), "", 0700 )
   endif
 endif
-set shellslash
-
+" set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
 if has("user_commands")
   filetype off " just in case it was activated before
@@ -146,9 +145,9 @@ if has("autocmd")
     highlight EOLWS ctermbg=red guibg=red
     autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
     " highlight trailing whitespace, space before tab and tab not at the
-    " beginning of the line (except in comments):
+    " beginning of the line (except in comments), only for normal buffers:
     autocmd InsertLeave,BufWinEnter *
-          \ if &ft != "diff" && &ft != "help" && &ft != "" |
+          \ if &bt == "" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif

@@ -148,7 +148,7 @@ if has("autocmd")
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments):
     autocmd InsertLeave,BufWinEnter *
-          \ if &ft != "diff" && &ft != "help" && &ft != "git" |
+          \ if &ft != "diff" && &ft != "help" && &ft != "" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif
@@ -231,7 +231,7 @@ set numberwidth=5
 if exists('+relativenumber') " 7.3
   set relativenumber " Use relative line numbers. Current line is still in status bar.
 	" do not use relative number for quickfix window
-  au BufReadPost * if &ft == "qf" |
+  au BufReadPost * if &bt == "quickfix" |
 				\	  set number |
 				\ else |
 				\	  set relativenumber |
@@ -242,7 +242,6 @@ endif
 " (only complete to the longest unambiguous match, and show a menu)
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
-set complete=.,t
 
 set wildmenu
 " move cursor instead of selecting entries (wildmenu)
@@ -342,6 +341,8 @@ noremap <Leader>n :NERDTreeToggle<cr>
 noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> <C-]>
+noremap <F3> :TRecentlyUsedFiles<cr>
+noremap <F5> :GundoToggle<cr>
 
 
 " taglist plugin

@@ -37,7 +37,7 @@ set backspace=indent,eol,start
 
 set nobackup
 set nowritebackup
-set history=50    " keep 50 lines of command line history
+set history=1000
 set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
@@ -148,7 +148,7 @@ if has("autocmd")
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments):
     autocmd InsertLeave,BufWinEnter *
-          \ if &ft != "diff" && &ft != "help" |
+          \ if &ft != "diff" && &ft != "help" && &ft != "git" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif
@@ -207,17 +207,19 @@ imap <C-L> <Space>=><Space>
 " Display extra whitespace
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
+" set showbreak=↪ " no required with line numbers
 nnoremap <silent> <leader>c :set nolist!<CR>
 set nolist
 
-" Paste toggle (,p)
-set pastetoggle=<leader>p
-map <leader>p :set invpaste paste?<CR>
-
+" toggle settings, mnemonic "set paste", "set wrap", ..
+set pastetoggle=<leader>sp
+noremap <leader>sw :set wrap!<cr>
 
 " Use Ack instead of Grep when available
 if executable("ack")
   set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
+elseif executable("ack-grep")
+  set grepprg=ack-grep\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
 else
   " this is for Windows/cygwin and to add -H
   set grepprg=grep\ -nH\ $*\ /dev/null
@@ -228,7 +230,12 @@ set nonumber
 set numberwidth=5
 if exists('+relativenumber') " 7.3
   set relativenumber " Use relative line numbers. Current line is still in status bar.
-  au BufReadPost * set relativenumber
+	" do not use relative number for quickfix window
+  au BufReadPost * if &ft == "qf" |
+				\	  set number |
+				\ else |
+				\	  set relativenumber |
+				\ endif
 endif
 
 " Tab completion options
@@ -320,10 +327,10 @@ noremap ; :s/\([^;]\)$/\1;/<cr>
 
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
-nnoremap  <Down> <C-W>j
-nnoremap  <Up> <C-W>k
-nnoremap  <Right> <C-PageDown>_
-nnoremap  <Left> <C-PageUp>_
+" nnoremap  <Down> <C-W>j
+" nnoremap  <Up> <C-W>k
+" nnoremap  <Right> <C-PageDown>
+" nnoremap  <Left> <C-PageUp>
 
 " defined in php-doc.vim
 nnoremap <Leader>d :call PhpDocSingle()<CR>
@@ -403,6 +410,12 @@ let g:snips_author = "Daniel Hahler"
 " function! s:CommandCabbr(abbreviation, expansion)
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
+
+" Swap ' and ` keys (` is much more useful)
+no ` '
+no ' `
+
+set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
 
 " Open URL

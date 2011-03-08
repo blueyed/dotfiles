@@ -3,3 +3,6 @@ pentadactyl/info
 vim/.netrwhist
 vim/.VimballRecord
 vim/undo
+tags
+*.pyc
+*.swp

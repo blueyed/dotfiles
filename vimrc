@@ -15,8 +15,7 @@ if has('persistent_undo')
     call mkdir( shellescape(expand(&undodir)), "", 0700 )
   endif
 endif
-set shellslash
-
+" set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
 if has("user_commands")
   filetype off " just in case it was activated before
@@ -146,9 +145,9 @@ if has("autocmd")
     highlight EOLWS ctermbg=red guibg=red
     autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
     " highlight trailing whitespace, space before tab and tab not at the
-    " beginning of the line (except in comments):
+    " beginning of the line (except in comments), only for normal buffers:
     autocmd InsertLeave,BufWinEnter *
-          \ if &ft != "diff" && &ft != "help" && &ft != "git" |
+          \ if &bt == "" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif
@@ -231,7 +230,7 @@ set numberwidth=5
 if exists('+relativenumber') " 7.3
   set relativenumber " Use relative line numbers. Current line is still in status bar.
 	" do not use relative number for quickfix window
-  au BufReadPost * if &ft == "qf" |
+  au BufReadPost * if &bt == "quickfix" |
 				\	  set number |
 				\ else |
 				\	  set relativenumber |
@@ -242,7 +241,6 @@ endif
 " (only complete to the longest unambiguous match, and show a menu)
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
-set complete=.,t
 
 set wildmenu
 " move cursor instead of selecting entries (wildmenu)
@@ -342,6 +340,8 @@ noremap <Leader>n :NERDTreeToggle<cr>
 noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> <C-]>
+noremap <F3> :TRecentlyUsedFiles<cr>
+noremap <F5> :GundoToggle<cr>
 
 
 " taglist plugin
@@ -351,9 +351,10 @@ nnoremap <silent> <F8> :TlistToggle<CR>
 " handling of matches items, like braces
 set showmatch
 set matchtime=3
-inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+" deactivated, causes keys to be ignored when typed too fast (?)
+"inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
@@ -418,20 +419,23 @@ no ' `
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
 
-" Open URL
-if has("user_commands")
-command! -bar -nargs=1 OpenURL :!open <args>
-function! OpenURL()
-  let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
-  echo s:uri
-  if s:uri != ""
-    exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
+" source http://vim.wikia.com/wiki/Switching_case_of_characters
+function! TwiddleCase(str)
+  if a:str ==# toupper(a:str)
+    let result = tolower(a:str)
+  elseif a:str ==# tolower(a:str)
+    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
   else
-    echo "No URI found in line."
+    let result = toupper(a:str)
   endif
+  return result
 endfunction
-map <Leader>w :call OpenURL()<CR>
-endif
+vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
+
+
+" Open URL
+nmap <leader>gw <Plug>(openbrowser-open)
+vmap <leader>gw <Plug>(openbrowser-open)
 
 
 " source ~/.vim/source.d/*.vim

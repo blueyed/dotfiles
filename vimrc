@@ -351,9 +351,10 @@ nnoremap <silent> <F8> :TlistToggle<CR>
 " handling of matches items, like braces
 set showmatch
 set matchtime=3
-inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+" deactivated, causes keys to be ignored when typed too fast (?)
+"inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
@@ -418,20 +419,23 @@ no ' `
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
 
-" Open URL
-if has("user_commands")
-command! -bar -nargs=1 OpenURL :!open <args>
-function! OpenURL()
-  let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
-  echo s:uri
-  if s:uri != ""
-    exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
+" source http://vim.wikia.com/wiki/Switching_case_of_characters
+function! TwiddleCase(str)
+  if a:str ==# toupper(a:str)
+    let result = tolower(a:str)
+  elseif a:str ==# tolower(a:str)
+    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
   else
-    echo "No URI found in line."
+    let result = toupper(a:str)
   endif
+  return result
 endfunction
-map <Leader>w :call OpenURL()<CR>
-endif
+vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
+
+
+" Open URL
+nmap <leader>gw <Plug>(openbrowser-open)
+vmap <leader>gw <Plug>(openbrowser-open)
 
 
 " source ~/.vim/source.d/*.vim

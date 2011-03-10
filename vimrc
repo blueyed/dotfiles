@@ -140,21 +140,30 @@ if has("autocmd")
   au FileType makefile setlocal noexpandtab
 
   " Whitespace highlighting
-  augroup vimrcExEOLWS
+  map <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
+        \:if ! g:MyAuGroupEOLWSactive \| hi clear EOLWS <cr>
+        \else \| hi EOLWS ctermbg=red guibg=red \| endif<cr>
+  let g:MyAuGroupEOLWSactive = 1
+  augroup vimrcExEOLWS 
     au!
     highlight EOLWS ctermbg=red guibg=red
-    autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+    autocmd InsertEnter *
+          \ if g:MyAuGroupEOLWSactive |
+          \ syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL |
+          \ endif
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments), only for normal buffers:
-    autocmd InsertLeave,BufWinEnter *
-          \ if &bt == "" |
+    autocmd InsertLeave,BufWinEnter * 
+          \ if g:MyAuGroupEOLWSactive && &bt == "" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif
       " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
     " add this for Python:
-    highlight PEP8WS ctermbg=red guibg=red
-    autocmd FileType python syn match PEP8WS excludenl /^\t\+/ containedin=ALL
+    autocmd FileType python
+          \ if g:MyAuGroupEOLWSactive |
+          \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
+          \ endif
   augroup END
 
   " syntax mode setup
@@ -207,7 +216,7 @@ imap <C-L> <Space>=><Space>
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 " set showbreak=↪ " no required with line numbers
-nnoremap <silent> <leader>c :set nolist!<CR>
+nnoremap <silent> <leader>sc :set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..
@@ -441,6 +450,9 @@ vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 nmap <leader>gw <Plug>(openbrowser-open)
 vmap <leader>gw <Plug>(openbrowser-open)
 
+" do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
+let g:tlib_pick_last_item = 0
+let g:tlib_inputlist_match = 'fuzzy' " test
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

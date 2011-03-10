@@ -127,3 +127,6 @@
 [submodule "vim/bundle/reporoot"]
 	path = vim/bundle/reporoot
 	url = git://github.com/vim-scripts/reporoot.vim.git
+[submodule "vim/bundle/visualctrlg"]
+	path = vim/bundle/visualctrlg
+	url = git://github.com/vim-scripts/visualctrlg.git

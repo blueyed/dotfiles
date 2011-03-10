@@ -15,6 +15,7 @@ if has('persistent_undo')
     call mkdir( shellescape(expand(&undodir)), "", 0700 )
   endif
 endif
+let g:session_directory='~/.vim/sessions'
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
 if has("user_commands")
@@ -222,6 +223,7 @@ set nolist
 " toggle settings, mnemonic "set paste", "set wrap", ..
 set pastetoggle=<leader>sp
 noremap <leader>sw :set wrap!<cr>
+noremap <leader>ss :set spell!<cr>
 
 " Use Ack instead of Grep when available
 if executable("ack")
@@ -296,7 +298,7 @@ cno jj <c-c>
 imap <Leader>/ </<C-X><C-O>
 
 
-" Strip trailing whitespace (,ss)
+" Strip trailing whitespace
 function! StripWhitespace ()
     let save_cursor = getpos(".")
     let old_query = getreg('/')
@@ -304,7 +306,10 @@ function! StripWhitespace ()
     call setpos('.', save_cursor)
     call setreg('/', old_query)
 endfunction
-noremap <leader>ss :call StripWhitespace ()<CR>
+noremap <leader>st :call StripWhitespace ()<CR>
+
+" swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
+vnoremap <C-X> <Esc>`.``gvP``P
 
 " Faster split resizing (+,-)
 if bufwinnr(1)
@@ -383,6 +388,10 @@ if (has("gui_running"))
   map <leader>t :CommandT<CR>
 endif
 
+" supertab
+let g:SuperTabLongestEnhanced=1
+let g:SuperTabLongestHighlight=1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
+
 " Smart way to move btw. windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
@@ -447,8 +456,8 @@ vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
 
 " Open URL
-nmap <leader>gw <Plug>(openbrowser-open)
-vmap <leader>gw <Plug>(openbrowser-open)
+nmap <leader>gw <Plug>(openbrowser-smart-search)
+vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 0

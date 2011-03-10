@@ -130,3 +130,6 @@
 [submodule "vim/bundle/visualctrlg"]
 	path = vim/bundle/visualctrlg
 	url = git://github.com/vim-scripts/visualctrlg.git
+[submodule "vim/bundle/tplugin"]
+	path = vim/bundle/tplugin
+	url = git://github.com/tomtom/tplugin_vim.git

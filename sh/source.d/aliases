@@ -9,7 +9,9 @@ alias la='ls $LS_OPTIONS -aF'
 alias ll='ls $LS_OPTIONS -lF'
 alias lla='ls $LS_OPTIONS -laF'
 alias lll='ll -a --color | less -R'
-alias lth='ll -t | head'
+lth() {
+	ll -t "$@" | head
+}
 
 # commands starting with % for pasting from web
 alias %=' '

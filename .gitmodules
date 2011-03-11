@@ -145,3 +145,6 @@
 [submodule "vim/bundle/shymenu"]
 	path = vim/bundle/shymenu
 	url = git://github.com/tomtom/shymenu_vim.git
+[submodule "vim/bundle/easytags"]
+	path = vim/bundle/easytags
+	url = git://github.com/vim-scripts/easytags.vim.git

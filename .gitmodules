@@ -139,3 +139,6 @@
 [submodule "vim/bundle/ttagecho"]
 	path = vim/bundle/ttagecho
 	url = git://github.com/tomtom/ttagecho_vim.git
+[submodule "vim/bundle/detectindent"]
+	path = vim/bundle/detectindent
+	url = git://github.com/ciaranm/detectindent.git

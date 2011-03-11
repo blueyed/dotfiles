@@ -441,6 +441,7 @@ no ' `
 
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
+let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
 
 " source http://vim.wikia.com/wiki/Switching_case_of_characters
 function! TwiddleCase(str)

@@ -153,3 +153,16 @@
 [submodule "vim/bundle/tmarks"]
 	path = vim/bundle/tmarks
 	url = git://github.com/tomtom/tmarks_vim.git
+	ignore = untracked
+[submodule "vim/bundle/ttagecho"]
+	path = vim/bundle/ttagecho
+	url = git://github.com/tomtom/ttagecho_vim.git
+	ignore = untracked
+[submodule "vim/bundle/detectindent"]
+	path = vim/bundle/detectindent
+	url = git://github.com/ciaranm/detectindent.git
+	ignore = untracked
+[submodule "vim/bundle/shymenu"]
+	path = vim/bundle/shymenu
+	url = git://github.com/tomtom/shymenu_vim.git
+	ignore = untracked

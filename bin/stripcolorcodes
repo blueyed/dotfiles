@@ -1,0 +1,11 @@
+#! /usr/bin/perl
+# source: http://unix.stackexchange.com/questions/4527/program-that-passes-stdin-to-stdout-with-color-codes-stripped/4529#4529
+
+use strict;
+use warnings;
+
+while (<>) {
+	  s/\e\[?.*?[\@-~]//g; # Strip ANSI escape codes
+			  print;
+}
+

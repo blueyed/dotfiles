@@ -92,7 +92,7 @@
 	ignore = untracked
 [submodule "vim/bundle/snipmate"]
 	path = vim/bundle/snipmate
-	url = git@github.com:blueyed/snipmate.vim.git
+	url = git://github.com/MarcWeber/snipmate.vim.git
 	ignore = untracked
 [submodule "vim/bundle/tcomment"]
 	path = vim/bundle/tcomment
@@ -112,3 +112,27 @@
 [submodule "vim/bundle/vim-addon-mw-utils"]
 	path = vim/bundle/vim-addon-mw-utils
 	url = git://github.com/MarcWeber/vim-addon-mw-utils.git
+[submodule "vim/bundle/ultisnips"]
+	path = vim/bundle/ultisnips
+	url = git://github.com/vim-scripts/UltiSnips.git
+[submodule "vim/bundle/molokai"]
+	path = vim/bundle/molokai
+	url = git://github.com/vim-scripts/molokai.git
+[submodule "vim/bundle/open-browser"]
+	path = vim/bundle/open-browser
+	url = git://github.com/tyru/open-browser.vim.git
+[submodule "vim/bundle/surround"]
+	path = vim/bundle/surround
+	url = git://github.com/tpope/vim-surround.git
+[submodule "vim/bundle/reporoot"]
+	path = vim/bundle/reporoot
+	url = git://github.com/vim-scripts/reporoot.vim.git
+[submodule "vim/bundle/visualctrlg"]
+	path = vim/bundle/visualctrlg
+	url = git://github.com/vim-scripts/visualctrlg.git
+[submodule "vim/bundle/tplugin"]
+	path = vim/bundle/tplugin
+	url = git://github.com/tomtom/tplugin_vim.git
+[submodule "vim/bundle/unimpaired"]
+	path = vim/bundle/unimpaired
+	url = git://github.com/tpope/vim-unimpaired.git

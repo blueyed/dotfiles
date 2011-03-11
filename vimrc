@@ -15,6 +15,7 @@ if has('persistent_undo')
     call mkdir( shellescape(expand(&undodir)), "", 0700 )
   endif
 endif
+let g:session_directory='~/.vim/sessions'
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
 if has("user_commands")
@@ -140,21 +141,30 @@ if has("autocmd")
   au FileType makefile setlocal noexpandtab
 
   " Whitespace highlighting
-  augroup vimrcExEOLWS
+  map <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
+        \:if ! g:MyAuGroupEOLWSactive \| hi clear EOLWS <cr>
+        \else \| hi EOLWS ctermbg=red guibg=red \| endif<cr>
+  let g:MyAuGroupEOLWSactive = 1
+  augroup vimrcExEOLWS 
     au!
     highlight EOLWS ctermbg=red guibg=red
-    autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+    autocmd InsertEnter *
+          \ if g:MyAuGroupEOLWSactive |
+          \ syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL |
+          \ endif
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments), only for normal buffers:
-    autocmd InsertLeave,BufWinEnter *
-          \ if &bt == "" |
+    autocmd InsertLeave,BufWinEnter * 
+          \ if g:MyAuGroupEOLWSactive && &bt == "" |
           \ syn clear EOLWS |
           \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
           \ endif
       " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
     " add this for Python:
-    highlight PEP8WS ctermbg=red guibg=red
-    autocmd FileType python syn match PEP8WS excludenl /^\t\+/ containedin=ALL
+    autocmd FileType python
+          \ if g:MyAuGroupEOLWSactive |
+          \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
+          \ endif
   augroup END
 
   " syntax mode setup
@@ -207,12 +217,13 @@ imap <C-L> <Space>=><Space>
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 " set showbreak=↪ " no required with line numbers
-nnoremap <silent> <leader>c :set nolist!<CR>
+nnoremap <silent> <leader>sc :set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..
 set pastetoggle=<leader>sp
 noremap <leader>sw :set wrap!<cr>
+noremap <leader>ss :set spell!<cr>
 
 " Use Ack instead of Grep when available
 if executable("ack")
@@ -287,7 +298,7 @@ cno jj <c-c>
 imap <Leader>/ </<C-X><C-O>
 
 
-" Strip trailing whitespace (,ss)
+" Strip trailing whitespace
 function! StripWhitespace ()
     let save_cursor = getpos(".")
     let old_query = getreg('/')
@@ -295,7 +306,10 @@ function! StripWhitespace ()
     call setpos('.', save_cursor)
     call setreg('/', old_query)
 endfunction
-noremap <leader>ss :call StripWhitespace ()<CR>
+noremap <leader>st :call StripWhitespace ()<CR>
+
+" swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
+vnoremap <C-X> <Esc>`.``gvP``P
 
 " Faster split resizing (+,-)
 if bufwinnr(1)
@@ -351,9 +365,10 @@ nnoremap <silent> <F8> :TlistToggle<CR>
 " handling of matches items, like braces
 set showmatch
 set matchtime=3
-inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+" deactivated, causes keys to be ignored when typed too fast (?)
+"inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
@@ -372,6 +387,10 @@ if (has("gui_running"))
   map <M-t> :CommandT<CR>
   map <leader>t :CommandT<CR>
 endif
+
+" supertab
+let g:SuperTabLongestEnhanced=1
+let g:SuperTabLongestHighlight=1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
 
 " Smart way to move btw. windows
 map <C-j> <C-W>j
@@ -405,6 +424,10 @@ nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
 
 let g:snips_author = "Daniel Hahler"
 
+let g:UltiSnipsExpandTrigger="<tab>"
+"let g:UltiSnipsJumpForwardTrigger="<tab>"
+"let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc
 " function! s:CommandCabbr(abbreviation, expansion)
@@ -418,21 +441,27 @@ no ' `
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
 
-" Open URL
-if has("user_commands")
-command! -bar -nargs=1 OpenURL :!open <args>
-function! OpenURL()
-  let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
-  echo s:uri
-  if s:uri != ""
-    exec "!xdg-open '" . escape(s:uri, "'%#") . "'"
+" source http://vim.wikia.com/wiki/Switching_case_of_characters
+function! TwiddleCase(str)
+  if a:str ==# toupper(a:str)
+    let result = tolower(a:str)
+  elseif a:str ==# tolower(a:str)
+    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
   else
-    echo "No URI found in line."
+    let result = toupper(a:str)
   endif
+  return result
 endfunction
-map <Leader>w :call OpenURL()<CR>
-endif
+vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
+
+" Open URL
+nmap <leader>gw <Plug>(openbrowser-smart-search)
+vmap <leader>gw <Plug>(openbrowser-smart-search)
+
+" do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
+let g:tlib_pick_last_item = 0
+let g:tlib_inputlist_match = 'fuzzy' " test
 
 let vimcachedir=expand('~/.cache/vim')
 if ! isdirectory(vimcachedir)

@@ -136,3 +136,6 @@
 [submodule "vim/bundle/unimpaired"]
 	path = vim/bundle/unimpaired
 	url = git://github.com/tpope/vim-unimpaired.git
+[submodule "vim/bundle/ttagecho"]
+	path = vim/bundle/ttagecho
+	url = git://github.com/tomtom/ttagecho_vim.git

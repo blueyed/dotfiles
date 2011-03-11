@@ -420,7 +420,7 @@ nmap <tab> %
 " conflicts with snipMate: vmap <tab> %
 
 " edit vimrc shortcut
-nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
+nnoremap <leader>ev <C-w><C-s><C-l>:e $MYVIMRC<cr>
 
 let g:snips_author = "Daniel Hahler"
 

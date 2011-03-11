@@ -218,6 +218,7 @@ set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 " set showbreak=↪ " no required with line numbers
 nnoremap <silent> <leader>sc :set list!<CR>
+inoremap <silent> <leader>sc <C-o>:set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..

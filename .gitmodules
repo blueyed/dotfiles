@@ -150,6 +150,10 @@
 	path = vim/bundle/unimpaired
 	url = git://github.com/tpope/vim-unimpaired.git
 	ignore = untracked
+[submodule "vim/bundle/tmarks"]
+	path = vim/bundle/tmarks
+	url = git://github.com/tomtom/tmarks_vim.git
+	ignore = untracked
 [submodule "vim/bundle/ttagecho"]
 	path = vim/bundle/ttagecho
 	url = git://github.com/tomtom/ttagecho_vim.git

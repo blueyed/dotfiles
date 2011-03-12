@@ -218,6 +218,7 @@ set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 " set showbreak=↪ " no required with line numbers
 nnoremap <silent> <leader>sc :set list!<CR>
+inoremap <silent> <leader>sc <C-o>:set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..
@@ -440,6 +441,7 @@ no ' `
 
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 
+let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
 
 " source http://vim.wikia.com/wiki/Switching_case_of_characters
 function! TwiddleCase(str)
@@ -462,6 +464,18 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 0
 let g:tlib_inputlist_match = 'fuzzy' " test
+
+let vimcachedir=expand('~/.cache/vim')
+if ! isdirectory(vimcachedir)
+	call mkdir( vimcachedir, 'p', 0700 )
+endif
+let g:tlib_cache = vimcachedir . '/tlib'
+
+let vimconfigdir=expand('~/.config/vim')
+if ! isdirectory(vimconfigdir)
+	call mkdir( vimconfigdir, 'p', 0700 )
+endif
+let g:session_directory = vimconfigdir . '/sessions'
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

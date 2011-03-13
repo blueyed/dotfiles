@@ -121,6 +121,10 @@ endif " has("autocmd")
 set tabstop=2
 set shiftwidth=2
 set noexpandtab
+
+if 1 " has('eval')
+  let mapleader = ","
+endif
 if has("autocmd")
   " Expand tabs for Debian changelog. This is probably not the correct way.
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
@@ -141,10 +145,10 @@ if has("autocmd")
   au FileType makefile setlocal noexpandtab
 
   " Whitespace highlighting
-  map <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
+  noremap <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
         \:if ! g:MyAuGroupEOLWSactive \| hi clear EOLWS <cr>
         \else \| hi EOLWS ctermbg=red guibg=red \| endif<cr>
-  let g:MyAuGroupEOLWSactive = 1
+  let g:MyAuGroupEOLWSactive = 0
   augroup vimrcExEOLWS 
     au!
     highlight EOLWS ctermbg=red guibg=red
@@ -176,10 +180,6 @@ endif
 " Always display the status line
 set laststatus=2
 set statusline=%F%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
-
-if 1 " has('eval')
-  let mapleader = ","
-endif
 
 " Hide search highlighting
 map <Leader>h :set invhls <CR>

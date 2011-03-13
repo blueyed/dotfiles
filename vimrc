@@ -420,8 +420,12 @@ vnoremap / /\v
 nmap <tab> %
 " conflicts with snipMate: vmap <tab> %
 
+" Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory
+imap <C-BS> <C-W>
+imap <C-Del> <esc>Ea<C-W>
+
 " edit vimrc shortcut
-nnoremap <leader>ev <C-w><C-s><C-l>:e $MYVIMRC<cr>
+nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
 
 let g:snips_author = "Daniel Hahler"
 

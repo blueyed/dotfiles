@@ -140,7 +140,7 @@
 	ignore = untracked
 [submodule "vim/bundle/visualctrlg"]
 	path = vim/bundle/visualctrlg
-	url = git://github.com/vim-scripts/visualctrlg.git
+	url = git://github.com/tyru/visualctrlg.vim.git
 	ignore = untracked
 [submodule "vim/bundle/tplugin"]
 	path = vim/bundle/tplugin

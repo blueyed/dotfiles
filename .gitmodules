@@ -170,3 +170,6 @@
 	path = vim/bundle/easytags
 	url = git://github.com/vim-scripts/easytags.vim.git
 	ignore = untracked
+[submodule "vim/bundle/zoomwin"]
+	path = vim/bundle/zoomwin
+	url = git://github.com/vim-scripts/ZoomWin.git

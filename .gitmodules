@@ -176,3 +176,6 @@
 [submodule "vim/bundle/maximize"]
 	path = vim/bundle/maximize
 	url = git://github.com/ervandew/maximize.git
+[submodule "vim/bundle/outlook"]
+	path = vim/bundle/outlook
+	url = git://github.com/vim-scripts/OutlookVim.git

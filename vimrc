@@ -120,7 +120,7 @@ endif " has("autocmd")
 
 set tabstop=2
 set shiftwidth=2
-set noexpandtab
+set expandtab
 
 if 1 " has('eval')
   let mapleader = ","

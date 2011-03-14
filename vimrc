@@ -146,7 +146,7 @@ if has("autocmd")
 
   " Whitespace highlighting
   noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
-				\:call MyAuGroupEOLWS(mode())<cr>
+        \:call MyAuGroupEOLWS(mode())<cr>
   let g:MyAuGroupEOLWSactive = 0
   function! MyAuGroupEOLWS(mode)
     if g:MyAuGroupEOLWSactive && &bt == ""
@@ -248,12 +248,12 @@ set nonumber
 set numberwidth=5
 if exists('+relativenumber') " 7.3
   set relativenumber " Use relative line numbers. Current line is still in status bar.
-	" do not use relative number for quickfix window
+  " do not use relative number for quickfix window
   au BufReadPost * if &bt == "quickfix" |
-				\	  set number |
-				\ else |
-				\	  set relativenumber |
-				\ endif
+        \  set number |
+        \else |
+        \  set relativenumber |
+        \endif
 endif
 
 " Tab completion options
@@ -478,13 +478,13 @@ let g:tlib_inputlist_match = 'fuzzy' " test
 
 let vimcachedir=expand('~/.cache/vim')
 if ! isdirectory(vimcachedir)
-	call mkdir( vimcachedir, 'p', 0700 )
+  call mkdir( vimcachedir, 'p', 0700 )
 endif
 let g:tlib_cache = vimcachedir . '/tlib'
 
 let vimconfigdir=expand('~/.config/vim')
 if ! isdirectory(vimconfigdir)
-	call mkdir( vimconfigdir, 'p', 0700 )
+  call mkdir( vimconfigdir, 'p', 0700 )
 endif
 let g:session_directory = vimconfigdir . '/sessions'
 

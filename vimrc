@@ -5,17 +5,33 @@
 " replace ~/vimfiles with ~/.vim in runtimepath
 let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
 
-" Local dirs
-set backupdir=~/.vim/backups
+" Local dirs"{{{
+set backupdir=~/.local/share/vim/backups
+if ! isdirectory(expand(&backupdir))
+  call mkdir( &backupdir, 'p', 0700 )
+endif
+
 if has('persistent_undo')
-  set undodir=~/.vim/undo
+  set undodir=~/.local/share/vim/undo
   set undofile
   if ! isdirectory(expand(&undodir))
     echo "Creating undodir ".&undodir
-    call mkdir( shellescape(expand(&undodir)), "", 0700 )
+    call mkdir( expand(&undodir), 'p', 0700 )
   endif
 endif
-let g:session_directory='~/.vim/sessions'
+
+let vimcachedir=expand('~/.cache/vim')
+if ! isdirectory(vimcachedir)
+  call mkdir( vimcachedir, 'p', 0700 )
+endif
+let g:tlib_cache = vimcachedir . '/tlib'
+
+let vimconfigdir=expand('~/.config/vim')
+if ! isdirectory(vimconfigdir)
+  call mkdir( vimconfigdir, 'p', 0700 )
+endif
+let g:session_directory = vimconfigdir . '/sessions'"}}}
+
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
 if has("user_commands")
@@ -77,9 +93,6 @@ if has("autocmd")
 
   " Set File type to 'text' for files ending in .txt
   autocmd BufNewFile,BufRead *.txt setfiletype text
-
-  " Typoscript file type
-  au BufNewFile,BufRead *.ts setfiletype=typoscript
 
   " Enable soft-wrapping for text files
   autocmd FileType text,markdown,html,xhtml,eruby setlocal wrap linebreak nolist
@@ -357,8 +370,13 @@ nnoremap <Leader>d :call PhpDocSingle()<CR>
 
 " Open Windows explorer and select current file
 command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
-
-noremap <Leader>n :NERDTreeToggle<cr>
+noremap <Leader>n :NERDTree<space>
+noremap <Leader>n. :execute "NERDTree ".expand("%:p:h")<cr>
+noremap <Leader>nb :NERDTreeFromBookmark<space>
+noremap <Leader>nn :NERDTreeToggle<cr>
+noremap <Leader>no :NERDTreeToggle<space>
+noremap <Leader>nf :NERDTreeFind<cr>
+noremap <Leader>nc :NERDTreeClose<cr>
 noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> <C-]>
@@ -386,14 +404,16 @@ set sidescroll=1
 " command-t plugin
 let g:CommandTMaxFiles=50000
 let g:CommandTMaxHeight=20
-if has("autocmd") && exists(":CommandTFlush")
+if has("autocmd") && exists(":CommandTFlush") && has("ruby")
   " this is required for Command-T to pickup the setting(s)
   au VimEnter * CommandTFlush
 endif
 if (has("gui_running"))
   " use Alt-T in GUI mode
   map <M-t> :CommandT<CR>
-  map <leader>t :CommandT<CR>
+  map <leader>tt :CommandT<CR>
+  map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
+  map <Leader>t  :CommandT<space>
 endif
 
 " supertab
@@ -451,6 +471,7 @@ no ` '
 no ' `
 
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
+set guioptions-=m
 
 let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
 
@@ -475,18 +496,9 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 0
 let g:tlib_inputlist_match = 'fuzzy' " test
+let g:tmruSize = 500
 
-let vimcachedir=expand('~/.cache/vim')
-if ! isdirectory(vimcachedir)
-  call mkdir( vimcachedir, 'p', 0700 )
-endif
-let g:tlib_cache = vimcachedir . '/tlib'
-
-let vimconfigdir=expand('~/.config/vim')
-if ! isdirectory(vimconfigdir)
-  call mkdir( vimconfigdir, 'p', 0700 )
-endif
-let g:session_directory = vimconfigdir . '/sessions'
+let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
@@ -498,3 +510,5 @@ runtime! source.d/*.vim
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
+
+" vim: fdm=marker

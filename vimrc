@@ -145,30 +145,37 @@ if has("autocmd")
   au FileType makefile setlocal noexpandtab
 
   " Whitespace highlighting
-  noremap <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
-        \:if ! g:MyAuGroupEOLWSactive \| hi clear EOLWS <cr>
-        \else \| hi EOLWS ctermbg=red guibg=red \| endif<cr>
+  noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
+				\:call MyAuGroupEOLWS(mode())<cr>
   let g:MyAuGroupEOLWSactive = 0
+  function! MyAuGroupEOLWS(mode)
+    if g:MyAuGroupEOLWSactive && &bt == ""
+      hi EOLWS ctermbg=red guibg=red
+      syn clear EOLWS
+      if a:mode == "i"
+        syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+      else
+        syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
+      endif
+    else
+      syn clear EOLWS
+      hi clear EOLWS
+    endif
+  endfunction
   augroup vimrcExEOLWS 
     au!
     highlight EOLWS ctermbg=red guibg=red
-    autocmd InsertEnter *
-          \ if g:MyAuGroupEOLWSactive |
-          \ syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL |
-          \ endif
+    autocmd InsertEnter * call MyAuGroupEOLWS("i")
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments), only for normal buffers:
-    autocmd InsertLeave,BufWinEnter * 
-          \ if g:MyAuGroupEOLWSactive && &bt == "" |
-          \ syn clear EOLWS |
-          \ syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
-          \ endif
+    autocmd InsertLeave,BufWinEnter * call MyAuGroupEOLWS("n")
       " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
-    " add this for Python:
-    autocmd FileType python
-          \ if g:MyAuGroupEOLWSactive |
-          \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
-          \ endif
+
+    " add this for Python (via python_highlight_all?!):
+    " autocmd FileType python
+    "       \ if g:MyAuGroupEOLWSactive |
+    "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
+    "       \ endif
   augroup END
 
   " syntax mode setup

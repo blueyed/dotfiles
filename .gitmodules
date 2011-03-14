@@ -173,3 +173,6 @@
 [submodule "vim/bundle/zoomwin"]
 	path = vim/bundle/zoomwin
 	url = git://github.com/vim-scripts/ZoomWin.git
+[submodule "vim/bundle/maximize"]
+	path = vim/bundle/maximize
+	url = git://github.com/ervandew/maximize.git

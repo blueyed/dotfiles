@@ -182,3 +182,6 @@
 [submodule "vim/bundle/yankring"]
 	path = vim/bundle/yankring
 	url = git://github.com/vim-scripts/YankRing.vim.git
+[submodule "vim/bundle/sparkup"]
+	path = vim/bundle/sparkup
+	url = git://github.com/rstacruz/sparkup.git

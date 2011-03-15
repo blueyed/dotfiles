@@ -500,6 +500,12 @@ let g:tmruSize = 500
 
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 
+
+" I feel dirty, plz rename kthxbye!
+behave mswin
+set keymodel-=stopsel " do not stop visual selection with cursor keys
+
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 " TODO: move to plugins

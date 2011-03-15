@@ -15,19 +15,21 @@ if has('persistent_undo')
   set undodir=~/.local/share/vim/undo
   set undofile
   if ! isdirectory(expand(&undodir))
-    echo "Creating undodir ".&undodir
+    echo "Creating undo dir ".&undodir
     call mkdir( expand(&undodir), 'p', 0700 )
   endif
 endif
 
 let vimcachedir=expand('~/.cache/vim')
 if ! isdirectory(vimcachedir)
+  echo "Creating cache dir ".vimcachedir
   call mkdir( vimcachedir, 'p', 0700 )
 endif
 let g:tlib_cache = vimcachedir . '/tlib'
 
 let vimconfigdir=expand('~/.config/vim')
 if ! isdirectory(vimconfigdir)
+  echo "Creating config dir ".vimconfigdir
   call mkdir( vimconfigdir, 'p', 0700 )
 endif
 let g:session_directory = vimconfigdir . '/sessions'"}}}
@@ -411,10 +413,10 @@ endif
 if (has("gui_running"))
   " use Alt-T in GUI mode
   map <M-t> :CommandT<CR>
-  map <leader>tt :CommandT<CR>
-  map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
-  map <Leader>t  :CommandT<space>
 endif
+map <leader>tt :CommandT<CR>
+map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
+map <Leader>t  :CommandT<space>
 
 " supertab
 let g:SuperTabLongestEnhanced=1
@@ -500,6 +502,7 @@ let g:tmruSize = 500
 
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 
+let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 
 " I feel dirty, plz rename kthxbye!
 behave mswin

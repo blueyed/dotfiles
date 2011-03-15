@@ -356,7 +356,7 @@ noremap <leader>W :w !sudo tee % > /dev/null<CR>
 " autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 " add semicolon to end of line if there is none
-noremap ; :s/\([^;]\)$/\1;/<cr>
+noremap <leader>; :s/\([^;]\)$/\1;/<cr>
 
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it

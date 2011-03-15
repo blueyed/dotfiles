@@ -106,6 +106,7 @@ map <C-k> <Nop>
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark r reddit.com
 silent qmark t twitter.com
+silent qmark g https://www.google.com/reader/view
 
 autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
 autocmd LocationChange ^mail\\..*   :set editor='gvim -f -c ''set ft=mail | call cursor(<line>, <column>)'''

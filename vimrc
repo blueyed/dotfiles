@@ -273,6 +273,15 @@ endif
 " (only complete to the longest unambiguous match, and show a menu)
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
+" set complete+=kspell " complete from spell checking
+set dictionary+=spell " very useful, but requires ':set spell' once
+if has("autocmd") && exists("+omnifunc")            
+  autocmd Filetype *
+    \   if &omnifunc == "" |
+    \     setlocal omnifunc=syntaxcomplete#Complete |
+    \   endif
+endif
+
 
 set wildmenu
 " move cursor instead of selecting entries (wildmenu)
@@ -499,11 +508,14 @@ let g:tlib_inputlist_match = 'fuzzy' " test
 let g:tmruSize = 500
 
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
+let g:easytags_cmd = 'ctags'
 
+set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 
 " I feel dirty, plz rename kthxbye!
 behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
+set selection=inclusive
 
 
 " source ~/.vim/source.d/*.vim

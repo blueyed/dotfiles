@@ -460,7 +460,10 @@ nmap <tab> %
 
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory
 imap <C-BS> <C-W>
-imap <C-Del> <esc>Ea<C-W>
+imap <C-Del> <esc>dwa
+imap <C-S-Del> <esc>dWa
+nmap <C-Del> dw
+nmap <C-S-Del> dWa
 
 " edit vimrc shortcut
 nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
@@ -521,6 +524,12 @@ behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 
+" Identify the syntax highlighting group used at the cursor
+" via http://vim.wikia.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor
+map <leader><F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
+" remap CTRL-W_ using maximize.vim (smarter and toggles)
+map <c-w>_ :MaximizeWindow<cr>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

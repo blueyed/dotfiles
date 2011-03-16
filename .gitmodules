@@ -188,3 +188,6 @@
 [submodule "vim/bundle/zenburn"]
 	path = vim/bundle/zenburn
 	url = git://github.com/vim-scripts/Zenburn.git
+[submodule "vim/bundle/mail_tgz"]
+	path = vim/bundle/mail_tgz
+	url = git://github.com/vim-scripts/mail.tgz.git

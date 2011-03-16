@@ -191,3 +191,6 @@
 [submodule "vim/bundle/mail_tgz"]
 	path = vim/bundle/mail_tgz
 	url = git://github.com/vim-scripts/mail.tgz.git
+[submodule "vim/bundle/ragtag"]
+	path = vim/bundle/ragtag
+	url = git://github.com/smith/vim-ragtag.git

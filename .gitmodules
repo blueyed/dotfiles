@@ -168,7 +168,7 @@
 	ignore = untracked
 [submodule "vim/bundle/easytags"]
 	path = vim/bundle/easytags
-	url = git://github.com/vim-scripts/easytags.vim.git
+	url = git://github.com/xolox/vim-easytags.git
 	ignore = untracked
 [submodule "vim/bundle/zoomwin"]
 	path = vim/bundle/zoomwin

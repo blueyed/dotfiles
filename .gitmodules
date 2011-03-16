@@ -185,3 +185,6 @@
 [submodule "vim/bundle/sparkup"]
 	path = vim/bundle/sparkup
 	url = git://github.com/rstacruz/sparkup.git
+[submodule "vim/bundle/zenburn"]
+	path = vim/bundle/zenburn
+	url = git://github.com/vim-scripts/Zenburn.git

@@ -249,14 +249,14 @@ noremap <leader>sw :set wrap!<cr>
 noremap <leader>ss :set spell!<cr>
 
 " Use Ack instead of Grep when available
-if executable("ack")
-  set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
-elseif executable("ack-grep")
-  set grepprg=ack-grep\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
-else
-  " this is for Windows/cygwin and to add -H
-  set grepprg=grep\ -nH\ $*\ /dev/null
-endif
+" if executable("ack")
+"   set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
+" elseif executable("ack-grep")
+"   set grepprg=ack-grep\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
+" else
+   " this is for Windows/cygwin and to add -H
+   set grepprg=grep\ -nH\ $*\ /dev/null
+" endif
 
 " Line numbers
 set nonumber
@@ -523,6 +523,7 @@ let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
+set clipboard=unnamed
 
 " Identify the syntax highlighting group used at the cursor
 " via http://vim.wikia.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor

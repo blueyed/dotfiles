@@ -194,3 +194,6 @@
 [submodule "vim/bundle/ragtag"]
 	path = vim/bundle/ragtag
 	url = git://github.com/smith/vim-ragtag.git
+[submodule "vim/bundle/cyclecolors"]
+	path = vim/bundle/cyclecolors
+	url = git://github.com/vim-scripts/CycleColor.git

@@ -200,3 +200,6 @@
 [submodule "vim/bundle/xoria256"]
 	path = vim/bundle/xoria256
 	url = git@github.com:blueyed/xoria256.vim.git
+[submodule "vim/bundle/fugitive"]
+	path = vim/bundle/fugitive
+	url = git://github.com/tpope/vim-fugitive.git

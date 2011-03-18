@@ -197,3 +197,6 @@
 [submodule "vim/bundle/cyclecolors"]
 	path = vim/bundle/cyclecolors
 	url = git://github.com/vim-scripts/CycleColor.git
+[submodule "vim/bundle/xoria256"]
+	path = vim/bundle/xoria256
+	url = git@github.com:blueyed/xoria256.vim.git

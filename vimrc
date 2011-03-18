@@ -314,6 +314,10 @@ endif
 set cursorline
 "highlight CursorLine guibg=lightblue ctermbg=lightgray
 
+" Make the current status line stand out, e.g. with xoria256 (using the
+" PreProc colors from there)
+" hi StatusLine      ctermfg=150 guifg=#afdf87
+
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
 
@@ -322,9 +326,11 @@ set hidden
 " consider existing windows (but not tabs) when opening files, e.g. from quickfix
 set switchbuf=useopen
 
-" Maps for jj to act as Esc
+" Maps for jj and kj to act as Esc (kj is idempotent in normal mode)
 ino jj <esc>
 cno jj <c-c>
+ino kj <esc>
+cno kj <c-c>
 
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>

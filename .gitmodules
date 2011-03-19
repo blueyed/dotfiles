@@ -209,3 +209,6 @@
 [submodule "vim/bundle/tir_black"]
 	path = vim/bundle/tir_black
 	url = git://github.com/vim-scripts/tir_black.git
+[submodule "vim/bundle/colorhighlight"]
+	path = vim/bundle/colorhighlight
+	url = git@github.com:blueyed/colorhighlight.vim.git

@@ -538,6 +538,12 @@ map <leader><F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . 
 " remap CTRL-W_ using maximize.vim (smarter and toggles)
 map <c-w>_ :MaximizeWindow<cr>
 
+" Exit with ÄÄ (German keyboard layout)
+noremap ÄÄ :confirm qall<cr>
+inoremap ÄÄ <C-O>:confirm qall<cr>
+cnoremap ÄÄ <C-C>:confirm qall<cr>
+onoremap ÄÄ <C-C>:confirm qall<cr>
+
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
 " TODO: move to plugins

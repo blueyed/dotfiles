@@ -206,3 +206,6 @@
 [submodule "vim/bundle/vim-addon-manager"]
 	path = vim/bundle/vim-addon-manager
 	url = git://github.com/MarcWeber/vim-addon-manager.git
+[submodule "vim/bundle/tir_black"]
+	path = vim/bundle/tir_black
+	url = git://github.com/vim-scripts/tir_black.git

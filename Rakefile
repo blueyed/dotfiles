@@ -1,10 +1,46 @@
 require 'rake'
 require 'erb'
 
+verbose = 1
+
 desc "Update the dot files in the user's home directory"
 task :update do
-  system %Q{git pull}
-  system %Q{git submodule update --init --recursive}
+  system %Q{git pull} or raise "Git pull failed."
+  system %Q{git submodule --quiet sync 2>&1} or raise "Git submodule sync failed."
+  while true
+    sm_update = %x[git submodule update --init --recursive 2>&1]
+    puts sm_update if verbose and sm_update != ""
+    if $?.success?
+      break
+    end
+    last_line = sm_update.split("\n")[-1]
+    if last_line =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
+      github_user = %x[git config --get github.user]
+      if github_user == ""
+        puts "No GitHub user found in `git config --get github.user`. Aborting."
+      end
+      # check for github_user's remote, and maybe add it and then retry
+      sm_path = $2
+      remotes = %x[git --git-dir '#{sm_path}/.git' remote]
+      if remotes =~ /^#{github_user}$/
+        puts "Remote '#{github_user}' exists already. Aborting."
+      else
+        puts "Adding remote '#{github_user}'." if verbose
+        output = %x[cd #{sm_path} && hub remote add -p #{github_user} 2>&1]
+        if not $?.success?
+          puts "Failed to add submodule:\n" + output
+          break
+        end
+      end
+      puts "Fetching remote '#{github_user}'." if verbose
+      output = %x[cd #{sm_path} && git fetch #{github_user} 2>&1]
+      if not $?.success?
+        puts "Failed to fetch submodule:\n" + output
+        break
+      end
+    end
+    puts "Retrying update.."
+  end
 end
 
 desc "install the dot files into user's home directory"

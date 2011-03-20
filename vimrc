@@ -384,7 +384,7 @@ noremap <leader>; :s/\([^;]\)$/\1;/<cr>
 " nnoremap  <Left> <C-PageUp>
 
 " defined in php-doc.vim
-nnoremap <Leader>d :call PhpDocSingle()<CR>
+" nnoremap <Leader>d :call PhpDocSingle()<CR>
 
 " Open Windows explorer and select current file
 command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
@@ -522,6 +522,7 @@ let g:tmruSize = 500
 
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 let g:easytags_cmd = 'ctags'
+let g:easytags_suppress_ctags_warning = 1
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 

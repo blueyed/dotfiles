@@ -43,6 +43,51 @@ task :update do
   end
 end
 
+def get_submodule_status
+  status = %x[ git submodule status --recursive ] or raise "Getting submodule status failed"
+  r = {}
+  status.split("\n").each do |line|
+    if not line =~ /^([ +-])(\w{40}) (.*) \(.*\)$/
+      raise "Found invalid submodule line: #{line}"
+    end
+    path = $3
+    r[path] = {"state" => $1}
+  end
+  return r
+end
+
+desc "Upgrade submodules to current master"
+task :upgrade do
+  # system %Q{ git diff --cached --exit-code > /dev/null } or raise "The Git index is not clean."
+
+  submodules = {}
+  # get_submodule_status.each do |sm|
+  get_submodule_status().each do |path, sm|
+    if sm["state"] == "+"
+      puts "Skipping modified submodule #{path}."
+      next
+    end
+    if sm["state"] == "-"
+      puts "Skipping uninitialized submodule #{path}."
+      next
+    end
+  end
+  submodules.each do |path,match|
+    puts path if verbose
+    output = %x[ cd '#{path}' && git co master && git pull origin master ]
+    puts output
+  end
+
+  # Commit any modules
+  submodule.each do |path|
+    output = %x[ git commit -m 'Update submodule #{path} to origin/master.' ]
+    puts output
+  end
+  # %x[ git submodule foreach "git pull origin master && git co master" ]
+  # Commit any new modules
+end
+
+
 desc "install the dot files into user's home directory"
 task :install do
   base = ENV['HOME']

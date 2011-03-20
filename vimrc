@@ -515,6 +515,7 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 0
+let g:tlib_pick_single_item = 1
 let g:tlib_inputlist_match = 'fuzzy' " test
 let g:tmruSize = 500
 

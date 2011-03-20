@@ -39,6 +39,7 @@ let g:session_directory = vimconfigdir . '/sessions'"}}}
 if has("user_commands")
   filetype off " just in case it was activated before
   " enable pathogen, which allows bundles in vim/bundle
+  set rtp+=~/.vim/bundle/pathogen
   call pathogen#runtime_append_all_bundles()
   command! Mkhelptags call pathogen#helptags()
 endif

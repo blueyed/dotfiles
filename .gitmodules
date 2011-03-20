@@ -200,3 +200,6 @@
 [submodule "vim/bundle/xoria256"]
 	path = vim/bundle/xoria256
 	url = git@github.com:blueyed/xoria256.vim.git
+[submodule "vim/bundle/pathogen"]
+	path = vim/bundle/pathogen
+	url = git://github.com/tpope/vim-pathogen.git

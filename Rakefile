@@ -1,6 +1,12 @@
 require 'rake'
 require 'erb'
 
+desc "Update the dot files in the user's home directory"
+task :update do
+  system %Q{git pull}
+  system %Q{git submodule update --init --recursive}
+end
+
 desc "install the dot files into user's home directory"
 task :install do
   base = ENV['HOME']

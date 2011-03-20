@@ -173,33 +173,68 @@
 [submodule "vim/bundle/zoomwin"]
 	path = vim/bundle/zoomwin
 	url = git://github.com/vim-scripts/ZoomWin.git
+	ignore = untracked
 [submodule "vim/bundle/maximize"]
 	path = vim/bundle/maximize
 	url = git://github.com/ervandew/maximize.git
+	ignore = untracked
 [submodule "vim/bundle/outlook"]
 	path = vim/bundle/outlook
 	url = git://github.com/vim-scripts/OutlookVim.git
+	ignore = untracked
 [submodule "vim/bundle/yankring"]
 	path = vim/bundle/yankring
 	url = git://github.com/vim-scripts/YankRing.vim.git
+	ignore = untracked
 [submodule "vim/bundle/sparkup"]
 	path = vim/bundle/sparkup
 	url = git://github.com/rstacruz/sparkup.git
+	ignore = untracked
 [submodule "vim/bundle/zenburn"]
 	path = vim/bundle/zenburn
 	url = git://github.com/vim-scripts/Zenburn.git
+	ignore = untracked
 [submodule "vim/bundle/mail_tgz"]
 	path = vim/bundle/mail_tgz
 	url = git://github.com/vim-scripts/mail.tgz.git
+	ignore = untracked
 [submodule "vim/bundle/ragtag"]
 	path = vim/bundle/ragtag
 	url = git://github.com/smith/vim-ragtag.git
+	ignore = untracked
 [submodule "vim/bundle/cyclecolors"]
 	path = vim/bundle/cyclecolors
 	url = git://github.com/vim-scripts/CycleColor.git
+	ignore = untracked
 [submodule "vim/bundle/xoria256"]
 	path = vim/bundle/xoria256
 	url = git@github.com:blueyed/xoria256.vim.git
+	ignore = untracked
 [submodule "vim/bundle/pathogen"]
 	path = vim/bundle/pathogen
 	url = git://github.com/tpope/vim-pathogen.git
+	ignore = untracked
+[submodule "vim/bundle/fugitive"]
+	path = vim/bundle/fugitive
+	url = git://github.com/tpope/vim-fugitive.git
+	ignore = untracked
+[submodule "vim/bundle/vim-addon-manager"]
+	path = vim/bundle/vim-addon-manager
+	url = git://github.com/MarcWeber/vim-addon-manager.git
+	ignore = untracked
+[submodule "vim/bundle/tir_black"]
+	path = vim/bundle/tir_black
+	url = git://github.com/vim-scripts/tir_black.git
+	ignore = untracked
+[submodule "vim/bundle/colorhighlight"]
+	path = vim/bundle/colorhighlight
+	url = git@github.com:blueyed/colorhighlight.vim.git
+	ignore = untracked
+[submodule "vim/bundle/syntaxattr"]
+	path = vim/bundle/syntaxattr
+	url = git://github.com/vim-scripts/SyntaxAttr.vim.git
+	ignore = untracked
+[submodule "vim/bundle/xterm-color-table"]
+	path = vim/bundle/xterm-color-table
+	url = git://github.com/guns/xterm-color-table.vim.git
+	ignore = untracked

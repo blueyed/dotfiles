@@ -315,6 +315,10 @@ endif
 set cursorline
 "highlight CursorLine guibg=lightblue ctermbg=lightgray
 
+" Make the current status line stand out, e.g. with xoria256 (using the
+" PreProc colors from there)
+" hi StatusLine      ctermfg=150 guifg=#afdf87
+
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
 
@@ -323,9 +327,11 @@ set hidden
 " consider existing windows (but not tabs) when opening files, e.g. from quickfix
 set switchbuf=useopen
 
-" Maps for jj to act as Esc
+" Maps for jj and kj to act as Esc (kj is idempotent in normal mode)
 ino jj <esc>
 cno jj <c-c>
+ino kj <esc>
+cno kj <c-c>
 
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
@@ -461,8 +467,8 @@ nmap <tab> %
 
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory
 imap <C-BS> <C-W>
-imap <C-Del> <esc>dwa
-imap <C-S-Del> <esc>dWa
+imap <C-Del> <C-O>dw
+imap <C-S-Del> <C-O>dW
 nmap <C-Del> dw
 nmap <C-S-Del> dWa
 
@@ -510,6 +516,7 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 0
+let g:tlib_pick_single_item = 1
 let g:tlib_inputlist_match = 'fuzzy' " test
 let g:tmruSize = 500
 
@@ -526,12 +533,15 @@ set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 set clipboard=unnamed
 
-" Identify the syntax highlighting group used at the cursor
-" via http://vim.wikia.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor
-map <leader><F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-
 " remap CTRL-W_ using maximize.vim (smarter and toggles)
 map <c-w>_ :MaximizeWindow<cr>
+
+" Exit with ÄÄ (German keyboard layout)
+noremap ÄÄ :confirm qall<cr>
+inoremap ÄÄ <C-O>:confirm qall<cr>
+cnoremap ÄÄ <C-C>:confirm qall<cr>
+onoremap ÄÄ <C-C>:confirm qall<cr>
+noremap ää :q<cr>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

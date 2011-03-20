@@ -212,3 +212,6 @@
 [submodule "vim/bundle/colorhighlight"]
 	path = vim/bundle/colorhighlight
 	url = git@github.com:blueyed/colorhighlight.vim.git
+[submodule "vim/bundle/syntaxattr"]
+	path = vim/bundle/syntaxattr
+	url = git://github.com/vim-scripts/SyntaxAttr.vim.git

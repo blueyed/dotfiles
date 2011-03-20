@@ -531,10 +531,6 @@ set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 set clipboard=unnamed
 
-" Identify the syntax highlighting group used at the cursor
-" via http://vim.wikia.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor
-map <leader><F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-
 " remap CTRL-W_ using maximize.vim (smarter and toggles)
 map <c-w>_ :MaximizeWindow<cr>
 

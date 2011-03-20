@@ -466,8 +466,8 @@ nmap <tab> %
 
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory
 imap <C-BS> <C-W>
-imap <C-Del> <esc>dwa
-imap <C-S-Del> <esc>dWa
+imap <C-Del> <C-O>dw
+imap <C-S-Del> <C-O>dW
 nmap <C-Del> dw
 nmap <C-S-Del> dWa
 
@@ -539,6 +539,7 @@ noremap ÄÄ :confirm qall<cr>
 inoremap ÄÄ <C-O>:confirm qall<cr>
 cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
+noremap ää :q<cr>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

@@ -179,7 +179,7 @@ if has("autocmd")
       hi clear EOLWS
     endif
   endfunction
-  augroup vimrcExEOLWS 
+  augroup vimrcExEOLWS
     au!
     highlight EOLWS ctermbg=red guibg=red
     autocmd InsertEnter * call MyAuGroupEOLWS("i")
@@ -279,7 +279,7 @@ set completeopt=longest,menu
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
 set dictionary+=spell " very useful, but requires ':set spell' once
-if has("autocmd") && exists("+omnifunc")            
+if has("autocmd") && exists("+omnifunc")
   autocmd Filetype *
     \   if &omnifunc == "" |
     \     setlocal omnifunc=syntaxcomplete#Complete |
@@ -516,8 +516,7 @@ nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
-let g:tlib_pick_last_item = 0
-let g:tlib_pick_single_item = 1
+let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'fuzzy' " test
 let g:tmruSize = 500
 

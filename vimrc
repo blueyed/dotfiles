@@ -168,10 +168,11 @@ if has("autocmd")
     if g:MyAuGroupEOLWSactive && &bt == ""
       hi EOLWS ctermbg=red guibg=red
       syn clear EOLWS
+      " match whitespace not preceded by a backslash
       if a:mode == "i"
-        syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+        syn match EOLWS excludenl /[\\]\@<!\s\+\%#\@!$/ containedin=ALL
       else
-        syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
+        syn match EOLWS excludenl /[\\]\@<!\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
       endif
     else
       syn clear EOLWS
@@ -341,7 +342,7 @@ imap <Leader>/ </<C-X><C-O>
 function! StripWhitespace ()
     let save_cursor = getpos(".")
     let old_query = getreg('/')
-    :%s/\s\+$//e
+    :%s/[\\]\@<!\s\+$//e
     call setpos('.', save_cursor)
     call setreg('/', old_query)
 endfunction

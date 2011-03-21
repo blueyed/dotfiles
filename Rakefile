@@ -79,7 +79,7 @@ task :upgrade do
   end
 
   # Commit any modules
-  submodule.each do |path|
+  submodules.each do |path|
     output = %x[ git commit -m 'Update submodule #{path} to origin/master.' ]
     puts output
   end

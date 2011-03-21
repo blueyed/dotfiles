@@ -1,6 +1,93 @@
 require 'rake'
 require 'erb'
 
+verbose = 1
+
+desc "Update the dot files in the user's home directory"
+task :update do
+  system %Q{git pull} or raise "Git pull failed."
+  system %Q{git submodule --quiet sync 2>&1} or raise "Git submodule sync failed."
+  while true
+    sm_update = %x[git submodule update --init --recursive 2>&1]
+    puts sm_update if verbose and sm_update != ""
+    if $?.success?
+      break
+    end
+    last_line = sm_update.split("\n")[-1]
+    if last_line =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
+      github_user = %x[git config --get github.user]
+      if github_user == ""
+        puts "No GitHub user found in `git config --get github.user`. Aborting."
+      end
+      # check for github_user's remote, and maybe add it and then retry
+      sm_path = $2
+      remotes = %x[git --git-dir '#{sm_path}/.git' remote]
+      if remotes =~ /^#{github_user}$/
+        puts "Remote '#{github_user}' exists already. Aborting."
+      else
+        puts "Adding remote '#{github_user}'." if verbose
+        output = %x[cd #{sm_path} && hub remote add -p #{github_user} 2>&1]
+        if not $?.success?
+          puts "Failed to add submodule:\n" + output
+          break
+        end
+      end
+      puts "Fetching remote '#{github_user}'." if verbose
+      output = %x[cd #{sm_path} && git fetch #{github_user} 2>&1]
+      if not $?.success?
+        puts "Failed to fetch submodule:\n" + output
+        break
+      end
+    end
+    puts "Retrying update.."
+  end
+end
+
+def get_submodule_status
+  status = %x[ git submodule status --recursive ] or raise "Getting submodule status failed"
+  r = {}
+  status.split("\n").each do |line|
+    if not line =~ /^([ +-])(\w{40}) (.*) \(.*\)$/
+      raise "Found invalid submodule line: #{line}"
+    end
+    path = $3
+    r[path] = {"state" => $1}
+  end
+  return r
+end
+
+desc "Upgrade submodules to current master"
+task :upgrade do
+  # system %Q{ git diff --cached --exit-code > /dev/null } or raise "The Git index is not clean."
+
+  submodules = {}
+  # get_submodule_status.each do |sm|
+  get_submodule_status().each do |path, sm|
+    if sm["state"] == "+"
+      puts "Skipping modified submodule #{path}."
+      next
+    end
+    if sm["state"] == "-"
+      puts "Skipping uninitialized submodule #{path}."
+      next
+    end
+  end
+  submodules.each do |path,match|
+    puts path if verbose
+    output = %x[ cd '#{path}' && git co master && git pull origin master ]
+    puts output
+  end
+
+  # Commit any modules
+  submodule.each do |path|
+    output = %x[ git commit -m 'Update submodule #{path} to origin/master.' ]
+    puts output
+  end
+  # %x[ git submodule foreach "git pull origin master && git co master" ]
+  # Commit any new modules
+end
+
+
 desc "install the dot files into user's home directory"
 task :install do
   base = ENV['HOME']

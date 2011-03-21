@@ -238,3 +238,6 @@
 	path = vim/bundle/xterm-color-table
 	url = git://github.com/guns/xterm-color-table.vim.git
 	ignore = untracked
+[submodule "vim/bundle/autoclose"]
+	path = vim/bundle/autoclose
+	url = git://github.com/vim-scripts/AutoClose.git

@@ -542,7 +542,7 @@ noremap ÄÄ :confirm qall<cr>
 inoremap ÄÄ <C-O>:confirm qall<cr>
 cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
-noremap ää :q<cr>
+noremap ää :confirm q<cr>
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

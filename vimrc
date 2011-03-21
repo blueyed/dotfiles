@@ -120,6 +120,8 @@ if has("autocmd")
   augroup END
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
+
+  au FocusLost * stopinsert
 else
 
   set autoindent    " always set autoindenting on

@@ -203,7 +203,49 @@ endif
 
 " Always display the status line
 set laststatus=2
-set statusline=%F%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+
+" statusline{{{
+" old
+" set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+
+set statusline=%!MyStatusLine()
+function! FileSize()
+  let bytes = getfsize(expand("%:p"))
+  if bytes <= 0
+    return ""
+  endif
+  if bytes < 1024
+    return bytes
+  else
+    return (bytes / 1024) . "K"
+  endif
+endfunction
+fun! MyStatusLine()
+  let r = []
+  let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
+  "let r += ['%t']       "tail of the filename
+  "let r += ['%f']       "filename
+  let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+  let r += ['%m']       "modified flag
+  let r += ['%<']       "cut here
+  let r += ['%( [']
+  let r += ['%Y']      "filetype
+  let r += ['%H']      "help file flag
+  let r += ['%W']      "preview window flag
+  let r += ['%R']      "read only flag
+  let r += [',%{&ff}']  "file format
+  let r += [',%{strlen(&fenc)?&fenc:"none"}'] "file encoding
+  let r += ['] %)']
+  let r += ['%{fugitive#statusline()}']
+  let r += ['%=']      "left/right separator
+  let r += ['[c%03.3b]'] " Value of character under cursor
+  let r += [' %{FileSize()} ']  " size of file (human readable)
+  let r += ['%c%V,']   "cursor column (virtual if different)
+  let r += ['%l/%L']   "cursor line/total lines
+  let r += [' %P']    "percent through file
+  return join(r, '')
+endfunction"}}}
+
 
 " Hide search highlighting
 map <Leader>h :set invhls <CR>

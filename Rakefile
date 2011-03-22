@@ -74,16 +74,30 @@ task :upgrade do
       puts "Skipping uninitialized submodule #{path}."
       next
     end
+    submodules[path] = [sm]
   end
-  submodules.each do |path,match|
+  submodules.each do |path,sm|
     puts path if verbose
+    # TODO: pull from github_user branch if present
+    # should fix:
+    # vim/bundle/visualctrlg
+    # Already on 'master'
+    # From git://github.com/tyru/visualctrlg.vim
+    #  * branch            master     -> FETCH_HEAD
+    #  Your branch and 'origin/master' have diverged,
+    #  and have 2 and 1 different commit(s) each, respectively.
+    #  Auto-merging plugin/visualctrlg.vim
+    #  CONFLICT (content): Merge conflict in plugin/visualctrlg.vim
+    #  Automatic merge failed; fix conflicts and then commit the result.
+    #
     output = %x[ cd '#{path}' && git co master && git pull origin master ]
     puts output
   end
 
-  # Commit any modules
+  # Commit any updated modules
   submodules.each do |path|
-    output = %x[ git commit -m 'Update submodule #{path} to origin/master.' ]
+    next if sm["state"] != "+"
+    output = %x[ git commit -m 'Update submodule #{path} to origin/master.' #{path} ]
     puts output
   end
   # %x[ git submodule foreach "git pull origin master && git co master" ]

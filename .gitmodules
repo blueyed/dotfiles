@@ -240,4 +240,4 @@
 	ignore = untracked
 [submodule "vim/bundle/autoclose"]
 	path = vim/bundle/autoclose
-	url = git://github.com/vim-scripts/AutoClose.git
+	url = git://github.com/blueyed/vim-autoclose.git

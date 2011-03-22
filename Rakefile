@@ -5,9 +5,12 @@ verbose = 1
 
 desc "Update the dot files in the user's home directory"
 task :update do
+  puts "Pulling.." if verbose
   system %Q{git pull} or raise "Git pull failed."
+  puts "Syncing submodules.." if verbose
   system %Q{git submodule --quiet sync 2>&1} or raise "Git submodule sync failed."
   while true
+    puts "Updating submodules.." if verbose
     sm_update = %x[git submodule update --init --recursive 2>&1]
     puts sm_update if verbose and sm_update != ""
     if $?.success?
@@ -79,7 +82,7 @@ task :upgrade do
   end
 
   # Commit any modules
-  submodule.each do |path|
+  submodules.each do |path|
     output = %x[ git commit -m 'Update submodule #{path} to origin/master.' ]
     puts output
   end

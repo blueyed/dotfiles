@@ -170,17 +170,18 @@ if has("autocmd")
     if g:MyAuGroupEOLWSactive && &bt == ""
       hi EOLWS ctermbg=red guibg=red
       syn clear EOLWS
+      " match whitespace not preceded by a backslash
       if a:mode == "i"
-        syn match EOLWS excludenl /\s\+\%#\@!$/ containedin=ALL
+        syn match EOLWS excludenl /[\\]\@<!\s\+\%#\@!$/ containedin=ALL
       else
-        syn match EOLWS excludenl /\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
+        syn match EOLWS excludenl /[\\]\@<!\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
       endif
     else
       syn clear EOLWS
       hi clear EOLWS
     endif
   endfunction
-  augroup vimrcExEOLWS 
+  augroup vimrcExEOLWS
     au!
     highlight EOLWS ctermbg=red guibg=red
     autocmd InsertEnter * call MyAuGroupEOLWS("i")
@@ -204,7 +205,49 @@ endif
 
 " Always display the status line
 set laststatus=2
-set statusline=%F%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+
+" statusline{{{
+" old
+" set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+
+set statusline=%!MyStatusLine()
+function! FileSize()
+  let bytes = getfsize(expand("%:p"))
+  if bytes <= 0
+    return ""
+  endif
+  if bytes < 1024
+    return bytes
+  else
+    return (bytes / 1024) . "K"
+  endif
+endfunction
+fun! MyStatusLine()
+  let r = []
+  let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
+  "let r += ['%t']       "tail of the filename
+  "let r += ['%f']       "filename
+  let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+  let r += ['%m']       "modified flag
+  let r += ['%<']       "cut here
+  let r += ['%( [']
+  let r += ['%Y']      "filetype
+  let r += ['%H']      "help file flag
+  let r += ['%W']      "preview window flag
+  let r += ['%R']      "read only flag
+  let r += [',%{&ff}']  "file format
+  let r += [',%{strlen(&fenc)?&fenc:"none"}'] "file encoding
+  let r += ['] %)']
+  let r += ['%{fugitive#statusline()}']
+  let r += ['%=']      "left/right separator
+  let r += ['[c%03.3b]'] " Value of character under cursor
+  let r += [' %{FileSize()} ']  " size of file (human readable)
+  let r += ['%c%V,']   "cursor column (virtual if different)
+  let r += ['%l/%L']   "cursor line/total lines
+  let r += [' %P']    "percent through file
+  return join(r, '')
+endfunction"}}}
+
 
 " Hide search highlighting
 map <Leader>h :set invhls <CR>
@@ -280,7 +323,7 @@ set completeopt=longest,menu
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
 set dictionary+=spell " very useful, but requires ':set spell' once
-if has("autocmd") && exists("+omnifunc")            
+if has("autocmd") && exists("+omnifunc")
   autocmd Filetype *
     \   if &omnifunc == "" |
     \     setlocal omnifunc=syntaxcomplete#Complete |
@@ -343,7 +386,7 @@ imap <Leader>/ </<C-X><C-O>
 function! StripWhitespace ()
     let save_cursor = getpos(".")
     let old_query = getreg('/')
-    :%s/\s\+$//e
+    :%s/[\\]\@<!\s\+$//e
     call setpos('.', save_cursor)
     call setreg('/', old_query)
 endfunction
@@ -517,8 +560,7 @@ nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
-let g:tlib_pick_last_item = 0
-let g:tlib_pick_single_item = 1
+let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'fuzzy' " test
 let g:tmruSize = 500
 

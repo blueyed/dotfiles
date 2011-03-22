@@ -18,7 +18,7 @@ task :update do
     end
     last_line = sm_update.split("\n")[-1]
     if last_line =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
-      github_user = %x[git config --get github.user]
+      github_user = %x[git config --get github.user].chomp
       if github_user == ""
         puts "No GitHub user found in `git config --get github.user`. Aborting."
       end

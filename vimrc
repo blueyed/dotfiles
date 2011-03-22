@@ -119,7 +119,7 @@ if has("autocmd")
   autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc source $MYVIMRC
   augroup END
 
-  au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl
+  au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim
 
   au FocusLost * stopinsert
 else
@@ -504,8 +504,8 @@ if exists("*VCSCommandVCSType")
 endif
 
 " make search very magic by default (more PCRE style)
-nnoremap / /\v
-vnoremap / /\v
+" nnoremap / /\v
+" vnoremap / /\v
 
 nmap <tab> %
 " conflicts with snipMate: vmap <tab> %

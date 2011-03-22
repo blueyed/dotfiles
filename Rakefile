@@ -16,8 +16,12 @@ task :update do
     if $?.success?
       break
     end
-    last_line = sm_update.split("\n")[-1]
-    if last_line =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
+    output = sm_update.split("\n")
+    if output[-1] =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
+      if output.index('Please, commit your changes or stash them before you can switch branches.')
+        puts "Abort: manual interaction required." # XXX: we might stash here automatically, but not yet..
+        break
+      end
       github_user = %x[git config --get github.user].chomp
       if github_user == ""
         puts "No GitHub user found in `git config --get github.user`. Aborting."
@@ -26,7 +30,7 @@ task :update do
       sm_path = $2
       remotes = %x[git --git-dir '#{sm_path}/.git' remote]
       if remotes =~ /^#{github_user}$/
-        puts "Remote '#{github_user}' exists already. Aborting."
+        puts "Remote '#{github_user}' exists already." if verbose
       else
         puts "Adding remote '#{github_user}'." if verbose
         output = %x[cd #{sm_path} && hub remote add -p #{github_user} 2>&1]
@@ -47,13 +51,15 @@ task :update do
 end
 
 def get_submodule_status
+  puts "Getting submodules status.." if verbose
   status = %x[ git submodule status --recursive ] or raise "Getting submodule status failed"
   r = {}
   status.split("\n").each do |line|
-    if not line =~ /^([ +-])(\w{40}) (.*) \(.*\)$/
-      raise "Found invalid submodule line: #{line}"
+    if not line =~ /^([ +-])(\w{40}) (.*?)(?: \(.*\))?$/
+      raise "Found unexpected submodule line: #{line}"
     end
     path = $3
+    next if ! path
     r[path] = {"state" => $1}
   end
   return r
@@ -65,7 +71,7 @@ task :upgrade do
 
   submodules = {}
   # get_submodule_status.each do |sm|
-  get_submodule_status().each do |path, sm|
+  get_submodule_status.each do |path, sm|
     if sm["state"] == "+"
       puts "Skipping modified submodule #{path}."
       next
@@ -77,7 +83,7 @@ task :upgrade do
     submodules[path] = [sm]
   end
   submodules.each do |path,sm|
-    puts path if verbose
+    puts "Pulling #{path}.." if verbose
     # TODO: pull from github_user branch if present
     # should fix:
     # vim/bundle/visualctrlg
@@ -90,12 +96,23 @@ task :upgrade do
     #  CONFLICT (content): Merge conflict in plugin/visualctrlg.vim
     #  Automatic merge failed; fix conflicts and then commit the result.
     #
-    output = %x[ cd '#{path}' && git co master && git pull origin master ]
-    puts output
+    output = %x[ { cd '#{path}' && git co master && git pull origin master; } 2>&1 ]
+    if not $?.success?
+      raise "Pulling failed: " + output
+    end
+    output = output.split("\n")
+    # Output important lines
+    puts output.select{|x| x=~/^Your branch is/}
+
+    if output[-1] != 'Already up-to-date.'
+      puts output
+    else
+      puts output if verbose > 1
+    end
   end
 
   # Commit any updated modules
-  submodules.each do |path|
+  get_submodule_status.each do |path, sm|
     next if sm["state"] != "+"
     output = %x[ git commit -m 'Update submodule #{path} to origin/master.' #{path} ]
     puts output

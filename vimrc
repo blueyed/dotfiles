@@ -128,13 +128,13 @@ else
 
 endif " has("autocmd")
 
-" if has("folding")
-  " set foldenable
-  " set foldmethod=syntax
+if has("folding")
+  set foldenable
+  set foldmethod=marker
   " set foldlevel=1
   " set foldnestmax=2
   " set foldtext=strpart(getline(v:foldstart),0,50).'\ ...\ '.substitute(getline(v:foldend),'^[\ #]*','','g').'\ '
-" endif
+endif
 
 set tabstop=2
 set shiftwidth=2
@@ -225,9 +225,12 @@ endfunction
 fun! MyStatusLine()
   let r = []
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
-  "let r += ['%t']       "tail of the filename
   "let r += ['%f']       "filename
-  let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+  if &ft == "help"
+    let r += ['%t']       "tail of the filename
+  else
+    let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+  endif
   let r += ['%m']       "modified flag
   let r += ['%<']       "cut here
   let r += ['%( [']
@@ -561,7 +564,7 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 1
-let g:tlib_inputlist_match = 'fuzzy' " test
+let g:tlib_inputlist_match = 'seq'
 let g:tmruSize = 500
 
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
@@ -587,6 +590,12 @@ inoremap ÄÄ <C-O>:confirm qall<cr>
 cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
 noremap ää :confirm q<cr>
+
+" typos
+command! Q q
+command! W w
+command! Wq wq
+
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

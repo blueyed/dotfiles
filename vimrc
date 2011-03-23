@@ -529,6 +529,8 @@ nmap <C-S-Del> dWa
 
 " edit vimrc shortcut
 nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
+" edit zshrc shortcut
+nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 
 let g:snips_author = "Daniel Hahler"
 

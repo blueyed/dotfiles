@@ -12,7 +12,7 @@
 	ignore = untracked
 [submodule "vim/bundle/ack"]
 	path = vim/bundle/ack
-	url = git://github.com/mileszs/ack.vim.git
+	url = git://github.com/blueyed/ack.vim.git
 	ignore = untracked
 [submodule "vim/bundle/taglist"]
 	path = vim/bundle/taglist

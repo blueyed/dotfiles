@@ -67,7 +67,7 @@ end
 
 desc "Upgrade submodules to current master"
 task :upgrade do
-  # system %Q{ git diff --cached --exit-code > /dev/null } or raise "The Git index is not clean."
+  system %Q{ git diff --cached --exit-code > /dev/null } or raise "The git index is not clean."
 
   submodules = {}
   # get_submodule_status.each do |sm|
@@ -96,7 +96,7 @@ task :upgrade do
     #  CONFLICT (content): Merge conflict in plugin/visualctrlg.vim
     #  Automatic merge failed; fix conflicts and then commit the result.
     #
-    output = %x[ { cd '#{path}' && git co master && git pull origin master; } 2>&1 ]
+    output = %x[ { cd '#{path}' && git fetch --all && git co master && git merge origin master; } 2>&1 ]
     if not $?.success?
       raise "Pulling failed: " + output
     end
@@ -104,7 +104,7 @@ task :upgrade do
     # Output important lines
     puts output.select{|x| x=~/^Your branch is/}
 
-    if output[-1] != 'Already up-to-date.'
+    if ! output[-1] =~ /^Already up-to-date.( Yeeah!)?/
       puts output
     else
       puts output if verbose > 1

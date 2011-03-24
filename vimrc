@@ -259,7 +259,7 @@ map <Leader>h :set invhls <CR>
 
 " Opens an edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>e
-map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+map <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
 
 " Opens a tab edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>t
@@ -471,6 +471,9 @@ set nostartofline " do not go to start of line automatically when moving
 set scrolloff=3
 set sidescroll=1
 
+" gets ignored by tmru
+set suffixes+=.tmp 
+
 " command-t plugin
 let g:CommandTMaxFiles=50000
 let g:CommandTMaxHeight=20
@@ -562,6 +565,20 @@ endfunction
 vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
 
+" Close all open buffers on entering a window if the only
+" buffer that's left is the NERDTree buffer
+function! s:CloseIfOnlyNerdTreeLeft()
+  if exists("t:NERDTreeBufName")
+    if bufwinnr(t:NERDTreeBufName) != -1
+      if winnr("$") == 1
+        q
+      endif
+    endif
+  endif
+endfunction
+autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
+
+
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
@@ -599,6 +616,19 @@ noremap ää :confirm q<cr>
 command! Q q
 command! W w
 command! Wq wq
+
+
+command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
+fun! GrepCurrentBuffer(q)
+	let save_cursor = getpos(".")
+  try
+    cexpr []
+    exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
+  finally
+    call setpos('.', save_cursor)
+  endtry
+endfunction
+noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
 
 
 " source ~/.vim/source.d/*.vim

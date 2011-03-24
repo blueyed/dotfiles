@@ -96,7 +96,7 @@ task :upgrade do
     #  CONFLICT (content): Merge conflict in plugin/visualctrlg.vim
     #  Automatic merge failed; fix conflicts and then commit the result.
     #
-    output = %x[ { cd '#{path}' && git fetch --all && git co master && git merge origin master; } 2>&1 ]
+    output = %x[ { cd '#{path}' && git fetch --all && git co master && git merge origin/master master ; } 2>&1 ]
     if not $?.success?
       raise "Pulling failed: " + output
     end

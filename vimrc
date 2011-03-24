@@ -121,7 +121,9 @@ if has("autocmd")
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim
 
-  au FocusLost * stopinsert
+  if (has("gui_running"))
+    au FocusLost * stopinsert
+  endif
 else
 
   set autoindent    " always set autoindenting on
@@ -277,6 +279,8 @@ vmap P p :call setreg('"', getreg('0')) <CR>
 
 if has("autocmd")
   au! BufRead,BufNewFile *.haml         setfiletype haml
+
+  au! BufRead * DetectIndent
 endif
 
 " Press ^F from insert mode to insert the current file name

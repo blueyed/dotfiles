@@ -1,3 +1,4 @@
 --type-add=php=.inc
 --type-set=typoscript=.ts
 --ignore-dir=cache
+--ignore-dir=media

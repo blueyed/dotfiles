@@ -241,3 +241,6 @@
 [submodule "vim/bundle/autoclose"]
 	path = vim/bundle/autoclose
 	url = git://github.com/blueyed/vim-autoclose.git
+[submodule "vim/bundle/pastebin"]
+	path = vim/bundle/pastebin
+	url = git://github.com/mattn/pastebin-vim.git

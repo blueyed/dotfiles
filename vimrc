@@ -329,7 +329,7 @@ endif
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
-set dictionary+=spell " very useful, but requires ':set spell' once
+set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
 if has("autocmd") && exists("+omnifunc")
   autocmd Filetype *
     \   if &omnifunc == "" |
@@ -425,8 +425,18 @@ noremap <leader>W :w !sudo tee % > /dev/null<CR>
 " autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
 " autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
-" add semicolon to end of line if there is none
-noremap <leader>; :s/\([^;]\)$/\1;/<cr>
+" Toggle semicolon at end of line
+function! MyToggleSemicolon()
+  let ss = @/ | let save_cursor = getpos(".")
+  try
+    s/\([^;]\)$/\1;/
+	catch /^Vim\%((\a\+)\)\=:E486: Pattern not found/
+    s/;$//
+  finally
+    let @/ = ss | call setpos('.', save_cursor)
+  endtry
+endfunction
+noremap <leader>; :call MyToggleSemicolon()<cr>
 
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it

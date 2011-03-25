@@ -99,3 +99,11 @@ wiki() {
 		dig +short txt $1.wp.dg.cx;
 	fi
 }
+
+screen() {
+  if [ -x /usr/bin/tput ] && [ $(/usr/bin/tput colors 2>/dev/null || echo 0) -eq 256 ]; then
+    command screen -T screen-256color "$@"
+  else
+    command screen
+  fi
+}

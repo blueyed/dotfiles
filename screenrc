@@ -38,6 +38,10 @@ bindkey -m "^[[6;2~" stuff ^f
 # if this causes problems try/use ".i" instead
 attrcolor b ""
 
+# Enable 256 color terminal (from byobu)
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+termcapinfo xterm 'Co#256'
+
 # Change to home directory (this is used for new windows by default)
 # for more/related discussion about this see: http://stackoverflow.com/questions/1517414/how-to-make-gnu-screen-start-a-new-window-at-the-current-working-directory
 chdir $HOME

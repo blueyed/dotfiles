@@ -109,10 +109,10 @@ silent qmark t twitter.com
 silent qmark g https://www.google.com/reader/view
 
 group! editor
-autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
-autocmd LocationChange www.reddit.com :set editor='gvim -f -c ''set ft=markdown | call cursor(<line>, <column>)'''
-autocmd LocationChange ^https?://mail\\..*   :set editor='gvim -f -c ''set ft=mail | call cursor(<line>, <column>)'''
-autocmd LocationChange /phpmyadmin/ :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
+autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell | call cursor(<line>, <column>)'''
+autocmd LocationChange www.reddit.com,github.com,stackoverflow.com :set editor='gvim -f -c ''set ft=markdown spell | call cursor(<line>, <column>)'''
+autocmd LocationChange ^https?://mail\\..*   :set editor='gvim -f -c ''set ft=mail spell | call cursor(<line>, <column>)'''
+autocmd LocationChange ^https?://[^/]+/phpmyadmin/ :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
 group default
 
 " passthrough certain keys, see "h key-sequence" for a list

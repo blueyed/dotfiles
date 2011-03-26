@@ -244,3 +244,6 @@
 [submodule "vim/bundle/pastebin"]
 	path = vim/bundle/pastebin
 	url = git://github.com/mattn/pastebin-vim.git
+[submodule "vim/bundle/solarized"]
+	path = vim/bundle/solarized
+	url = git://github.com/altercation/vim-colors-solarized.git

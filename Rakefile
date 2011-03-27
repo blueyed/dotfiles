@@ -47,8 +47,8 @@ task :update do
         break
       end
       output = output.split("\n")
-      if output[-1] == ' = [up to date]      master     -> blueyed/master'
-        puts "blueyed/master already up to date. Something wrong. Aborting.\n" + output
+      if output.index(' = [up to date]      master     -> blueyed/master')
+        puts "blueyed/master already up to date. Something wrong. Aborting.\n" + output.join("\n")
         break
       end
     end
@@ -119,11 +119,12 @@ task :upgrade do
       %x[cd #{path} && git merge FETCH_HEAD]
     end
 
-    output = %x[cd #{path} && git merge FETCH_HEAD 2>&1]
-    if ! output[-1] =~ /^Already up-to-date.( Yeeah!)?/
+    output = %x[cd #{path} && git merge --ff-only FETCH_HEAD 2>&1]
+    if ! output.split("\n")[-1] =~ /^Already up-to-date.( Yeeah!)?/
       puts output
     else
       puts output if $my_verbose and $my_verbose > 1
+      # TODO: pull result
     end
     if not $?.success?
       raise "Merging FETCH_HEAD failed: " + output

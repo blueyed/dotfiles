@@ -1,7 +1,13 @@
-let g:my_full_name = "Daniel Hahler"
+if 1 " has('eval')
+  let mapleader = ","
+  let g:my_full_name = "Daniel Hahler"
 
-" replace ~/vimfiles with ~/.vim in runtimepath
-let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
+  let g:snips_author = g:my_full_name
+
+  " replace ~/vimfiles with ~/.vim in runtimepath
+  let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
+endif
+
 
 " Local dirs"{{{
 set backupdir=~/.local/share/vim/backups
@@ -18,19 +24,22 @@ if has('persistent_undo')
   endif
 endif
 
-let vimcachedir=expand('~/.cache/vim')
-if ! isdirectory(vimcachedir)
-  echo "Creating cache dir ".vimcachedir
-  call mkdir( vimcachedir, 'p', 0700 )
-endif
-let g:tlib_cache = vimcachedir . '/tlib'
+if 1
+  let vimcachedir=expand('~/.cache/vim')
+  if ! isdirectory(vimcachedir)
+    echo "Creating cache dir ".vimcachedir
+    call mkdir( vimcachedir, 'p', 0700 )
+  endif
+  let g:tlib_cache = vimcachedir . '/tlib'
 
-let vimconfigdir=expand('~/.config/vim')
-if ! isdirectory(vimconfigdir)
-  echo "Creating config dir ".vimconfigdir
-  call mkdir( vimconfigdir, 'p', 0700 )
-endif
-let g:session_directory = vimconfigdir . '/sessions'"}}}
+  let vimconfigdir=expand('~/.config/vim')
+  if ! isdirectory(vimconfigdir)
+    echo "Creating config dir ".vimconfigdir
+    call mkdir( vimconfigdir, 'p', 0700 )
+  endif
+  let g:session_directory = vimconfigdir . '/sessions'"
+end
+" }}}
 
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
@@ -140,9 +149,6 @@ set tabstop=2
 set shiftwidth=2
 set expandtab
 
-if 1 " has('eval')
-  let mapleader = ","
-endif
 if has("autocmd")
   " Expand tabs for Debian changelog. This is probably not the correct way.
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
@@ -210,6 +216,7 @@ set laststatus=2
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
+if has('statusline')
 set statusline=%!MyStatusLine()
 function! FileSize()
   let bytes = getfsize(expand("%:p"))
@@ -249,7 +256,9 @@ fun! MyStatusLine()
   let r += ['%l/%L']   "cursor line/total lines
   let r += [' %P']    "percent through file
   return join(r, '')
-endfunction"}}}
+endfunction
+endif
+"}}}
 
 
 " Hide search highlighting
@@ -387,16 +396,6 @@ cno kj <c-c>
 imap <Leader>/ </<C-X><C-O>
 
 
-" Strip trailing whitespace
-function! StripWhitespace ()
-    let save_cursor = getpos(".")
-    let old_query = getreg('/')
-    :%s/[\\]\@<!\s\+$//e
-    call setpos('.', save_cursor)
-    call setreg('/', old_query)
-endfunction
-noremap <leader>st :call StripWhitespace ()<CR>
-
 " swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
 vnoremap <C-X> <Esc>`.``gvP``P
 
@@ -423,6 +422,17 @@ noremap <leader>W :w !sudo tee % > /dev/null<CR>
 " autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
 " autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
+if 1 " has('eval')
+" Strip trailing whitespace
+function! StripWhitespace ()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    :%s/[\\]\@<!\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfunction
+noremap <leader>st :call StripWhitespace ()<CR>
+
 " Toggle semicolon at end of line
 function! MyToggleSemicolon()
   let ss = @/ | let save_cursor = getpos(".")
@@ -436,6 +446,102 @@ function! MyToggleSemicolon()
 endfunction
 noremap <leader>; :call MyToggleSemicolon()<cr>
 
+command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
+fun! GrepCurrentBuffer(q)
+	let save_cursor = getpos(".")
+  try
+    cexpr []
+    exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
+  finally
+    call setpos('.', save_cursor)
+  endtry
+endfunction
+noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
+
+" source http://vim.wikia.com/wiki/Switching_case_of_characters
+function! TwiddleCase(str)
+  if a:str ==# toupper(a:str)
+    let result = tolower(a:str)
+  elseif a:str ==# tolower(a:str)
+    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
+  else
+    let result = toupper(a:str)
+  endif
+  return result
+endfunction
+vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
+
+
+" Close all open buffers on entering a window if the only
+" buffer that's left is the NERDTree buffer
+function! s:CloseIfOnlyNerdTreeLeft()
+  if exists("t:NERDTreeBufName")
+    if bufwinnr(t:NERDTreeBufName) != -1
+      if winnr("$") == 1
+        q
+      endif
+    endif
+  endif
+endfunction
+autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
+
+" setup b:VCSCommandVCSType
+function! SetupVCSType()
+  try
+    call VCSCommandGetVCSType(bufnr('%'))
+  catch /No suitable plugin/
+  endtry
+endfunction
+" do not call it automatically for now: vcscommands behaves weird (changing
+" dirs), and slows simple scrolling (?) down (that might be quickfixsigns
+" though)
+if exists("*VCSCommandVCSType")
+"au BufRead * call SetupVCSType()
+endif
+
+" Open Windows explorer and select current file
+if executable('explorer.exe')
+  command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
+endif
+
+" do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
+let g:tlib_pick_last_item = 1
+let g:tlib_inputlist_match = 'seq'
+let g:tmruSize = 500
+
+let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
+let g:easytags_cmd = 'ctags'
+let g:easytags_suppress_ctags_warning = 1
+
+let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
+
+" command-t plugin
+let g:CommandTMaxFiles=50000
+let g:CommandTMaxHeight=20
+if has("autocmd") && exists(":CommandTFlush") && has("ruby")
+  " this is required for Command-T to pickup the setting(s)
+  au VimEnter * CommandTFlush
+endif
+if (has("gui_running"))
+  " use Alt-T in GUI mode
+  map <M-t> :CommandT<CR>
+endif
+map <leader>tt :CommandT<CR>
+map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
+map <Leader>t  :CommandT<space>
+
+" supertab
+let g:SuperTabLongestEnhanced=1
+let g:SuperTabLongestHighlight=1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
+
+let g:UltiSnipsExpandTrigger="<tab>"
+"let g:UltiSnipsJumpForwardTrigger="<tab>"
+"let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
+
+endif " eval guard
+
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
 " nnoremap  <Down> <C-W>j
@@ -446,8 +552,6 @@ noremap <leader>; :call MyToggleSemicolon()<cr>
 " defined in php-doc.vim
 " nnoremap <Leader>d :call PhpDocSingle()<CR>
 
-" Open Windows explorer and select current file
-command! Winexplorer :!start explorer.exe /e,/select,"%:p:gs?/?\\?"
 noremap <Leader>n :NERDTree<space>
 noremap <Leader>n. :execute "NERDTree ".expand("%:p:h")<cr>
 noremap <Leader>nb :NERDTreeFromBookmark<space>
@@ -484,44 +588,11 @@ set sidescroll=1
 " gets ignored by tmru
 set suffixes+=.tmp 
 
-" command-t plugin
-let g:CommandTMaxFiles=50000
-let g:CommandTMaxHeight=20
-if has("autocmd") && exists(":CommandTFlush") && has("ruby")
-  " this is required for Command-T to pickup the setting(s)
-  au VimEnter * CommandTFlush
-endif
-if (has("gui_running"))
-  " use Alt-T in GUI mode
-  map <M-t> :CommandT<CR>
-endif
-map <leader>tt :CommandT<CR>
-map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
-map <Leader>t  :CommandT<space>
-
-" supertab
-let g:SuperTabLongestEnhanced=1
-let g:SuperTabLongestHighlight=1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
-
 " Smart way to move btw. windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
-
-" setup b:VCSCommandVCSType
-function! SetupVCSType()
-  try
-    call VCSCommandGetVCSType(bufnr('%'))
-  catch /No suitable plugin/
-  endtry
-endfunction
-" do not call it automatically for now: vcscommands behaves weird (changing
-" dirs), and slows simple scrolling (?) down (that might be quickfixsigns
-" though)
-if exists("*VCSCommandVCSType")
-"au BufRead * call SetupVCSType()
-endif
 
 " make search very magic by default (more PCRE style)
 " nnoremap / /\v
@@ -542,12 +613,6 @@ nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
 " edit zshrc shortcut
 nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 
-let g:snips_author = g:my_full_name
-
-let g:UltiSnipsExpandTrigger="<tab>"
-"let g:UltiSnipsJumpForwardTrigger="<tab>"
-"let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc
 " function! s:CommandCabbr(abbreviation, expansion)
@@ -561,52 +626,12 @@ no ' `
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 set guioptions-=m
 
-let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
-
-" source http://vim.wikia.com/wiki/Switching_case_of_characters
-function! TwiddleCase(str)
-  if a:str ==# toupper(a:str)
-    let result = tolower(a:str)
-  elseif a:str ==# tolower(a:str)
-    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
-  else
-    let result = toupper(a:str)
-  endif
-  return result
-endfunction
-vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
-
-
-" Close all open buffers on entering a window if the only
-" buffer that's left is the NERDTree buffer
-function! s:CloseIfOnlyNerdTreeLeft()
-  if exists("t:NERDTreeBufName")
-    if bufwinnr(t:NERDTreeBufName) != -1
-      if winnr("$") == 1
-        q
-      endif
-    endif
-  endif
-endfunction
-autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
-
 
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
 
-" do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
-let g:tlib_pick_last_item = 1
-let g:tlib_inputlist_match = 'seq'
-let g:tmruSize = 500
-
-let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
-let g:easytags_cmd = 'ctags'
-let g:easytags_suppress_ctags_warning = 1
-
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
-
-let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 
 " I feel dirty, plz rename kthxbye!
 behave mswin
@@ -624,23 +649,13 @@ cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
 noremap ää :confirm q<cr>
 
-" typos
-command! Q q
-command! W w
-command! Wq wq
 
-
-command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
-fun! GrepCurrentBuffer(q)
-	let save_cursor = getpos(".")
-  try
-    cexpr []
-    exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
-  finally
-    call setpos('.', save_cursor)
-  endtry
-endfunction
-noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
+if has('user_commands')
+  " typos
+  command! Q q
+  command! W w
+  command! Wq wq
+endif
 
 "{{{ Abbreviations
 " <C-g>u adds break to undo chain, see i_CTRL-G_u

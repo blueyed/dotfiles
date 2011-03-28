@@ -1,18 +1,19 @@
 require 'rake'
 require 'erb'
 
-verbose = 1
+$my_verbose = 1
+$my_verbose = false if $my_verbose == 0
 
 desc "Update the dot files in the user's home directory"
 task :update do
-  puts "Pulling.." if verbose
+  puts "Pulling.." if $my_verbose
   system %Q{git pull} or raise "Git pull failed."
-  puts "Syncing submodules.." if verbose
+  puts "Syncing submodules.." if $my_verbose
   system %Q{git submodule --quiet sync 2>&1} or raise "Git submodule sync failed."
   while true
-    puts "Updating submodules.." if verbose
+    puts "Updating submodules.." if $my_verbose
     sm_update = %x[git submodule update --init --recursive 2>&1]
-    puts sm_update if verbose and sm_update != ""
+    puts sm_update if $my_verbose and sm_update != ""
     if $?.success?
       break
     end
@@ -22,7 +23,7 @@ task :update do
         puts "Abort: manual interaction required." # XXX: we might stash here automatically, but not yet..
         break
       end
-      github_user = %x[git config --get github.user].chomp
+      github_user = get_github_user
       if github_user == ""
         puts "No GitHub user found in `git config --get github.user`. Aborting."
       end
@@ -30,29 +31,39 @@ task :update do
       sm_path = $2
       remotes = %x[git --git-dir '#{sm_path}/.git' remote]
       if remotes =~ /^#{github_user}$/
-        puts "Remote '#{github_user}' exists already." if verbose
+        puts "Remote '#{github_user}' exists already." if $my_verbose
       else
-        puts "Adding remote '#{github_user}'." if verbose
+        puts "Adding remote '#{github_user}'." if $my_verbose
         output = %x[cd #{sm_path} && hub remote add -p #{github_user} 2>&1]
         if not $?.success?
           puts "Failed to add submodule:\n" + output
           break
         end
       end
-      puts "Fetching remote '#{github_user}'." if verbose
-      output = %x[cd #{sm_path} && git fetch #{github_user} 2>&1]
+      puts "Fetching remote '#{github_user}'." if $my_verbose
+      output = %x[cd #{sm_path} && git fetch #{github_user} -v 2>&1]
       if not $?.success?
         puts "Failed to fetch submodule:\n" + output
+        break
+      end
+      output = output.split("\n")
+      if output.index(' = [up to date]      master     -> blueyed/master')
+        puts "blueyed/master already up to date. Something wrong. Aborting.\n" + output.join("\n")
         break
       end
     end
     puts "Retrying update.."
   end
+
+  # TODO: update/add new symlinks
 end
 
-def get_submodule_status
-  puts "Getting submodules status.." if verbose
-  status = %x[ git submodule status --recursive ] or raise "Getting submodule status failed"
+# 1. update args, use for commit
+# 2. git fetch --all && git merge FETCH_HEAD
+def get_submodule_status(sm_args='')
+  # return { 'vim/bundle/visualctrlg' => {'state'=>' '} }
+  puts "Getting submodules status.." if $my_verbose
+  status = %x[ git submodule status #{sm_args} ] or raise "Getting submodule status failed"
   r = {}
   status.split("\n").each do |line|
     if not line =~ /^([ +-])(\w{40}) (.*?)(?: \(.*\))?$/
@@ -60,7 +71,7 @@ def get_submodule_status
     end
     path = $3
     next if ! path
-    r[path] = {"state" => $1}
+    r[path] = {"state" => $1, "commit" => $2}
   end
   return r
 end
@@ -80,39 +91,64 @@ task :upgrade do
       puts "Skipping uninitialized submodule #{path}."
       next
     end
-    submodules[path] = [sm]
+    submodules[path] = sm
   end
+
   submodules.each do |path,sm|
-    puts "Pulling #{path}.." if verbose
-    # TODO: pull from github_user branch if present
-    # should fix:
-    # vim/bundle/visualctrlg
-    # Already on 'master'
-    # From git://github.com/tyru/visualctrlg.vim
-    #  * branch            master     -> FETCH_HEAD
-    #  Your branch and 'origin/master' have diverged,
-    #  and have 2 and 1 different commit(s) each, respectively.
-    #  Auto-merging plugin/visualctrlg.vim
-    #  CONFLICT (content): Merge conflict in plugin/visualctrlg.vim
-    #  Automatic merge failed; fix conflicts and then commit the result.
-    #
-    output = %x[ { cd '#{path}' && git fetch --all && git co master && git merge origin/master master ; } 2>&1 ]
+    puts "Upgrading #{path}.." if $my_verbose
+
+    puts "Fetching all remotes" if $my_verbose
+    output = %x[cd #{path} && git fetch --all]
+
+    sm_url = %x[git config --get submodule.#{path}.url].chomp
+    puts "Fetching #{path} from #{sm_url}" if $my_verbose
+    output = %x[cd #{path} && git fetch #{sm_url} 2>&1]
+    puts output if $my_verbose and $my_verbose > 1
     if not $?.success?
-      raise "Pulling failed: " + output
+      raise "Fetching failed: " + output
     end
+
+    # Check that current commit is ancestor of FETCH_HEAD
+    # sm_commit = %x[cd #{path} && git rev-parse #{sm["commit"]}].chomp
+    sm_commit = sm['commit']
+    merge_base = %x[cd #{path} && git merge-base #{sm_commit} FETCH_HEAD].chomp
+    if sm_commit != merge_base
+      # puts "Skipping #{path}: Current commit does not appear to be ancestor of FETCH_HEAD."
+      # puts "Info: sm_commit: #{sm_commit}, merge_base: #{merge_base}"
+      # next
+      %x[cd #{path} && git merge FETCH_HEAD]
+    end
+
+    output = %x[cd #{path} && git merge --ff-only FETCH_HEAD 2>&1]
+    if ! output.split("\n")[-1] =~ /^Already up-to-date.( Yeeah!)?/
+      puts output
+    else
+      puts output if $my_verbose and $my_verbose > 1
+      # TODO: pull result
+    end
+    if not $?.success?
+      raise "Merging FETCH_HEAD failed: " + output
+    end
+    next
+
+    # 1. get available remotes
+    # 2. find newest one, via
+    #    git --describe always
+    #    git branch (-a) --contains $DESC
+    #    get available master branches via gb -r
+    # remotes = %x[git --git-dir '#{path}/.git' remote]
+    # if not $?.success?
+    #   raise "Pulling failed: " + output
+    # end
+    #
     output = output.split("\n")
     # Output important lines
     puts output.select{|x| x=~/^Your branch is/}
 
-    if ! output[-1] =~ /^Already up-to-date.( Yeeah!)?/
-      puts output
-    else
-      puts output if verbose > 1
-    end
   end
 
   # Commit any updated modules
-  get_submodule_status.each do |path, sm|
+  get_submodule_status( submodules.keys.join(" ") ).each do |path, sm|
     next if sm["state"] != "+"
     output = %x[ git commit -m 'Update submodule #{path} to origin/master.' #{path} ]
     puts output
@@ -191,4 +227,8 @@ def link_file(file, target)
     puts "linking #{nice_target}"
     system %Q{ln -sfn "$PWD/#{file}" "#{target}"}
   end
+end
+
+def get_github_user
+  return %x[git config --get github.user].chomp
 end

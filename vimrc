@@ -1,6 +1,4 @@
-" based on http://github.com/jferris/config_files/blob/master/vimrc
-
-" TODO: install https://github.com/vim-scripts/xterm-color-table.vim
+let g:my_full_name = "Daniel Hahler"
 
 " replace ~/vimfiles with ~/.vim in runtimepath
 let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
@@ -460,6 +458,8 @@ noremap <Leader>nc :NERDTreeClose<cr>
 noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> <C-]>
+" expand abbr
+imap <F2> <C-]>
 noremap <F3> :TRecentlyUsedFiles<cr>
 noremap <F5> :GundoToggle<cr>
 
@@ -542,7 +542,7 @@ nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
 " edit zshrc shortcut
 nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 
-let g:snips_author = "Daniel Hahler"
+let g:snips_author = g:my_full_name
 
 let g:UltiSnipsExpandTrigger="<tab>"
 "let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -642,6 +642,11 @@ fun! GrepCurrentBuffer(q)
 endfunction
 noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
 
+"{{{ Abbreviations
+" <C-g>u adds break to undo chain, see i_CTRL-G_u
+abbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
+abbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
+"}}}
 
 " source ~/.vim/source.d/*.vim
 " exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")

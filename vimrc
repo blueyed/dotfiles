@@ -648,11 +648,6 @@ abbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
 abbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 "}}}
 
-" source ~/.vim/source.d/*.vim
-" exe join(map(split(glob("~/.vim/source.d/*.vim"), "\n"), '"source " . v:val'), "\n")
-" TODO: move to plugins
-runtime! source.d/*.vim
-
 
 " Local config
 if filereadable(expand("~/.vimrc.local"))

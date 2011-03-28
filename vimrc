@@ -276,6 +276,9 @@ map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " Command mode: Ctrl+P
 cmap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
 
+" Change to current file's dir
+nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
+
 " Duplicate a selection
 " Visual mode: D
 vmap D y'>p
@@ -389,8 +392,8 @@ set switchbuf=useopen
 " Maps for jj and kj to act as Esc (kj is idempotent in normal mode)
 ino jj <esc>
 cno jj <c-c>
-ino kj <esc>
-cno kj <c-c>
+" ino kj <esc>
+" cno kj <c-c>
 
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>

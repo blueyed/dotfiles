@@ -250,3 +250,6 @@
 [submodule "vim/bundle/bufexplorer"]
 	path = vim/bundle/bufexplorer
 	url = git://github.com/vim-scripts/bufexplorer.zip.git
+[submodule "vim/bundle/autocomplpop"]
+	path = vim/bundle/autocomplpop
+	url = git://github.com/vim-scripts/AutoComplPop.git

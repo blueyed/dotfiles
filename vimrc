@@ -505,11 +505,15 @@ noremap <leader>; :call MyToggleSemicolon()<cr>
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
 fun! GrepCurrentBuffer(q)
 	let save_cursor = getpos(".")
+  let save_errorformat = &errorformat
   try
+    set errorformat=%f:%l:%m
     cexpr []
     exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
+    cw
   finally
     call setpos('.', save_cursor)
+    let &errorformat = save_errorformat
   endtry
 endfunction
 noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>

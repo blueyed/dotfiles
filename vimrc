@@ -60,7 +60,8 @@ set encoding=utf8
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
-
+set confirm " ask for confirmation by default (instead of silently failing)
+set splitright splitbelow
 set nobackup
 set nowritebackup
 set history=1000
@@ -202,6 +203,22 @@ if has("autocmd")
     "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
     "       \ endif
   augroup END
+
+  function! ToggleTooLongHL()
+    if exists('*matchadd')
+      if ! exists("w:TooLongMatchNr")
+        let last = (&tw <= 0 ? 80 : &tw)
+        let w:TooLongMatchNr = matchadd('ErrorMsg', '.\%>' . (last+1) . 'v', 0)
+        echo " Long Line Highlight"
+      else
+        call matchdelete(w:TooLongMatchNr)
+        unlet w:TooLongMatchNr
+        echo "No Long Line Highlight"
+      endif
+    endif
+  endfunction
+  noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
+
 
   " syntax mode setup
   let python_highlight_all = 1
@@ -601,7 +618,7 @@ map <C-l> <C-W>l
 " nnoremap / /\v
 " vnoremap / /\v
 
-nmap <tab> %
+" nmap <tab> %
 " conflicts with snipMate: vmap <tab> %
 
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory

@@ -256,3 +256,6 @@
 [submodule "vim/bundle/neocomplcache"]
 	path = vim/bundle/neocomplcache
 	url = git://github.com/Shougo/neocomplcache.git
+[submodule "vim/bundle/swap"]
+	path = vim/bundle/swap
+	url = git://github.com/vim-scripts/swap.git

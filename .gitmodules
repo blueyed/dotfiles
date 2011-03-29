@@ -259,3 +259,6 @@
 [submodule "vim/bundle/swap"]
 	path = vim/bundle/swap
 	url = git://github.com/vim-scripts/swap.git
+[submodule "vim/bundle/parameter-text-objects"]
+	path = vim/bundle/parameter-text-objects
+	url = git://github.com/vim-scripts/Parameter-Text-Objects.git

@@ -258,8 +258,8 @@ function! ShortenFilename(bufname, maxlen)
 
   let r = a:bufname
   let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
-  let parts = split(a:bufname, '\ze['.s:PS.'.]')
-  let i = len(parts)-1
+  let parts = split(a:bufname, '\ze['.s:PS.']')
+  let i = len(parts)
 
   let had_ps = 0
   while i>0
@@ -269,13 +269,19 @@ function! ShortenFilename(bufname, maxlen)
     let i -= 1
     " leave last path segment intact
     if ! had_ps
-      if parts[i][0] == s:PS
-        let had_ps = 1
-      endif
+      if parts[i][0] == s:PS | let had_ps = 1 | endif
       continue
     endif
     if len(parts[i]) > maxlen_of_parts
-      let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
+      " Let's see if there are dots or hyphens to truncate at, e.g.
+      " 'vim-pkg-debian' => 'v-p-d…'
+      let w = split(parts[i], '\ze[.-]')
+      if len(w) > 1
+        let w = map(w, 'v:val[0:1]')
+        let parts[i] = join(w, '').'…' " indicate that this has been truncated
+      else
+        let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
+      endif
     endif
     let r = join(parts, '')
   endwhile

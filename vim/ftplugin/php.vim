@@ -3,6 +3,10 @@ inoremap <Leader>pd pre_dump();hi
 inoremap <Leader>pdd pre_dump(); die();8hi
 inoremap <Leader>edb echo debug_get_backtrace(); die();
 
+" via eclim
+if exists(":PhpSearchContext")
+	nnoremap <silent> <buffer> <cr> :PhpSearchContext<cr>
+endif
 
 " php-funclist.txt generated using:
 " curl http://www.php.net/manual/en/indexes.php | sed '/class="indexentry"/!d' | grep -oP '>[^<]+</a>'|cut -b2- | sed 's~()</a>~~' > php-funclist.txt

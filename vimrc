@@ -532,18 +532,19 @@ endfunction
 vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
 
-" Close all open buffers on entering a window if the only
-" buffer that's left is the NERDTree buffer
-function! s:CloseIfOnlyNerdTreeLeft()
-  if exists("t:NERDTreeBufName")
-    if bufwinnr(t:NERDTreeBufName) != -1
-      if winnr("$") == 1
-        q
-      endif
-    endif
+" Close the last window on entering if its buffer is a controlling
+" buffer (NERDTree, quickfix).
+function! s:CloseIfOnlyControlWinLeft()
+  if winnr("$") != 1
+    return
+  endif
+  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
+        \ || getbufvar(winbufnr(1), '&buftype') == 'quickfix'
+    q
   endif
 endfunction
-autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
+autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
+
 
 " setup b:VCSCommandVCSType
 function! SetupVCSType()

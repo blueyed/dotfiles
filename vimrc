@@ -229,6 +229,7 @@ endif
 " Always display the status line
 set laststatus=2
 
+
 " statusline{{{
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
@@ -246,6 +247,41 @@ function! FileSize()
     return (bytes / 1024) . "K"
   endif
 endfunction
+
+" Shorten a given filename by truncating path segments.
+function! ShortenFilename(bufname, maxlen)
+  if len(a:bufname) <= a:maxlen
+    return a:bufname
+  endif
+
+  let maxlen_of_parts = 4 " including slash/dot
+
+  let r = a:bufname
+  let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
+  let parts = split(a:bufname, '\ze['.s:PS.'.]')
+  let i = len(parts)-1
+
+  let had_ps = 0
+  while i>0
+    if len(r) <= a:maxlen
+      return r
+    endif
+    let i -= 1
+    " leave last path segment intact
+    if ! had_ps
+      if parts[i][0] == s:PS
+        let had_ps = 1
+      endif
+      continue
+    endif
+    if len(parts[i]) > maxlen_of_parts
+      let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
+    endif
+    let r = join(parts, '')
+  endwhile
+  return r
+endfunction
+
 fun! MyStatusLine()
   let r = []
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
@@ -253,7 +289,7 @@ fun! MyStatusLine()
   if &ft == "help"
     let r += ['%t']       "tail of the filename
   else
-    let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+    let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
   endif
   let r += ['%m']       "modified flag
   let r += ['%<']       "cut here

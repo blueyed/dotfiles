@@ -270,3 +270,6 @@
 	path = vim/bundle/parameter-text-objects
 	url = git://github.com/vim-scripts/Parameter-Text-Objects.git
 	ignore = untracked
+[submodule "vim/bundle/easymotion"]
+	path = vim/bundle/easymotion
+	url = git://github.com/Lokaltog/vim-easymotion.git

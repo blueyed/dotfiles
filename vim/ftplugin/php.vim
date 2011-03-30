@@ -3,6 +3,10 @@ inoremap <Leader>pd pre_dump();hi
 inoremap <Leader>pdd pre_dump(); die();8hi
 inoremap <Leader>edb echo debug_get_backtrace(); die();
 
+" via eclim
+if exists(":PhpSearchContext")
+	nnoremap <silent> <buffer> <cr> :PhpSearchContext<cr>
+endif
 
 " php-funclist.txt generated using:
 " curl http://www.php.net/manual/en/indexes.php | sed '/class="indexentry"/!d' | grep -oP '>[^<]+</a>'|cut -b2- | sed 's~()</a>~~' > php-funclist.txt
@@ -49,6 +53,7 @@ if has('unix') && executable('pman')
   " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html
   setlocal keywordprg=pman
 else
+  " does not appear to work with 7.3.35 - newer feature?!
   setlocal keywordprg=:PhpLookup
 endif
 

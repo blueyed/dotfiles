@@ -241,18 +241,32 @@
 [submodule "vim/bundle/autoclose"]
 	path = vim/bundle/autoclose
 	url = git://github.com/blueyed/vim-autoclose.git
+	ignore = untracked
 [submodule "vim/bundle/pastebin"]
 	path = vim/bundle/pastebin
 	url = git://github.com/mattn/pastebin-vim.git
+	ignore = untracked
 [submodule "vim/bundle/solarized"]
 	path = vim/bundle/solarized
 	url = git://github.com/altercation/vim-colors-solarized.git
+	ignore = untracked
 [submodule "vim/bundle/bufexplorer"]
 	path = vim/bundle/bufexplorer
 	url = git://github.com/vim-scripts/bufexplorer.zip.git
+	ignore = untracked
 [submodule "vim/bundle/autocomplpop"]
 	path = vim/bundle/autocomplpop
 	url = git://github.com/vim-scripts/AutoComplPop.git
+	ignore = untracked
 [submodule "vim/bundle/neocomplcache"]
 	path = vim/bundle/neocomplcache
 	url = git://github.com/Shougo/neocomplcache.git
+	ignore = untracked
+[submodule "vim/bundle/swap"]
+	path = vim/bundle/swap
+	url = git://github.com/vim-scripts/swap.git
+	ignore = untracked
+[submodule "vim/bundle/parameter-text-objects"]
+	path = vim/bundle/parameter-text-objects
+	url = git://github.com/vim-scripts/Parameter-Text-Objects.git
+	ignore = untracked

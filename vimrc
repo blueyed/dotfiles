@@ -60,7 +60,8 @@ set encoding=utf8
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
-
+set confirm " ask for confirmation by default (instead of silently failing)
+set splitright splitbelow
 set nobackup
 set nowritebackup
 set history=1000
@@ -203,6 +204,22 @@ if has("autocmd")
     "       \ endif
   augroup END
 
+  function! ToggleTooLongHL()
+    if exists('*matchadd')
+      if ! exists("w:TooLongMatchNr")
+        let last = (&tw <= 0 ? 80 : &tw)
+        let w:TooLongMatchNr = matchadd('ErrorMsg', '.\%>' . (last+1) . 'v', 0)
+        echo " Long Line Highlight"
+      else
+        call matchdelete(w:TooLongMatchNr)
+        unlet w:TooLongMatchNr
+        echo "No Long Line Highlight"
+      endif
+    endif
+  endfunction
+  noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
+
+
   " syntax mode setup
   let python_highlight_all = 1
   let php_sql_query = 1
@@ -211,6 +228,7 @@ endif
 
 " Always display the status line
 set laststatus=2
+
 
 " statusline{{{
 " old
@@ -229,6 +247,47 @@ function! FileSize()
     return (bytes / 1024) . "K"
   endif
 endfunction
+
+" Shorten a given filename by truncating path segments.
+function! ShortenFilename(bufname, maxlen)
+  if len(a:bufname) <= a:maxlen
+    return a:bufname
+  endif
+
+  let maxlen_of_parts = 4 " including slash/dot
+
+  let r = a:bufname
+  let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
+  let parts = split(a:bufname, '\ze['.s:PS.']')
+  let i = len(parts)
+
+  let had_ps = 0
+  while i>0
+    if len(r) <= a:maxlen
+      return r
+    endif
+    let i -= 1
+    " leave last path segment intact
+    if ! had_ps
+      if parts[i][0] == s:PS | let had_ps = 1 | endif
+      continue
+    endif
+    if len(parts[i]) > maxlen_of_parts
+      " Let's see if there are dots or hyphens to truncate at, e.g.
+      " 'vim-pkg-debian' => 'v-p-d…'
+      let w = split(parts[i], '\ze[.-]')
+      if len(w) > 1
+        let w = map(w, 'v:val[0:1]')
+        let parts[i] = join(w, '').'…' " indicate that this has been truncated
+      else
+        let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
+      endif
+    endif
+    let r = join(parts, '')
+  endwhile
+  return r
+endfunction
+
 fun! MyStatusLine()
   let r = []
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
@@ -236,7 +295,7 @@ fun! MyStatusLine()
   if &ft == "help"
     let r += ['%t']       "tail of the filename
   else
-    let r += ['%{fnamemodify(bufname("%"), ":~")}'] "filename
+    let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
   endif
   let r += ['%m']       "modified flag
   let r += ['%<']       "cut here
@@ -452,11 +511,15 @@ noremap <leader>; :call MyToggleSemicolon()<cr>
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
 fun! GrepCurrentBuffer(q)
 	let save_cursor = getpos(".")
+  let save_errorformat = &errorformat
   try
+    set errorformat=%f:%l:%m
     cexpr []
     exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
+    cw
   finally
     call setpos('.', save_cursor)
+    let &errorformat = save_errorformat
   endtry
 endfunction
 noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
@@ -475,18 +538,19 @@ endfunction
 vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
 
-" Close all open buffers on entering a window if the only
-" buffer that's left is the NERDTree buffer
-function! s:CloseIfOnlyNerdTreeLeft()
-  if exists("t:NERDTreeBufName")
-    if bufwinnr(t:NERDTreeBufName) != -1
-      if winnr("$") == 1
-        q
-      endif
-    endif
+" Close the last window on entering if its buffer is a controlling
+" buffer (NERDTree, quickfix).
+function! s:CloseIfOnlyControlWinLeft()
+  if winnr("$") != 1
+    return
+  endif
+  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
+        \ || getbufvar(winbufnr(1), '&buftype') == 'quickfix'
+    q
   endif
 endfunction
-autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
+autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
+
 
 " setup b:VCSCommandVCSType
 function! SetupVCSType()
@@ -601,7 +665,7 @@ map <C-l> <C-W>l
 " nnoremap / /\v
 " vnoremap / /\v
 
-nmap <tab> %
+" nmap <tab> %
 " conflicts with snipMate: vmap <tab> %
 
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory

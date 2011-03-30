@@ -53,6 +53,7 @@ if has('unix') && executable('pman')
   " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html
   setlocal keywordprg=pman
 else
+  " does not appear to work with 7.3.35 - newer feature?!
   setlocal keywordprg=:PhpLookup
 endif
 

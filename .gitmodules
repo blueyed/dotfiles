@@ -273,3 +273,6 @@
 [submodule "vim/bundle/easymotion"]
 	path = vim/bundle/easymotion
 	url = git://github.com/Lokaltog/vim-easymotion.git
+[submodule "vim/bundle/cmdline-completion"]
+	path = vim/bundle/cmdline-completion
+	url = git://github.com/vim-scripts/cmdline-completion.git

@@ -498,7 +498,7 @@ if bufwinnr(1)
 endif
 
 " Sudo write (,W)
-noremap <leader>W :w !sudo tee % > /dev/null<CR>
+command! SudoWrite w !sudo tee % > /dev/null
 
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.
@@ -536,7 +536,9 @@ function! MyToggleSemicolon()
     let @/ = ss | call setpos('.', save_cursor)
   endtry
 endfunction
-noremap <leader>; :call MyToggleSemicolon()<cr>
+noremap ;; :call MyToggleSemicolon()<cr>
+
+noremap ö :
 
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
 fun! GrepCurrentBuffer(q)
@@ -623,9 +625,11 @@ if (has("gui_running"))
   " use Alt-T in GUI mode
   map <M-t> :CommandT<CR>
 endif
-map <leader>tt :CommandT<CR>
-map <Leader>t. :execute "CommandT ".expand("%:p:h")<cr>
-map <Leader>t  :CommandT<space>
+" use `m` prefix for CommandT - ,t is used by easymotion
+map <leader>mm :CommandT<CR>
+map <leader>m. :execute "CommandT ".expand("%:p:h")<cr>
+map <leader>m  :CommandT<space>
+map <leader>mb :CommandTBuffer<CR>
 
 " supertab
 let g:SuperTabLongestEnhanced=1
@@ -637,11 +641,11 @@ let g:UltiSnipsExpandTrigger="<tab>"
 
 let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
 
-
 " use for encryption:
 " openssl enc -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd > 1
 " openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
 let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
+" let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
 endif " eval guard
 
@@ -669,6 +673,7 @@ noremap <F2> <C-]>
 imap <F2> <C-]>
 noremap <F3> :TRecentlyUsedFiles<cr>
 noremap <F5> :GundoToggle<cr>
+noremap <F11> :YRShow<cr>
 
 
 " taglist plugin

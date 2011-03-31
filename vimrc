@@ -48,7 +48,7 @@ if 1 " use Pathogen? (or tplugin?)
     filetype off " just in case it was activated before
     " enable pathogen, which allows for bundles in vim/bundle
     set rtp+=~/.vim/bundle/pathogen
-    " let g:pathogen_disabled = [ "supertab" ]
+    let g:pathogen_disabled = [ "supertab" ]
     call pathogen#runtime_append_all_bundles()
     command! Mkhelptags call pathogen#helptags()
     " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
@@ -350,7 +350,7 @@ map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
 " Inserts the path of the currently edited file into a command
 " Command mode: Ctrl+P
-cmap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
+" cmap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
 
 " Change to current file's dir
 nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>

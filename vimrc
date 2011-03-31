@@ -15,15 +15,6 @@ if ! isdirectory(expand(&backupdir))
   call mkdir( &backupdir, 'p', 0700 )
 endif
 
-if has('persistent_undo')
-  set undodir=~/.local/share/vim/undo
-  set undofile
-  if ! isdirectory(expand(&undodir))
-    echo "Creating undo dir ".&undodir
-    call mkdir( expand(&undodir), 'p', 0700 )
-  endif
-endif
-
 if 1
   let vimcachedir=expand('~/.cache/vim')
   if ! isdirectory(vimcachedir)
@@ -38,7 +29,27 @@ if 1
     call mkdir( vimconfigdir, 'p', 0700 )
   endif
   let g:session_directory = vimconfigdir . '/sessions'"
+
+  let vimsharedir = expand('~/.local/share/vim')
+  let g:yankring_history_dir = vimsharedir
+  let g:yankring_max_history = 500
+  let g:yankring_min_element_length = 2
+  " Move yankring from old location, if any..
+  let s:old_yankring = expand('~/yankring_history_v2.txt')
+  if filereadable(s:old_yankring)
+    execute '!mv '.s:old_yankring.' '.vimsharedir
+  endif
 end
+
+if has('persistent_undo')
+  let &undodir = vimsharedir . '/undo'
+  set undofile
+  if ! isdirectory(expand(&undodir))
+    echo "Creating undo dir ".&undodir
+    call mkdir( expand(&undodir), 'p', 0700 )
+  endif
+endif
+
 " }}}
 
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))

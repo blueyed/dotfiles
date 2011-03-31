@@ -43,14 +43,31 @@ end
 
 " set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
 
-if has("user_commands")
-  filetype off " just in case it was activated before
-  " enable pathogen, which allows bundles in vim/bundle
-  set rtp+=~/.vim/bundle/pathogen
-  call pathogen#runtime_append_all_bundles()
-  command! Mkhelptags call pathogen#helptags()
-endif
-
+if 1 " use Pathogen? (or tplugin?)
+  if has("user_commands")
+    filetype off " just in case it was activated before
+    " enable pathogen, which allows for bundles in vim/bundle
+    set rtp+=~/.vim/bundle/pathogen
+    " let g:pathogen_disabled = [ "supertab" ]
+    call pathogen#runtime_append_all_bundles()
+    command! Mkhelptags call pathogen#helptags()
+    " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
+  endif
+else
+"  let g:tplugin#autoload_exclude = ['tplugin']
+  set rtp+=~/.vim/bundle/tplugin
+  runtime macros/tplugin.vim
+  TPlugin tlib
+  TPlugin tmru
+  TPlugin tcomment
+  TPlugin snipmate
+  TPlugin autoclose
+  TPlugin autocomplpop
+  TPlugin unimpaired
+  TPlugin surround
+  TPlugin swap
+  set rtp+=~/.vim/bundle/xoria256 " colorscheme
+end
 
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
@@ -398,6 +415,7 @@ endif
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
+set spell
 set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
 if has("autocmd") && exists("+omnifunc")
   autocmd Filetype *
@@ -606,6 +624,12 @@ let g:UltiSnipsExpandTrigger="<tab>"
 "let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
 let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
+
+
+" use for encryption:
+" openssl enc -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd > 1
+" openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
+let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
 
 endif " eval guard
 

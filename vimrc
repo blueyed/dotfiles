@@ -422,6 +422,21 @@ if exists('+relativenumber') " 7.3
         \  set relativenumber |
         \endif
 endif
+function! ToggleLineNr()
+  " relativenumber => number => nonumber/norelativenumber
+  if exists('+relativenumber')
+    if &relativenumber
+      set number
+    elseif &number
+      set nonumber
+    else
+      set relativenumber
+    endif
+  else
+    set number!
+  endif
+endfun
+nmap <leader>sa :call ToggleLineNr()<CR>
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)

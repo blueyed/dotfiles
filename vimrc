@@ -87,6 +87,7 @@ else
   TPlugin unimpaired
   TPlugin surround
   TPlugin swap
+  TPlugin easymotion
 end
 
 " Use Vim settings, rather then Vi settings (much better!).
@@ -514,6 +515,7 @@ if bufwinnr(1)
 endif
 
 " Sudo write (,W)
+" TODO: Automatically reload
 command! SudoWrite w !sudo tee % > /dev/null
 
 " Easy indentation in visual mode
@@ -662,6 +664,10 @@ let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is n
 " openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
 let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
 " let g:EasyMotion_keys = 'asdfghjklöä' " home row
+
+let g:EclimLargeFileEnabled = 0
+" let g:EclimLogLevel = 6
+au VimEnter * EclimEnable
 
 endif " eval guard
 

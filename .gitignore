@@ -2,6 +2,7 @@ vimperator/info
 pentadactyl/info
 vim/.netrwhist
 vim/.VimballRecord
+vim/bundle/_tplugin.vim
 vim/undo
 tags
 *.pyc

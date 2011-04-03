@@ -9,6 +9,16 @@ if 1 " has('eval')
 endif
 
 
+" Color scheme
+" Load this before e.g. tmru
+set rtp+=~/.vim/bundle/xoria256 " colorscheme
+silent! colorscheme xoria256
+"silent! colorscheme xterm16
+"set background=dark " gets messed up by desert256 scheme
+" highlight NonText guibg=#060606
+" highlight Folded  guibg=#0A0A0A guifg=#9090D0
+
+
 " Local dirs"{{{
 set backupdir=~/.local/share/vim/backups
 if ! isdirectory(expand(&backupdir))
@@ -77,7 +87,6 @@ else
   TPlugin unimpaired
   TPlugin surround
   TPlugin swap
-  set rtp+=~/.vim/bundle/xoria256 " colorscheme
 end
 
 " Use Vim settings, rather then Vi settings (much better!).
@@ -110,14 +119,6 @@ if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   syntax on
   set hlsearch
 endif
-
-" Color scheme
-"silent! colorscheme desert256
-silent! colorscheme xoria256
-"silent! colorscheme xterm16
-"set background=dark " gets messed up by desert256 scheme
-" highlight NonText guibg=#060606
-" highlight Folded  guibg=#0A0A0A guifg=#9090D0
 
 " Switch wrap off for everything
 set nowrap

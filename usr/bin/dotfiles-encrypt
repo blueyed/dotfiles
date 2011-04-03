@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+PASSWDFILE=~/.dotfiles/.passwd
+
+if [ "$(basename $0)" = "dotfiles-encrypt" ]; then
+  echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE
+else
+  echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE
+fi
+
+

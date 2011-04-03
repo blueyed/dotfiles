@@ -6,3 +6,4 @@ vim/undo
 tags
 *.pyc
 *.swp
+.passwd

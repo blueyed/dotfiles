@@ -1,6 +1,6 @@
 [user]
-	name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
-	email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
+	name = Daniel Hahler
+	email = git@thequod.de
 [alias]
 	a = add
 	ae = add -e
@@ -19,7 +19,7 @@
 	dc = diff --cached
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
-	ll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
+	ll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
 	l = log --abbrev-commit --graph --decorate --submodule=log
 	rbi = rebase -i
 	s = status
@@ -70,5 +70,6 @@
 	insteadOf = gitpub:
 
 [github]
-	user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
-	token = <%= print("GitHub API Token: "); STDOUT.flush; STDIN.gets.chomp %>
+	user = blueyed
+	token = !dotfiles-decrypt 'U2FsdGVkX19aP/itBgheeXGR50POMKwhQogqtix22cq+9DRnChCFIM8ZXgkdwlLu8UIfcXT4ePtvZodj7zplKw=='
+

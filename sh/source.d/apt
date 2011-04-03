@@ -154,6 +154,8 @@ ainst() {
   else
 		_apt_cache_madison_grep_wrapper "sudo aptitude install" "Packages" $*
   fi
+  # rebuild zsh cache of known programs
+  which rehash > /dev/null && rehash
 }
 ashow() {
 	_apt_cache_madison_grep_wrapper "apt-cache show" "" $* | less

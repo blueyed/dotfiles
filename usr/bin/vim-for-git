@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Wrapper meant to be set for GIT_EDITOR.
+# This sets up the editor for git commit messages:
+#   It scrolls to "Changes" in the buffer, splits the window (resized to 10 lines).
+#   This allows for reviewing the diff (from `git commit -v`) while editing the commit message.
+
+FILE=$1
+
+# TODO: allow for gvim, but make sure it's some "vim".
+# EDITOR=$(git config --get core.editor)
+# if [ -z $EDITOR ]; EDITOR=vim ; fi
+
+if [ "$FILE" = "COMMIT_EDITMSG" ]; then
+  $EDITOR -c "/Changes" -c "normal zt" -c "set nohlsearch nospell" -c "sp" -c "normal gg" -c "resize 10" -c "set spell" "$@"
+else
+  $EDITOR "$@"  
+fi

@@ -71,28 +71,8 @@ task :update_submodules do
 end
 
 
-end
-
-# 1. update args, use for commit
-# 2. git fetch --all && git merge FETCH_HEAD
-def get_submodule_status(sm_args='')
-  # return { 'vim/bundle/visualctrlg' => {'state'=>' '} }
-  puts "Getting submodules status.." if $my_verbose
-  status = %x[ git submodule status #{sm_args} ] or raise "Getting submodule status failed"
-  r = {}
-  status.split("\n").each do |line|
-    if not line =~ /^([ +-])(\w{40}) (.*?)(?: \(.*\))?$/
-      raise "Found unexpected submodule line: #{line}"
     end
-    path = $3
-    next if ! path
-    r[path] = {"state" => $1, "commit" => $2}
   end
-  return r
-end
-
-def get_modified_submodules()
-  get_submodule_status.delete_if {|path, sm| sm["state"] != "+"}
 end
 
 desc "Upgrade submodules to current master"
@@ -264,4 +244,24 @@ end
 
 def get_github_user
   return %x[git config --get github.user].chomp
+end
+
+def get_submodule_status(sm_args='')
+  # return { 'vim/bundle/visualctrlg' => {'state'=>' '} }
+  puts "Getting submodules status.." if $my_verbose
+  status = %x[ git submodule status #{sm_args} ] or raise "Getting submodule status failed"
+  r = {}
+  status.split("\n").each do |line|
+    if not line =~ /^([ +-])(\w{40}) (.*?)(?: \(.*\))?$/
+      raise "Found unexpected submodule line: #{line}"
+    end
+    path = $3
+    next if ! path
+    r[path] = {"state" => $1, "commit" => $2}
+  end
+  return r
+end
+
+def get_modified_submodules()
+  get_submodule_status.delete_if {|path, sm| sm["state"] != "+"}
 end

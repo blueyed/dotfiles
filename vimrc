@@ -268,7 +268,7 @@ set laststatus=2
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
 if has('statusline')
-set statusline=%!MyStatusLine()
+set statusline=%!MyStatusLine('Enter')
 function! FileSize()
   let bytes = getfsize(expand("%:p"))
   if bytes <= 0
@@ -324,16 +324,57 @@ function! ShortenFilename(bufname, maxlen)
   return r
 endfunction
 
-fun! MyStatusLine()
+
+" colorize start of statusline according to file status,
+" source: http://www.reddit.com/r/vim/comments/gexi6/a_smarter_statusline_code_in_comments/c1n2oo5
+hi StatColor guibg=#95e454 guifg=black ctermbg=lightgreen ctermfg=black
+hi Modified guibg=orange guifg=black ctermbg=lightred ctermfg=black
+function! InsertStatuslineColor(mode)
+  if a:mode == 'i'
+    hi StatColor guibg=orange ctermbg=lightred
+  elseif a:mode == 'r'
+    hi StatColor guibg=#e454ba ctermbg=magenta
+  elseif a:mode == 'v'
+    hi StatColor guibg=#e454ba ctermbg=magenta
+  else
+    hi StatColor guibg=red ctermbg=red
+  endif
+endfunction
+augroup MyStatusLine
+  au!
+  au WinEnter * setlocal statusline=%!MyStatusLine('Enter')
+  au WinLeave * setlocal statusline=%!MyStatusLine('Leave')
+  au InsertEnter * call InsertStatuslineColor(v:insertmode)
+  au InsertLeave * hi StatColor guibg=#95e454 guifg=black ctermbg=lightgreen ctermfg=black
+  au InsertLeave * hi Modified guibg=orange guifg=black ctermbg=lightred ctermfg=black
+augroup END
+
+fun! MyStatusLine(mode)
   let r = []
+  if a:mode == 'Enter'
+    let r += ["%#StatColor#"]
+  endif
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
+  if a:mode == 'Enter'
+    let r += ["%*"]
+  endif
+
+  " modified flag
+  let r += ["%#Modified#"]
+  let r += ["%{getbufvar(bufnr('%'), '&modified') ? ' [+]' : '' }"]
+  if a:mode == 'Leave' | let r += ["%*"] | endif
+
+  " readonly flag
+  let r += ["%{getbufvar(bufnr('%'), '&readonly') && getbufvar(bufnr('%'), '&ft') != 'help' ? '[RO]' : '' }"]
+  if a:mode == 'Enter' | let r += ["%*"] | endif
+
   let r += ['%<']       "cut here
   let r += ['%( [']
   let r += ['%Y']      "filetype
-  let r += ['%H']      "help file flag
+  " let r += ['%H']      "help file flag
   let r += ['%W']      "preview window flag
-  let r += ['%R']      "read only flag
+  " let r += ['%R']      "read only flag
   let r += [',%{&ff}']  "file format
   let r += [',%{strlen(&fenc)?&fenc:"none"}'] "file encoding
   let r += ['] %)']

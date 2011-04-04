@@ -820,6 +820,29 @@ cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
 noremap ää :confirm q<cr>
 
+"vimdiff current vs git head (fugitive extension)
+nnoremap <Leader>gd :Gdiff<cr>
+" Close any corresponding diff buffer
+function! MyCloseDiff()
+  if (&diff == 0 || getbufvar('#', '&diff') == 0)
+        \ && (bufname('%') !~ '^fugitive:' && bufname('#') !~ '^fugitive:')
+    echom "Not in diff view."
+    return
+  endif
+
+  " close current buffer if alternate is not fugitive but current one is
+  if bufname('#') !~ '^fugitive:' && bufname('%') =~ '^fugitive:'
+    if bufwinnr("#") == -1
+      b #
+      bd #
+    else
+      bd
+    endif
+  else
+    bd #
+  endif
+endfunction
+nnoremap <Leader>gD :call MyCloseDiff()<cr>
 
 if has('user_commands')
   " typos

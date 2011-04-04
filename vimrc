@@ -282,6 +282,9 @@ endfunction
 
 " Shorten a given filename by truncating path segments.
 function! ShortenFilename(bufname, maxlen)
+  if getbufvar(bufnr(a:bufname), '&filetype') == 'help'
+    return fnamemodify(a:bufname, ':t')
+  endif
   if len(a:bufname) <= a:maxlen
     return a:bufname
   endif
@@ -323,13 +326,7 @@ endfunction
 fun! MyStatusLine()
   let r = []
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
-  "let r += ['%f']       "filename
-  if &ft == "help"
-    let r += ['%t']       "tail of the filename
-  else
-    let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
-  endif
-  let r += ['%m']       "modified flag
+  let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
   let r += ['%<']       "cut here
   let r += ['%( [']
   let r += ['%Y']      "filetype

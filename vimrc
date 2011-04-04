@@ -667,7 +667,9 @@ let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
 
 let g:EclimLargeFileEnabled = 0
 " let g:EclimLogLevel = 6
-au VimEnter * EclimEnable
+" if exists(":EclimEnable")
+"   au VimEnter * EclimEnable
+" endif
 
 " Prepend <leader> to visualctrlg mappings.
 let g:visualctrg_no_default_keymappings = 1

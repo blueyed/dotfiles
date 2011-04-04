@@ -279,3 +279,6 @@
 [submodule "vim/bundle/endwise"]
 	path = vim/bundle/endwise
 	url = git://github.com/tpope/vim-endwise.git
+[submodule "vim/bundle/preview"]
+	path = vim/bundle/preview
+	url = git://github.com/greyblake/vim-preview.git

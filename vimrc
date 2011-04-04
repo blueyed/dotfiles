@@ -599,7 +599,7 @@ fun! GrepCurrentBuffer(q)
   try
     set errorformat=%f:%l:%m
     cexpr []
-    exe 'g/'.a:q.'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
+    exe 'g/'.escape(a:q, '/').'/caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")'
     cw
   finally
     call setpos('.', save_cursor)
@@ -757,7 +757,7 @@ set scrolloff=3
 set sidescroll=1
 
 " gets ignored by tmru
-set suffixes+=.tmp 
+set suffixes+=.tmp
 
 " Smart way to move btw. windows
 map <C-j> <C-W>j

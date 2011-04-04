@@ -282,3 +282,6 @@
 [submodule "vim/bundle/preview"]
 	path = vim/bundle/preview
 	url = git://github.com/greyblake/vim-preview.git
+[submodule "vim/bundle/repeat"]
+	path = vim/bundle/repeat
+	url = git://github.com/tpope/vim-repeat.git

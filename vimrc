@@ -669,6 +669,11 @@ let g:EclimLargeFileEnabled = 0
 " let g:EclimLogLevel = 6
 au VimEnter * EclimEnable
 
+" Prepend <leader> to visualctrlg mappings.
+let g:visualctrg_no_default_keymappings = 1
+silent! vmap <unique> <Leader><C-g>  <Plug>(visualctrlg-briefly)
+silent! vmap <unique> <Leader>g<C-g> <Plug>(visualctrlg-verbosely)
+
 endif " eval guard
 
 " Map cursor keys in normal mode to navigate windows/tabs

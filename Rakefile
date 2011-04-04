@@ -162,6 +162,12 @@ task :commitsubmodules, :submodules do |t, args|
   end
   get_submodule_status( args.submodules.keys.join(" ") ).each do |path, sm|
     next if sm["state"] != "+"
+    status = %x[ cd '#{path}' && git status -b -s ]
+    if status =~ /^## master...origin\/master \[ahead/
+      puts "WARNING: #{path} appears to be ahead of origin. You might need to push it."
+      puts "Skipping commit.."
+      next
+    end
     output = %x[ zsh -i -c 'gsmc #{path}' ]
     puts output
   end

@@ -107,8 +107,9 @@ set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
 
-" Don't use Ex mode, use Q for formatting
-map Q gq
+" Don't use Ex mode, use Q for something else
+" map Q gq
+nnoremap Q :cwindow<CR>
 
 " This is an alternative that also works in block mode, but the deleted
 " text is lost and it only works for putting the current register.

@@ -76,14 +76,19 @@ def get_submodule_status(sm_args='')
   return r
 end
 
+def get_modified_submodules()
+  get_submodule_status.delete_if {|path, sm| sm["state"] != "+"}
+end
+
 desc "Upgrade submodules to current master"
 task :upgrade do
+  ignore_modified = true
   system %Q{ git diff --cached --exit-code > /dev/null } or raise "The git index is not clean."
 
   submodules = {}
   # get_submodule_status.each do |sm|
   get_submodule_status.each do |path, sm|
-    if sm["state"] == "+"
+    if ignore_modified && sm["state"] == "+"
       puts "Skipping modified submodule #{path}."
       next
     end
@@ -144,13 +149,20 @@ task :upgrade do
     output = output.split("\n")
     # Output important lines
     puts output.select{|x| x=~/^Your branch is/}
-
   end
+  Rake::Task[:commitsubmodules].invoke(submodules)
+end
 
+desc "Commit modified submodules"
+task :commitsubmodules, :submodules do |t, args|
   # Commit any updated modules
-  get_submodule_status( submodules.keys.join(" ") ).each do |path, sm|
+  if not args.submodules
+    # only call the method on demand; there might be a ruby way to do this anyway..
+    args.with_defaults(:submodules => get_modified_submodules)
+  end
+  get_submodule_status( args.submodules.keys.join(" ") ).each do |path, sm|
     next if sm["state"] != "+"
-    output = %x[ git commit -m 'Update submodule #{path} to origin/master.' #{path} ]
+    output = %x[ zsh -i -c 'gsmc #{path}' ]
     puts output
   end
   # %x[ git submodule foreach "git pull origin master && git co master" ]

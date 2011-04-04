@@ -276,3 +276,6 @@
 [submodule "vim/bundle/cmdline-completion"]
 	path = vim/bundle/cmdline-completion
 	url = git://github.com/vim-scripts/cmdline-completion.git
+[submodule "vim/bundle/endwise"]
+	path = vim/bundle/endwise
+	url = git://github.com/tpope/vim-endwise.git

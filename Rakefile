@@ -4,19 +4,32 @@ require 'erb'
 $my_verbose = 1
 $my_verbose = false if $my_verbose == 0
 
-desc "Update the dot files in the user's home directory"
-task :update do
+desc "Update the dotfiles in the user's home directory"
+task :update => [:pull, :sync_submodules, :update_submodules] do
+end
+
+desc "Pull new changes, via `git pull`"
+task :pull do
   puts "Pulling.." if $my_verbose
   system %Q{git pull} or raise "Git pull failed."
+end
+
+desc "Sync submodules, via `git submodule sync`"
+task :sync_submodules do
   puts "Syncing submodules.." if $my_verbose
   system %Q{git submodule --quiet sync 2>&1} or raise "Git submodule sync failed."
+end
+
+desc "Update all submodules"
+task :update_submodules do
+  submodules = get_submodule_status
+  puts "Updating submodules.." if $my_verbose
   while true
-    puts "Updating submodules.." if $my_verbose
-    sm_update = %x[git submodule update --init --recursive 2>&1]
+    break if submodules.length == 0
+    path, sm = submodules.shift
+    puts "Updating #{path}.." if $my_verbose
+    sm_update = %x[git submodule update --init --recursive #{path} 2>&1]
     puts sm_update if $my_verbose and sm_update != ""
-    if $?.success?
-      break
-    end
     output = sm_update.split("\n")
     if output[-1] =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
       if output.index('Please, commit your changes or stash them before you can switch branches.')
@@ -48,14 +61,16 @@ task :update do
       end
       output = output.split("\n")
       if output.index(' = [up to date]      master     -> blueyed/master')
-        puts "blueyed/master already up to date. Something wrong. Aborting.\n" + output.join("\n")
-        break
+        puts "ERROR: blueyed/master already up to date. Something wrong. Skipping.\n\t" + output.join("\n\t")
+        next
       end
     end
-    puts "Retrying update.."
   end
 
   # TODO: update/add new symlinks
+end
+
+
 end
 
 # 1. update args, use for commit

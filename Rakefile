@@ -116,7 +116,8 @@ task :upgrade do
       # puts "Skipping #{path}: Current commit does not appear to be ancestor of FETCH_HEAD."
       # puts "Info: sm_commit: #{sm_commit}, merge_base: #{merge_base}"
       # next
-      %x[cd #{path} && git merge FETCH_HEAD]
+      output = %x[cd #{path} && git merge FETCH_HEAD]
+      puts "Merged FETCH_HEAD:\n" + output
     end
 
     output = %x[cd #{path} && git merge --ff-only FETCH_HEAD 2>&1]

@@ -42,7 +42,7 @@ function shortenURLBitLy (url) {
 		req.onreadystatechange = function (ev) {
 			if (req.readyState == 4) {
 				if (req.status == 200) {
-					dactyl.clipboardWrite(req.responseText, true);
+					dactyl.clipboardWrite(req.responseText.replace(/\s+$/, ''), true);
 				} else {
 					dactyl.echo(req.responseText);
 				}

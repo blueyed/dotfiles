@@ -713,7 +713,7 @@ function! QFixToggle(forced)
   if exists("t:qfix_buf") && bufwinnr(t:qfix_buf) != -1 && a:forced == 0
     cclose
   else
-    copen 10 " 10 is height
+    cwindow 10 " 10 is height
     let t:qfix_buf = bufnr("%")
   endif
 endfunction

@@ -9,6 +9,9 @@ if 1 " has('eval')
     " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
     let &runtimepath = substitute(&runtimepath, '\(\~\|'.$USER.'\)/vimfiles\>', '\1/.vim', 'g')
   endif
+
+  " let g:sparkupExecuteMapping = '<Leader>e'
+  " let g:sparkupNextMapping = '<Leader>ee'
 endif
 
 " Color scheme
@@ -98,10 +101,6 @@ set history=1000
 set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
-
-" Don't use Ex mode, use Q for something else
-" map Q gq
-nnoremap Q :cwindow<CR>
 
 " This is an alternative that also works in block mode, but the deleted
 " text is lost and it only works for putting the current register.
@@ -357,7 +356,9 @@ fun! MyStatusLine(mode)
   let r += ['%{&ff=="unix"?"":",".&ff}']  "file format (if !=unix)
   let r += ['%{strlen(&fenc) && &fenc!="utf-8"?",".&fenc:""}'] "file encoding (if !=utf-8)
   let r += ['] %)']
-  let r += ['%{fugitive#statusline()}']
+  if exists("*fugitive#statusline") " might not exist, e.g.  when :redrawing during startup (eclim debug)
+    let r += ['%{fugitive#statusline()}']
+  endif
 
   let r += ['%=']      "left/right separator
   " let r += ['%b,0x%-8B '] " Current character in decimal and hex representation
@@ -704,6 +705,25 @@ let g:visualctrg_no_default_keymappings = 1
 silent! vmap <unique> <Leader><C-g>  <Plug>(visualctrlg-briefly)
 silent! vmap <unique> <Leader>g<C-g> <Plug>(visualctrlg-verbosely)
 
+" Toggle quickfix window, using Q. {{{2
+" Based on: http://vim.wikia.com/wiki/Toggle_to_open_or_close_the_quickfix_window
+nnoremap Q :QFix<CR>
+command! -bang -nargs=? QFix call QFixToggle(<bang>0)
+function! QFixToggle(forced)
+  if exists("t:qfix_buf") && bufwinnr(t:qfix_buf) != -1 && a:forced == 0
+    cclose
+  else
+    copen 10 " 10 is height
+    let t:qfix_buf = bufnr("%")
+  endif
+endfunction
+" used to track manual opening of the quickfix, e.g. via `:copen`
+augroup QFixToggle
+  autocmd!
+  autocmd BufWinEnter quickfix let g:qfix_buf = bufnr("%")
+augroup END
+
+" 2}}}
 endif " 1}}} eval guard
 
 " Mappings {{{1
@@ -758,20 +778,14 @@ set sidescroll=1
 " gets ignored by tmru
 set suffixes+=.tmp
 
-" Smart way to move btw. windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+" Smart way to move btw. windows {{{2
+" (use cursor keys to not overwrite C-l (redraw))
+map <C-Down> <C-W>j
+map <C-Up> <C-W>k
+map <C-Left> <C-W>h
+map <C-Right> <C-W>l
 
-" make search very magic by default (more PCRE style)
-" nnoremap / /\v
-" vnoremap / /\v
-
-" nmap <tab> %
-" conflicts with snipMate: vmap <tab> %
-
-" Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory
+" Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory {{{2
 imap <C-BS> <C-W>
 imap <C-Del> <C-O>dw
 imap <C-S-Del> <C-O>dW
@@ -789,14 +803,8 @@ nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
-
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 set guioptions-=m
-
-
-" Open URL
-nmap <leader>gw <Plug>(openbrowser-smart-search)
-vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 
@@ -805,6 +813,10 @@ behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 set clipboard=unnamed
+
+" Open URL
+nmap <leader>gw <Plug>(openbrowser-smart-search)
+vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " remap CTRL-W_ using maximize.vim (smarter and toggles)
 map <c-w>_ :MaximizeWindow<cr>
@@ -854,7 +866,7 @@ sunmap g`
 nnoremap Y y$
 xnoremap Y y$
 
-" change the xterm cursor color for insert mode {{{2
+" Idea: change the xterm cursor color for insert mode {{{2
 if &term =~? '^xterm' && exists('&t_SI') && &t_Co > 1
   " let &t_SI="\<Esc>]12;purple\x7"
   " let &t_EI="\<Esc>]12;green\x7"

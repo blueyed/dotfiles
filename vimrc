@@ -4,8 +4,11 @@ if 1 " has('eval')
 
   let g:snips_author = g:my_full_name
 
-  " replace ~/vimfiles with ~/.vim in runtimepath
-  let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
+  if has('win32') || has('win64')
+    " replace ~/vimfiles with ~/.vim in runtimepath
+    " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
+    let &runtimepath = substitute(&runtimepath, '\(\~\|'.$USER.'\)/vimfiles\>', '\1/.vim', 'g')
+  endif
 endif
 
 
@@ -548,9 +551,13 @@ if bufwinnr(1)
   map - <C-W>-
 endif
 
-" Sudo write (,W)
-" TODO: Automatically reload
-command! SudoWrite w !sudo tee % > /dev/null
+" Sudo write
+if executable('sudo') && executable('tee')
+  command! SUwrite
+        \ execute 'w !sudo tee % > /dev/null' |
+        \ setlocal nomodified
+endif
+
 
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.

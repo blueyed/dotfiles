@@ -70,11 +70,6 @@ task :update_submodules do
   # TODO: update/add new symlinks
 end
 
-
-    end
-  end
-end
-
 desc "Upgrade submodules to current master"
 task :upgrade do
   ignore_modified = true

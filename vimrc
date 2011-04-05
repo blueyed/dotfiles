@@ -11,16 +11,9 @@ if 1 " has('eval')
   endif
 endif
 
-
 " Color scheme
-" Load this before e.g. tmru
 set rtp+=~/.vim/bundle/xoria256 " colorscheme
 silent! colorscheme xoria256
-"silent! colorscheme xterm16
-"set background=dark " gets messed up by desert256 scheme
-" highlight NonText guibg=#060606
-" highlight Folded  guibg=#0A0A0A guifg=#9090D0
-
 
 " Local dirs"{{{
 set backupdir=~/.local/share/vim/backups
@@ -65,9 +58,7 @@ endif
 
 " }}}
 
-" set shellslash " nicer for win32, but causes problems with shellescape (e.g. in the session plugin (:RestartVim))
-
-if 1 " use Pathogen? (or tplugin?)
+if 1 " use Pathogen? (or tplugin?) {{{1
   if has("user_commands")
     filetype off " just in case it was activated before
     " enable pathogen, which allows for bundles in vim/bundle
@@ -93,10 +84,8 @@ else
   TPlugin easymotion
 end
 
-" Use Vim settings, rather then Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
-set nocompatible
-
+" Settings {{{1
+set nocompatible " This must be first, because it changes other options as a side effect.
 set encoding=utf8
 
 " allow backspacing over everything in insert mode
@@ -173,14 +162,6 @@ else
   set autoindent    " always set autoindenting on
 
 endif " has("autocmd")
-
-if has("folding")
-  set foldenable
-  set foldmethod=marker
-  " set foldlevel=1
-  " set foldnestmax=2
-  " set foldtext=strpart(getline(v:foldstart),0,50).'\ ...\ '.substitute(getline(v:foldend),'^[\ #]*','','g').'\ '
-endif
 
 set tabstop=2
 set shiftwidth=2
@@ -373,15 +354,16 @@ fun! MyStatusLine(mode)
   " let r += ['%H']      "help file flag
   let r += ['%W']      "preview window flag
   " let r += ['%R']      "read only flag
-  let r += [',%{&ff}']  "file format
-  let r += [',%{strlen(&fenc)?&fenc:"none"}'] "file encoding
+  let r += ['%{&ff=="unix"?"":",".&ff}']  "file format (if !=unix)
+  let r += ['%{strlen(&fenc) && &fenc!="utf-8"?",".&fenc:""}'] "file encoding (if !=utf-8)
   let r += ['] %)']
   let r += ['%{fugitive#statusline()}']
+
   let r += ['%=']      "left/right separator
-  let r += ['[c%03.3b]'] " Value of character under cursor
+  " let r += ['%b,0x%-8B '] " Current character in decimal and hex representation
   let r += [' %{FileSize()} ']  " size of file (human readable)
-  let r += ['%c%V,']   "cursor column (virtual if different)
-  let r += ['%l/%L']   "cursor line/total lines
+  let r += ['%-12(%l,%c%V%)'] " Current line and column
+  " let r += ['%l/%L']   "cursor line/total lines
   let r += [' %P']    "percent through file
   return join(r, '')
 endfunction
@@ -390,7 +372,10 @@ endif
 
 
 " Hide search highlighting
-map <Leader>h :set invhls <CR>
+if has('extra_search')
+  nnoremap <silent> <Leader>h :set hlsearch!<CR>:set hlsearch?<CR>
+  nnoremap <silent> <C-l> :nohlsearch<CR><C-l>
+endif
 
 " Opens an edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>e
@@ -449,33 +434,33 @@ noremap <leader>ss :set spell!<cr>
    set grepprg=grep\ -nH\ $*\ /dev/null
 " endif
 
-" Line numbers
-set nonumber
-set numberwidth=5
-if exists('+relativenumber') " 7.3
-  set relativenumber " Use relative line numbers. Current line is still in status bar.
-  " do not use relative number for quickfix window
-  au BufReadPost * if &bt == "quickfix" |
-        \  set number |
-        \else |
-        \  set relativenumber |
-        \endif
-endif
+" Line numbers"{{{
+au BufReadPost *
+      \ if &bt == "quickfix" |
+      \   set number |
+      \ else |
+      \   set relativenumber |
+      \ endif |
+      \ call SetNumberWidth()
 function! ToggleLineNr()
   " relativenumber => number => nonumber/norelativenumber
   if exists('+relativenumber')
-    if &relativenumber
-      set number
-    elseif &number
-      set nonumber
-    else
-      set relativenumber
-    endif
+    if &relativenumber | set number | elseif &number | set nonumber | else | set relativenumber | endif
   else
     set number!
   endif
+  call SetNumberWidth()
+endfunction
+function! SetNumberWidth()
+  if &number
+    if has('float')
+      let &l:numberwidth = float2nr(ceil(log10(line('$'))))
+    endif
+  elseif &relativenumber
+    set numberwidth=2
+  endif
 endfun
-nmap <leader>sa :call ToggleLineNr()<CR>
+nmap <leader>sa :call ToggleLineNr()<CR>"}}}
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
@@ -573,18 +558,18 @@ endif
 " autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
 " autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
-if 1 " has('eval')
-" Strip trailing whitespace
-function! StripWhitespace ()
-    let save_cursor = getpos(".")
+if 1 " has('eval') {{{1
+" Strip trailing whitespace {{{2
+function! StripWhitespace () range
     let old_query = getreg('/')
-    :%s/[\\]\@<!\s\+$//e
-    call setpos('.', save_cursor)
+    exe 'keepjumps '.a:firstline.','.a:lastline.'substitute/[\\]\@<!\s\+$//e'
     call setreg('/', old_query)
 endfunction
-noremap <leader>st :call StripWhitespace ()<CR>
+command! -range=% UnTrail
+      \ keepjumps <line1>,<line2>call StripWhitespace()
+noremap <leader>st :UnTrail<CR>
 
-" Toggle semicolon at end of line
+" Toggle semicolon at end of line {{{2
 function! MyToggleSemicolon()
   let ss = @/ | let save_cursor = getpos(".")
   try
@@ -599,6 +584,7 @@ noremap ;; :call MyToggleSemicolon()<cr>
 
 noremap ö :
 
+" Grep in the current (potential unsaved) buffer {{{2
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
 fun! GrepCurrentBuffer(q)
 	let save_cursor = getpos(".")
@@ -615,6 +601,7 @@ fun! GrepCurrentBuffer(q)
 endfunction
 noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
 
+" Twiddle case of chars / visual selection {{{2
 " source http://vim.wikia.com/wiki/Switching_case_of_characters
 function! TwiddleCase(str)
   if a:str ==# toupper(a:str)
@@ -630,7 +617,7 @@ vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 
 
 " Close the last window on entering if its buffer is a controlling
-" buffer (NERDTree, quickfix).
+" buffer (NERDTree, quickfix). {{{2
 function! s:CloseIfOnlyControlWinLeft()
   if winnr("$") != 1
     return
@@ -717,14 +704,19 @@ let g:visualctrg_no_default_keymappings = 1
 silent! vmap <unique> <Leader><C-g>  <Plug>(visualctrlg-briefly)
 silent! vmap <unique> <Leader>g<C-g> <Plug>(visualctrlg-verbosely)
 
-endif " eval guard
+endif " 1}}} eval guard
 
+" Mappings {{{1
 " Map cursor keys in normal mode to navigate windows/tabs
 " via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
 " nnoremap  <Down> <C-W>j
 " nnoremap  <Up> <C-W>k
-" nnoremap  <Right> <C-PageDown>
-" nnoremap  <Left> <C-PageUp>
+" nnoremap  <Right> <C-W>l
+" nnoremap  <Left> <C-W>h
+
+" does not work with gnome-terminal
+nnoremap <C-s> :up<CR>
+inoremap <C-s> <Esc>:up<CR>
 
 " defined in php-doc.vim
 " nnoremap <Leader>d :call PhpDocSingle()<CR>
@@ -797,9 +789,6 @@ nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
-" Swap ' and ` keys (` is much more useful)
-no ` '
-no ' `
 
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
 set guioptions-=m
@@ -827,7 +816,7 @@ cnoremap ÄÄ <C-C>:confirm qall<cr>
 onoremap ÄÄ <C-C>:confirm qall<cr>
 noremap ää :confirm q<cr>
 
-"vimdiff current vs git head (fugitive extension)
+" vimdiff current vs git head (fugitive extension) {{{2
 nnoremap <Leader>gd :Gdiff<cr>
 " Close any corresponding diff buffer
 function! MyCloseDiff()
@@ -851,6 +840,41 @@ function! MyCloseDiff()
 endfunction
 nnoremap <Leader>gD :call MyCloseDiff()<cr>
 
+" Swap ' and ` keys (` is much more useful) {{{2
+noremap ' `
+sunmap '
+noremap ` '
+sunmap `
+noremap g' g`
+sunmap g'
+noremap g` g'
+sunmap g`
+
+" make Y like D & C {{{2
+nnoremap Y y$
+xnoremap Y y$
+
+" change the xterm cursor color for insert mode {{{2
+if &term =~? '^xterm' && exists('&t_SI') && &t_Co > 1
+  " let &t_SI="\<Esc>]12;purple\x7"
+  " let &t_EI="\<Esc>]12;green\x7"
+endif
+
+" Folding {{{2
+if has("folding")
+  set foldenable
+  set foldmethod=marker
+  " set foldlevel=1
+  " set foldnestmax=2
+  " set foldtext=strpart(getline(v:foldstart),0,50).'\ ...\ '.substitute(getline(v:foldend),'^[\ #]*','','g').'\ '
+endif
+
+if has('eval')
+  for k in ['i', 'm', 'M', 'n', 'N', 'r', 'R', 'v', 'x', 'X']
+    execute "nnoremap <silent> Z".k." :windo normal z".k."<CR>"
+  endfor
+endif
+
 if has('user_commands')
   " typos
   command! Q q
@@ -858,14 +882,13 @@ if has('user_commands')
   command! Wq wq
 endif
 
-"{{{ Abbreviations
+"{{{2 Abbreviations
 " <C-g>u adds break to undo chain, see i_CTRL-G_u
 abbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
 abbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 "}}}
 
-
-" Local config
+" Local config (if any)
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif

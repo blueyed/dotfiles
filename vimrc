@@ -67,7 +67,9 @@ if 1 " use Pathogen? (or tplugin?) {{{1
     " enable pathogen, which allows for bundles in vim/bundle
     set rtp+=~/.vim/bundle/pathogen
     let g:pathogen_disabled = [ "supertab" ]
-    call pathogen#runtime_append_all_bundles()
+    if exists("*pathogen#runtime_append_all_bundles")
+      call pathogen#runtime_append_all_bundles()
+    endif
     command! Mkhelptags call pathogen#helptags()
     " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
   endif
@@ -404,7 +406,9 @@ vmap P p :call setreg('"', getreg('0')) <CR>
 if has("autocmd")
   au! BufRead,BufNewFile *.haml         setfiletype haml
 
-  au! BufRead * DetectIndent
+  if exists(":DetectIndent")
+    au! BufRead * DetectIndent
+  endif
 endif
 
 " Press ^F from insert mode to insert the current file name
@@ -437,10 +441,10 @@ noremap <leader>ss :set spell!<cr>
 
 " Line numbers"{{{
 au BufReadPost *
-      \ if &bt == "quickfix" |
+      \ if &bt == "quickfix" || ! exists('+relativenumber') |
       \   set number |
       \ else |
-      \   set relativenumber |
+      \   set relativenumber
       \ endif |
       \ call SetNumberWidth()
 function! ToggleLineNr()
@@ -457,7 +461,7 @@ function! SetNumberWidth()
     if has('float')
       let &l:numberwidth = float2nr(ceil(log10(line('$'))))
     endif
-  elseif &relativenumber
+  elseif exists('+relativenumber') && &relativenumber
     set numberwidth=2
   endif
 endfun

@@ -24,11 +24,26 @@ desc "Update all submodules"
 task :update_submodules do
   submodules = get_submodule_status
   puts "Updating submodules.." if $my_verbose
+  git_sm_has_recursive = true # until proven otherwise
+
+  i = 0
+  n = submodules.length
   while true
     break if submodules.length == 0
     path, sm = submodules.shift
-    puts "Updating #{path}.." if $my_verbose
-    sm_update = %x[git submodule update --init --recursive #{path} 2>&1]
+    puts "[#{i+=1}/#{n}] Updating #{path}.." if $my_verbose
+    if git_sm_has_recursive
+      sm_update = %x[git submodule update --init --recursive #{path} 2>&1]
+      if not $?.success?
+        if sm_update.start_with?("Usage: ")
+          git_sm_has_recursive = false
+        end
+      end
+    end
+    if not git_sm_has_recursive
+      sm_update = %x[git submodule update --init #{path} 2>&1]
+    end
+
     puts sm_update if $my_verbose and sm_update != ""
     output = sm_update.split("\n")
     if output[-1] =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
@@ -36,9 +51,10 @@ task :update_submodules do
         puts "Abort: manual interaction required." # XXX: we might stash here automatically, but not yet..
         break
       end
-      github_user = get_github_user
+      github_user = get_github_repo_user
       if github_user == ""
-        puts "No GitHub user found in `git config --get github.user`. Aborting."
+        puts "No GitHub repo user found to add a remote for/from. Skipping."
+        next
       end
       # check for github_user's remote, and maybe add it and then retry
       sm_path = $2
@@ -47,17 +63,17 @@ task :update_submodules do
         puts "Remote '#{github_user}' exists already." if $my_verbose
       else
         puts "Adding remote '#{github_user}'." if $my_verbose
-        output = %x[cd #{sm_path} && hub remote add -p #{github_user} 2>&1]
+        output = %x[cd #{sm_path} && hub remote add #{github_user} 2>&1]
         if not $?.success?
           puts "Failed to add submodule:\n" + output
-          break
+          next
         end
       end
       puts "Fetching remote '#{github_user}'." if $my_verbose
       output = %x[cd #{sm_path} && git fetch #{github_user} -v 2>&1]
       if not $?.success?
         puts "Failed to fetch submodule:\n" + output
-        break
+        next
       end
       output = output.split("\n")
       if output.index(' = [up to date]      master     -> blueyed/master')
@@ -238,8 +254,10 @@ def link_file(file, target)
   end
 end
 
-def get_github_user
-  return %x[git config --get github.user].chomp
+def get_github_repo_user
+  return "blueyed"
+  # XXX: parse from "git remote" output, e.g. origin  git://github.com/blueyed/dotfiles.git
+  # irrelevant: return %x[git config --get github.user].chomp
 end
 
 def get_submodule_status(sm_args='')

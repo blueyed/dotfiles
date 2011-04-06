@@ -4,7 +4,7 @@
 	ignore = untracked
 [submodule "autojump"]
 	path = autojump
-	url = git@github.com:blueyed/autojump.git
+	url = git://github.com/blueyed/autojump.git
 	ignore = untracked
 [submodule "vim/bundle/xmledit"]
 	path = vim/bundle/xmledit
@@ -92,7 +92,7 @@
 	ignore = untracked
 [submodule "vim/bundle/snipmate"]
 	path = vim/bundle/snipmate
-	url = git@github.com:MarcWeber/snipmate.vim.git
+	url = git://github.com/MarcWeber/snipmate.vim.git
 	ignore = untracked
 [submodule "vim/bundle/tcomment"]
 	path = vim/bundle/tcomment
@@ -104,7 +104,7 @@
 	ignore = untracked
 [submodule "vim/bundle/DBGp-Remote-Debugger-Interface"]
 	path = vim/bundle/DBGp-Remote-Debugger-Interface
-	url = git@github.com:blueyed/DBGp-Remote-Debugger-Interface.git
+	url = git://github.com/blueyed/DBGp-Remote-Debugger-Interface.git
 	ignore = untracked
 [submodule "vim/bundle/lusty"]
 	path = vim/bundle/lusty
@@ -208,7 +208,7 @@
 	ignore = untracked
 [submodule "vim/bundle/xoria256"]
 	path = vim/bundle/xoria256
-	url = git@github.com:blueyed/xoria256.vim.git
+	url = git://github.com/blueyed/xoria256.vim.git
 	ignore = untracked
 [submodule "vim/bundle/pathogen"]
 	path = vim/bundle/pathogen
@@ -228,7 +228,7 @@
 	ignore = untracked
 [submodule "vim/bundle/colorhighlight"]
 	path = vim/bundle/colorhighlight
-	url = git@github.com:blueyed/colorhighlight.vim.git
+	url = git://github.com/blueyed/colorhighlight.vim.git
 	ignore = untracked
 [submodule "vim/bundle/syntaxattr"]
 	path = vim/bundle/syntaxattr

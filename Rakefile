@@ -29,14 +29,19 @@ task :update_submodules do
   i = 0
   n = submodules.length
   while true
-    break if submodules.length == 0
-    path, sm = submodules.shift
-    puts "[#{i+=1}/#{n}] Updating #{path}.." if $my_verbose
+    i+=1
+    break if i == n
+    path = submodules.keys[i]
+    sm = submodules[path]
+
+    puts "[#{i}/#{n}] Updating #{path}.." if $my_verbose
     if git_sm_has_recursive
       sm_update = %x[git submodule update --init --recursive #{path} 2>&1]
       if not $?.success?
         if sm_update.start_with?("Usage: ")
           git_sm_has_recursive = false
+        else
+          raise "ERROR: `git submodule update` failed. Aborting.\n" + sm_update
         end
       end
     end
@@ -80,6 +85,8 @@ task :update_submodules do
         puts "ERROR: blueyed/master already up to date. Something wrong. Skipping.\n\t" + output.join("\n\t")
         next
       end
+      puts "Retrying.." if verbose
+      i -= 1
     end
   end
 

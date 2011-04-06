@@ -287,4 +287,4 @@
 	url = git://github.com/tpope/vim-repeat.git
 [submodule "vim/bundle/fatrat"]
 	path = vim/bundle/fatrat
-	url = git://github.com/vim-scripts/fatrat.vim.git
+	url = git://github.com/jmcantrell/vim-fatrat.git

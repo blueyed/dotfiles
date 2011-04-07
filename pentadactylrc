@@ -144,4 +144,4 @@ nnoremap -silent zc :removeselect<CR>
 
 source! ~/.pentadactylrc.local
 
-" vim: set ft=pentadactyl:
+" vim: set ft=pentadactyl.vim:

@@ -67,9 +67,7 @@ if 1 " use Pathogen? (or tplugin?) {{{1
     " enable pathogen, which allows for bundles in vim/bundle
     set rtp+=~/.vim/bundle/pathogen
     let g:pathogen_disabled = [ "supertab" ]
-    if exists("*pathogen#runtime_append_all_bundles")
-      call pathogen#runtime_append_all_bundles()
-    endif
+    call pathogen#runtime_append_all_bundles()
     command! Mkhelptags call pathogen#helptags()
     " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
   endif
@@ -444,7 +442,7 @@ au BufReadPost *
       \ if &bt == "quickfix" || ! exists('+relativenumber') |
       \   set number |
       \ else |
-      \   set relativenumber
+      \   set relativenumber |
       \ endif |
       \ call SetNumberWidth()
 function! ToggleLineNr()

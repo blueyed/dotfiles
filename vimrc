@@ -14,11 +14,11 @@ if 1 " has('eval')
   " let g:sparkupNextMapping = '<Leader>ee'
 endif
 
-" Color scheme
+" Color scheme {{{2
 set rtp+=~/.vim/bundle/xoria256 " colorscheme
 silent! colorscheme xoria256
 
-" Local dirs"{{{
+" Local dirs"{{{2
 set backupdir=~/.local/share/vim/backups
 if ! isdirectory(expand(&backupdir))
   call mkdir( &backupdir, 'p', 0700 )
@@ -153,9 +153,9 @@ if has("autocmd")
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim
 
-  if (has("gui_running"))
-    au FocusLost * stopinsert
-  endif
+  " if (has("gui_running"))
+  "   au FocusLost * stopinsert
+  " endif
 else
 
   set autoindent    " always set autoindenting on
@@ -815,6 +815,7 @@ behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 set clipboard=unnamed
+set mouse=a
 
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)

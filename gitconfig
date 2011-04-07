@@ -21,7 +21,9 @@
 	f = fetch
 	ll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate
 	l = log --abbrev-commit --graph --decorate
-	rbi = rebase -i
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbi = rebase --interactive
 	s = status
 	sm = submodule
 	st = status
@@ -44,12 +46,14 @@
 	autocrlf = input
 [diff]
 	tool = bc3
+	mnemonicprefix = true
 [difftool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE
 [difftool]
 	prompt = false
 [merge]
 	tool = bc3
+	stat = true
 [mergetool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
 	trustExitCode = true

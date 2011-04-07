@@ -29,10 +29,10 @@ task :update_submodules do
   i = 0
   n = submodules.length
   while true
-    i+=1
     break if i == n
     path = submodules.keys[i]
     sm = submodules[path]
+    i+=1
 
     puts "[#{i}/#{n}] Updating #{path}.." if $my_verbose
     if git_sm_has_recursive
@@ -40,8 +40,6 @@ task :update_submodules do
       if not $?.success?
         if sm_update.start_with?("Usage: ")
           git_sm_has_recursive = false
-        else
-          raise "ERROR: `git submodule update` failed. Aborting.\n" + sm_update
         end
       end
     end

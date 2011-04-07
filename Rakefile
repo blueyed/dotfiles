@@ -93,6 +93,22 @@ task :update_submodules do
   # TODO: update/add new symlinks
 end
 
+
+desc "Generate diff files for repo and any modified submodules"
+task :diff do
+  puts "Writing dotfiles.diff"
+  %x[git diff --ignore-submodules=all > dotfiles.diff]
+  get_submodule_status.each do |path,sm|
+    puts "Diffing #{path}.." if verbose
+    diff = %x[ cd #{path} && git diff ]
+    if diff.length > 0
+      diffname = "#{File.basename(path)}.diff"
+      puts "Writing #{diffname}"
+      File.open(diffname, "w").write(diff)
+    end
+  end
+end
+
 desc "Upgrade submodules to current master"
 task :upgrade do
   ignore_modified = true

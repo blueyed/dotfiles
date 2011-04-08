@@ -130,7 +130,7 @@ task :upgrade do
     puts "Upgrading #{path}.." if $my_verbose
 
     # puts "Fetching all remotes" if $my_verbose
-    # output = %x[cd #{path} && git fetch --all]
+    output = %x[cd #{path} && git fetch --all]
 
     sm_url = %x[git config --get submodule.#{path}.url].chomp
     puts "Fetching #{path} from #{sm_url}" if $my_verbose

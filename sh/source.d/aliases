@@ -112,6 +112,6 @@ screen() {
   if [ -x /usr/bin/tput ] && [ $(/usr/bin/tput colors 2>/dev/null || echo 0) -eq 256 ]; then
     TERM=$term command screen -T screen-256color "$@"
   else
-    TERM=$term command screen
+    TERM=$term command screen "$@"
   fi
 }

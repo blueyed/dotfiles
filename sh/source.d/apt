@@ -192,3 +192,8 @@ _complete_apt_cache_package() {
     return 0
 }
 
+# Usefule aptitude aliases
+# Source: https://github.com/xtaran/zshrc/commit/a02dc87df6b16d1856e1559150347cf2432e8ad7
+alias aptitude-just-recommended='aptitude -o "Aptitude::Pkg-Display-Limit=!?reverse-depends(~i) ~M !?essential"'
+alias aptitude-also-via-dependency='aptitude -o "Aptitude::Pkg-Display-Limit=~i !~M ?reverse-depends(~i) !?essential"'
+

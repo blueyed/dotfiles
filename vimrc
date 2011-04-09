@@ -14,9 +14,20 @@ if 1 " has('eval')
   " let g:sparkupNextMapping = '<Leader>ee'
 endif
 
+" Enable syntax {{{1
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
+  syntax on
+  set hlsearch
+endif
+
 " Color scheme {{{2
-set rtp+=~/.vim/bundle/xoria256 " colorscheme
-silent! colorscheme xoria256
+let g:solarized_termcolors=256
+set rtp+=~/.vim/bundle/solarized
+colorscheme solarized
+" set rtp+=~/.vim/bundle/xoria256 " colorscheme
+" silent! colorscheme xoria256
 
 " Local dirs"{{{2
 set backupdir=~/.local/share/vim/backups
@@ -105,13 +116,6 @@ set incsearch   " do incremental searching
 " This is an alternative that also works in block mode, but the deleted
 " text is lost and it only works for putting the current register.
 "vnoremap p "_dp
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
-  syntax on
-  set hlsearch
-endif
 
 " Switch wrap off for everything
 set nowrap

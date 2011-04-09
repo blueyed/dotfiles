@@ -103,9 +103,15 @@ wiki() {
 }
 
 screen() {
+  local term=$TERM
+  if [ "$TERM" = rxvt-unicode-256color ]; then
+    term=rxvt-256color
+    echo "Working around screen bug #30880, using TERM=$term.." # http://savannah.gnu.org/bugs/?30880
+    sleep 2
+  fi
   if [ -x /usr/bin/tput ] && [ $(/usr/bin/tput colors 2>/dev/null || echo 0) -eq 256 ]; then
-    command screen -T screen-256color "$@"
+    TERM=$term command screen -T screen-256color "$@"
   else
-    command screen
+    TERM=$term command screen
   fi
 }

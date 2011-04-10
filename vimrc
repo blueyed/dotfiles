@@ -25,8 +25,9 @@ if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
 endif
 
 " Color scheme {{{2
-let g:solarized_termcolors=256
+set background=dark
 set rtp+=~/.vim/bundle/solarized
+let g:solarized_termcolors=256
 colorscheme solarized
 " set rtp+=~/.vim/bundle/xoria256 " colorscheme
 " silent! colorscheme xoria256

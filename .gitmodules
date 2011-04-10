@@ -291,3 +291,6 @@
 [submodule "vim/bundle/operator-user"]
 	path = vim/bundle/operator-user
 	url = git://github.com/kana/vim-operator-user.git
+[submodule "vim/bundle/operator-replace"]
+	path = vim/bundle/operator-replace
+	url = git://github.com/kana/vim-operator-replace.git

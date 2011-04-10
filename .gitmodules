@@ -288,3 +288,6 @@
 [submodule "vim/bundle/fatrat"]
 	path = vim/bundle/fatrat
 	url = git://github.com/jmcantrell/vim-fatrat.git
+[submodule "vim/bundle/operator-user"]
+	path = vim/bundle/operator-user
+	url = git://github.com/kana/vim-operator-user.git

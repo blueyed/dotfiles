@@ -28,6 +28,7 @@ task :update_submodules do
 
   i = 0
   n = submodules.length
+  begin
   while true
     break if i == n
     path = submodules.keys[i]
@@ -35,6 +36,12 @@ task :update_submodules do
     i+=1
 
     puts "[#{i}/#{n}] Updating #{path}.." if $my_verbose
+
+    if sm['state'] == '+'
+      puts "Skipping modified submodule #{path}."
+      next
+    end
+
     if git_sm_has_recursive
       sm_update = %x[git submodule update --init --recursive #{path} 2>&1]
       if not $?.success?
@@ -49,10 +56,19 @@ task :update_submodules do
 
     puts sm_update if $my_verbose and sm_update != ""
     output = sm_update.split("\n")
-    if output[-1] =~ /Unable to checkout '(\w+)' in submodule path '(.*?)'/
+    if sm_update =~ /^Unable to checkout '(\w+)' in submodule path '(.*?)'$/
       if output.index('Please, commit your changes or stash them before you can switch branches.')
-        puts "Abort: manual interaction required." # XXX: we might stash here automatically, but not yet..
-        break
+        puts "Stashing changes in #{path}"
+        if submodules[path]['stashed']
+          raise "Already stashed #{path}!"
+        end
+        stash_output = %x[ cd '#{path}' && git stash save 'Stashed for `rake update` at #{Time.new.strftime("%Y-%m-%d %H:%M:%S")}.' ]
+        if not $?.success?
+          raise "ERROR when stashing:\n" + stash_output
+        end
+        submodules[path]['stashed'] = true
+        i -= 1
+        next
       end
       github_user = get_github_repo_user
       if github_user == ""
@@ -60,20 +76,19 @@ task :update_submodules do
         next
       end
       # check for github_user's remote, and maybe add it and then retry
-      sm_path = $2
-      remotes = %x[git --git-dir '#{sm_path}/.git' remote]
+      remotes = %x[git --git-dir '#{path}/.git' remote]
       if remotes =~ /^#{github_user}$/
         puts "Remote '#{github_user}' exists already." if $my_verbose
       else
         puts "Adding remote '#{github_user}'." if $my_verbose
-        output = %x[cd #{sm_path} && hub remote add #{github_user} 2>&1]
+        output = %x[cd #{path} && hub remote add #{github_user} 2>&1]
         if not $?.success?
           puts "Failed to add submodule:\n" + output
           next
         end
       end
       puts "Fetching remote '#{github_user}'." if $my_verbose
-      output = %x[cd #{sm_path} && git fetch #{github_user} -v 2>&1]
+      output = %x[cd #{path} && git fetch #{github_user} -v 2>&1]
       if not $?.success?
         puts "Failed to fetch submodule:\n" + output
         next
@@ -87,10 +102,24 @@ task :update_submodules do
       i -= 1
     end
   end
+  rescue Exception => exc
+    puts "Exception: " + exc.message
+    puts exc.backtrace.join("\n")
+  ensure
+    submodules.each do |sm_path,sm|
+      if sm['stashed'] == true
+        puts "Unstashing #{sm_path}" if verbose
+        stash_output = %x[{cd '#{sm_path}' && git stash pop} 2>&1]
+        if not $?.success?
+          puts "ERROR when popping stash for #{sm_path}:\n" + stash_output
+        end
+        sm['stashed'] = false
+      end
+    end
+  end
 
   # TODO: update/add new symlinks
 end
-
 
 desc "Generate diff files for repo and any modified submodules"
 task :diff do
@@ -113,7 +142,6 @@ task :upgrade do
   system %Q{ git diff --cached --exit-code > /dev/null } or raise "The git index is not clean."
 
   submodules = {}
-  # get_submodule_status.each do |sm|
   get_submodule_status.each do |path, sm|
     if ignore_modified && sm["state"] == "+"
       puts "Skipping modified submodule #{path}."
@@ -282,7 +310,7 @@ def get_github_repo_user
 end
 
 def get_submodule_status(sm_args='')
-  # return { 'vim/bundle/visualctrlg' => {'state'=>' '} }
+  # return { 'vim/bundle/solarized' => {'state'=>' '} }
   puts "Getting submodules status.." if $my_verbose
   status = %x[ git submodule status #{sm_args} ] or raise "Getting submodule status failed"
   r = {}

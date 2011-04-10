@@ -264,7 +264,7 @@
 	ignore = untracked
 [submodule "vim/bundle/swap"]
 	path = vim/bundle/swap
-	url = git://github.com/vim-scripts/swap.git
+	url = git://github.com/kurkale6ka/vim-swap.git
 	ignore = untracked
 [submodule "vim/bundle/parameter-text-objects"]
 	path = vim/bundle/parameter-text-objects

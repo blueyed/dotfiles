@@ -12,6 +12,8 @@ if 1 " has('eval')
 
   " let g:sparkupExecuteMapping = '<Leader>e'
   " let g:sparkupNextMapping = '<Leader>ee'
+  "
+  let g:EasyMotion_leader_key = '<Leader>m'
 endif
 
 " Enable syntax {{{1
@@ -678,11 +680,10 @@ if (has("gui_running"))
   " use Alt-T in GUI mode
   map <M-t> :CommandT<CR>
 endif
-" use `m` prefix for CommandT - ,t is used by easymotion
-map <leader>mm :CommandT<CR>
-map <leader>m. :execute "CommandT ".expand("%:p:h")<cr>
-map <leader>m  :CommandT<space>
-map <leader>mb :CommandTBuffer<CR>
+map <leader>tt :CommandT<CR>
+map <leader>t. :execute "CommandT ".expand("%:p:h")<cr>
+map <leader>t  :CommandT<space>
+map <leader>tb :CommandTBuffer<CR>
 
 " supertab
 let g:SuperTabLongestEnhanced=1

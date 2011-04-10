@@ -24,7 +24,7 @@ if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   set hlsearch
 endif
 
-" Color scheme {{{2
+" Color scheme {{{1
 set background=dark
 set rtp+=~/.vim/bundle/solarized
 let g:solarized_termcolors=256
@@ -32,7 +32,7 @@ colorscheme solarized
 " set rtp+=~/.vim/bundle/xoria256 " colorscheme
 " silent! colorscheme xoria256
 
-" Local dirs"{{{2
+" Local dirs"{{{1
 set backupdir=~/.local/share/vim/backups
 if ! isdirectory(expand(&backupdir))
   call mkdir( &backupdir, 'p', 0700 )

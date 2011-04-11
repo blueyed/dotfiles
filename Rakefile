@@ -26,6 +26,23 @@ task :update_submodules do
   puts "Updating submodules.." if $my_verbose
   git_sm_has_recursive = true # until proven otherwise
 
+  # Get submodule summary and remove any submodules with _new_ commits from
+  # the list to be updated.
+  sm_summary = %x[git submodule summary]
+  if not $?.success?
+    raise sm_summary
+  end
+  sm_path = nil
+  sm_summary.split("\n").each do |line|
+    if line =~ /^\* (.*?) \w+\.\.\.\w+/
+      sm_path = $1
+    elsif sm_path and line =~ /^  >/
+      puts "Skipping submodule #{sm_path}, which is ahead locally."
+      submodules.delete(sm_path)
+      sm_path = nil
+    end
+  end
+
   i = 0
   n = submodules.length
   begin
@@ -36,11 +53,6 @@ task :update_submodules do
     i+=1
 
     puts "[#{i}/#{n}] Updating #{path}.." if $my_verbose
-
-    if sm['state'] == '+'
-      puts "Skipping modified submodule #{path}."
-      next
-    end
 
     if git_sm_has_recursive
       sm_update = %x[git submodule update --init --recursive #{path} 2>&1]

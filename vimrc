@@ -612,6 +612,31 @@ fun! GrepCurrentBuffer(q)
 endfunction
 noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
 
+
+" Commands to disable (and re-enable) all other tests in the current file. {{{2
+command! DisableOtherTests call DisableOtherTests()
+fun! DisableOtherTests()
+  let save_cursor = getpos(".")
+  try
+    %s/function test_/function ttest_/
+    call setpos('.', save_cursor)
+    call search('function ttest_', 'b')
+    normal wx
+  finally
+    call setpos('.', save_cursor)
+  endtry
+endfun
+command! EnableAllTests call EnableAllTests()
+fun! EnableAllTests()
+  let save_cursor = getpos(".")
+  try
+    %s/function ttest_/function test_/
+  finally
+    call setpos('.', save_cursor)
+  endtry
+endfun
+
+
 " Twiddle case of chars / visual selection {{{2
 " source http://vim.wikia.com/wiki/Switching_case_of_characters
 function! TwiddleCase(str)

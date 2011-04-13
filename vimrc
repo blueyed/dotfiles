@@ -104,6 +104,7 @@ end
 " Settings {{{1
 set nocompatible " This must be first, because it changes other options as a side effect.
 set encoding=utf8
+set fileformat=unix
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start

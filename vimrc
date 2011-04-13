@@ -152,7 +152,7 @@ if has("autocmd")
   " (happens when dropping a file on gvim).
   autocmd BufReadPost *
     \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal g`\"" |
+    \   exe 'normal! g`"zv' |
     \ endif
 
   " Automatically load .vimrc source when saved

@@ -726,7 +726,7 @@ let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is n
 " openssl enc -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd > 1
 " openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
 let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
-" let g:EasyMotion_keys = 'asdfghjklöä' " home row
+let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
 let g:EclimLargeFileEnabled = 0
 " let g:EclimLogLevel = 6
@@ -825,6 +825,14 @@ imap <C-Del> <C-O>dw
 imap <C-S-Del> <C-O>dW
 nmap <C-Del> dw
 nmap <C-S-Del> dWa
+
+" Map delete to 'delete to black hole register' (experimental, might use
+" `d` instead)
+map  <Del> "_x
+imap <Del> <C-O>"_x
+vmap <Del> "_x
+
+map _  <Plug>(operator-replace)
 
 " edit vimrc shortcut
 nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>

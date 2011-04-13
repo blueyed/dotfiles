@@ -7,7 +7,7 @@ if 1 " has('eval')
   if has('win32') || has('win64')
     " replace ~/vimfiles with ~/.vim in runtimepath
     " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
-    let &runtimepath = substitute(&runtimepath, '\(\~\|'.$USER.'\)/vimfiles\>', '\1/.vim', 'g')
+    let &runtimepath = substitute(&runtimepath, '\('.escape($HOME, '\').'\)vimfiles\>', '\1.vim', 'g')
   endif
 
   " let g:sparkupExecuteMapping = '<Leader>e'

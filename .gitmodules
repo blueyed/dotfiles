@@ -294,3 +294,6 @@
 [submodule "vim/bundle/operator-replace"]
 	path = vim/bundle/operator-replace
 	url = git://github.com/kana/vim-operator-replace.git
+[submodule "vim/bundle/nginx"]
+	path = vim/bundle/nginx
+	url = git://github.com/vim-scripts/nginx.vim.git

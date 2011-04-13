@@ -121,7 +121,7 @@ task :update_submodules do
     submodules.each do |sm_path,sm|
       if sm['stashed'] == true
         puts "Unstashing #{sm_path}" if verbose
-        stash_output = %x[{cd '#{sm_path}' && git stash pop} 2>&1]
+        stash_output = %x[cd '#{sm_path}' && git stash pop 2>&1]
         if not $?.success?
           puts "ERROR when popping stash for #{sm_path}:\n" + stash_output
         end

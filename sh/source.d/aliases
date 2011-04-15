@@ -115,3 +115,5 @@ screen() {
     TERM=$term command screen "$@"
   fi
 }
+
+alias idn='idn --quiet'

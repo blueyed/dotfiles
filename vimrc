@@ -86,7 +86,6 @@ if 1 " use Pathogen? (or tplugin?) {{{1
     set rtp+=~/.vim/bundle/pathogen
     let g:pathogen_disabled = [ "supertab" ]
     call pathogen#runtime_append_all_bundles()
-    command! Mkhelptags call pathogen#helptags()
     " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
   endif
 else

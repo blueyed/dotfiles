@@ -14,6 +14,10 @@ if 1 " has('eval')
   " let g:sparkupNextMapping = '<Leader>ee'
   "
   let g:EasyMotion_leader_key = '<Leader>m'
+
+  " autocomplpop: do not complete from dictionary; -= "k"
+  " (manually trigger it by C-X C-K instead).
+  let g:acp_completeOption = '.,w,b'
 endif
 
 " Enable syntax {{{1

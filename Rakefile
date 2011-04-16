@@ -52,7 +52,11 @@ task :update_submodules do
     sm = submodules[path]
     i+=1
 
-    puts "[#{i}/#{n}] Updating #{path}.." if $my_verbose
+    if $my_verbose
+      cols = `stty size`.scan(/\d+/).map { |s| s.to_i }[1]
+      s = "[#{i}/#{n}] Updating #{path}.."
+      print "\r" + s.ljust(cols, ' ')
+    end
 
     if git_sm_has_recursive
       sm_update = %x[git submodule update --init --recursive #{path} 2>&1]

@@ -159,7 +159,7 @@ if has("autocmd")
     \ endif
 
   " Automatically load .vimrc source when saved
-  autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc source $MYVIMRC
+  autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
   augroup END
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim

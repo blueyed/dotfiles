@@ -170,6 +170,7 @@ task :upgrade do
     submodules[path] = sm
   end
 
+  begin
   submodules.each do |path,sm|
     puts "Upgrading #{path}.." if $my_verbose
 
@@ -222,7 +223,12 @@ task :upgrade do
     # Output important lines
     puts output.select{|x| x=~/^Your branch is/}
   end
-  Rake::Task[:commitsubmodules].invoke(submodules)
+  rescue Exception => exc
+    puts "Exception: " + exc.message
+    puts exc.backtrace.join("\n")
+  ensure
+    Rake::Task[:commitsubmodules].invoke(submodules)
+  end
 end
 
 desc "Commit modified submodules"

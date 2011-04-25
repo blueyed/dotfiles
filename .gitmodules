@@ -297,3 +297,6 @@
 [submodule "vim/bundle/nginx"]
 	path = vim/bundle/nginx
 	url = git://github.com/vim-scripts/nginx.vim.git
+[submodule "lib/LS_COLORS"]
+	path = lib/LS_COLORS
+	url = git://github.com/trapd00r/LS_COLORS.git

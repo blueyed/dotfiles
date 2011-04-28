@@ -143,7 +143,7 @@ if has("autocmd")
   autocmd BufNewFile,BufRead *.txt setfiletype text
 
   " Enable soft-wrapping for text files
-  autocmd FileType text,markdown,html,xhtml,eruby setlocal wrap linebreak nolist
+  autocmd FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
 
   au FileType mail,markdown,gitcommit setlocal spell
 

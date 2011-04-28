@@ -481,7 +481,7 @@ nmap <leader>sa :call ToggleLineNr()<CR>"}}}
 set completeopt=longest,menu
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
-set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
+" set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
 if has("autocmd") && exists("+omnifunc")
   autocmd Filetype *
     \   if &omnifunc == "" |

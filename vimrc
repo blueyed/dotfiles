@@ -284,7 +284,7 @@ function! ShortenFilename(bufname, maxlen)
     return a:bufname
   endif
 
-  let maxlen_of_parts = 4 " including slash/dot
+  let maxlen_of_parts = 5 " including slash/dot
 
   let r = a:bufname
   let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
@@ -300,7 +300,7 @@ function! ShortenFilename(bufname, maxlen)
     if len(parts[i]) > maxlen_of_parts
       " Let's see if there are dots or hyphens to truncate at, e.g.
       " 'vim-pkg-debian' => 'v-p-d…'
-      let w = split(parts[i], '\ze[.-]')
+      let w = split(parts[i], '\ze[._-]')
       if len(w) > 1
         let w = map(w, 'v:val[0:1]')
         let parts[i] = join(w, '').'…' " indicate that this has been truncated

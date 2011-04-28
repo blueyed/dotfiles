@@ -20,9 +20,10 @@ augroup END
 
 " originally from http://vim.wikia.com/wiki/PHP_online_help
 function! OpenPhpFunction (keyword)
-  let proc_keyword = substitute(a:keyword , '_', '-', 'g')
+  let keyword = expand(a:keyword) " expand e.g. '<cword>'
+  let proc_keyword = substitute(keyword , '_', '-', 'g')
   try
-    exe 'pedit'
+    exe 'pedit __php-help__'
     " sometimes seems to throw an error
   catch /.*/
   endtry
@@ -36,25 +37,28 @@ function! OpenPhpFunction (keyword)
   " the first command automatically names
   " the buffer [Scratch]. We could use this
   " to reuse the scratch window.
-  set buftype=nofile
-  setlocal noswapfile
+  setlocal buftype=nofile noswapfile
+  call SetupPhpHelp() " allow for recursive use of 'K'
 
   exe 'silent r!lynx -dump -nolist http://php.net/'.proc_keyword
 
   " go to beginning
   norm gg
   " delete until above the line starting with the keyword
-  exe 'silent 1,/^' . a:keyword . '/-1d'
+  try
+    exe 'silent 1,/^' . escape(keyword, '/~.') . '/-1d'
+  catch /^Vim\%((\a\+)\)\=:E486/	" catch error E486 'pattern not found'
+  endtry
 endfunction
 command! -nargs=1 PhpLookup call OpenPhpFunction("<args>")
 
-if has('unix') && executable('pman')
-  " Use pman for help, installed via 'pear install doc.php.net/pman'
-  " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html
-  setlocal keywordprg=pman
-else
-  " does not appear to work with 7.3.35 - newer feature?!
-  setlocal keywordprg=:PhpLookup
-endif
-
-
+function! SetupPhpHelp()
+  if has('unix') && executable('pman')
+    " Use pman for help, installed via 'pear install doc.php.net/pman'
+    " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html
+    setlocal keywordprg=pman
+  else
+    map <buffer> K :PhpLookup <cword><cr>
+  endif
+endfunction
+call SetupPhpHelp()

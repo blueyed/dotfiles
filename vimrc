@@ -594,7 +594,7 @@ function! MyToggleSemicolon()
     let @/ = ss | call setpos('.', save_cursor)
   endtry
 endfunction
-noremap ;; :call MyToggleSemicolon()<cr>
+noremap <Leader>; :call MyToggleSemicolon()<cr>
 
 noremap ö :
 

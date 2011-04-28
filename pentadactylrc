@@ -29,8 +29,8 @@ nmap -s -b ö [[
 nmap -s -b ä ]]
 
 " next/prev as single word is rather weak!
-set previouspattern=^<$,^<(?!<),[^<]<$,'vorige Seite',zurück,'^prev|previous$',^(<<|«)$,^«,«$,^‹,'\bprev|previous\b'
-set nextpattern=^>$,^>(?!>),[^>]>$,weiter,'nächste Seite','\bvor(wärts)?\b','^next|more$',^(>>|»)$,^»,»$,›$,'\bnext|more\b'
+set previouspattern='^voriges Angebot$',^<$,^<(?!<),[^<]<$,'vorige Seite',zurück,'^prev|previous$',^(<<|«)$,^«,«$,^‹,'\bprev|previous\b'
+set nextpattern='^nächstes Angebot$',^>$,^>(?!>),[^>]>$,weiter,'nächste Seite','\bvor(wärts)?\b','^next|more$',^(>>|»)$,^»,»$,›$,'\bnext|more\b'
 
 set popups=tab,resized
 

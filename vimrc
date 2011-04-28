@@ -942,8 +942,10 @@ endif
 
 "{{{2 Abbreviations
 " <C-g>u adds break to undo chain, see i_CTRL-G_u
-abbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
-abbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
+iabbr sg Sehr geehrte Damen und Herren,<cr>
+iabbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
+iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
+iabbr ... …
 "}}}
 
 " Local config (if any)

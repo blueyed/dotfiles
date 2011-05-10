@@ -67,7 +67,7 @@ if 1
   let vimsharedir = expand('~/.local/share/vim')
   let g:yankring_history_dir = vimsharedir
   let g:yankring_max_history = 500
-  let g:yankring_min_element_length = 2
+  " let g:yankring_min_element_length = 2 " more that 1 breaks e.g. `xp`
   " Move yankring from old location, if any..
   let s:old_yankring = expand('~/yankring_history_v2.txt')
   if filereadable(s:old_yankring)

@@ -822,6 +822,9 @@ map <C-Up> <C-W>k
 map <C-Left> <C-W>h
 map <C-Right> <C-W>l
 
+noremap <Up> gk
+noremap <Down> gj
+
 " Make C-BS and C-Del work like they do in most text editors for the sake of muscle memory {{{2
 imap <C-BS> <C-W>
 imap <C-Del> <C-O>dw

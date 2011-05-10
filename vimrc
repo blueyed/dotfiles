@@ -18,6 +18,15 @@ if 1 " has('eval')
   " autocomplpop: do not complete from dictionary; -= "k"
   " (manually trigger it by C-X C-K instead).
   let g:acp_completeOption = '.,w,b'
+
+  " Color scheme {{{1
+  set background=dark
+  set rtp+=~/.vim/bundle/solarized
+  let g:solarized_termcolors=256
+  silent! colorscheme solarized
+  " set rtp+=~/.vim/bundle/xoria256 " colorscheme
+  " silent! colorscheme xoria256
+
 endif
 
 " Enable syntax {{{1
@@ -27,14 +36,6 @@ if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   syntax on
   set hlsearch
 endif
-
-" Color scheme {{{1
-set background=dark
-set rtp+=~/.vim/bundle/solarized
-let g:solarized_termcolors=256
-colorscheme solarized
-" set rtp+=~/.vim/bundle/xoria256 " colorscheme
-" silent! colorscheme xoria256
 
 " Local dirs"{{{1
 set backupdir=~/.local/share/vim/backups
@@ -160,6 +161,7 @@ if has("autocmd")
 
   " Automatically load .vimrc source when saved
   autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
+  autocmd BufWritePost $MYGVIMRC,~/.dotfiles/gvimrc source $MYGVIMRC
   augroup END
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim

@@ -959,6 +959,7 @@ if has('user_commands')
   command! Q q
   command! W w
   command! Wq wq
+  command! Wqa wqa
 endif
 
 "{{{2 Abbreviations

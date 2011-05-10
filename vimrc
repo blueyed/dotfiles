@@ -27,6 +27,10 @@ if 1 " has('eval')
   " set rtp+=~/.vim/bundle/xoria256 " colorscheme
   " silent! colorscheme xoria256
 
+  " Syntastic
+  let g:syntastic_enable_signs=1
+  let g:syntastic_auto_jump=1
+  let g:syntastic_auto_loc_list=1
 endif
 
 " Enable syntax {{{1
@@ -108,7 +112,10 @@ end
 " Settings {{{1
 set nocompatible " This must be first, because it changes other options as a side effect.
 set encoding=utf8
-set fileformat=unix
+" Prefer unix fileformat
+" set fileformat=unix
+set fileformats=unix,dos
+
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -125,8 +132,7 @@ set incsearch   " do incremental searching
 " text is lost and it only works for putting the current register.
 "vnoremap p "_dp
 
-" Switch wrap off for everything
-set nowrap
+set wrap
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -349,6 +355,13 @@ fun! MyStatusLine(mode)
   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
   if a:mode == 'Enter'
     let r += ["%*"]
+  endif
+
+  " syntax errors
+  if exists('*SyntasticStatuslineFlag')
+    let r+=['%#WarningMsg#']
+    let r+=['%{SyntasticStatuslineFlag()}']
+    let r+=['%*']
   endif
 
   " modified flag
@@ -695,9 +708,12 @@ let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'seq'
 let g:tmruSize = 500
 
+" Easytags
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 let g:easytags_cmd = 'ctags'
 let g:easytags_suppress_ctags_warning = 1
+let g:easytags_dynamic_files = 1
+let g:easytags_resolve_links = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 

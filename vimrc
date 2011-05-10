@@ -19,14 +19,6 @@ if 1 " has('eval')
   " (manually trigger it by C-X C-K instead).
   let g:acp_completeOption = '.,w,b'
 
-  " Color scheme {{{1
-  set background=dark
-  set rtp+=~/.vim/bundle/solarized
-  let g:solarized_termcolors=256
-  silent! colorscheme solarized
-  " set rtp+=~/.vim/bundle/xoria256 " colorscheme
-  " silent! colorscheme xoria256
-
   " Syntastic
   let g:syntastic_enable_signs=1
   let g:syntastic_auto_jump=1
@@ -39,6 +31,16 @@ endif
 if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   syntax on
   set hlsearch
+endif
+
+if 1 " has('eval')
+  " Color scheme (after 'syntax on') {{{1
+  set background=dark
+  set rtp+=~/.vim/bundle/solarized
+  let g:solarized_termcolors=256
+  silent! colorscheme solarized
+  " set rtp+=~/.vim/bundle/xoria256 " colorscheme
+  " silent! colorscheme xoria256
 endif
 
 " Local dirs"{{{1

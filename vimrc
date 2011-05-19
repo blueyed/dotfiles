@@ -23,6 +23,11 @@ if 1 " has('eval')
   let g:syntastic_enable_signs=1
   let g:syntastic_auto_jump=1
   let g:syntastic_auto_loc_list=1
+
+  " syntax mode setup
+  let python_highlight_all = 1
+  let php_sql_query = 1
+  let php_htmlInStrings = 1
 endif
 
 " Enable syntax {{{1
@@ -91,7 +96,7 @@ if 1 " use Pathogen? (or tplugin?) {{{1
     filetype off " just in case it was activated before
     " enable pathogen, which allows for bundles in vim/bundle
     set rtp+=~/.vim/bundle/pathogen
-    let g:pathogen_disabled = [ "supertab" ]
+    let g:pathogen_disabled = [ "supertab", "DBGp-Remote-Debugger-Interface" ]
     call pathogen#runtime_append_all_bundles()
     " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
   endif
@@ -177,17 +182,21 @@ if has("autocmd")
   " if (has("gui_running"))
   "   au FocusLost * stopinsert
   " endif
-else
 
-  set autoindent    " always set autoindenting on
+  au! BufRead,BufNewFile *.haml         setfiletype haml
 
-endif " has("autocmd")
+  if exists(":DetectIndent")
+    au! BufRead * if empty('b:no_detect_indent') | DetectIndent | endif
+  endif
 
-set tabstop=2
-set shiftwidth=2
-set expandtab
+  " autocommands for fugitive {{{2
+  " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
+  autocmd User fugitive
+    \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)' |
+    \   nnoremap <buffer> .. :edit %:h<CR> |
+    \ endif
+  autocmd BufReadPost fugitive://* set bufhidden=delete
 
-if has("autocmd")
   " Expand tabs for Debian changelog. This is probably not the correct way.
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
 
@@ -206,7 +215,9 @@ if has("autocmd")
   au FileType c call Select_c_style()
   au FileType makefile setlocal noexpandtab
 
-  " Whitespace highlighting
+  augroup END
+
+  " Whitespace highlighting {{{2
   noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
         \:call MyAuGroupEOLWS(mode())<cr>
   let g:MyAuGroupEOLWSactive = 0
@@ -240,34 +251,18 @@ if has("autocmd")
     "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
     "       \ endif
   augroup END
+else
+  set autoindent    " always set autoindenting on
+endif " has("autocmd")
 
-  function! ToggleTooLongHL()
-    if exists('*matchadd')
-      if ! exists("w:TooLongMatchNr")
-        let last = (&tw <= 0 ? 80 : &tw)
-        let w:TooLongMatchNr = matchadd('ErrorMsg', '.\%>' . (last+1) . 'v', 0)
-        echo " Long Line Highlight"
-      else
-        call matchdelete(w:TooLongMatchNr)
-        unlet w:TooLongMatchNr
-        echo "No Long Line Highlight"
-      endif
-    endif
-  endfunction
-  noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
-
-
-  " syntax mode setup
-  let python_highlight_all = 1
-  let php_sql_query = 1
-  let php_htmlInStrings = 1
-endif
+set tabstop=2
+set shiftwidth=2
+set expandtab
 
 " Always display the status line
 set laststatus=2
 
-
-" statusline{{{
+" statusline {{{
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
@@ -429,14 +424,6 @@ vmap D y'>p
 " overwriting the default register
 vmap P p :call setreg('"', getreg('0')) <CR>
 
-if has("autocmd")
-  au! BufRead,BufNewFile *.haml         setfiletype haml
-
-  if exists(":DetectIndent")
-    au! BufRead * DetectIndent
-  endif
-endif
-
 " Press ^F from insert mode to insert the current file name
 imap <C-F> <C-R>=expand("%")<CR>
 
@@ -556,6 +543,9 @@ cno jj <c-c>
 
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
+
+" paste shortcut (source: http://userobsessed.net/tips-and-tricks/2011/05/10/copy-and-paste-in-vim/)
+imap <Leader>v  <C-O>:set paste<CR><C-r>*<C-O>:set nopaste<CR>
 
 
 " swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
@@ -707,7 +697,7 @@ endif
 
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 1
-let g:tlib_inputlist_match = 'seq'
+let g:tlib_inputlist_match = 'cnf'
 let g:tmruSize = 500
 
 " Easytags
@@ -810,7 +800,8 @@ noremap <F1> :tab<Space>:help<Space>
 noremap <F2> <C-]>
 " expand abbr
 imap <F2> <C-]>
-noremap <F3> :TRecentlyUsedFiles<cr>
+noremap <F3> :let g:tmru_world.restore_from_cache = ['filter']<cr>:TRecentlyUsedFiles<cr>
+noremap <S-F3> :let g:tmru_world.restore_from_cache = []<cr>:TRecentlyUsedFiles<cr>
 noremap <F5> :GundoToggle<cr>
 noremap <F11> :YRShow<cr>
 
@@ -920,6 +911,22 @@ function! MyCloseDiff()
   endif
 endfunction
 nnoremap <Leader>gD :call MyCloseDiff()<cr>
+
+" Toggle highlighting of too long lines {{{2
+function! ToggleTooLongHL()
+  if exists('*matchadd')
+    if ! exists("w:TooLongMatchNr")
+      let last = (&tw <= 0 ? 80 : &tw)
+      let w:TooLongMatchNr = matchadd('ErrorMsg', '.\%>' . (last+1) . 'v', 0)
+      echo " Long Line Highlight"
+    else
+      call matchdelete(w:TooLongMatchNr)
+      unlet w:TooLongMatchNr
+      echo "No Long Line Highlight"
+    endif
+  endif
+endfunction
+noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
 
 " Swap ' and ` keys (` is much more useful) {{{2
 noremap ' `

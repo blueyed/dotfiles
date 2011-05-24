@@ -93,12 +93,10 @@ endif
 
 if 1 " use Pathogen? (or tplugin?) {{{1
   if has("user_commands")
-    filetype off " just in case it was activated before
     " enable pathogen, which allows for bundles in vim/bundle
     set rtp+=~/.vim/bundle/pathogen
     let g:pathogen_disabled = [ "supertab", "DBGp-Remote-Debugger-Interface" ]
-    call pathogen#runtime_append_all_bundles()
-    " command! Mkhelptags call pathogen#runtime_append_all_bundles() | call pathogen#helptags()
+    call pathogen#infect()
   endif
 else
 "  let g:tplugin#autoload_exclude = ['tplugin']

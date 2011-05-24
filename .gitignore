@@ -3,6 +3,7 @@ pentadactyl/info
 vim/.netrwhist
 vim/.VimballRecord
 vim/bundle/_tplugin.vim
+vim/bundle/eclim
 vim/undo
 tags
 *.pyc

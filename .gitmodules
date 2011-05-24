@@ -302,3 +302,6 @@
 [submodule "vim/bundle/gitv"]
 	path = vim/bundle/gitv
 	url = git://github.com/gregsexton/gitv.git
+[submodule "vim/bundle/eclim"]
+	path = vim/bundle/eclim
+	url = git://github.com/blueyed/eclim.git

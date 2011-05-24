@@ -142,6 +142,8 @@ nnoremap -silent zc :removeselect<CR>
 " tab-options plugin:
 "set tabclose=opener,previous,left,right
 
+" Focus largest frame. This replaces the auto-focus-frame.js plugin. Props @John-Galt!
+au PageLoad .* -js function area(w) w.innerWidth * w.innerHeight; buffer.allFrames(doc.defaultView.top).reduce(function (w, acc) area(w) > area(acc) ? w : acc).focus()
 
 source! ~/.pentadactylrc.local
 

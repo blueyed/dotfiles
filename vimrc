@@ -431,14 +431,16 @@ imap <C-L> <Space>=><Space>
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
 " set showbreak=↪ " no required with line numbers
-nnoremap <silent> <leader>sc :set list!<CR>
-inoremap <silent> <leader>sc <C-o>:set list!<CR>
+nnoremap <silent> <leader>sl :set list!<CR>
+inoremap <silent> <leader>sl <C-o>:set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..
 set pastetoggle=<leader>sp
 noremap <leader>sw :set wrap!<cr>
 noremap <leader>ss :set spell!<cr>
+nmap    <leader>sc <Plug>Colorizer
+
 
 " Use Ack instead of Grep when available
 " if executable("ack")

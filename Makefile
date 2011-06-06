@@ -2,6 +2,7 @@ INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc h
 
 install: $(addprefix ~/.,$(INSTALL_FILES))
 	git submodule init
+	git submodule update --recursive
 
 ~/.%: %
 	@echo ln -sfn $< $@

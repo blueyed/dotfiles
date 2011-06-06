@@ -107,6 +107,9 @@ map gp -js dactyl.open( String.replace(buffer.URL, /(\.\w{2,4})\//, "$1.nyud.net
 " Clear mapping for Ubiquity
 map <C-k> <Nop>
 
+" NoScript popup
+map <Leader>np -ex noscript popup
+
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark r reddit.com
 silent qmark t twitter.com

@@ -24,7 +24,7 @@
 	ignore = untracked
 [submodule "vim/bundle/grep"]
 	path = vim/bundle/grep
-	url = git://github.com/vim-scripts/grep.vim.git
+	url = git://github.com/blueyed/grep.vim.git
 	ignore = untracked
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
@@ -96,7 +96,7 @@
 	ignore = untracked
 [submodule "vim/bundle/nerdtree"]
 	path = vim/bundle/nerdtree
-	url = git://github.com/scrooloose/nerdtree.git
+	url = git://github.com/blueyed/nerdtree.git
 	ignore = untracked
 [submodule "vim/bundle/DBGp-Remote-Debugger-Interface"]
 	path = vim/bundle/DBGp-Remote-Debugger-Interface
@@ -144,7 +144,7 @@
 	ignore = untracked
 [submodule "vim/bundle/unimpaired"]
 	path = vim/bundle/unimpaired
-	url = git://github.com/tpope/vim-unimpaired.git
+	url = git://github.com/blueyed/vim-unimpaired.git
 	ignore = untracked
 [submodule "vim/bundle/tmarks"]
 	path = vim/bundle/tmarks
@@ -184,7 +184,7 @@
 	ignore = untracked
 [submodule "vim/bundle/sparkup"]
 	path = vim/bundle/sparkup
-	url = git://github.com/rstacruz/sparkup.git
+	url = git://github.com/blueyed/sparkup.git
 	ignore = untracked
 [submodule "vim/bundle/zenburn"]
 	path = vim/bundle/zenburn
@@ -292,7 +292,7 @@
 	url = git://github.com/kana/vim-operator-replace.git
 [submodule "vim/bundle/nginx"]
 	path = vim/bundle/nginx
-	url = git://github.com/vim-scripts/nginx.vim.git
+	url = git://github.com/blueyed/nginx.vim.git
 [submodule "lib/LS_COLORS"]
 	path = lib/LS_COLORS
 	url = git://github.com/trapd00r/LS_COLORS.git

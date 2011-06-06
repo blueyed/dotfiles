@@ -43,6 +43,7 @@ if 1 " has('eval')
   set background=dark
   set rtp+=~/.vim/bundle/solarized
   let g:solarized_termcolors=256
+  let g:solarized_italic=0
   silent! colorscheme solarized
   " set rtp+=~/.vim/bundle/xoria256 " colorscheme
   " silent! colorscheme xoria256

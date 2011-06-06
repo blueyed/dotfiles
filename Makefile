@@ -10,3 +10,5 @@ install: $(addprefix ~/.,$(INSTALL_FILES))
 
 install_programs:
 	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique zsh
+	# extra
+	sudo aptitude install ttf-mscorefonts-installer

@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pentadactyl pentadactylrc railsrc screenrc vim vimrc zlogin zshenv zshrc
+INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pentadactyl pentadactylrc railsrc screenrc vim vimrc Xdefaults zlogin zshenv zshrc
 
 install: $(addprefix ~/.,$(INSTALL_FILES))
 	git submodule init

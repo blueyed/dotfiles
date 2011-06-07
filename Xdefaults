@@ -1,0 +1,200 @@
+Xft.dpi: 93
+
+! source: https://wiki.archlinux.de/title/Urxvt#Konfiguration
+URxvt.saveLines: 8192
+URxvt.scrollBar: false
+! URxvt.foreground: white
+! URxvt.background: black
+URxvt.jumpScroll: true
+URxvt.skipScroll: true
+
+URxvt.font: terminus-14,\
+  xft:DejaVu Sans Mono:size=12:antialias=true
+! URxvt.font: xft:DejaVu Sans Mono:size=10:antialias=true
+! URxvt.font: -*-terminus-medium-*-*-*-14-120-*-*-*-*-*-*
+! URxvt.font: xft:Inconsolata:style=Medium:pixelsize=14:antialias=true
+! URxvt.font: xft:DejaVu Sans Mono:size=10:style=Book
+! URxvt.font: terminus-14,\
+!     -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1, \
+!     [codeset=JISX0208]xft:Kochi Gothic:antialias=false, \
+!     xft:Code2000:antialias=false
+
+! From author:
+! URxvt.font:             9x15,\
+!                            -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1,\
+!                            -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1, \
+!                            [codeset=JISX0208]xft:Kochi Gothic, \
+!                            xft:Bitstream Vera Sans Mono:autohint=true, \
+!                            xft:Code2000:antialias=false
+! URxvt.boldFont:         -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso8859-15
+! URxvt.italicFont:       xft:Bitstream Vera Sans Mono:italic:autohint=true
+! URxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
+                                                                                                                                                    urxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
+! URxvt*letterSpace: -1
+                                                                                                            xft:Code2000:antialias=false
+URxvt.perl-ext-common: default,matcher
+! URxvt.perl-ext-common: default,matcher,tabbed
+URxvt.urlLauncher: x-www-browser
+URxvt.matcher.button: 2
+URxvt.tabbed.saveLines: 1000
+URxvt.tabbed.scrollBar: false
+URxvt.tabbed.tabbar-fg: 3
+URxvt.tabbed.tabbar-bg: 0
+URxvt.tabbed.tab-fg: 0
+URxvt.tabbed.tab-bg: 1
+URxvt.tabbed.secondaryScroll: true
+! URxvt.tabbed.font: xft:Bitstream Vera Sans Mono:pixelsize=12
+! URxvt*transparent: false
+! URxvt*shading: 70
+! urxvt*font:        -dec-terminal-medium-r-normal--14-140-75-75-c-80-iso8859-*
+! urxvt*boldFont:    -dec-terminal-bold-r-normal--14-140-75-75-c-80-iso8859-*
+
+! mine
+! URxvt.antialias:true
+URxvt.geometry: 100x50
+URxvt.fading: 25
+URxvt.urgentOnBell:true
+URxvt.visualBell:true
+
+URxvt.cutchars: "()*,<>[]{}|«»"
+
+! "pretty girl" {{{
+! URxvt.cursorColor:  #dc74d1
+! URxvt.pointerColor: #dc74d1
+! URxvt.background:   #0e0e0e
+! URxvt.foreground:   #4ad5e1
+! URxvt.color0:       #000000
+! URxvt.color8:       #8b8f93
+! URxvt.color1:       #dc74d1
+! URxvt.color9:       #dc74d1
+! URxvt.color2:       #0eb8c7
+! URxvt.color10:      #0eb8c7
+! URxvt.color3:       #dfe37e
+! URxvt.color11:      #dfe37e
+! URxvt.color5:       #9e88f0
+! URxvt.color13:      #9e88f0
+! URxvt.color6:       #73f7ff
+! URxvt.color14:      #73f7ff
+! URxvt.color7:       #e1dddd
+! URxvt.color15:      #e1dddd
+! }}}
+ 
+
+!! drop in Solarized colorscheme for Xresources/Xdefaults
+
+!! To choose between light/dark background, you have two options:
+!!
+!! 1: Hardcode your choice in your .Xresources file by adding either
+!!      #define SOLARIZED_DARK
+!!      or
+!!      #define SOLARIZED_LIGHT
+!!    above where you pasted the contents of this file.
+!!
+!! 2: Define either of those symbols when loading your .Xresources with
+!!    xrdb, like so:
+!!      xrdb -DSOLARIZED_LIGHT -merge ~/.Xresources
+
+!!SOLARIZED HEX     16/8 TERMCOL  XTERM/HEX   L*A*B      RGB         HSB
+!!--------- ------- ---- -------  ----------- ---------- ----------- -----------
+!!base03    #002b36  8/4 brblack  234 #1c1c1c 15 -12 -12   0  43  54 193 100  21
+!!base02    #073642  0/4 black    235 #262626 20 -12 -12   7  54  66 192  90  26
+!!base01    #586e75 10/7 brgreen  240 #585858 45 -07 -07  88 110 117 194  25  46
+!!base00    #657b83 11/7 bryellow 241 #626262 50 -07 -07 101 123 131 195  23  51
+!!base0     #839496 12/6 brblue   244 #808080 60 -06 -03 131 148 150 186  13  59
+!!base1     #93a1a1 14/4 brcyan   245 #8a8a8a 65 -05 -02 147 161 161 180   9  63
+!!base2     #eee8d5  7/7 white    254 #e4e4e4 92 -00  10 238 232 213  44  11  93
+!!base3     #fdf6e3 15/7 brwhite  230 #ffffd7 97  00  10 253 246 227  44  10  99
+!!yellow    #b58900  3/3 yellow   136 #af8700 60  10  65 181 137   0  45 100  71
+!!orange    #cb4b16  9/3 brred    166 #d75f00 50  50  55 203  75  22  18  89  80
+!!red       #dc322f  1/1 red      160 #d70000 50  65  45 220  50  47   1  79  86
+!!magenta   #d33682  5/5 magenta  125 #af005f 50  65 -05 211  54 130 331  74  83
+!!violet    #6c71c4 13/5 brmagenta 61 #5f5faf 50  15 -45 108 113 196 237  45  77
+!!blue      #268bd2  4/4 blue      33 #0087ff 55 -10 -45  38 139 210 205  82  82
+!!cyan      #2aa198  6/6 cyan      37 #00afaf 60 -35 -05  42 161 152 175  74  63
+!!green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
+
+! Default to dark background if neither constant is defined, or if both are.
+#if !defined(SOLARIZED_LIGHT) && !defined(SOLARIZED_DARK)
+#define SOLARIZED_DARK
+#elif defined(SOLARIZED_LIGHT) && defined(SOLARIZED_DARK)
+#undef SOLARIZED_LIGHT
+#endif
+
+#define S_rebase03      #002b36
+#define S_rebase02      #073642
+#define S_rebase01      #586e75
+#define S_rebase00      #657b83
+#define S_rebase0       #839496
+#define S_rebase1       #93a1a1
+#define S_rebase2       #eee8d5
+#define S_rebase3       #fdf6e3
+#define S_yellow        #b58900
+#define S_orange        #cb4b16
+#define S_red           #dc322f
+#define S_magenta       #d33682
+#define S_violet        #6c71c4
+#define S_blue          #268bd2
+#define S_cyan          #2aa198
+#define S_green         #859900
+
+#ifdef SOLARIZED_LIGHT
+  #define S_base03      S_rebase3
+  #define S_base02      S_rebase2
+  #define S_base01      S_rebase1
+  #define S_base00      S_rebase0
+  #define S_base0       S_rebase00
+  #define S_base1       S_rebase01
+  #define S_base2       S_rebase02
+  #define S_base3       S_rebase03
+#endif
+#ifdef SOLARIZED_DARK
+  #define S_base03      S_rebase03
+  #define S_base02      S_rebase02
+  #define S_base01      S_rebase01
+  #define S_base00      S_rebase00
+  #define S_base0       S_rebase0
+  #define S_base1       S_rebase1
+  #define S_base2       S_rebase2
+  #define S_base3       S_rebase3
+#endif
+
+*background:            S_base03
+*foreground:            S_base00
+*fading:                40
+*fadeColor:             S_base03
+*cursorColor:           S_base1
+*pointerColorBackground:S_base01
+*pointerColorForeground:S_base1
+
+!! black dark/light
+*color0:                S_base02
+*color8:                S_base03
+
+!! red dark/light
+*color1:                S_red
+*color9:                S_orange
+
+!! green dark/light
+*color2:                S_green
+*color10:               S_base01
+
+!! yellow dark/light
+*color3:                S_yellow
+*color11:               S_base00
+
+!! blue dark/light
+*color4:                S_blue
+*color12:               S_base0
+
+!! magenta dark/light
+*color5:                S_magenta
+*color13:               S_violet
+
+!! cyan dark/light
+*color6:                S_cyan
+*color14:               S_base1
+
+!! white dark/light
+*color7:                S_base2
+*color15:               S_base3
+

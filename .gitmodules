@@ -305,3 +305,6 @@
 [submodule "vim/bundle/colorizer"]
 	path = vim/bundle/colorizer
 	url = git://github.com/lilydjwg/colorizer.git
+[submodule "vim/bundle/tracwiki"]
+	path = vim/bundle/tracwiki
+	url = git://github.com/vim-scripts/tracwiki.git

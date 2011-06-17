@@ -120,6 +120,7 @@ autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell 
 autocmd LocationChange www.reddit.com,github.com,stackoverflow.com :set editor='gvim -f -c ''set ft=markdown spell | call cursor(<line>, <column>)'''
 autocmd LocationChange ^https?://mail\\..*   :set editor='gvim -f -c ''set ft=mail spell | call cursor(<line>, <column>)'''
 autocmd LocationChange ^https?://[^/]+/phpmyadmin/ :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
+autocmd LocationChange ^https?://.*trac.*/wiki/ :set editor='gvim -f -c ''set ft=tracwiki | call cursor(<line>, <column>)'''
 group default
 
 " passthrough certain keys, see "h key-sequence" for a list

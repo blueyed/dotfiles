@@ -53,9 +53,10 @@ endfunction
 command! -nargs=1 PhpLookup call OpenPhpFunction("<args>")
 
 function! SetupPhpHelp()
-  if has('unix') && executable('pman')
+  if has('unix') && ! has('gui_running') && executable('pman')
     " Use pman for help, installed via 'pear install doc.php.net/pman'
     " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html
+    " Not for "gui_running", which has a dumb terminal only.
     setlocal keywordprg=pman
   else
     map <buffer> K :PhpLookup <cword><cr>

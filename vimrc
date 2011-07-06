@@ -928,7 +928,7 @@ function! ToggleTooLongHL()
     endif
   endif
 endfunction
-noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
+" noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
 
 " Swap ' and ` keys (` is much more useful) {{{2
 noremap ' `

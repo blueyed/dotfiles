@@ -34,7 +34,7 @@ system "git pull #{pull_args.shelljoin}"
 
 updated = (old_head != `git rev-parse HEAD`.chomp)
 
-system "git stash pop --quiet" if stashed && rebase
+system "git stash pop" if stashed && rebase
 
 if updated
   if rebase

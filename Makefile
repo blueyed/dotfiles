@@ -16,6 +16,7 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
 install_programs:
 	sudo apt-add-repository ppa:git-core/ppa
+	sudo apt-get update
 	sudo apt-get install aptitude
 	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique
 	# extra

@@ -23,5 +23,5 @@ install_programs:
 	sudo aptitude install ttf-mscorefonts-installer
 	# zsh
 	sudo aptitude install zsh
-	# changing shell to zsh
-	chsh -s /usr/bin/zsh
+	# changing shell to zsh, if $ZSH is empty (set by oh-my-zsh/dotfiles)
+	[ "${ZSH})" != "" ] || chsh -s /usr/bin/zsh

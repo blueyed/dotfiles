@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # This script is used to change proxy settings.
-# Source: http://www.codinginahurry.com/2011/06/22/script-for-changing-gnome-proxy-settings/
+#
+# Original source: http://www.codinginahurry.com/2011/06/22/script-for-changing-gnome-proxy-settings/
+#
+# Configuration in /etc/environment requires the `augtool` program
+# (located in `augeas-tools` for Debian/Ubuntu).
 
 PROXY_HOST=$1
 PROXY_PORT=${2-8080}
@@ -61,6 +65,8 @@ if which augtool >/dev/null ; then
     set /files/etc/environment/https_proxy '$PROXY_STRING'
     set /files/etc/environment/ftp_proxy '$PROXY_STRING'
     save" | augtool
+else
+  echo "Skipping configuration in /etc/environment: augtool not found."
 fi
 
 pkill gconfd

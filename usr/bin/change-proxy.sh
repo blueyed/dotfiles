@@ -7,6 +7,11 @@
 # Configuration in /etc/environment requires the `augtool` program
 # (located in `augeas-tools` for Debian/Ubuntu).
 
+if [ "$(id -u)" = "0" ] ; then 
+  echo "This should not be run as root. Relevant commands are being run with sudo." >&2
+  exit 1
+fi
+
 PROXY_HOST=$1
 PROXY_PORT=${2-8080}
 PROXY_USERNAME=$3
@@ -18,7 +23,7 @@ if [ -n "$PROXY_HOST" ]
 then
     echo "Setting proxy configuration : $PROXY_HOST:$PROXY_PORT"
 
-    gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /system/proxy/mode "manual"
+    sudo gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /system/proxy/mode "manual"
     gconftool-2 --direct --config-source xml:readwrite:$CONF --type string --set /system/http_proxy/host "$PROXY_HOST"
     gconftool-2 --direct --config-source xml:readwrite:$CONF --type int    --set /system/http_proxy/port "$PROXY_PORT"
     gconftool-2 --direct --config-source xml:readwrite:$CONF --type bool   --set /system/http_proxy/use_same_proxy "TRUE"
@@ -46,7 +51,7 @@ then
 else
     echo "Removing proxy configuration."
 
-    gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /system/proxy/mode "none"
+    sudo gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /system/proxy/mode "none"
 
     gconftool-2 --direct --config-source xml:readwrite:$CONF --unset /system/proxy/mode
     gconftool-2 --direct --config-source xml:readwrite:$CONF --unset /system/http_proxy/host
@@ -64,7 +69,7 @@ if which augtool >/dev/null ; then
   echo "set /files/etc/environment/http_proxy '$PROXY_STRING'
     set /files/etc/environment/https_proxy '$PROXY_STRING'
     set /files/etc/environment/ftp_proxy '$PROXY_STRING'
-    save" | augtool
+    save" | sudo augtool
 else
   echo "Skipping configuration in /etc/environment: augtool not found."
 fi

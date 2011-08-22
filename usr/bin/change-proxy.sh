@@ -31,7 +31,13 @@ then
         gconftool-2 --direct --config-source xml:readwrite:$CONF --type=string --set /system/http_proxy/authentication_password "$PROXY_PASSWORD"
     else
         gconftool-2 --direct --config-source xml:readwrite:$CONF --type=bool   --set /system/http_proxy/use_authentication "FALSE"
+    fi
 
+    # Setup PROXY_STRING used for environment configuration
+    if [ "$PROXY_USERNAME$PROXY_PASSWORD" != "" ] ; then
+      PROXY_STRING="$PROXY_USERNAME:$PROXY_PASSWORD@$PROXY_HOST:$PROXY_PORT"
+    else
+      PROXY_STRING="$PROXY_HOST:$PROXY_PORT"
     fi
 else
     echo "Removing proxy configuration."
@@ -46,6 +52,15 @@ else
     gconftool-2 --direct --config-source xml:readwrite:$CONF --unset /system/http_proxy/use_authentication
     gconftool-2 --direct --config-source xml:readwrite:$CONF --unset /system/http_proxy/authentication_user
     gconftool-2 --direct --config-source xml:readwrite:$CONF --unset /system/http_proxy/authentication_password
+
+    PROXY_STRING=""
+fi
+
+if which augtool >/dev/null ; then
+  echo "set /files/etc/environment/http_proxy '$PROXY_STRING'
+    set /files/etc/environment/https_proxy '$PROXY_STRING'
+    set /files/etc/environment/ftp_proxy '$PROXY_STRING'
+    save" | augtool
 fi
 
 pkill gconfd

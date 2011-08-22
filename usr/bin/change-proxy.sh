@@ -4,7 +4,7 @@
 # Source: http://www.codinginahurry.com/2011/06/22/script-for-changing-gnome-proxy-settings/
 
 PROXY_HOST=$1
-PROXY_PORT=$2
+PROXY_PORT=${2-8080}
 PROXY_USERNAME=$3
 PROXY_PASSWORD=$4
 # Your .gconf directory under your home

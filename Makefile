@@ -18,7 +18,7 @@ install_programs:
 	sudo apt-add-repository ppa:git-core/ppa
 	sudo apt-get update
 	sudo apt-get install aptitude
-	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique
+	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique exuberant-ctags
 	# extra
 	sudo aptitude install ttf-mscorefonts-installer
 	# zsh

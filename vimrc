@@ -158,6 +158,9 @@ if has("autocmd")
   " Enable soft-wrapping for text files
   autocmd FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
 
+  au BufNewFile,BufRead /etc/network/interfaces,/etc/environment setfiletype conf
+  au BufRead,BufNewFile *.haml         setfiletype haml
+
   au FileType mail,markdown,gitcommit setlocal spell
 
   " For all text files set 'textwidth' to 78 characters.
@@ -181,8 +184,6 @@ if has("autocmd")
   " if (has("gui_running"))
   "   au FocusLost * stopinsert
   " endif
-
-  au! BufRead,BufNewFile *.haml         setfiletype haml
 
   if exists(":DetectIndent")
     au! BufRead * if empty('b:no_detect_indent') | DetectIndent | endif

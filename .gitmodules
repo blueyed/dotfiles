@@ -308,3 +308,6 @@
 [submodule "vim/bundle/snipmate-snippets"]
 	path = vim/bundle/snipmate-snippets
 	url = git://github.com/honza/snipmate-snippets.git
+[submodule "vim/bundle/pac"]
+	path = vim/bundle/pac
+	url = git://github.com/vim-scripts/pac.vim.git

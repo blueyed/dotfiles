@@ -24,4 +24,4 @@ install_programs:
 	# zsh
 	sudo aptitude install zsh
 	# changing shell to zsh, if $ZSH is empty (set by oh-my-zsh/dotfiles)
-	[ "${ZSH})" != "" ] || chsh -s /usr/bin/zsh
+	[ "${ZSH}" != "" ] || chsh -s /usr/bin/zsh

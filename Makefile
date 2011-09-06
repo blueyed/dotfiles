@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pentadactyl pentadactylrc railsrc screenrc vim vimrc Xdefaults zlogin zshenv
+INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc vim vimrc Xdefaults zlogin zshenv
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshrc
 

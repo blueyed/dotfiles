@@ -21,7 +21,17 @@ install_programs:
 	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique exuberant-ctags
 	# extra
 	sudo aptitude install ttf-mscorefonts-installer
-	# zsh
 	sudo aptitude install zsh
-	# changing shell to zsh, if $ZSH is empty (set by oh-my-zsh/dotfiles)
-	[ "${ZSH}" != "" ] || chsh -s /usr/bin/zsh
+
+install_programs_rpm:
+	sudo yum install git rubygem-rake ctags zsh
+
+ZSH_PATH := /usr/bin/zsh
+ifneq ($(wildcard /bin/zsh),)
+	ZSH_PATH := /bin/zsh
+endif
+
+setup: setup_zsh
+setup_zsh:
+	# changing shell to zsh, if $$ZSH is empty (set by oh-my-zsh/dotfiles)
+	[ "${ZSH}" != "" ] || chsh -s $(ZSH_PATH)

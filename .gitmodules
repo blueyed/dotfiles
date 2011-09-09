@@ -8,7 +8,7 @@
 	ignore = untracked
 [submodule "vim/bundle/xmledit"]
 	path = vim/bundle/xmledit
-	url = http://github.com/sukima/xmledit.git
+	url = git://github.com/sukima/xmledit.git
 	ignore = untracked
 [submodule "vim/bundle/ack"]
 	path = vim/bundle/ack
@@ -60,7 +60,7 @@
 	ignore = untracked
 [submodule "vim/bundle/gundo"]
 	path = vim/bundle/gundo
-	url = http://github.com/sjl/gundo.vim.git
+	url = git://github.com/sjl/gundo.vim.git
 	ignore = untracked
 [submodule "vim/bundle/Rainbow-Parenthsis-Bundle"]
 	path = vim/bundle/Rainbow-Parenthsis-Bundle

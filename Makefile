@@ -4,6 +4,10 @@ INSTALL_FILES_AFTER_SM := zshrc
 
 install: install_files init_submodules install_files_after_sm
 
+# Target to install a copy of .dotfiles, where Git is not available
+# (e.g. distributed with rsync)
+install_checkout: install_files install_files_after_sm
+
 init_submodules:
 	# Requires e.g. git 1.7.5.4
 	git submodule update --init --recursive

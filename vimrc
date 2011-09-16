@@ -160,6 +160,7 @@ if has("autocmd")
 
   au BufNewFile,BufRead /etc/network/interfaces,/etc/environment setfiletype conf
   au BufRead,BufNewFile *.haml         setfiletype haml
+  au BufRead,BufNewFile *.pac          setl filetype=pac
 
   au FileType mail,markdown,gitcommit setlocal spell
 
@@ -573,6 +574,10 @@ endif
 " Usually the visual selection is lost after you indent it.
 "vmap > >gv
 "vmap < <gv
+
+" Make `gp` select the last pasted text
+" (http://vim.wikia.com/wiki/Selecting_your_pasted_text).
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " Syntax Checking entire file (Python)
 " Usage: :make (check file)

@@ -1,1 +1,1 @@
-setopt noglobalrcs
+oh-my-zsh/zshenv

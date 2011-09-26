@@ -311,3 +311,6 @@
 [submodule "vim/bundle/pac"]
 	path = vim/bundle/pac
 	url = git@github.com:vim-scripts/pac.vim.git
+[submodule "lib/vimpager"]
+	path = lib/vimpager
+	url = git@github.com:rkitover/vimpager.git

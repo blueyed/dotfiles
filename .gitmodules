@@ -314,3 +314,6 @@
 [submodule "lib/vimpager"]
 	path = lib/vimpager
 	url = git@github.com:rkitover/vimpager.git
+[submodule "vim/bundle/file-line"]
+	path = vim/bundle/file-line
+	url = git@github.com:bogado/file-line.git

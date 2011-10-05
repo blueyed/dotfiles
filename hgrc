@@ -4,6 +4,7 @@ username = Daniel Hahler <hg@thequod.de>
 [extensions]
 hgext.patchbomb =
 graphlog =
+mercurial_keyring =
 
 [email]
 method = /usr/sbin/sendmail

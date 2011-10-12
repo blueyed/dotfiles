@@ -2,13 +2,13 @@
 XML.ignoreWhitespace = false;
 XML.prettyPrinting   = false;
 var INFO =
-<plugin name="browser-improvements" version="0.1"
+<plugin name="browser-improvements" version="0.3"
         href="http://dactyl.sf.net/pentadactyl/plugins#browser-improvements-plugin"
         summary="Browser Consistency Improvements"
         xmlns={NS}>
     <author email="maglione.k@gmail.com">Kris Maglione</author>
     <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Pentadactyl" minVersion="1.0"/>
+    <project name="Pentadactyl" min-version="1.0"/>
     <p>
         This plugin provides various browser consistency improvements, including:
     </p>
@@ -18,75 +18,39 @@ var INFO =
     </ul>
 </plugin>;
 
-// Nuances gleaned from browser.jar/content/browser/browser.js
-function parseForm(submit) {
-    function encode(name, value) {
-        if (post)
-            return name + "=" + value;
-        return encodeURIComponent(name) + "=" + encodeURIComponent(value);
-    }
-
-    let form = submit.form;
-    let doc = form.ownerDocument;
-    let charset = doc.charset;
-    let uri = window.makeURI(String(doc.URL.replace(/\?.*/, "")), charset);
-    let url = window.makeURI(form.getAttribute("action"), charset, uri).spec;
-
-    let post = form.method.toUpperCase() == "POST";
-
-    let elems = [encode(submit.name, submit.value)];
-    for (let [,elem] in Iterator(form.elements)) {
-        if (set.has(Events.editableInputs, elem.type)
-                || /^(?:hidden|textarea)$/.test(elem.type)
-                || elem.checked && /^(?:checkbox|radio)$/.test(elem.type))
-            elems.push(encode(elem.name, elem.value));
-        else if (elem instanceof HTMLSelectElement) {
-            for (let [,opt] in Iterator(elem.options))
-                if (opt.selected)
-                    elems.push(encode(elem.name, opt.value));
-        }
-    }
-    if (post)
-        return [url, elems.map(encodeURIComponent).join('&'), elems];
-    return [url + "?" + elems.join('&'), null];
-}
-
 function clickListener(event) {
-    let elem = event.target;
+    let elem = event.originalTarget;
     if (elem instanceof HTMLAnchorElement) {
         if (/^_(?!top$)/.test(elem.getAttribute("target")))
             elem.removeAttribute("target");
         return;
     }
-    if (!(elem instanceof HTMLInputElement) || elem.type != "submit")
-        return;
-    if (elem.ownerDocument.defaultView.top != content)
-        return;
-    if (event.button != 1)
-        return;
-
-    liberator.open([parseForm(elem)], liberator.NEW_TAB);
+    if (elem instanceof HTMLInputElement && elem.type === "submit")
+        if (elem.ownerDocument.defaultView.top == content)
+            if (event.button == 1)
+                dactyl.open(DOM(elem).formData, dactyl.NEW_TAB);
 }
 
 function keypressListener(event) {
-    let elem = event.target;
-    let key = events.toString(event);
-    function submit(form) {
-        if (isinstance(form.submit, HTMLInputElement))
-            form.submit.click();
-        else if (isinstance(form.submit, Function))
-            form.submit();
+    let elem = event.originalTarget;
+    let key = DOM.Event.stringify(event);
+    let submit = function submit(form) {
+        if (isinstance(form.wrappedJSObject.submit, HTMLInputElement))
+            buffer.followLink(form.wrappedJSObject.submit);
+        else {
+            if (!DOM(form).submit().canceled)
+                form.submit();
+        }
     }
-    if (key == "<C-Return>" && isinstance(elem, [HTMLTextAreaElement, HTMLSelectElement]))
+    if (key == "<C-Return>" && elem.form && isinstance(elem, [HTMLTextAreaElement, HTMLSelectElement]))
         submit(elem.form);
 }
 
-let appContent = document.getElementById("appcontent");
 function onUnload() {
-    appContent.removeEventListener("click", clickListener, true);
-    appContent.removeEventListener("keypress", keypressListener, true);
+    group.events.unlisten(null);
 }
-appContent.addEventListener("click", clickListener, true);
-appContent.addEventListener("keypress", keypressListener, true);
+let appContent = document.getElementById("appcontent");
+group.events.listen(appContent, "click", clickListener, true);
+group.events.listen(appContent, "keypress", keypressListener, true);
 
 /* vim:se sts=4 sw=4 et: */

@@ -100,7 +100,7 @@ CenterSelect.Selector.animate = function(element, target_position){
 			target = bodyObj.scrollTop + Math.floor(bodyObj.clientHeight/2 - visibleElement.clientHeight/2 );
 			break;
 		case target_positions.bottom:
-			target = bodyObj.scrollTop + Math.floor(bodyObj.clientHeight - visibleElement.clientHeight);
+			target = bodyObj.scrollTop + Math.floor(bodyObj.clientHeight - visibleElement.clientHeight - visibleElement.offsetHeight);
 			break;
 	}
 
@@ -210,25 +210,25 @@ CenterSelect.Selector.remove = function(){
 }
 
 // cannot use "_" in the command name; that is, center_select will not work
-commands.add(['centerselect'],
+group.commands.add(['centerselect'],
 		'run centerselect from within vimperator.',
 		function(mystyle) {
 			CenterSelect.Selector.center(mystyle);
 		}
 		);
-commands.add(['topselect'],
+group.commands.add(['topselect'],
 		'run topselect from within vimperator.',
 		function(mystyle) {
 			CenterSelect.Selector.top(mystyle);
 		}
 		);
-commands.add(['bottomselect'],
+group.commands.add(['bottomselect'],
 		'run topselect from within vimperator.',
 		function(mystyle) {
 			CenterSelect.Selector.bottom(mystyle);
 		}
 		);
-commands.add(['removeselect'],
+group.commands.add(['removeselect'],
 		'run removeselect from within vimperator.',
 		function() {
 			CenterSelect.Selector.remove();

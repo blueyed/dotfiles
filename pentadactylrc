@@ -129,6 +129,9 @@ set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
 " use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
 set hintkeys=asdfgöälkjh
 
+" add suggestion,history to completion list
+set complete=search,location,file,suggestion,history
+
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
 nnoremap -silent zz :centerselect<CR>
 "nnoremap -silent zz :centerselect "border: 5px solid orange;"<CR>

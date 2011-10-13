@@ -130,7 +130,7 @@ set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
 set hintkeys=asdfgöälkjh
 
 " add suggestion,history to completion list
-set complete=search,location,file,suggestion,history
+set complete=search,location,file,suggestion
 
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
 nnoremap -silent zz :centerselect<CR>

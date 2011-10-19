@@ -320,3 +320,6 @@
 [submodule "vim/bundle/viewoutput"]
 	path = vim/bundle/viewoutput
 	url = git@github.com:vim-scripts/ViewOutput.git
+[submodule "vim/bundle/fontzoom"]
+	path = vim/bundle/fontzoom
+	url = git@github.com:thinca/vim-fontzoom.git

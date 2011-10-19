@@ -1,4 +1,4 @@
-Xft.dpi: 93
+! Xft.dpi: 93
 
 ! source: https://wiki.archlinux.de/title/Urxvt#Konfiguration
 URxvt.saveLines: 8192
@@ -8,8 +8,7 @@ URxvt.scrollBar: false
 URxvt.jumpScroll: true
 URxvt.skipScroll: true
 
-URxvt.font: terminus-14,\
-  xft:DejaVu Sans Mono:size=12:antialias=true
+URxvt.font: terminus-14,xft:DejaVu Sans Mono:size=12:antialias=true
 ! URxvt.font: xft:DejaVu Sans Mono:size=10:antialias=true
 ! URxvt.font: -*-terminus-medium-*-*-*-14-120-*-*-*-*-*-*
 ! URxvt.font: xft:Inconsolata:style=Medium:pixelsize=14:antialias=true
@@ -29,9 +28,11 @@ URxvt.font: terminus-14,\
 ! URxvt.boldFont:         -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso8859-15
 ! URxvt.italicFont:       xft:Bitstream Vera Sans Mono:italic:autohint=true
 ! URxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
-                                                                                                                                                    urxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
+  urxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
 ! URxvt*letterSpace: -1
-                                                                                                            xft:Code2000:antialias=false
+
+xft:Code2000:antialias=false
+
 URxvt.perl-ext-common: default,matcher
 ! URxvt.perl-ext-common: default,matcher,tabbed
 URxvt.urlLauncher: x-www-browser
@@ -51,7 +52,7 @@ URxvt.tabbed.secondaryScroll: true
 
 ! mine
 ! URxvt.antialias:true
-URxvt.geometry: 100x50
+URxvt.geometry: 80x32
 URxvt.fading: 25
 URxvt.urgentOnBell:true
 URxvt.visualBell:true

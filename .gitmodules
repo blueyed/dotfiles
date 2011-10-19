@@ -323,3 +323,6 @@
 [submodule "vim/bundle/fontzoom"]
 	path = vim/bundle/fontzoom
 	url = git@github.com:thinca/vim-fontzoom.git
+[submodule "vim/bundle/pydoc"]
+	path = vim/bundle/pydoc
+	url = git@github.com:fs111/pydoc.vim.git

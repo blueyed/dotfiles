@@ -329,3 +329,6 @@
 [submodule "vim/bundle/virtualenv"]
 	path = vim/bundle/virtualenv
 	url = git@github.com:jmcantrell/vim-virtualenv
+[submodule "vim/bundle/sudoedit"]
+	path = vim/bundle/sudoedit
+	url = git@github.com:chrisbra/SudoEdit.vim.git

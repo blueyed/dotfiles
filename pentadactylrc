@@ -35,8 +35,8 @@ nmap -s -b ä ]]
 group prevnext
 au LocationChange .* set previouspattern='^voriges Angebot$',^<$,^<(?!<),[^<]<$,'^(prev|previous|früher|zurück|Vorherige)$','(vorige Seite|next page)',^(<<|«|‹)$,^«,«$,^‹,'\b(prev|previous|zurück)\b'
 au LocationChange .* set nextpattern='^nächstes Angebot$',^>$,^>(?!>),[^>]>$,'^(next|more|weiter|später)$','(nächste Seite|next page)',^(>>|»|›)$,^»,»$,›$,'\b(next|more|weiter|vor(wärts)?)\b'
-au LocationChange www.xing.com set previouspattern=^Weiter$
-au LocationChange www.xing.com set nextpattern=^Zurück$
+au LocationChange www.xing.com set previouspattern=^Zurück$
+au LocationChange www.xing.com set nextpattern=^Weiter$
 group default
 
 set popups=tab,resized

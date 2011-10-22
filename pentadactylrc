@@ -32,8 +32,12 @@ nmap -s -b ö [[
 nmap -s -b ä ]]
 
 " next/prev as single word is rather weak!
-set previouspattern='^voriges Angebot$',^<$,^<(?!<),[^<]<$,'^prev|previous|früher|zurück|Vorherige$','vorige Seite|next page',^(<<|«|‹)$,^«,«$,^‹,'\bprev|previous|zurück\b'
-set nextpattern='^nächstes Angebot$',^>$,^>(?!>),[^>]>$,'\bvor(wärts)?\b','^next|more|weiter|später$','nächste Seite|next page',^(>>|»|›)$,^»,»$,›$,'\bnext|more|weiter\b'
+group prevnext
+au LocationChange .* set previouspattern='^voriges Angebot$',^<$,^<(?!<),[^<]<$,'^(prev|previous|früher|zurück|Vorherige)$','(vorige Seite|next page)',^(<<|«|‹)$,^«,«$,^‹,'\b(prev|previous|zurück)\b'
+au LocationChange .* set nextpattern='^nächstes Angebot$',^>$,^>(?!>),[^>]>$,'^(next|more|weiter|später)$','(nächste Seite|next page)',^(>>|»|›)$,^»,»$,›$,'\b(next|more|weiter|vor(wärts)?)\b'
+au LocationChange www.xing.com set previouspattern=^Weiter$
+au LocationChange www.xing.com set nextpattern=^Zurück$
+group default
 
 set popups=tab,resized
 

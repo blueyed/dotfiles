@@ -18,24 +18,33 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 	@echo ln -sfn $< $@
 	test -e $@ && echo "Skipping existing target: $@" || ln -sfn ${PWD}/$< $@
 
-install_programs:
+install_ppa:
+	# TODO: make it work with missing apt-add-repository (Debian Squeeze)
 	sudo apt-add-repository ppa:git-core/ppa
+
+install_programs:
 	sudo apt-get update
 	sudo apt-get install aptitude
 	sudo aptitude install console-terminus git rake vim-gnome xfonts-terminus xfonts-terminus-oblique exuberant-ctags
 	# extra
 	sudo aptitude install ttf-mscorefonts-installer
+install_zsh:
 	sudo aptitude install zsh
 
-install_programs_rpm:
-	sudo yum install git rubygem-rake ctags zsh
+install_programs_rpm: install_zsh_rpm
+	sudo yum install git rubygem-rake ctags
+install_zsh_rpm:
+	sudo yum install zsh
 
-ZSH_PATH := /usr/bin/zsh
-ifneq ($(wildcard /bin/zsh),)
-	ZSH_PATH := /bin/zsh
+ZSH_PATH := /bin/zsh
+ifneq ($(wildcard /usr/bin/zsh),)
+	ZSH_PATH := /usr/bin/zsh
+endif
+ifneq ($(wildcard /usr/local/bin/zsh),)
+	ZSH_PATH := /usr/local/bin/zsh
 endif
 
-setup: setup_zsh
+setup: install_zsh setup_zsh
 setup_zsh:
 	# changing shell to zsh, if $$ZSH is empty (set by oh-my-zsh/dotfiles)
-	[ "${ZSH}" != "" ] || chsh -s $(ZSH_PATH)
+	[ "$(shell getent passwd $$USER | cut -f7 -d:)" != "${ZSH_PATH}" -o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ] && chsh -s ${ZSH_PATH}

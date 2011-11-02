@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc vim vimrc vimpagerrc Xresources zlogin zshenv
+INSTALL_FILES := ackrc autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc subversion/servers vim vimrc vimpagerrc Xresources zlogin zshenv
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshrc
 
@@ -16,7 +16,7 @@ install_files: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 ~/.%: %
 	@echo ln -sfn $< $@
-	test -e $@ && echo "Skipping existing target: $@" || ln -sfn ${PWD}/$< $@
+	@test -e $@ && echo "Skipping existing target: $@" || { mkdir -p $(shell dirname $@) && ln -sfn ${PWD}/$< $@ ; }
 
 install_ppa:
 	# TODO: make it work with missing apt-add-repository (Debian Squeeze)

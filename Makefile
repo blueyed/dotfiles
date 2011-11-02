@@ -15,8 +15,7 @@ init_submodules:
 install_files: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 ~/.%: %
-	@echo ln -sfn $< $@
-	@test -e $@ && echo "Skipping existing target: $@" || { mkdir -p $(shell dirname $@) && ln -sfn ${PWD}/$< $@ ; }
+	@test -e $@ && echo "Skipping existing target: $@" || { echo ln -sfn $< $@ ; mkdir -p $(shell dirname $@) && ln -sfn ${PWD}/$< $@ ; }
 
 install_ppa:
 	# TODO: make it work with missing apt-add-repository (Debian Squeeze)

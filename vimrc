@@ -684,6 +684,14 @@ endfunction
 autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
 
 
+" Check for file modifications automatically
+augroup AutoChecktime
+au!
+autocmd FocusGained * checktime
+autocmd BufEnter * checktime
+autocmd CursorHold * checktime
+augroup END
+
 " setup b:VCSCommandVCSType
 function! SetupVCSType()
   try

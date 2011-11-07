@@ -263,6 +263,7 @@ task :install do
   end
 
   $replace_all = false
+  # TODO: do not install all files, see INSTALL_FILES in Makefile
   Dir['*'].each do |file|
     next if %w[Rakefile README.rdoc LICENSE].include? file
 

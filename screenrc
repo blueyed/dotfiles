@@ -1,47 +1,9 @@
-# from http://www.debian-administration.org/articles/205#comment_17
+source .screenrc.common
 
 # Caption  (use lastline for tabs)
 caption always "%?%F%{-b gk}%? %L=%-Lw%45>%{-b kg}%n%f* %t%{-}%+Lw%-0<"
 
 # Hardstatus (update xterm title)
 # do not overwrite byobu's
-# hardstatus string "SCREEN @ %H: %-n - %t"
+hardstatus string "SCREEN @ %H: %-n - %t"
 
-# Do not leave old content (e.g. from less/vim) on the screen, when exiting
-altscreen on
-
-bindkey -m ^[w eval "stuff ' '" writebuf "exec sh -c 'xsel < /tmp/screen-exchange'"
-
-# Shift-PageUp and Shift-PageDown control without Ctrl-A Esc
-termcapinfo xterm|xterms|xs|rxvt ti@:te@
-
-bind j focus down
-bind k focus up
-bind t focus top
-bind b focus bottom
-
-# fix copy'n'pasting (current line is filled with spaces (from vim))
-# source: http://www.df7cb.de/blog/2006/screen-bce.html
-defbce on
-
-defscrollback 30000
-
-# bind ctrl-left/right (experimental):
-bindkey "^[[1;5C" next
-bindkey "^[[1;5D" prev
-
-# bind Shift+PgUp/PgDn
-bindkey -m "^[[5;2~" stuff ^b
-bindkey -m "^[[6;2~" stuff ^f
-
-# workaround https://bugs.launchpad.net/byobu/+bug/727466
-# if this causes problems try/use ".i" instead
-attrcolor b ""
-
-# Enable 256 color terminal (from byobu)
-termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
-termcapinfo xterm 'Co#256'
-
-# Change to home directory (this is used for new windows by default)
-# for more/related discussion about this see: http://stackoverflow.com/questions/1517414/how-to-make-gnu-screen-start-a-new-window-at-the-current-working-directory
-chdir $HOME

@@ -707,6 +707,7 @@ endif
 let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'cnf'
 let g:tmruSize = 500
+let g:tlib#cache#purge_days = 365
 
 " Easytags
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine

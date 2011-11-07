@@ -1,0 +1,34 @@
+#    statusrc - Byobu's default status configurations
+#
+#      Override these in $BYOBU_CONFIG_DIR/statusrc
+#      where BYOBU_CONFIG_DIR is XDG_CONFIG_HOME if defined,
+#      and $HOME/.byobu otherwise.
+#
+#    Copyright (C) 2009-2011 Canonical Ltd.
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Configurations that you can override; if you leave these commented out,
+# Byobu will try to auto-detect them.
+#LOGO="\o/"
+#MONITORED_DISK=/
+#DISK_IO_THRESHOLD=50
+#MONITORED_INTERFACE=eth0
+#NETWORK_THRESHOLD=20
+#MONITORED_TEMP=/proc/acpi/thermal_zone/THM0/temperature
+#TEMP=F
+#DISTRO=Ubuntu
+#SERVICES="eucalyptus-nc|NC eucalyptus-cloud|CLC eucalyptus-walrus eucalyptus-cc|CC eucalyptus-sc|SC"
+#FAN=$(find /sys -type f -name fan1_input | head -n1)

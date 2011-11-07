@@ -387,7 +387,7 @@ fun! MyStatusLine(mode)
   let r += ['%=']      "left/right separator
   " let r += ['%b,0x%-8B '] " Current character in decimal and hex representation
   let r += [' %{FileSize()} ']  " size of file (human readable)
-  let r += ['%-12(%l,%c%V%)'] " Current line and column
+  let r += ['%-12(L%l/%L:C%c%V%)'] " Current line and column
   " let r += ['%l/%L']   "cursor line/total lines
   let r += [' %P']    "percent through file
   return join(r, '')

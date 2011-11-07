@@ -456,13 +456,8 @@ nmap    <leader>sc <Plug>Colorizer
 " endif
 
 " Line numbers"{{{
-au BufReadPost *
-      \ if &bt == "quickfix" || ! exists('+relativenumber') |
-      \   set number |
-      \ else |
-      \   set relativenumber |
-      \ endif |
-      \ call SetNumberWidth()
+" au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
+set nonumber
 function! ToggleLineNr()
   " relativenumber => number => nonumber/norelativenumber
   if exists('+relativenumber')

@@ -406,6 +406,11 @@ endif
 " Normal mode: <Leader>e
 map <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
 
+" gt: next tab or buffer
+" http://j.mp/dotvimrc
+nn gt : exec tabpagenr('$') == 1 ? 'bn' : 'tabnext'<CR>
+nn gT : exec tabpagenr('$') == 1 ? 'bp' : 'tabprevious'<CR>
+
 " Opens a tab edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>t
 map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>

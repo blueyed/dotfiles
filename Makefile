@@ -1,6 +1,6 @@
-INSTALL_FILES := ackrc aptitude/config autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc subversion/servers vim vimrc vimpagerrc Xresources zlogin zshenv
+INSTALL_FILES := ackrc aptitude/config autojump config gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc subversion/servers vim vimrc vimpagerrc Xresources
 # zshrc needs to get installed after submodules have been initialized
-INSTALL_FILES_AFTER_SM := zshrc
+INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
 install: install_files init_submodules install_files_after_sm
 

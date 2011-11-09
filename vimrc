@@ -888,7 +888,7 @@ set viminfo+=% " remember opened files and restore on no-args start (poor man's 
 behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
-set clipboard=unnamed
+" set clipboard=unnamed
 set mouse=a
 
 " Open URL

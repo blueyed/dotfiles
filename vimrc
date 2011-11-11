@@ -485,7 +485,8 @@ nmap <leader>sa :call ToggleLineNr()<CR>"}}}
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
-set completeopt=longest,menu
+" set completeopt=longest,menu
+set completeopt=longest,menuone,preview
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
 " set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once

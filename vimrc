@@ -563,11 +563,12 @@ if bufwinnr(1)
 endif
 
 " Sudo write
-if executable('sudo') && executable('tee')
-  command! SUwrite
-        \ execute 'w !sudo tee % > /dev/null' |
-        \ setlocal nomodified
-endif
+" Using SudoEdit instead (https://github.com/chrisbra/SudoEdit.vim)
+" if executable('sudo') && executable('tee')
+"   command! SUwrite
+"         \ execute 'w !sudo tee % > /dev/null' |
+"         \ setlocal nomodified
+" endif
 
 
 " Easy indentation in visual mode

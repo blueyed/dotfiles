@@ -682,7 +682,10 @@ function! s:CloseIfOnlyControlWinLeft()
     q
   endif
 endfunction
+augroup CloseIfOnlyControlWinLeft
+au!
 autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
+augroup END
 
 
 " Check for file modifications automatically
@@ -838,7 +841,7 @@ set matchtime=3
 
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
-set scrolloff=3
+set scrolloff=3 " scroll offset/margin (cursor at 4th line)
 set sidescroll=1
 
 " gets ignored by tmru

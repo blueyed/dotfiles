@@ -18,7 +18,9 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 ~/.% ~/.local/share/%: %
 	@test -e $@ && echo "Skipping existing target: $@" || { echo ln -sfn $< $@ ; mkdir -p $(shell dirname $@) && ln -sfn ${PWD}/$< $@ ; }
 
-install_ppa:
+setup_full: setup_ppa install_programs install_zsh setup_zsh
+
+setup_ppa:
 	# TODO: make it work with missing apt-add-repository (Debian Squeeze)
 	sudo apt-add-repository ppa:git-core/ppa
 
@@ -44,7 +46,6 @@ ifneq ($(wildcard /usr/local/bin/zsh),)
 	ZSH_PATH := /usr/local/bin/zsh
 endif
 
-setup: install_zsh setup_zsh
 setup_zsh:
 	# changing shell to zsh, if $$ZSH is empty (set by oh-my-zsh/dotfiles)
 	[ "$(shell getent passwd $$USER | cut -f7 -d:)" != "${ZSH_PATH}" -o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ] && chsh -s ${ZSH_PATH}

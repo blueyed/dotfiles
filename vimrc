@@ -847,6 +847,9 @@ set sidescroll=1
 
 " gets ignored by tmru
 set suffixes+=.tmp
+set suffixes+=.pyc
+
+set commentstring=#\ %s
 
 " Smart way to move btw. windows {{{2
 " (use cursor keys to not overwrite C-l (redraw))

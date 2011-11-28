@@ -186,9 +186,9 @@ if has("autocmd")
   "   au FocusLost * stopinsert
   " endif
 
-  if exists(":DetectIndent")
-    au! BufRead * if empty('b:no_detect_indent') | DetectIndent | endif
-  endif
+  au BufRead * if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) |
+        \ if exists(':DetectIndent') | DetectIndent | endif |
+      \ endif
 
   " autocommands for fugitive {{{2
   " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/

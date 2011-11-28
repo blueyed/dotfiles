@@ -4,6 +4,8 @@ set -e
 
 PASSWDFILE=~/.dotfiles/.passwd
 
+test -f $PASSWDFILE || { echo "Missing password file $PASSWDFILE."; exit 1; }
+
 if [ "$(basename $0)" = "dotfiles-encrypt" ]; then
   echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE
 else

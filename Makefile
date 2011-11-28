@@ -14,7 +14,11 @@ install_checkout: install_files install_files_after_sm
 init_submodules: sync_submodules update_submodules
 update_submodules:
 	# Requires e.g. git 1.7.5.4
-	git submodule update --init --recursive --quiet
+	git submodule update --init --quiet
+	# Simulate `--recursive`, but not for vim/bundle/command-t:
+	# (https://github.com/wincent/Command-T/pull/23)
+	cd vim/bundle/operator-replace && git submodule update --init --quiet
+	cd vim/bundle/operator-user && git submodule update --init --quiet
 sync_submodules:
 	git submodule sync --quiet
 

@@ -114,10 +114,12 @@ map <C-k> <Nop>
 " NoScript popup
 map <Leader>n -ex noscript popup
 
+" Quickmarks
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark r reddit.com
 silent qmark t twitter.com
 silent qmark g https://www.google.com/reader/view
+silent qmark h http://hahler.de
 
 group! editor
 autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell | call cursor(<line>, <column>)'''

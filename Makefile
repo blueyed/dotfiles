@@ -25,7 +25,7 @@ sync_submodules:
 install_files: $(addprefix ~/.,$(INSTALL_FILES)) $(addprefix ~/.local/share/,$(INSTALL_FILES_LOCAL_SHARE))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 ~/.% ~/.local/share/%: %
-	@test -e $@ && echo "Skipping existing target: $@" || { echo ln -sfn .dotfiles/$< $@ ; mkdir -p $(shell dirname $@) && ln -sfn .dotfiles/$< $@ ; }
+	@test -e $@ && echo "Skipping existing target: $@" || { echo ln -sfn $(CURDIR)/$< $@ ; mkdir -p $(shell dirname $@) && ln -sfn $(CURDIR)/$< $@ ; }
 
 setup_full: setup_ppa install_programs install_zsh setup_zsh
 

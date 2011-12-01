@@ -1,6 +1,4 @@
 INSTALL_FILES := ackrc aptitude/config autojump $(wildcard byobu/*) byoburc gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers vim vimrc vimpagerrc Xresources
-# Install these files to ~/.local/share/
-# INSTALL_FILES_LOCAL_SHARE := $(wildcard byobu/*)
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
@@ -22,8 +20,11 @@ update_submodules:
 sync_submodules:
 	git submodule sync --quiet
 
-.PHONY: $(INSTALL_FILES) $(INSTALL_FILES_LOCAL_SHARE) $(INSTALL_FILES_AFTER_SM)
-install_files: $(addprefix ~/.,$(INSTALL_FILES)) $(addprefix ~/.local/share/,$(INSTALL_FILES_LOCAL_SHARE))
+ALL_FILES := $(INSTALL_FILES) $(INSTALL_FILES_AFTER_SM)
+
+.PHONY: $(ALL_FILES)
+
+install_files: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
 ~/.% ~/.local/share/%: %

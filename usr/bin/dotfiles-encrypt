@@ -1,15 +1,19 @@
 #!/bin/sh
-
 set -e
 
 PASSWDFILE=~/.dotfiles/.passwd
 
 test -f $PASSWDFILE || { echo "Missing password file $PASSWDFILE."; exit 1; }
 
-if [ "$(basename $0)" = "dotfiles-encrypt" ]; then
-  echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE
-else
-  echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE
-fi
+basename=$(basename $0)
 
+case $basename in
+  dotfiles-encrypt)
+    echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE ;;
+  dotfiles-decrypt)
+    echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE ;;
+  # test if decryption works properly:
+  dotfiles-decrypt-verify)
+    dotfiles-decrypt "U2FsdGVkX1/X+Wc1BfXHegcNhZx3c+0JHJgCfZwmI37JyrmQibztEjHs9xpuY64rt2gGmA7ibHdlLjniv0PlGw1Dnypbi/L3pgyDSksYVQhNPerpNBTWgy5YF9N1QTyy" > /dev/null ;;
 
+esac

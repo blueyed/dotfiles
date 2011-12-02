@@ -35,7 +35,7 @@ then
   grep -q "can be fast-forwarded" "$TEMPFILE" || CAN_FF=0
 
   # stash any uncommitted changes
-  git stash save "Automatic stash by gup." | tee "$TEMPFILE"
+  git stash save "Automatic stash by gup on $(date +'%F %T')." | tee "$TEMPFILE"
   [ "${PIPESTATUS[0]}" -eq 0 ] || exit 1
 
   # take note if anything was stashed

@@ -30,6 +30,24 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 ~/.% ~/.local/share/%: %
 	@test -h $@ || { test -e $@ && echo "Skipping existing target (non-link): $@"; } || { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ ; }
 
+diff_files: $(ALL_FILES)
+	@for i in $^ ; do \
+		test -h "$$HOME/.$$i" && continue; \
+		echo ===== $(CURDIR)/$$i $$HOME/.$$i ================ ; \
+		ls -lh "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
+		if cmp "$(CURDIR)/$$i" "$$HOME/.$$i" ; then \
+			echo "Same contents." ; \
+		else \
+		  diff -u "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
+		fi ; \
+		printf "Replace regular file with symlink? (y/n) " ; \
+		read yn ; \
+		if [ "x$$yn" = xy ]; then \
+			rm "$$HOME/.$$i" ; \
+			ln -sfn "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
+		fi \
+	done
+
 setup_full: setup_ppa install_programs install_zsh setup_zsh
 
 setup_ppa:

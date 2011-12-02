@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc aptitude/config autojump $(wildcard byobu/*) byoburc gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers vim vimrc vimpagerrc Xresources
+INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/* bazaar/*) $(wildcard byobu/*) byoburc gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers vim vimrc vimpagerrc Xresources
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
@@ -27,8 +27,11 @@ ALL_FILES := $(INSTALL_FILES) $(INSTALL_FILES_AFTER_SM)
 install_files: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
+# TODO: test for "/" as last char (=> dir) || { test -d $@ && echo "Skipping existing target (dir): $@"; }
 ~/.% ~/.local/share/%: %
-	@test -h $@ || { test -e $@ && echo "Skipping existing target (non-link): $@"; } || { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ ; }
+	@test -h $@ \
+		|| { test -f $@ && echo "Skipping existing target (file): $@"; } \
+		|| { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ ; }
 
 diff_files: $(ALL_FILES)
 	@for i in $^ ; do \

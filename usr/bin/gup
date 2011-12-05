@@ -54,6 +54,7 @@ then
   # restore any stashed changes
   if [ "$HAVE_STASH" -ne 0 ]
   then
+    echo "Popping stashed changes.."
     git stash pop
   fi
 

@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Find files and list them sorted by size.
+#
+# Usage: $0 [dir] [minsize]
+
+dir=${1:-.}
+minsize=${2:-1M}
+
+find $dir -mount -path '/afs' -prune -o -size +$minsize -type f -exec du {} + | sort -n -r

@@ -3,17 +3,31 @@ set -e
 
 PASSWDFILE=~/.dotfiles/.passwd
 
-test -f $PASSWDFILE || { echo "Missing password file $PASSWDFILE."; exit 1; }
+
+if ! [ -f $PASSWDFILE ]; then
+  printf "Missing password file $PASSWDFILE.\nPassword: "
+  read passwd
+  tempfile=$(mktemp --tmpdir dotfiles-encrypt.XXX)
+  trap 'rm -f "$tempfile" >/dev/null 2>&1' 0
+  trap 'exit 2' 1 2 3 15
+  echo $passwd > $tempfile
+  PASSWDFILE="$tempfile"
+fi
 
 basename=$(basename $0)
 
+dotfiles_decrypt() {
+    echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE"
+}
+
 case $basename in
   dotfiles-encrypt)
-    echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE ;;
-  dotfiles-decrypt)
-    echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE ;;
+    echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE" ;;
+  dotfiles_decrypt)
+    dotfiles-decrypt "$@" ;;
+
   # test if decryption works properly:
   dotfiles-decrypt-verify)
-    dotfiles-decrypt "U2FsdGVkX1/X+Wc1BfXHegcNhZx3c+0JHJgCfZwmI37JyrmQibztEjHs9xpuY64rt2gGmA7ibHdlLjniv0PlGw1Dnypbi/L3pgyDSksYVQhNPerpNBTWgy5YF9N1QTyy" > /dev/null ;;
+    dotfiles_decrypt "U2FsdGVkX1/X+Wc1BfXHegcNhZx3c+0JHJgCfZwmI37JyrmQibztEjHs9xpuY64rt2gGmA7ibHdlLjniv0PlGw1Dnypbi/L3pgyDSksYVQhNPerpNBTWgy5YF9N1QTyy" > /dev/null ;;
 
 esac

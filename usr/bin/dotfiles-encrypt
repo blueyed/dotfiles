@@ -23,8 +23,8 @@ dotfiles_decrypt() {
 case $basename in
   dotfiles-encrypt)
     echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE" ;;
-  dotfiles_decrypt)
-    dotfiles-decrypt "$@" ;;
+  dotfiles-decrypt)
+    dotfiles_decrypt "$@" ;;
 
   # test if decryption works properly:
   dotfiles-decrypt-verify)

@@ -1,0 +1,14 @@
+#!/usr/bin/zsh
+# Display all available color combinations
+# (bold/non-bold foreground on backgrounds)
+
+autoload -U colors && colors
+
+for b in ${(k)bg}; do
+	for c in ${(k)fg}; do
+		print -nP %{${bg_no_bold[$b]}%}
+		print -nP %{${fg_no_bold[$c]}%} ${(l.$((COLUMNS/2-1)).)c}
+		print -nP %{${fg_bold[$c]}%}    ${(r.$((COLUMNS/2-1)).)c}
+		print -P %{${reset_color}%}
+	done
+done

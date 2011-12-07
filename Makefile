@@ -65,6 +65,10 @@ install_programs:
 	sudo aptitude install ttf-mscorefonts-installer
 install_zsh:
 	sudo aptitude install zsh
+install_commandt_module:
+	cd ~/.dotfiles/vim/bundle/command-t && \
+		rake make
+
 
 install_programs_rpm: install_zsh_rpm
 	sudo yum install git rubygem-rake ctags

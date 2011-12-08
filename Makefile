@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byoburc gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo vim vimrc vimpagerrc Xresources xsessionrc
+INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byobu/.screenrc gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo vim vimrc vimpagerrc Xresources xsessionrc
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 

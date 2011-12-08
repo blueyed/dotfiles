@@ -36,17 +36,17 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 diff_files: $(ALL_FILES)
 	@for i in $^ ; do \
 		test -h "$$HOME/.$$i" && continue; \
-		echo ===== $(CURDIR)/$$i $$HOME/.$$i ================ ; \
-		ls -lh "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
-		if cmp "$(CURDIR)/$$i" "$$HOME/.$$i" ; then \
+		echo ===== $$HOME/.$$i $(CURDIR)/$$i ================ ; \
+		ls -lh "$$HOME/.$$i" "$(CURDIR)/$$i" ; \
+		if cmp "$$HOME/.$$i" "$(CURDIR)/$$i" ; then \
 			echo "Same contents." ; \
 		else \
-		  diff -u "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
+		  diff -u "$$HOME/.$$i" "$(CURDIR)/$$i" ; \
 		fi ; \
-		printf "Replace regular file with symlink? (y/n) " ; \
+		printf "Replace regular file/dir ($$HOME/.$$i) with symlink? (y/n) " ; \
 		read yn ; \
 		if [ "x$$yn" = xy ]; then \
-			rm "$$HOME/.$$i" ; \
+			command rm -rf "$$HOME/.$$i" ; \
 			ln -sfn "$(CURDIR)/$$i" "$$HOME/.$$i" ; \
 		fi \
 	done

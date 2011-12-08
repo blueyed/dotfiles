@@ -161,6 +161,7 @@ if has("autocmd") " Autocommands {{{1
   au BufNewFile,BufRead /etc/network/interfaces,/etc/environment setfiletype conf
   au BufRead,BufNewFile *.haml         setfiletype haml
   au BufRead,BufNewFile *.pac          setl filetype=pac
+  au BufNewFile,BufRead *zsh/functions* setfiletype zsh
 
   au FileType mail,markdown,gitcommit setlocal spell
 

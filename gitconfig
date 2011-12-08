@@ -24,6 +24,7 @@
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbi = rebase --interactive
+	rbs = rebase --skip
 	s = status
 	sm = submodule
 	st = status

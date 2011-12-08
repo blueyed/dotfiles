@@ -3,7 +3,6 @@ set -e
 
 PASSWDFILE=~/.dotfiles/.passwd
 
-
 if ! [ -f $PASSWDFILE ]; then
   printf "Missing password file $PASSWDFILE.\nPassword: "
   read passwd
@@ -14,17 +13,24 @@ if ! [ -f $PASSWDFILE ]; then
   PASSWDFILE="$tempfile"
 fi
 
+if [ x$# = x0 ]; then
+  printf "Input: "
+  read input
+else
+  input="$@"
+fi
+
 basename=$(basename $0)
 
 dotfiles_decrypt() {
-    echo "$@" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE"
+    echo "$input" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE"
 }
 
 case $basename in
   dotfiles-encrypt)
-    echo "$@" | openssl enc -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE" ;;
+    echo "$input" | openssl enc -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE" ;;
   dotfiles-decrypt)
-    dotfiles_decrypt "$@" ;;
+    dotfiles_decrypt "$input" ;;
 
   # test if decryption works properly:
   dotfiles-decrypt-verify)

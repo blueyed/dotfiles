@@ -141,7 +141,7 @@ set incsearch   " do incremental searching
 set wrap
 
 " Only do this part when compiled with support for autocommands.
-if has("autocmd")
+if has("autocmd") " Autocommands {{{1
   " Enable file type detection.
   " Use the default filetype settings, so that mail gets 'tw' set to 72,
   " 'cindent' is on in C files, etc.
@@ -251,10 +251,10 @@ if has("autocmd")
     "       \ if g:MyAuGroupEOLWSactive |
     "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
     "       \ endif
-  augroup END
+  augroup END "}}}
 else
   set autoindent    " always set autoindenting on
-endif " has("autocmd")
+endif " has("autocmd") }}}
 
 set tabstop=2
 set shiftwidth=2

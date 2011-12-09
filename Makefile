@@ -2,6 +2,8 @@ INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(f
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
+default: install migrate
+
 install: install_files init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup

@@ -603,17 +603,18 @@ command! -range=% UnTrail
 noremap <leader>st :UnTrail<CR>
 
 " Toggle semicolon at end of line {{{2
-function! MyToggleSemicolon()
+function! MyToggleLastChar(char)
   let ss = @/ | let save_cursor = getpos(".")
   try
-    s/\([^;]\)$/\1;/
+    exe 's/\([^'.escape(a:char,'/').']\)$/\1'.escape(a:char,'/').'/'
 	catch /^Vim\%((\a\+)\)\=:E486: Pattern not found/
-    s/;$//
+    exe 's/'.escape(a:char, '/').'$//'
   finally
     let @/ = ss | call setpos('.', save_cursor)
   endtry
 endfunction
-noremap <Leader>; :call MyToggleSemicolon()<cr>
+noremap <Leader>; :call MyToggleLastChar(';')<cr>
+noremap <Leader>: :call MyToggleLastChar(':')<cr>
 
 noremap ö :
 

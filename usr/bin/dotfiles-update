@@ -4,4 +4,4 @@ set -e
 
 cd ~/.dotfiles
 git pull
-make install
+make

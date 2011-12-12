@@ -7,10 +7,12 @@ default: install migrate
 install: install_files init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.1 .stamps/dangling.1
-.stamps/migrate_byobu.1:
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1
+.stamps/migrate_byobu.2:
 	@# .local/share/byobu is handled independently (preferred), only use ~/.byobu
 	$(RM) -r ~/.local/share/byobu
+	$(RM) ~/.byobu/keybindings ~/.byobu/profile ~/.byobu/profile.tmux ~/.byobu/status ~/.byobu/statusrc
+	$(RM) .stamps/migrate_byobu.*
 	touch $@
 .stamps/dangling.1:
 	for i in ~/.byoburc ~/.sh ~/.bin ~/.vimperator ~/.vimperatorrc ~/.gitignore ; do \

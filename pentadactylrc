@@ -19,6 +19,11 @@ map s :gg<Space>
 nmap s :gg<Space>
 vmap s :gg<Space>
 
+
+" bypass ctrl-tab (ref: http://code.google.com/p/dactyl/issues/detail?id=171)
+nmap <C-Tab> <Pass>
+nmap <C-S-Tab> <Pass>
+
 " command to clear history
 " command! clearhist sanitize commandline
 

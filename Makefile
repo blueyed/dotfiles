@@ -15,7 +15,7 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1
 	$(RM) .stamps/migrate_byobu.*
 	touch $@
 .stamps/dangling.1:
-	for i in ~/.byoburc ~/.sh ~/.bin ~/.vimperator ~/.vimperatorrc ~/.gitignore ; do \
+	for i in ~/.byobu ~/.byoburc ~/.sh ~/.bin ~/.vimperator ~/.vimperatorrc ~/.gitignore ; do \
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@

@@ -7,7 +7,10 @@
 export SSH_ASKPASS=ssh-askpass
 if ! ssh-add -l >/dev/null 2>&1; then ssh-add; fi
 
+PATH="$(dirname $0):$PATH"
+
 logfile=/tmp/log.weechat
+touch $logfile
 chmod 600 $logfile
 
 # user and hosts information, encrypted.
@@ -19,7 +22,9 @@ test -f ~/.dotfiles/dotfilesrc && source ~/.dotfiles/dotfilesrc
 
 if [ x$autossh_weechat_port = x ]; then
   # autogenerate port based on hostname
-  autossh_weechat_port=$(( 20000 + $(sumcharvals $(hostname)) ))
+  port_offset="$(sumcharvals $(hostname))"
+  autossh_weechat_port=$(( 20000 + port_offset ))
+  exit
 fi
 
 date >> $logfile

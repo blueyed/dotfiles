@@ -9,3 +9,5 @@ mercurial_keyring =
 [email]
 method = /usr/sbin/sendmail
 
+[hostfingerprints]
+lu1.lugensa.net = 60:3A:2E:1B:D5:DD:12:0D:CF:C5:90:BF:38:98:68:83:68:B2:1E:5E

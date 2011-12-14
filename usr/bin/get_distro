@@ -1,0 +1,53 @@
+#!/usr/bin/env zsh
+# Display information about currently used distribution.
+# Code is taken and adopted from byobu.
+
+if (( $+DISTRO )); then
+  echo $DISTRO
+  exit
+fi
+
+if [ -r "/etc/issue" ]; then
+  # lsb_release is *really* slow;  try to use /etc/issue first
+  issue=$(grep -m1 "^[A-Za-z]" /etc/issue)
+  case "$issue" in
+    Ubuntu*) DISTRO=${${${issue%%\(*}%%\\*}%% } ;;
+    Debian*) DISTRO="Debian $(</etc/debian_version)" ;;
+    *) if [ -r /etc/SuSE-release ] ; then
+        # TODO: use ${//}
+        DISTRO="SuSE $(fgrep VERSION /etc/SuSE-release | cut -f2 -d= | tr -d ' ').$(fgrep PATCHLEVEL /etc/SuSE-release | cut -f2 -d= | tr -d ' ')"
+      elif [ -r /etc/redhat-release ] ; then
+        DISTRO=$(</etc/redhat-release)
+        DISTRO=${DISTRO/Red Hat Enterprise Linux Server/RHEL}
+        DISTRO=${DISTRO/ Linux/} # for CentOS
+        DISTRO=${DISTRO/release /}
+        DISTRO=${DISTRO/ \(*/}
+      elif ! which lsb_release >/dev/null 2>&1; then
+        DISTRO=$(echo "$issue" | sed "s/ [^0-9]* / /" | awk '{print $1 " " $2}')
+      fi
+    ;;
+  esac
+fi
+
+if ! (( $+DISTRO )) && which lsb_release >/dev/null 2>&1; then
+  # If lsb_release is available, use it
+  r=$(lsb_release -s -d)
+  case "$r" in
+    Ubuntu*.*.*)
+      # Use the -d if an Ubuntu LTS
+      DISTRO="$r"
+    ;;
+    *)
+      # But for other distros the description
+      # is too long, so build from -i and -r
+      DISTRO="${(f)$(lsb_release -s -i -r)}"
+      DISTRO=${DISTRO/RedHatEnterpriseServer/RHEL}
+    ;;
+  esac
+fi
+
+(( $+DISTRO )) || DISTRO="unknown"
+DISTRO+=" ($(uname -m))"
+
+export DISTRO
+echo $DISTRO

@@ -24,7 +24,6 @@ if [ x$autossh_weechat_port = x ]; then
   # autogenerate port based on hostname
   port_offset="$(sumcharvals $(hostname))"
   autossh_weechat_port=$(( 20000 + port_offset ))
-  exit
 fi
 
 date >> $logfile

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Start thunderbird with german date format.
+# 'en_DK' would allow for ISO 8601 format.
+# See: http://kb.mozillazine.org/Date_display_format#Configuring_the_date.2Ftime_system_settings_on_your_computer
+
+export LC_TIME=de_DE.UTF-8
+[ "$LC_ALL" != "$LC_TIME" ] && unset LC_ALL
+exec /usr/bin/thunderbird

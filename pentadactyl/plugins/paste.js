@@ -211,7 +211,7 @@ var langlist = [    // looooooongcat, he's rather long.
 	['xpp', 'XPP'], 
 	['z80', 'z80 Assembler']];
 
-commands.addUserCommand(
+group.commands.add(
 	["past[ebin]"], 
 	"pastebin the clipboard, store the address in clipboard",
 	function(args) { 

@@ -135,7 +135,7 @@ function NoscriptVimperator() {
 
 var nsv = NoscriptVimperator();
 
-commands.addUserCommand(["nosc[ript]"],
+group.commands.add(["nosc[ript]"],
   "Execute noscript commands",
   function(args) { nsv._execute(args); },
   { argCount: '1', completer: nsv._completer }

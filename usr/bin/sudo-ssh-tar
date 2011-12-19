@@ -1,0 +1,63 @@
+#!/bin/sh
+# Copy remote files using ssh, sudo, tar and scp.
+# This allows to transfer files from a remote site, where you only have
+# sudo access.
+
+# Abort on any non-zero exit status
+set -e
+
+: ${VERBOSE:=1}
+
+NAME=$(basename $0)
+
+if [ $# -lt 1 ]; then
+	echo "Usage: $NAME <host>:<path> [local path]"
+	echo "Default for [local path] is the same name in the current directory."
+	exit 1
+fi
+
+host="${1%%:*}"
+src="${1#*:}"
+target="$2"
+
+srcdir="$(dirname "$src")"
+srcname="$(basename "$src")"
+
+# Default target: same name in current directory
+if [ -z "$target" ]; then
+  target="$PWD/$srcname"
+fi
+
+[ -n $VERBOSE ] && echo "src: $src\nsrcdir: $srcdir\nsrcname: $srcname\ntarget: $target"
+
+if [ -e "$target" ]; then
+  echo "ERROR: $target exists." >&2
+  exit 1
+fi
+
+# Quote single quotes in arguments:
+# source: http://git.kitenet.net/?p=etckeeper.git;a=blob;f=pre-commit.d/30store-metadata;h=aeec37461cd5dc1863b7b58ce722306c7d47c4ae;hb=299dc44f1014404ca1367b72e2a22605ef22d127#l40
+shellquote() {
+  sed -e "s/'/'\"'\"'/" -e "s/^/'/" -e "s/$/'/"
+}
+srcdir=$(echo "$srcdir" | shellquote)
+srcname=$(echo "$srcname" | shellquote)
+
+mktemp_template="tmp-$NAME.tar.bz2.XXX"
+remote_tempfile=$(ssh "$host" mktemp "\$HOME/$mktemp_template")
+local_tempfile=$(mktemp "$PWD/$mktemp_template")
+[ -n $VERBOSE ] && echo "remote_tempfile: $remote_tempfile, local_tempfile: ./$local_tempfile"
+
+[ -n $VERBOSE ] && echo "Compressing remotely."
+ssh -t $host "sudo tar cjf '$remote_tempfile' -C '$srcdir' '$srcname'"
+
+[ -n $VERBOSE ] && echo "Copying file."
+scp "$host:$remote_tempfile" "$local_tempfile"
+
+[ -n $VERBOSE ] && echo "Remove remote temporary file."
+ssh "$host" rm "$remote_tempfile"
+
+# To simulate scp's `-p` option (requires sudo):
+# tar xf "$local_tempfile" --atime-preserve --preserve-permissions --preserve-order --same-owner
+tar xf "$local_tempfile" --atime-preserve
+

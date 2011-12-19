@@ -101,6 +101,16 @@ ifneq ($(wildcard /usr/local/bin/zsh),)
 	ZSH_PATH := /usr/local/bin/zsh
 endif
 
+setup_sudo:
+	@user_file=/etc/sudoers.d/$$USER ; \
+	if [ -e $$user_file ] ; then \
+		echo "$$user_file exists already." ; exit 1 ; \
+	fi ; \
+	printf '# sudo config for %s\nDefaults:%s !tty_tickets,timestamp_timeout=60\n' $$USER $$USER | sudo tee $$user_file.tmp > /dev/null \
+		&& sudo chmod 440 $$user_file.tmp \
+		&& sudo visudo -c -f $$user_file.tmp \
+		&& sudo mv $$user_file.tmp $$user_file
+
 setup_zsh:
 	# changing shell to zsh, if $$ZSH is empty (set by oh-my-zsh/dotfiles)
 	[ "$(shell getent passwd $$USER | cut -f7 -d:)" != "${ZSH_PATH}" -o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ] && chsh -s ${ZSH_PATH}

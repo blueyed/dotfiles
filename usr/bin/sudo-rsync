@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+#
+# Wrap rsync remotely in `sudo`.
+#
+# This requires the option "tty_tickets" to be deactivated on the remote
+# host (or allow for passwordless sudo).
+
+# get host from rsync args
+host_arg="${@[(r)*:*]}"
+host=${host_arg%%:*}
+if [[ -z $host ]]; then
+	echo "No host in arguments found."
+	exit 1
+fi
+
+ssh -t "$host" sudo -v
+rsync -e ssh --rsync-path="sudo rsync" "$@"

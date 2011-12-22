@@ -38,7 +38,7 @@ fi
 # Quote single quotes in arguments:
 # source: http://git.kitenet.net/?p=etckeeper.git;a=blob;f=pre-commit.d/30store-metadata;h=aeec37461cd5dc1863b7b58ce722306c7d47c4ae;hb=299dc44f1014404ca1367b72e2a22605ef22d127#l40
 shellquote() {
-  sed -e "s/'/'\"'\"'/" -e "s/^/'/" -e "s/$/'/"
+  sed -e "s/'/'\"'\"'/g" -e "s/^/'/" -e "s/$/'/"
 }
 srcdir=$(echo "$srcdir" | shellquote)
 srcname=$(echo "$srcname" | shellquote)

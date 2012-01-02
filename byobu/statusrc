@@ -66,4 +66,4 @@
 # The users notification normally counts ssh sessions; set this configuration to '1'
 # to instead count number of distinct users logged onto the system
 # Default: 0
-#USERS_DISTINCT=0
+USERS_DISTINCT=1

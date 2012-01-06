@@ -11,7 +11,7 @@
  *
  * Documentation is at the tail of this file.
  */
-"use strict";
+/* use strict */
 
 let groupId = 0;
 let onUnload = overlay.overlayObject(gBrowser, {
@@ -146,6 +146,10 @@ var INFO =
             { template.map(options.get("tabclose").completer(), function ([k, v])
                 <><dt>{k}</dt> <dd>{v}</dd></>) }
             </dl>
+            <note>
+                This option does not affect the default mappings for <k>d</k>
+                and <k>D</k>, which behave as documented.
+            </note>
         </description>
     </item>
     <item>

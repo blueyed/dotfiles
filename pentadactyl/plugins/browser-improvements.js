@@ -1,4 +1,4 @@
-"use strict";
+/* use strict */
 XML.ignoreWhitespace = false;
 XML.prettyPrinting   = false;
 var INFO =
@@ -14,7 +14,7 @@ var INFO =
     </p>
     <ul>
         <li>Middle clicking on a form submit button opens the resulting page in a new tab.</li>
-        <li>Pressing <k name="C-Return"/> while a textarea or select element is focused submits the form.</li>
+        <li>Pressing <k name="C-Return" link="false"/> while a textarea or select element is focused submits the form.</li>
     </ul>
 </plugin>;
 

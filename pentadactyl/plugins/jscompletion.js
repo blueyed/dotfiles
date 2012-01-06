@@ -1,19 +1,19 @@
-"use strict";
+/* use strict */
 XML.ignoreWhitespace = false;
 XML.prettyPrinting   = false;
 var INFO =
-<plugin name="jscompletion" version="1.0.1"
+<plugin name="jscompletion" version="1.0.2"
         href="http://dactyl.sf.net/pentadactyl/plugins#jscompletion-plugin"
         summary="JavaScript completion enhancements"
         xmlns={NS}>
     <author email="maglione.k@gmail.com">Kris Maglione</author>
     <license href="http://people.freebsd.org/~phk/">BEER-WARE</license>
-    <project name="Pentadactyl" minVersion="1.0"/>
+    <project name="Pentadactyl" min-version="1.0"/>
     <p>
         This plugin provides advanced completion functions for
         DOM functions, eval, and some other special functions.
         For instance,
-        <ex>:js content.document.getElementById("<k name="Tab"/></ex>
+        <ex>:js content.document.getElementById("<k name="Tab" link="c_&lt;Tab>"/></ex>
         should provide you with a list of all element IDs
         present on the current web page. Many other DOM
         methods are provided, along with their namespaced variants.
@@ -27,10 +27,10 @@ function evalXPath(xpath, doc, namespace) {
             dactyl:     NS.uri,
             ns:         namespace
         }[prefix]),
-        XPathResult.UNORDERED_NODE_ITERATOR_TYPE,
+        XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
         null
     );
-    return (function () { try { let elem; while ((elem = res.iterateNext())) yield elem; } catch (e) {} })();
+    return (function () { for (let i = 0; i < res.snapshotLength; i++) yield res.snapshotItem(i); })();
 }
 
 let NAMESPACES = [
@@ -39,6 +39,7 @@ let NAMESPACES = [
     [NS.uri, "Dactyl"],
     ["http://www.w3.org/2005/Atom", "RSS"],
     ["http://www.w3.org/2000/svg", "SVG"],
+    ["http://www.mozilla.org/xbl", "XBL"],
     ["http://www.w3.org/1999/xhtml", "XHTML 1.0"],
     ["http://www.w3.org/2002/06/xhtml2", "XHTML 2.0"],
     ["http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "XUL"]
@@ -51,7 +52,7 @@ function addCompleter(names, fn) {
 function uniq(iter) {
     let seen = {};
     for (let val in iter)
-        if (!set.add(seen, val))
+        if (!Set.add(seen, val))
             yield val;
 }
 
@@ -67,7 +68,7 @@ addCompleter("eval", function (context, func, obj, args) {
     if (args.length > 1)
         return [];
     if (!context.cache.js) {
-        context.cache.js = new JavaScript();
+        context.cache.js = JavaScript();
         context.cache.context = CompletionContext("");
     }
     let ctxt = context.cache.context;
@@ -89,7 +90,7 @@ addCompleter("getElementById", function (context, func, doc, args) {
     context.anchored = false;
     if (args.length == 1) {
         context.keys = { text: function (e) e.getAttribute("id"), description: util.objectToString };
-        return evalXPath("//*[@id and contains(@id," + util.escapeString(args.pop(), "'") + ")]", doc);
+        context.generate = function () evalXPath("//*[@id]", doc);
     }
 });
 

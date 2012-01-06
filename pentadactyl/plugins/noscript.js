@@ -4,7 +4,7 @@
  *
  * Documentation is at the tail of this file.
  */
-"use strict";
+/* use strict */
 
 dactyl.assert("noscriptOverlay" in window,
               "This plugin requires the NoScript add-on.");
@@ -156,7 +156,7 @@ function splitContext(context, list) {
 }
 
 completion.noscriptObjects = function (context) {
-    let whitelist = this.set;
+    let whitelist = options.get("noscript-objects").set;
     context = context.fork();
     context.compare = CompletionContext.Sort.unsorted;
     context.generate = getObjects;
@@ -348,7 +348,7 @@ group.options.add(["script"],
 XML.ignoreWhitespace = false;
 XML.prettyPrinting   = false;
 var INFO =
-<plugin name="noscript" version="0.7"
+<plugin name="noscript" version="0.8"
         href="http://dactyl.sf.net/pentadactyl/plugins#noscript-plugin"
         summary="NoScript integration"
         xmlns={NS}>
@@ -416,7 +416,7 @@ var INFO =
                 The list of objects which allowed to display. See also
                 <o>noscript-forbid</o>.
             </p>
-            <example><ex>:map <k name="A-c"/></ex> <ex>:set nso!=<k name="A-Tab"/></ex></example>
+            <example><ex>:map <k name="A-c" link="false"/></ex> <ex>:set nso!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
         </description>
     </item>
     <item>
@@ -428,7 +428,7 @@ var INFO =
                 The list of sites which are permanently allowed to execute
                 scripts.
             </p>
-            <example><ex>:map <k name="A-s"/></ex> <ex>:set nss!=<k name="A-Tab"/></ex></example>
+            <example><ex>:map <k name="A-s" link="false"/></ex> <ex>:set nss!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
         </description>
     </item>
     <item>
@@ -441,7 +441,7 @@ var INFO =
                 scripts. The value is not preserved across application
                 restarts.
             </p>
-            <example><ex>:map <k name="A-S-s"/></ex> <ex>:set nst!=<k name="A-Tab"/></ex></example>
+            <example><ex>:map <k name="A-S-s" link="false"/></ex> <ex>:set nst!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
         </description>
     </item>
     <item>
@@ -453,7 +453,7 @@ var INFO =
                 The list of untrusted sites which are not allowed to activate,
                 nor are listed in the main completion lists or NoScript menu.
             </p>
-            <example><ex>:map <k name="A-C-s"/></ex> <ex>:set nsu!=<k name="A-Tab"/></ex></example>
+            <example><ex>:map <k name="A-C-s" link="false"/></ex> <ex>:set nsu!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
         </description>
     </item>
 </plugin>;

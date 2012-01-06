@@ -1,4 +1,6 @@
-"use strict";
+/* use strict */
+isGlobalModule = true;
+
 XML.prettyPrinting   = false;
 XML.ignoreWhitespace = false;
 var INFO =
@@ -16,6 +18,8 @@ var INFO =
     </p>
     <example><ex>:pageinfo hH</ex></example>
 </plugin>;
+
+var { Buffer } = require("buffer");
 
 var Controller = Class("Controller", XPCOM(Ci.nsIController), {
     init: function (command, data) {
@@ -122,7 +126,7 @@ var HttpObserver = Class("HttpObserver",
 let observer = HttpObserver();
 let onUnload = observer.closure.cleanup;
 
-function iterHeaders(type) {
+function iterHeaders(buffer, type) {
     let win = buffer.focusedFrame;
     let store = win.document[overlay.id];
     if (!store || !store.headers)
@@ -134,9 +138,9 @@ function iterHeaders(type) {
 }
 
 iter({ h: "Request", H: "Response" }).forEach(function ([key, name])
-    buffer.addPageInfoSection(key, name + " Headers", function (verbose) {
+    Buffer.addPageInfoSection(key, name + " Headers", function (verbose) {
         if (verbose)
-            return iterHeaders(name.toLowerCase())
+            return iterHeaders(this, name.toLowerCase())
     }));
 
 /* vim:se sts=4 sw=4 et: */

@@ -332,6 +332,3 @@
 [submodule "vim/bundle/sudoedit"]
 	path = vim/bundle/sudoedit
 	url = http://github.com/chrisbra/SudoEdit.vim.git
-[submodule "vim/bundle/smartusline"]
-	path = vim/bundle/smartusline
-	url = https://github.com/molok/vim-smartusline.git

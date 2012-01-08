@@ -440,7 +440,6 @@ imap <C-L> <Space>=><Space>
 " Display extra whitespace
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
 set fillchars=fold:-
-" set showbreak=↪ " no required with line numbers
 nnoremap <silent> <leader>sl :set list!<CR>
 inoremap <silent> <leader>sl <C-o>:set list!<CR>
 set nolist
@@ -465,6 +464,7 @@ nmap    <leader>sc <Plug>Colorizer
 " Line numbers"{{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set nonumber
+set showbreak=↪\ 
 function! ToggleLineNr()
   " relativenumber => number => nonumber/norelativenumber
   if exists('+relativenumber')
@@ -473,6 +473,11 @@ function! ToggleLineNr()
     set number!
   endif
   call SetNumberWidth()
+  if &relativenumber == 0 && &number == 0
+    let &showbreak='↪ '
+  else
+    set showbreak= " not required with line numbers
+  endif
 endfunction
 function! SetNumberWidth()
   if &number

@@ -328,11 +328,11 @@ hi StatColor guibg=#95e454 guifg=black ctermbg=lightgreen ctermfg=black
 hi Modified guibg=orange guifg=black ctermbg=lightred ctermfg=black
 function! InsertStatuslineColor(mode)
   if a:mode == 'i'
-    hi StatColor guibg=orange ctermbg=lightred
+    hi StatColor guibg=orange guifg=black ctermbg=lightred ctermfg=black
   elseif a:mode == 'r'
-    hi StatColor guibg=#e454ba ctermbg=magenta
+    hi StatColor guibg=#e454ba guifg=black ctermbg=magenta ctermfg=black
   elseif a:mode == 'v'
-    hi StatColor guibg=#e454ba ctermbg=magenta
+    hi StatColor guibg=#e454ba guifg=black ctermbg=magenta ctermfg=black
   else
     hi StatColor guibg=red ctermbg=red
   endif

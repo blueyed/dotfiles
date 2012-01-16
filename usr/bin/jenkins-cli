@@ -1,0 +1,10 @@
+#!/bin/sh
+
+: ${JENKINS_WAR:=/usr/share/jenkins/jenkins.war}
+
+passwdfile=~/.jenkinspasswd
+if [ ! -f $passwdfile ]; then
+  echo "Password file $passwdfile is missing."; exit 1
+fi
+
+java -jar $JENKINS_WAR "$@" --username servicemgr --password-file $passwdfile

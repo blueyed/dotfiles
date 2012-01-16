@@ -112,5 +112,12 @@ setup_sudo:
 		&& sudo mv $$user_file.tmp $$user_file
 
 setup_zsh:
-	# changing shell to zsh, if $$ZSH is empty (set by oh-my-zsh/dotfiles)
-	[ "$(shell getent passwd $$USER | cut -f7 -d:)" != "${ZSH_PATH}" -o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ] && chsh -s ${ZSH_PATH}
+	@# Check that ZSH_PATH is listed in /etc/shells
+	@grep -qF "${ZSH_PATH}" /etc/shells || { \
+		echo "Adding ${ZSH_PATH} to /etc/shells" ; \
+		echo "${ZSH_PATH}" | sudo tee -a /etc/shells > /dev/null ; \
+	}
+	@if [ "$(shell getent passwd $$USER | cut -f7 -d:)" != "${ZSH_PATH}" ]; then \
+		chsh -s ${ZSH_PATH} ; \
+	fi
+	@# obsolete/buggy?!:	-o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ]

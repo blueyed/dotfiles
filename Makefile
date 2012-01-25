@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byobu/.screenrc byobu/.tmux.conf gemrc gitconfig gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pbuilderrc pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources xsessionrc
+INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byobu/.screenrc byobu/.tmux.conf gemrc gitconfig gitattributes.global gitignore.global gvimrc hgrc irbrc lib oh-my-zsh pbuilderrc pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources xsessionrc
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 

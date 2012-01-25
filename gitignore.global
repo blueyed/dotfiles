@@ -5,3 +5,5 @@
 tags
 # vim tags like tags-ja in dotfiles/vim/bundle/autocomplpop
 tags-??
+# LibreOffice lock files
+.~lock.*#

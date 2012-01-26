@@ -1,14 +1,16 @@
-= Daniel Hahlers Dot Files
+= Daniel Hahlers Dotfiles
 
 These are config files to set up a system the way I like it.
 
 
 == Installation
 
+  # a) with a github account/setup:
+  git clone git@github.com:blueyed/dotfiles ~/.dotfiles
+  # b) without a github account setup:
   git clone git://github.com/blueyed/dotfiles ~/.dotfiles
   cd ~/.dotfiles
-  rake install
-
+  make
 
 == Environment
 
@@ -20,8 +22,10 @@ the following command:
 
   chsh -s /bin/zsh
 
+The Makefile in ~/.dotfiles provides this conviently via `make setup_zsh`.
+
 
 == Z Shell
 
-zsh is setup via a oh-my-zsh Git submodule.
+zsh is setup via a oh-my-zsh git submodule (heavily forked).
 

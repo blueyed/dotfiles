@@ -79,14 +79,18 @@ set errorbells visualbell
 " rss-icon in statusbar, via http://code.google.com/p/vimperator-labs/issues/detail?id=237
 javascript <<EOF
 (function(){
-	var feedButton = document.getElementById("feed-button");
-	if ( feedButton ) {
+	if ( ! document.getElementById("BMB_subscribeToPageMenuitem").disabled ) {
+		var feedButton = document.getElementById("BMB_subscribeToPageMenupopup");
+		// var feedButton = document.createElement("")
+		// <image xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" id="lazarus-statusbarpanel-image" src="chrome://lazarus/skin/lazarus.png" onclick="Lazarus.onStatusbarImageClick(event)" tooltip="lazarus-statusbaricon-tooltip-enabled"/>
+
 		var feedPanel = document.createElement("statusbarpanel");
 		feedPanel.setAttribute("id", "feed-panel-clone");
 		feedPanel.appendChild(feedButton);
 		feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
 		document.getElementById("status-bar")
-			.insertBefore(feedPanel, document.getElementById("security-button"));
+			.appendChild(feedPanel);
+			// .insertBefore(feedPanel, document.getElementById("security-button"));
 	}
 })();
 EOF
@@ -121,6 +125,7 @@ map <Leader>n -ex noscript popup
 
 " Quickmarks
 silent qmark 0 hahler.de
+silent qmark c http://www.google.com/calendar
 silent qmark f facebook.com
 silent qmark g https://www.google.com/reader/view
 silent qmark h heise.de

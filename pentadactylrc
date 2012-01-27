@@ -120,13 +120,13 @@ map <C-k> <Nop>
 map <Leader>n -ex noscript popup
 
 " Quickmarks
-qmark 0 hahler.de
-qmark f facebook.com
-qmark g https://www.google.com/reader/view
-qmark h heise.de
-qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
-qmark r reddit.com
-qmark t twitter.com
+silent qmark 0 hahler.de
+silent qmark f facebook.com
+silent qmark g https://www.google.com/reader/view
+silent qmark h heise.de
+silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
+silent qmark r reddit.com
+silent qmark t twitter.com
 
 group! editor
 autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell | call cursor(<line>, <column>)'''

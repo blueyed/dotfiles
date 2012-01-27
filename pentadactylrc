@@ -125,7 +125,7 @@ silent qmark r reddit.com
 silent qmark f facebook.com
 silent qmark t twitter.com
 silent qmark g https://www.google.com/reader/view
-silent qmark h http://hahler.de
+silent qmark h heise.de
 
 group! editor
 autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell | call cursor(<line>, <column>)'''

@@ -120,6 +120,7 @@ map <C-k> <Nop>
 map <Leader>n -ex noscript popup
 
 " Quickmarks
+qmark 0 hahler.de
 qmark f facebook.com
 qmark g https://www.google.com/reader/view
 qmark h heise.de

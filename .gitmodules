@@ -332,3 +332,6 @@
 [submodule "vim/bundle/sudoedit"]
 	path = vim/bundle/sudoedit
 	url = git://github.com/chrisbra/SudoEdit.vim.git
+[submodule "vim/bundle/speeddating"]
+	path = vim/bundle/speeddating
+	url = https://github.com/tpope/vim-speeddating.git

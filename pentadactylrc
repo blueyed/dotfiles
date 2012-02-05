@@ -3,7 +3,7 @@
 " delete any previously defined autocommands in this context
 autocmd!
 
-set mapleader=','
+map , <Leader> " `mapleader` setting/option is removed
 set urlseparator='\|'
 set guioptions+=N
 

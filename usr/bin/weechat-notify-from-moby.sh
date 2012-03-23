@@ -14,7 +14,7 @@ touch $logfile
 chmod 600 $logfile
 
 # user and hosts information, encrypted.
-userhost=$(dotfiles-decrypt 'U2FsdGVkX1/IGyB2mLXvSSKSNFs/J8d7FiQwB2fx9HWU9w+1L9+v3SfWzYpkLlbk')
+userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
 
 # this might be used to override $autossh_weechat_port

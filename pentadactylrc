@@ -29,9 +29,9 @@ nmap <C-S-Tab> <Pass>
 " command! clearhist sanitize commandline
 
 " Esc: abort request
-noremap <Esc> <C-c><Esc>
+map -builtin <Esc> <C-c><Esc>
 
-noremap <F1> :tab<Space>:help<Space>
+map -builtin <F1> :tab<Space>:help<Space>
 
 " prev/next for german keyboard layout
 nmap -s -b ö [[
@@ -153,19 +153,19 @@ set hintkeys=asdfgöälkjh
 set complete=search,location,file,suggestion
 
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
-nnoremap -silent zz :centerselect<CR>
+nmap -builtin -silent zz :centerselect<CR>
 "nnoremap -silent zz :centerselect "border: 5px solid orange;"<CR>
 "nnoremap -silent n n:norm zz<CR>
 "nnoremap -silent N N:norm zz<CR>
-nnoremap zH 10h
-nnoremap zL 10l
-nnoremap j 5j
-nnoremap k 5k
-nnoremap l 5l
-nnoremap h 5h
-nnoremap -silent zt :topselect<CR>
-nnoremap -silent zb :bottomselect<CR>
-nnoremap -silent zc :removeselect<CR>
+nmap -builtin zH 10h
+nmap -builtin zL 10l
+nmap -builtin j 5j
+nmap -builtin k 5k
+nmap -builtin l 5l
+nmap -builtin h 5h
+nmap -builtin -silent zt :topselect<CR>
+nmap -builtin -silent zb :bottomselect<CR>
+nmap -builtin -silent zc :removeselect<CR>
 
 "loadplugins
 

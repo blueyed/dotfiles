@@ -41,6 +41,10 @@ if ! (( $+distro )) && which lsb_release >/dev/null 2>&1; then
   esac
 fi
 
+if ! (( $+distro )) && [[ -f /etc/synoinfo.conf ]]; then
+  distro=$(grep '^synobios=' /etc/synoinfo.conf | sed -nr 's/^.*"(.*)"$/\1/p')
+fi
+
 (( $+distro )) || distro="unknown"
 distro+=" ($(uname -m))"
 

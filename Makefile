@@ -4,7 +4,8 @@ INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
 default: migrate install
 
-install: install_files init_submodules install_files_after_sm
+install_files: install_files_before_sm install_files_after_sm
+install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
 migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1
@@ -42,7 +43,7 @@ ALL_FILES := $(INSTALL_FILES) $(INSTALL_FILES_AFTER_SM)
 
 .PHONY: $(ALL_FILES)
 
-install_files: $(addprefix ~/.,$(INSTALL_FILES))
+install_files_before_sm: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
 ~/.% ~/.local/share/%: %

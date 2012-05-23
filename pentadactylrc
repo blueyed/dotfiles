@@ -130,6 +130,7 @@ silent qmark c http://www.google.com/calendar
 silent qmark f facebook.com
 silent qmark g https://www.google.com/reader/view
 silent qmark h heise.de
+silent qmark m https://mail.google.com/mail
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark p https://www.producteev.com/dashboard.php
 silent qmark r reddit.com

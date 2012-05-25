@@ -4,7 +4,7 @@
 	ignore = untracked
 [submodule "autojump"]
 	path = autojump
-	url = git://github.com/blueyed/autojump.git
+	url = git://github.com/joelthelion/autojump.git
 	ignore = untracked
 [submodule "vim/bundle/xmledit"]
 	path = vim/bundle/xmledit

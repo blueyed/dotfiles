@@ -29,7 +29,7 @@ install_checkout: install_files install_files_after_sm
 
 # Handle Git submodules
 init_submodules: update_submodules
-update_submodules:
+update_submodules: sync_submodules
 	@# Requires e.g. git 1.7.5.4
 	git submodule update --init --quiet
 	@# Simulate `--recursive`, but not for vim/bundle/command-t:

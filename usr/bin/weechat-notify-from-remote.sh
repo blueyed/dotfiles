@@ -1,7 +1,9 @@
-#!/bin/sh
-# 
-# Connect remotely (via SSH) to a host running weechat and tail-f/read the logfile
-# containing any highlights.
+#!/usr/bin/zsh
+#   NB: zsh is used for "$=" mainly, where `eval` failed to work with `trap`
+#       (quoting).
+#
+# Connect remotely (via SSH) to a host running weechat and tail-f/read the
+# logfile containing any highlights.
 # For any new highlights/mentions a notification gets displayed (locally).
 
 # Sound to play on highlight
@@ -21,22 +23,24 @@ logfile=/tmp/log.weechat
 touch $logfile
 chmod 600 $logfile
 
-# user and hosts information, encrypted.
+# # user and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
 
-# this might be used to override $autossh_weechat_port
-test -f ~/.dotfiles/dotfilesrc && source ~/.dotfiles/dotfilesrc
+# # this might be used to override $autossh_weechat_port
+# test -f ~/.dotfiles/dotfilesrc && source ~/.dotfiles/dotfilesrc
+#
+# if [ x$autossh_weechat_port = x ]; then
+#   # autogenerate port based on hostname
+#   port_offset="$(sumcharvals $(hostname))"
+#   autossh_weechat_port=$(( 20000 + port_offset ))
+# fi
 
-if [ x$autossh_weechat_port = x ]; then
-  # autogenerate port based on hostname
-  port_offset="$(sumcharvals $(hostname))"
-  autossh_weechat_port=$(( 20000 + port_offset ))
-fi
+trap 'sig=$? ; echo TRAP:$sig >> $logfile ; $=kill_cmd ; exit' 0 2 3 15
 
-# Kill autossh when this script gets killed
-export AUTOSSH_PIDFILE=/tmp/weechat-notify-from-moby-autossh.pid
-trap 'echo TRAP:$? >> $logfile ; test -f $AUTOSSH_PIDFILE && kill $(cat $AUTOSSH_PIDFILE); exit;' 0 2 3 15
+tail_cmd='tail -n0 -f .weechat/logs/perl.strmon.weechatlog'
+call_cmd="ssh $userhost ssh $internalhost '$tail_cmd'"
+kill_cmd="ssh $userhost ssh $internalhost \"pkill -f '$tail_cmd'\""
 
 date >> $logfile
 echo "Starting loop in $0..." >> $logfile
@@ -44,8 +48,7 @@ echo "Starting loop in $0..." >> $logfile
 sleep_failure=0
 while true ; do
   sleep_failure=$((sleep_failure+1))
-  autossh -M $autossh_weechat_port -t $userhost \
-    "ssh $internalhost 'tail -n0 -f .weechat/logs/perl.strmon.weechatlog'" | \
+  $=call_cmd 2>>$logfile | \
     # sed -u 's/[<@&]//g' | \
     while read date time number channel nick delim message; do
       echo "== $(date) ==" >> $logfile
@@ -56,7 +59,7 @@ while true ; do
       body="$message"
       notify-send --category=im.received -t 15000 "$title" "$body"
       # kdialog --passivepopup  "${message}" --title "${nick} @ ${channel}" 30
-      # zenity --info --title "${nick} @ ${channel}" --timeout 30 --text "${message}" 
+      # zenity --info --title "${nick} @ ${channel}" --timeout 30 --text "${message}"
       # nervt, irgendwie einschränken:
       #       ogg123 /usr/share/sounds/KDE-Sys-App-Message.ogg
 
@@ -68,6 +71,6 @@ while true ; do
       sleep_failure=0 # reset on successful read
     done
 
-  echo "Sleeping $sleep_failure seconds after read failure..." >> $logfile
+  echo "Sleeping $sleep_failure seconds after read/autossh failure..." >> $logfile
   sleep $sleep_failure
 done

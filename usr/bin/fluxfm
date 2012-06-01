@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /opt/deadbeef/bin/deadbeef http://www.fluxfm.de/stream-berlin

@@ -36,7 +36,7 @@ fi
 
 # Kill autossh when this script gets killed
 export AUTOSSH_PIDFILE=/tmp/weechat-notify-from-moby-autossh.pid
-trap 'echo TRAP:$? >> $logfile ; test -f $AUTOSSH_PIDFILE && kill $(<$AUTOSSH_PIDFILE); exit;' 0 2 3 15
+trap 'echo TRAP:$? >> $logfile ; test -f $AUTOSSH_PIDFILE && kill $(cat $AUTOSSH_PIDFILE); exit;' 0 2 3 15
 
 date >> $logfile
 echo "Starting loop in $0..." >> $logfile

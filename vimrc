@@ -261,6 +261,8 @@ set tabstop=2
 set shiftwidth=2
 set expandtab
 set iskeyword+=-
+" remove '=' from filename characters; for completion of FOO=/path/to/file
+set isfname-==
 
 " Always display the status line
 set laststatus=2

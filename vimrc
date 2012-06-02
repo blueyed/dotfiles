@@ -290,36 +290,46 @@ function! ShortenFilename(bufname, maxlen)
   if getbufvar(bufnr(a:bufname), '&filetype') == 'help'
     return fnamemodify(a:bufname, ':t')
   endif
-  if len(a:bufname) <= a:maxlen
-    return a:bufname
-  endif
 
-  let maxlen_of_parts = 5 " including slash/dot
+  let maxlen_of_parts = 7 " including slash/dot
+  let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
 
-  let r = a:bufname
   let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
   let parts = split(a:bufname, '\ze['.escape(s:PS, '\').']')
-  let i = len(parts)-1
-
-  let had_ps = 0
-  while i>0
-    if len(r) <= a:maxlen
-      return r
-    endif
-    let i -= 1
-    if len(parts[i]) > maxlen_of_parts
+  let i = 0
+  let n = len(parts)
+  let wholepath = '' " used for symlink check
+  while i < n
+    let wholepath .= parts[i]
+    " Shorten part, if necessary:
+    if i<n-1 && len(a:bufname) > a:maxlen && len(parts[i]) > maxlen_of_parts
       " Let's see if there are dots or hyphens to truncate at, e.g.
       " 'vim-pkg-debian' => 'v-p-d…'
       let w = split(parts[i], '\ze[._-]')
       if len(w) > 1
-        let w = map(w, 'v:val[0:1]')
-        let parts[i] = join(w, '').'…' " indicate that this has been truncated
+        let parts[i] = ''
+        for j in w
+          if len(j) > maxlen_of_subparts-1
+            let parts[i] .= j[0:maxlen_of_subparts-2]."…"
+          else
+            let parts[i] .= j
+          endif
+        endfor
       else
         let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
       endif
     endif
-    let r = join(parts, '')
+    " add indicator if this part of the filename is a symlink
+    if getftype(wholepath) == "link"
+      if parts[i][0] == s:PS
+        let parts[i] = parts[i][0] . '↬ ' . parts[i][1:]
+      else
+        let parts[i] = '↬ ' . parts[i]
+      endif
+    endif
+    let i += 1
   endwhile
+  let r = join(parts, '')
   return r
 endfunction
 
@@ -354,7 +364,8 @@ fun! MyStatusLine(mode)
     let r += ["%#StatColor#"]
   endif
   let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
-  let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~"), 20)}']
+  " Shorten filename while reserving 50 characters for the rest of the statusline.
+  let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
   if a:mode == 'Enter'
     let r += ["%*"]
   endif

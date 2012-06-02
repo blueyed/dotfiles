@@ -913,6 +913,8 @@ set guioptions-=m
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 
+set viminfo+=! " keep global uppercase variables. Used by tmru.
+
 " I feel dirty, plz rename kthxbye!
 behave mswin
 set keymodel-=stopsel " do not stop visual selection with cursor keys

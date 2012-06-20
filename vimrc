@@ -79,6 +79,14 @@ if 1
   if filereadable(s:old_yankring)
     execute '!mv '.s:old_yankring.' '.vimsharedir
   endif
+
+  " transfer any old tmru files to new location
+  let g:tlib_persistent = vimsharedir
+  let s:old_tmru_files = expand('~/.cache/vim/tlib/tmru/files')
+  if filereadable(s:old_tmru_files)
+    execute '!mv '.shellescape(s:old_tmru_files).' '.shellescape(tlib#persistent#Filename('tmru', 'files', 1))
+    " execute '!rm -r '.shellescape(g:tlib_cache)
+  endif
 end
 
 if has('persistent_undo')

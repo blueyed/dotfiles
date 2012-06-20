@@ -83,8 +83,9 @@ if 1
   " transfer any old tmru files to new location
   let g:tlib_persistent = vimsharedir
   let s:old_tmru_files = expand('~/.cache/vim/tlib/tmru/files')
+  let s:new_tmru_files = vimsharedir.'/tmru/files'
   if filereadable(s:old_tmru_files)
-    execute '!mv '.shellescape(s:old_tmru_files).' '.shellescape(tlib#persistent#Filename('tmru', 'files', 1))
+    execute '!mv '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
     " execute '!rm -r '.shellescape(g:tlib_cache)
   endif
 end

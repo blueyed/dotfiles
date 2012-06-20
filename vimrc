@@ -843,7 +843,7 @@ noremap <F1> :tab<Space>:help<Space>
 noremap <F2> <C-]>
 " expand abbr
 imap <F2> <C-]>
-noremap <F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>'
+noremap <F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 noremap <S-F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 noremap <F5> :GundoToggle<cr>
 noremap <F11> :YRShow<cr>

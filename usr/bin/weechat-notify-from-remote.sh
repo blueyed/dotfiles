@@ -36,7 +36,7 @@ internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
 #   autossh_weechat_port=$(( 20000 + port_offset ))
 # fi
 
-trap 'sig=$? ; echo TRAP:$sig >> $logfile ; $=kill_cmd ; exit' 0 2 3 15
+trap 'sig=$? ; echo TRAP:$sig >> $logfile ; if [ $sig -ne 1 ]; then $=kill_cmd ; exit ; fi' 0 2 3 15
 
 tail_cmd='tail -n0 -f .weechat/logs/perl.strmon.weechatlog'
 call_cmd="ssh $userhost ssh $internalhost '$tail_cmd'"

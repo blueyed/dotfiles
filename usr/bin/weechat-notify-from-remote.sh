@@ -38,7 +38,7 @@ internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
 
 trap 'sig=$? ; echo TRAP:$sig >> $logfile ; if [ $sig -ne 1 ]; then $=kill_cmd ; exit ; fi' 0 2 3 15
 
-tail_cmd='tail -n0 -f .weechat/logs/perl.strmon.weechatlog'
+tail_cmd="tail -n0 -f .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
 call_cmd="ssh $userhost ssh $internalhost '$tail_cmd'"
 kill_cmd="ssh $userhost ssh $internalhost \"pkill -f '$tail_cmd'\""
 

@@ -341,3 +341,6 @@
 [submodule "lib/zsh-completions"]
 	path = lib/zsh-completions
 	url = https://github.com/zsh-users/zsh-completions.git
+[submodule "vim/bundle/gnupg"]
+	path = vim/bundle/gnupg
+	url = https://github.com/jamessan/vim-gnupg.git

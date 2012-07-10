@@ -1,0 +1,48 @@
+#!/bin/sh -e
+#
+#    apport: note if there are crash dumps available for apporting
+#
+#    Copyright (C) 2009 Canonical Ltd.
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__apport_detail() {
+	for i in /var/crash/*.crash; do
+		if [ -f "$i" ]; then
+			printf "\nTo file bugs on the existing crash reports, run:\n"
+			which apport-cli >/dev/null || printf "  sudo apt-get install apport\n"
+			for i in /var/crash/*.crash; do
+				printf "  apport-cli $i\n"
+			done
+			printf "\nTo clear the pending reports:\n"
+			printf "  rm -f /var/crash/*.crash\n\n"
+			return
+		fi
+	done
+	printf "No pending crash reports\n"
+}
+
+__apport() {
+	# Print {!} if a /var/crash/*.crash file exists
+	for i in /var/crash/*.crash; do
+		if [ -f "$i" ]; then
+			color y k; printf "{!}"; color --
+			return
+		fi
+	done
+}
+
+# vi: syntax=sh ts=4 noexpandtab

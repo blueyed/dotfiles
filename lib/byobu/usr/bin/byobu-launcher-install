@@ -1,0 +1,80 @@
+#!/bin/sh -e
+#
+#    byobu-launcher-install
+#    Copyright (C) 2008 Canonical Ltd.
+#
+#    Authors: Nick Barcet <nick.barcet@ubuntu.com>
+#             Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+FLAG="$BYOBU_CONFIG_DIR/no-logout-on-detach"
+
+LOGOUT_ON_DETACH=1
+for i in $@; do
+	case "$i" in
+		-n|--no-logout)
+			LOGOUT_ON_DETACH=0
+		;;
+	esac
+done
+
+update_flag() {
+	if [ "$LOGOUT_ON_DETACH" = "1" ]; then
+		rm -f "$FLAG"
+	else
+		touch "$FLAG"
+	fi
+}
+
+install_launcher() {
+	$PKG-launcher-uninstall "$1" || true
+	printf "_byobu_sourced=1 . ${BYOBU_PREFIX}/bin/byobu-launch\n" >> "$1"
+}
+
+# Sanitize the environment
+$PKG-launcher-uninstall || true
+
+# Handle bourne shells, if not set globally in /etc/profile.d
+if [ ! -h "/etc/profile.d/Z98-$PKG.sh" ]; then
+	# Install in $HOME/.profile unconditionally
+	install_launcher "$HOME/.profile"
+	# Now, install in any shell-specific profiles, if they exist
+	# This list may grow to support other shells
+	for i in ".bash_profile" ".bash_login"; do
+		if [ -w "$HOME/$i" ]; then
+			install_launcher "$HOME/$i"
+		fi
+	done
+fi
+
+# Install in zprofile if default shell is zsh
+case "$SHELL" in
+	*zsh)
+		install_launcher "$HOME/.zprofile"
+	;;
+esac
+
+# Hush login, since we will handle motd printing
+touch "$HOME"/.hushlogin
+rm -f "$BYOBU_CONFIG_DIR/disable-autolaunch"
+
+# Update the logout/nologout flag
+update_flag
+
+# vi: syntax=sh ts=4 noexpandtab

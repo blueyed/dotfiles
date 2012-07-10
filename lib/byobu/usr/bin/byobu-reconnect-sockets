@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+#    byobu-reconnect-sockets - source this file to re-establish
+#                              GPG_AGENT_INFO and DBUS_SESSION_BUS_ADDRESS,
+#                              useful when reconnecting to an existing
+#                              byobu session.
+#
+#    Copyright (C) 2009 Canonical Ltd.
+#    Copyright (C) 2012 Dustin Kirkland <dustin.kirkland@gmail.com>
+#
+#    Authors: Dustin Kirkland <dustin.kirkland@gmail.com>
+#             Ryan C. Thompson <rct@thompsonclan.org>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+case "$-" in
+	*i*)
+		# no-op
+	;;
+	*)
+		echo 2>&1
+		echo "ERROR: You must source this file, rather than execute it." 2>&1
+		echo "  . $0" 2>&1
+		echo 2>&1
+		exit 1
+	;;
+esac
+
+export_and_send () {
+	var="$1"
+	value="$(eval "echo \$$var")"
+	export "$var"
+	case $BYOBU_BACKEND in
+		tmux)
+			tmux setenv "$var" "$value"
+		;;
+		screen)
+			screen -X setenv "$var" "$value"
+		;;
+	esac
+}
+
+screen_update () {
+	# Ensure that screen's environment variables/values get propagated here
+	# Enable word splitting for zsh:
+	[ "x$ZSH_VERSION" != x ] && setopt local_options sh_word_split
+	tempfile=$(mktemp -q) && {
+		for var in $VARS_TO_UPDATE; do
+			screen sh -c "echo export $var=\$$var >> \"$tempfile\""
+		done
+		. "$tempfile"
+		rm -f "$tempfile"
+	}
+}
+
+tmux_update () {
+	# Ensure that tmux's environment variables/values get propagated here
+	# Enable word splitting for zsh:
+	[ "x$ZSH_VERSION" != x ] && setopt local_options sh_word_split
+	for var in $VARS_TO_UPDATE; do
+		expr="$(tmux showenv | grep "^$var=")"
+		if [ -n "$expr" ]; then
+			export "$expr"
+		fi
+	done
+}
+
+# Pull environment variables/values from backend and update/export here
+VARS_TO_UPDATE="DISPLAY DBUS_SESSION_BUS_ADDRESS SESSION_MANAGER GPG_AGENT_INFO XDG_SESSION_COOKIE XDG_SESSION_PATH GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID"
+
+case $BYOBU_BACKEND in
+	tmux)
+		tmux_update
+	;;
+	screen)
+		screen_update
+	;;
+esac
+
+# Establish gpg-agent socket, helps when reconnecting to a detached session
+newest "$HOME/.gnupg/"gpg-agent-info-* && . "$_RET" && export_and_send GPG_AGENT_INFO
+
+# Reconnect dbus, source the most recently touched session-bus
+# Sorry, ls -t is needed here, to sort by time
+newest "$HOME/.dbus/session-bus/*" && . "$_RET"
+
+[ -r "$BYOBU_RUN_DIR/sockets" ] && . "$BYOBU_RUN_DIR/sockets"
+export_and_send DBUS_SESSION_BUS_ADDRESS
+export_and_send SESSION_MANAGER
+
+# vi: syntax=sh ts=4 noexpandtab

@@ -1,0 +1,105 @@
+#!/bin/sh
+#
+#    constants: some constant values needed by all library status scripts
+#
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+
+# UTF-8 support in the hardstatus is coming one day in Screen
+if [ "$BYOBU_BACKEND" = "tmux" ] && [ "$BYOBU_CHARMAP" = "UTF-8" ]; then
+	#ICON_C="℃"
+	#ICON_F="℉"
+	ICON_C="C"
+	ICON_F="F"
+	ICON_RD="◂"
+	ICON_WR="▸"
+	ICON_MAIL="⍌"
+	ICON_UP="▴"
+	ICON_DN="▾"
+	ICON_TRASH="♸"
+	ICON_WIFI=
+	ICON_REBOOT="⟳"
+	ICON_UPDATES="!"
+	ICON_SECURITY="‼"
+	#ICON_KB="㎅"
+	#ICON_MB="㎆"
+	#ICON_GB="㎇"
+	ICON_KB="K"
+	ICON_MB="M"
+	ICON_GB="G"
+	ICON_TB="T"
+	#ICON_KHz="㎑"
+	#ICON_MHz="㎒"
+	#ICON_GHz="㎓"
+	ICON_KHz="KHz"
+	ICON_MHz="MHz"
+	ICON_GHz="GHz"
+	#ICON_MBPS="㏔㎰"
+	ICON_MBPS="Mb"
+else
+	ICON_C="C"
+	ICON_F="F"
+	ICON_RD="<"
+	ICON_WR=">"
+	ICON_MAIL="[M]"
+	ICON_UP="^"
+	ICON_DN="v"
+	ICON_TRASH="T"
+	ICON_WIFI=
+	ICON_REBOOT="(R)"
+	ICON_UPDATES="!"
+	ICON_SECURITY="!!"
+	ICON_KB="KB"
+	ICON_MB="MB"
+	ICON_GB="GB"
+	ICON_TB="TB"
+	ICON_KHz="kHz"
+	ICON_MHz="MHz"
+	ICON_GHz="GHz"
+	ICON_MBPS="Mbps"
+fi
+PCT="%"
+
+# Support two different backends (screen/tmux)
+if [ -z "$BYOBU_BACKEND" ]; then
+	[ -r "/etc/byobu/backend" ] && . "/etc/byobu/backend"
+	[ -r "$BYOBU_CONFIG_DIR/backend" ] && . "$BYOBU_CONFIG_DIR/backend"
+fi
+case "$BYOBU_BACKEND" in
+	tmux)
+		export BYOBU_BACKEND
+		BYOBU_ARG_VERSION="-V"
+		ESC=
+	;;
+	screen)
+		export BYOBU_BACKEND
+		BYOBU_ARG_VERSION="-v"
+		ESC="\005"
+	;;
+esac
+
+# MacOS Support
+$BYOBU_TEST gsed >/dev/null 2>&1 && export BYOBU_SED="gsed --follow-symlinks" || export BYOBU_SED="sed --follow-symlinks"
+$BYOBU_TEST greadlink >/dev/null 2>&1 && export BYOBU_READLINK="greadlink" || export BYOBU_READLINK="readlink"
+$BYOBU_TEST sensible-pager >/dev/null 2>&1 && export BYOBU_PAGER="sensible-pager" || export BYOBU_PAGER="less"
+
+# Default colors
+export BYOBU_DARK="black"
+export BYOBU_LIGHT="white"
+export BYOBU_ACCENT="#75507B"          # AUBERGINE
+export BYOBU_HIGHLIGHT="#DD4814"       # UBUNTU ORANGE

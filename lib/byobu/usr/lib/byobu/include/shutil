@@ -1,0 +1,313 @@
+#!/bin/sh
+#
+#    shutil: some shared utilities used by all status scripts
+#
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#             Scott Moser <smoser@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Define colors
+color_screen() {
+	ESC="\005"
+	case "$1" in
+		"") return 0 ;;
+		-)   printf "$ESC{-}" ;;
+		--)   printf "$ESC{-} " ;;
+		esc)    printf "$ESC" ;;
+		bold1)  printf "$ESC{=b }" || printf "$ESC{= }" ;;
+		bold2)  printf "$ESC{+b }" || printf "$ESC{= }" ;;
+		none)   printf "$ESC{= }" ;;
+		invert) printf "$ESC{=r }" ;;
+		*)
+			local attr fg bg
+			case $# in
+				2)
+					attr= ; fg=$1 ; bg=$2
+				;;
+				3)
+					attr=$1 ; fg=$2 ; bg=$3
+				;;
+			esac
+			if [ "$MONOCHROME" = "1" ]; then
+				fg=
+				bg=
+			fi
+			printf "$ESC{=$attr $fg$bg}"
+		;;
+	esac
+}
+
+color_map() {
+	case "$1" in
+		k) _RET="black" ;;
+		r) _RET="red" ;;
+		g) _RET="green" ;;
+		y) _RET="yellow" ;;
+		b) _RET="blue" ;;
+		m) _RET="magenta" ;;
+		c) _RET="cyan" ;;
+		w) _RET="white" ;;
+		d) _RET="color0" ;;
+		K) _RET="#555555" ;;
+		R) _RET="#FF0000" ;;
+		G) _RET="#00FF00" ;;
+		Y) _RET="#FFFF00" ;;
+		B) _RET="#0000FF" ;;
+		M) _RET="#FF00FF" ;;
+		C) _RET="#00FFFF" ;;
+		W) _RET="#FFFFFF" ;;
+		*) _RET= ;;
+	esac
+}
+
+attr_map() {
+	case "$1" in
+		d) _RET=,dim ;;
+		u) _RET=,underscore ;;
+		b) _RET=,bold ;;
+		r) _RET=,reverse ;;
+		s) _RET=,standout ;;
+		B) _RET=,blinking ;;
+		h) _RET=,hidden ;;
+		i) _RET=,italics ;;
+		*) _RET= ;;
+	esac
+}
+
+color_tmux() {
+	local back fore attr
+	case "$1" in
+		"") return 0 ;;
+		-)   printf "#[fg=$BYOBU_LIGHT,bg=$BYOBU_DARK]" ;;
+		--)   printf "#[fg=$BYOBU_LIGHT,bg=$BYOBU_DARK] " ;;
+		esc)    printf "" ;;
+		bold*)  printf "#[fg=bold]" ;;
+		none)   printf "#[fg=$BYOBU_LIGHT,bg=$BYOBU_DARK]" ;;
+		invert) printf "#[reverse]" ;;
+		*)
+			if [ "$#" = "2" ]; then
+				color_map "$1"; back="$_RET"
+				color_map "$2"; fore="$_RET"
+			else
+				attr_map "$1";  attr="$_RET"
+				color_map "$2"; back="$_RET"
+				color_map "$3"; fore="$_RET"
+			fi
+			[ "$MONOCHROME" = "1" ] && printf "#[default]" || printf "#[fg=$fore$attr,bg=$back]"
+		;;
+	esac
+}
+
+color() {
+	case "$BYOBU_BACKEND" in
+		tmux)
+			color_tmux "$@"
+		;;
+		screen)
+			color_screen "$@"
+		;;
+	esac
+}
+
+# uncommented_lines(char=#)
+# does the standard input have lines that do not start with 'char'?
+uncommented_lines() {
+	local line chr="${1:-#}"
+	while read line; do
+		[ "${line#${chr}}" = "${line}" ] && return 0;
+	done
+	return 1
+}
+
+# newest(file,file,file..)
+# return the newest file in the list
+newest() {
+	local c="$1" i
+	for i in "$@"; do [ "$i" -nt "$c" ] && c="$i"; done
+	[ -e "$c" ] && _RET="$c"
+}
+
+error() {
+	printf "%s\n" "ERROR: " "$@" 1>&2
+}
+
+fail() {
+	[ $# -eq 0 ] || error "$@"; exit 1;
+}
+
+find_script() {
+	# Allow for local status scripts
+	if [ -x "$BYOBU_CONFIG_DIR/bin/$1" ]; then
+		_RET="$BYOBU_CONFIG_DIR/bin/$1"
+	elif [ -x "$BYOBU_PREFIX/lib/$PKG/$1" ]; then
+		_RET="$BYOBU_PREFIX/lib/$PKG/$1"
+	elif [ -x "$BYOBU_PREFIX/libexec/$PKG/$1" ]; then
+		_RET="$BYOBU_PREFIX/libexec/$PKG/$1"
+	else
+		_RET="/dev/null"
+	fi
+}
+
+# divide 2 integers and return a floating point number
+# third argument indicates how many digits after the decimal
+fpdiv() {
+	local a=$1 b=$2 pres=${3:-3}
+	local i=0 mp="10" whole="" part="" chunk="" n=0
+	while i=$(($i+1)) && [ $i -le $pres ]; do
+		mp="${mp}0"
+		chunk="${chunk}?"
+	done
+
+	n=$(((${mp}*${a})/${b}))
+
+	# round up if necessary
+	[ $((($n-5)/10)) = $(($n/10)) ] && n=$(($n+5))
+
+	# drop the last digit, which was only there for rounding
+	n=${n%?}
+	whole=${n%${chunk}}
+	part=${n#${whole}}
+	_RET=${whole:-0}${part:+.${part}}
+	return
+}
+
+# rtrim(string,chars)
+rtrim() {
+	local tab=' ' cr="
+"
+	local cur="${1}" set="[${2:- ${tab}${cr}}]" n=""
+	while n=${cur%${set}} && [ "$n" != "$cur" ]; do cur=${n}; done
+	_RET=${cur}
+}
+
+readfile() {
+	local c="" r="" cr="
+"
+	OIFS="$IFS"; IFS="";
+	while read c; do
+		r="$r${cr}$c"
+	done
+	IFS=$OIFS
+	_RET=${r}
+	return 0
+}
+
+metadata_available() {
+	# This is really ugly.  We need a reliable, fast way of determining
+	# if a metadata service is available, that does NOT slow down non-ec2
+	# machines.
+	local x=0 cache="$BYOBU_CONFIG_DIR/.metadata_available"
+	# First, check the cache
+	if [ -s "$cache" ]; then
+		# Metadata is non-empty, so we have metadata available
+		x=1
+	else
+		# Must seed the cache
+		if [ -e /etc/ec2_version ] || [ -e /usr/sbin/update-grub-legacy-ec2 ]; then
+			# This *looks* like a machine with metadata, so background a potentially slow check
+			wget -q -O "$cache" --timeout=10 --tries=1 http://169.254.169.254 2>/dev/null &
+			sleep 0.02
+			[ -s "$cache" ] && x=1
+		fi
+	fi
+	[ "$x" = "1" ]
+}
+
+status_freq() {
+# Define status frequencies
+#   Use prime number intervals, to decrease collisions, which
+#   yields some less expensive status updates.
+#   ~86000 ~1 day
+#   ~600   ~10 minutes
+#   ~180   ~3 minutes
+#   ~60    ~1 minute
+	case "$1" in
+		apport)		_RET=67 ;;
+		arch)		_RET=9999999 ;;
+		battery)	_RET=61 ;;
+		color)		_RET=9999999 ;;
+		cpu_count)	_RET=5 ;;
+		cpu_freq)	_RET=2 ;;
+		cpu_temp)	_RET=19 ;;
+		custom)		_RET=5 ;;
+		date)		[ "$BYOBU_BACKEND" = "tmux" ] && _RET=1 || _RET=28793 ;;
+		disk)		_RET=13 ;;
+		disk_io)	_RET=3 ;;
+		distro)		_RET=9999999 ;;
+		ec2_cost)	_RET=601 ;;
+		entropy)	_RET=5 ;;
+		fan_speed)	_RET=23 ;;
+		hostname)	_RET=607 ;;
+		ip_address)	_RET=127 ;;
+		load_average)	_RET=2 ;;
+		logo)		_RET=9999999 ;;
+		mail)		_RET=5 ;;
+		memory)		_RET=13 ;;
+		menu)		_RET=9999999 ;;
+		network)	_RET=3 ;;
+		notify_osd)	_RET=9999999 ;;
+		processes)	_RET=7 ;;
+		raid)		_RET=59 ;;
+		rcs_cost)	_RET=613 ;;
+		reboot_required) _RET=5 ;;
+		release)	_RET=599 ;;
+		services)	_RET=53 ;;
+		swap)		_RET=19 ;;
+		time)		[ "$BYOBU_BACKEND" = "tmux" ] && _RET=1 || _RET=9999999 ;;
+		time_binary)	_RET=23 ;;
+		time_utc)	_RET=11 ;;
+		trash)		_RET=9999999 ;;
+		updates_available) _RET=7 ;;
+		uptime)		_RET=29 ;;
+		users)		_RET=11 ;;
+		whoami)		_RET=86029 ;;
+		wifi_quality)	_RET=17 ;;
+		*)		_RET=9999999 ;;
+	esac
+}
+
+get_now() {
+	if [ -r /proc/uptime ]; then
+		# return the integer part of the first item in /proc/uptime
+		local s c
+		read s c < /proc/uptime
+		_RET=${s%.*}
+	else
+		_RET=$(date +%s);
+	fi
+}
+
+get_network_interface() {
+        if [ -n "$MONITORED_NETWORK" ]; then
+		# Manual override
+                _RET="$MONITORED_NETWORK"
+        elif [ -e /proc/net/route ]; then
+		# Linux systems, read route and interface from procfs
+		local Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT
+		while read Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT; do
+			[ "$Mask" = "00000000" ] && break
+		done < /proc/net/route
+		_RET="$Iface"
+	elif $BYOBU_TEST route >/dev/null; then
+		# Route command on path
+		_RET=$(route get default|grep interface:|awk '{print $2}')
+	elif [ -x "/sbin/route" ]; then
+		# Mac OSX, shell out to the route command
+		_RET=$(/sbin/route get default|grep interface:|awk '{print $2}')
+	fi
+}
+
+# vi: syntax=sh ts=4 noexpandtab

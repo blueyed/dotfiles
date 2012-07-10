@@ -1,0 +1,50 @@
+Source: byobu
+Section: misc
+Priority: optional
+Maintainer: Dustin Kirkland <kirkland@ubuntu.com>
+DM-Upload-Allowed: yes
+Uploaders: Antoine Beaupré <anarcat@koumbit.org>
+Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 7.0.50~), gettext-base, automake, autoconf
+Homepage: http://launchpad.net/byobu
+Vcs-Bzr: http://bazaar.launchpad.net/~kirkland/byobu/trunk
+
+Package: byobu
+Architecture: all
+Depends:
+ ${misc:Depends}, ${perl:Depends},
+ debconf (>= 0.5) | debconf-2.0,
+ gettext-base,
+ python,
+ python-newt (>= 0.52.2-11),
+ tmux (>= 1.5) | screen
+Recommends:
+ screen,
+ tmux (>= 1.5),
+Suggests:
+ apport,
+ lsb-release,
+ po-debconf,
+ ttf-ubuntu-font-family (>= 0.80-0ubuntu1~medium),
+ update-notifier-common,
+ vim,
+ w3m
+Provides:
+ screen-profiles,
+ screen-profiles-extras,
+ byobu-extras
+Replaces:
+ screen-profiles (<< 2.0),
+ screen-profiles-extras (<< 2.0),
+ byobu-extras (<< 2.17)
+Breaks:
+ screen-profiles (<< 2.0),
+ screen-profiles-extras (<< 2.0),
+ byobu-extras (<< 2.17)
+Enhances: screen
+Description: powerful, text based window manager and shell multiplexer
+ Byobu is Ubuntu's text-based window manager based on GNU Screen.
+ Using Byobu, you can quickly create and move between different windows
+ over a single SSH connection or TTY terminal, monitor dozens of important
+ statistics about your system, detach and reattach to sessions later
+ while your programs continue to run in the background.

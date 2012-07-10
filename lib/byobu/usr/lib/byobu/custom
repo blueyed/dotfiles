@@ -1,0 +1,60 @@
+#!/bin/sh -e
+#
+#    custom: run the user's custom status scripts
+#
+#    Copyright (C) 2009 Canonical Ltd.
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__custom_detail() {
+	return
+}
+
+__custom() {
+	local cache="$BYOBU_RUN_DIR/cache.$BYOBU_BACKEND/custom"
+	local i= output=
+	for i in "$BYOBU_CONFIG_DIR/bin/"[0-9]*_*; do
+		# Loop over custom scripts
+		[ -x "$i" ] || continue
+		local now="$(date +%s)"
+		local script=${i##*/}
+		local freq=${script%%_*}
+		freq=${freq#0}
+		local lastrun=
+		[ -r "$cache.$script.last" ] && read lastrun < "$cache.$script.last" || lastrun=0
+		local expiration=$(($lastrun+$freq))
+		if [ $now -ge $expiration ]; then
+			"$i" > "$cache.$script" 2>/dev/null
+			printf "%s\n" "${now}" > "$cache.$script.last"
+		fi
+		readfile < "$cache.$script"
+		local str="${_RET}"
+		case "$str" in
+			*"$ESC{"*)
+				# User has formatted the colors
+				output="$output$(printf "$str")"
+			;;
+			*)
+				# Default to inverted coloring
+				output="$output$(color invert; printf "%s" "$str"; color --)"
+			;;
+		esac
+	done
+	[ -n "$output" ] || return
+	printf "$output" | $BYOBU_SED ':a;N;$!ba;s/\n//g'
+}
+
+# vi: syntax=sh ts=4 noexpandtab

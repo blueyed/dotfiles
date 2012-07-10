@@ -1,0 +1,81 @@
+#!/bin/sh -e
+#
+#    ip_address: report a host's ip address
+#
+#    Copyright (C) 2008-2011 Canonical Ltd.
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__ip_address_detail() {
+	[ -x /sbin/ifconfig ] && /sbin/ifconfig
+	/sbin/ip -4 addr list
+	/sbin/ip -6 addr list
+}
+
+__ip_address() {
+	local interface ipaddr cache="$BYOBU_RUN_DIR/cache.$BYOBU_BACKEND/ip_address"
+	# Allow interface overrides in $BYOBU_CONFIG_DIR/statusrc
+	if [ -n "$MONITORED_NETWORK" ]; then
+		interface="$MONITORED_NETWORK"
+	else
+		case "$IPV6" in
+			1|true|yes) interface=$(awk '$10 != "lo" { iface=$10 ; }; END { print iface; }' /proc/net/ipv6_route);;
+			*) get_network_interface; interface="$_RET";;
+		esac
+	fi
+	case "$IPV6" in
+		1|true|yes)
+			if [ "$IP_EXTERNAL" = "1" ]; then
+				# Background an update
+				wget -q -O "$cache" http://v6.ipv6-test.com/api/myip.php 2>/dev/null &
+				sleep 0.02
+			else
+				# Background an update
+				LC_ALL=C /sbin/ip -6 addr list dev "$interface" scope global >"$cache" 2>/dev/null &
+			fi
+			[ -s "$cache" ] && read ipaddr < "$cache"
+			# Print 'None' if we have no global address
+			[ -z "$ipaddr" ] && ipaddr="None"
+			ipaddr=${ipaddr#* inet6 }
+			ipaddr=${ipaddr%%/*}
+		;;
+		*)
+			if [ "$IP_EXTERNAL" = "1" ]; then
+				wget -q -O "$cache" http://v4.ipv6-test.com/api/myip.php 2>/dev/null &
+				sleep 0.02
+				[ -s "$cache" ] && read ipaddr < "$cache"
+			elif metadata_available; then
+				# We're in EC2, so get our public IP address
+				wget -q -O "$cache" http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null &
+				sleep 0.02
+				[ -s "$cache" ] && read ipaddr < "$cache"
+			else
+				ipaddr=$(LC_ALL=C /sbin/ip -4 addr list dev "$interface" scope global 2>/dev/null)
+				ipaddr=${ipaddr#* inet }
+				ipaddr=${ipaddr%%/*}
+			fi
+		;;
+	esac
+	if [ -n "$ipaddr" ]; then
+		if [ "$1" = "t" ]; then
+			printf "%s" "$ipaddr"
+		else
+			color b w k; printf "%s" "$ipaddr"; color --
+		fi
+	fi
+}
+
+# vi: syntax=sh ts=4 noexpandtab

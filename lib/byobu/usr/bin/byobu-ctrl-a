@@ -1,0 +1,123 @@
+#!/bin/sh
+#
+#    byobu-ctrl-a - set the ctrl-a behavior
+#    Copyright (C) 2011 Canonical Ltd.
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Usage() {
+	cat <<EOF
+Usage: ${0##*/} [mode]
+   mode is one of 'screen' or 'emacs'
+   if not specified, prompt the user
+EOF
+}
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+bind_to=""
+keybindings="$BYOBU_CONFIG_DIR/keybindings"
+[ "$BYOBU_BACKEND" = "tmux" ] && keybindings="$keybindings.tmux"
+touch "$keybindings"
+
+# If the user has already chosen an escape sequence, then
+# presumably they want ctrl-a to operate in emacs mode
+grep -qs "^escape" "$keybindings" && bind_to="emacs"
+
+case "${1}" in
+	-h|--help) Usage; exit 0;;
+	screen) bind_to="screen";;
+	emacs) bind_to="emacs";;
+	"") :;;
+	*) { Usage printf "%s\n" "Bad argument $1"; } 1>&2; exit 1;;
+esac
+
+while [ -z "$bind_to" ]; do
+	echo
+	echo "Configure Byobu's ctrl-a behavior..."
+	echo
+	echo "When you press ctrl-a in Byobu, do you want it to operate in:"
+	echo "    (1) Screen mode (GNU Screen's default escape sequence)"
+	echo "    (2) Emacs mode  (go to beginning of line)"
+	echo
+	echo "Note that:"
+	echo "  - F12 also operates as an escape in Byobu"
+	echo "  - You can press F9 and choose your escape character"
+	echo "  - You can run 'byobu-ctrl-a' at any time to change your selection"
+	echo
+	printf "Select [1 or 2]: "
+	s=$(head -n1)
+	echo
+	case "$s" in
+		1) bind_to="screen"; break;;
+		2) bind_to="emacs"; break;;
+	esac
+done
+
+case "$bind_to" in
+	emacs)
+		case "$BYOBU_BACKEND" in
+			screen)
+				$BYOBU_SED -i -e "/^register x /d" -e "/^bindkey \"^A\"/d" -e "/^escape escape \^Aa/d" "$keybindings"
+				echo 'bindkey "^A"' >> "$keybindings"
+				$BYOBU_BACKEND -X at 0 source "$BYOBU_CONFIG_DIR/profile"
+			;;
+			tmux)
+				$BYOBU_SED -i -e "/^set -g prefix/d" -e "/ send-prefix/d" -e "/^unbind-key -n C-a/d" "$keybindings"
+				echo "set -g prefix F12" >> "$keybindings"
+				echo "unbind-key -n C-a" >> "$keybindings"
+				$BYOBU_BACKEND source "$BYOBU_PREFIX/share/byobu/profiles/tmuxrc"
+			;;
+		esac
+		echo "INFO: ctrl-a will now operate in emacs mode"
+	;;
+	screen)
+		case "$BYOBU_BACKEND" in
+			screen)
+				$BYOBU_SED -i -e "/^register x /d" -e "/^bindkey \"^A\"/d" -e "/^escape /d" "$keybindings"
+				echo 'escape "^Aa"' >> "$keybindings"
+				echo 'register x "^A"' >> "$keybindings"
+				echo 'bindkey "^A"' >> "$keybindings"
+				$BYOBU_BACKEND -X at 0 source "$BYOBU_CONFIG_DIR/profile"
+			;;
+			tmux)
+				$BYOBU_SED -i -e "/^set -g prefix/d" -e "/ send-prefix/d" -e "/^unbind-key -n C-a/d" "$keybindings"
+				echo "unbind-key -n C-a" >> "$keybindings"
+				if $BYOBU_BACKEND -V | grep " 1.5"; then
+					# tmux 1.5 supports a list of prefixes
+					echo "set -g prefix ^A,F12" >> "$keybindings"
+				else
+					# tmux 1.6 and above supports prefix and prefix2
+					echo "set -g prefix ^A" >> "$keybindings"
+					echo "set -g prefix2 ^A" >> "$keybindings"
+				fi
+				echo "bind a send-prefix" >> "$keybindings"
+				$BYOBU_BACKEND source "$BYOBU_PREFIX/share/byobu/profiles/tmuxrc"
+			;;
+		esac
+		echo "INFO: ctrl-a will now operate in GNU Screen mode"
+	;;
+	*)
+		echo "Error: bad value for binding: $bind_to"
+	;;
+esac
+
+echo "To modify this behavior again later, run 'byobu-ctrl-a'"
+echo
+
+# vi: syntax=sh ts=4 noexpandtab

@@ -1,0 +1,47 @@
+#!/bin/sh -e
+#
+#    byobu-launcher-uninstall
+#    Copyright (C) 2008 Canonical Ltd.
+#
+#    Authors: Nick Barcet <nick.barcet@ubuntu.com>
+#             Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+remove_launcher() {
+	dest=$1
+	if [ -w "$dest" ]; then
+		# keep any comments, and remove lines invoking byobu:
+		$BYOBU_SED -i -e '/^\s*#/n' -e "/\b$PKG-launch\$/d" -e "/ screen-launch/d" "$dest"
+	fi
+}
+
+if [ -f "$1" ]; then
+		remove_launcher "$1"
+else
+	for i in ".profile" ".bashrc" ".bash_profile" ".bash_login" ".zprofile"; do
+		remove_launcher "$HOME/$i"
+	done
+fi
+
+mkdir -p "$BYOBU_CONFIG_DIR"
+touch "$BYOBU_CONFIG_DIR/disable-autolaunch"
+# install disabled motd printing; re-enable
+rm -f "$HOME"/.hushlogin
+
+# vi: syntax=sh ts=4 noexpandtab

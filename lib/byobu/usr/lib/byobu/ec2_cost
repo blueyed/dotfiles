@@ -1,0 +1,126 @@
+#!/bin/sh -e
+#
+#    ec2_cost: approximate EC2 cost (USD) of the current instance
+#
+#    Copyright (C) 2008 Canonical Ltd.
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Data Transfer Cost Basis
+# Incoming	$0.10/GB
+# Outgoing	$0.17/GB
+# (This gets more complex if you use >1TB/mo)
+RX_RATE="0.10"
+TX_RATE="0.15"
+
+__ec2_cost_detail() {
+	DETAIL=1
+	__ec2_cost
+}
+
+__ec2_cost() {
+	local zone type file_to_stat cpu mem rate hours tx_gb rx_gb network_cost uptime_cost total_cost interface cache="$BYOBU_RUN_DIR/cache.$BYOBU_BACKEND/ec2_cost"
+	# Try to use metadata service
+	if metadata_available; then
+		[ -s "$cache.zone" ] || wget -q -O "$cache.zone" http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null &
+		sleep 0.02
+		[ -s "$cache.zone" ] && read zone < "$cache.zone"
+		[ -r "$BYOBU_PREFIX/share/$PKG/ec2/rates.${zone%?}" ] || zone="us-east-1d"
+		. "$BYOBU_PREFIX/share/$PKG/ec2/rates.${zone%?}"
+		[ -s "$cache.type" ] || wget -q -O "$cache.type" http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null &
+		sleep 0.02
+		[ -s "$cache.type" ] && type=$($BYOBU_SED -e "s/\./_/g" "$cache.type")
+		eval rate="\$$type"
+		file_to_stat="$cache.type"
+	fi
+	if [ -z "$rate" ]; then
+		# No instance type/rate, exit immediately unless we explicitly want an estimate
+		[ "$EC2_ESTIMATE" = "1" ] || return
+		. "$BYOBU_PREFIX/share/$PKG/ec2/rates."*
+		# Count CPUs, Memory, Architecture, hours
+		cpu=$(grep -c "^processor.*:" /proc/cpuinfo) || cpu=1
+		mem=$(grep ^MemTotal /proc/meminfo | awk '{print $2}')
+		# /etc/hostname gets created at installation (but might get updated...other ideas?)
+		file_to_stat="/etc/hostname"
+		# Guess this system's going rate, based on mem available (m* types)
+		if [ $mem -lt 700000 ]; then
+			rate=$t1_micro
+		elif [ $mem -gt 64000000 ]; then
+			rate=$m2_4xlarge
+		elif [ $mem -gt 32000000 ]; then
+			rate=$m2_2xlarge
+		elif [ $mem -gt 16000000 ]; then
+			rate=$m2_xlarge
+		elif [ $mem -gt 14000000 ]; then
+			rate=$m1_xlarge
+		elif [ $mem -gt 7000000 ]; then
+			rate=$m1_large
+		else
+			# Otherwise, scale based on number of cpu's (c* types)
+			rate=$(printf "%s %s" "$cpu" "$m1_small" | awk '{printf "%f", $1*$2}')
+		fi
+	fi
+	hours=$(((`date +%s` - `stat --printf %Y $file_to_stat`) / 60 / 60 + 1))
+	# Auto detect network interface
+	[ -r "/proc/net/route" ] || return
+	interface=$(tail -n1 /proc/net/route  | awk '{print $1}')
+	local iface rbytes rpackets rerrs rdrop rfifo rframe rcompressed rmulticast tbytes tpackets terrs tdrop tfifo tcolls tcarrier tcompressed
+	while read iface rbytes rpackets rerrs rdrop rfifo rframe rcompressed rmulticast tbytes tpackets terrs tdrop tfifo tcolls tcarrier tcompressed; do
+		case "$iface" in
+			${interface}:)
+				tx_gb=${tbytes}
+				rx_gb=${rbytes}
+				break;
+			;;
+			${interface}:*)
+				# Interface and rbytes got munged together
+				tx_gb=${rmulticast##*:}
+				rx_gb=${iface##*:}
+				break;
+			;;
+		esac
+		if [ "$iface" = "${interface}:" ]; then
+			tx_gb=${tbytes}
+			rx_gb=${rbytes}
+			break
+		fi
+	done < /proc/net/dev
+	tx_gb=$(printf "%s" ${tx_gb} | awk '{ printf "%f", $1 / 1024 / 1024 / 1024 }')
+	rx_gb=$(printf "%s" ${rx_gb} | awk '{ printf "%f", $1 / 1024 / 1024 / 1024 }')
+	network_cost=`printf "%s %s %s %s" "$tx_gb" "$TX_RATE" "$rx_gb" "$RX_RATE" | awk '{printf "%f %f", $1*$2, $3*$4}' | awk '{printf "%f", $1 + $2}'`
+	# Calculate uptime cost
+	uptime_cost=`printf "%s" "$hours" | awk "{printf \"%f\", "$rate" * $hours}"`
+	total_cost=`printf "%s %s" "$network_cost" "$uptime_cost" | awk '{printf "%.2f", $1 + $2}'`
+	if [ "$DETAIL" = "1" ]; then
+		echo "================================================"
+		echo "Estimated cost in Amazon's EC2 since last reboot"
+		echo "================================================"
+		echo "  Network sent:  $tx_gb GB   @ \$$RX_RATE/GB"
+		echo "  Network recv:  $rx_gb GB   @ \$$TX_RATE/GB"
+		echo "  Network cost:  \$$network_cost"
+		echo "------------------------------------------------"
+		echo "  Uptime:        $hours hr  @ \$$rate/hr"
+		echo "  Uptime cost:   \$$uptime_cost"
+		echo "------------------------------------------------"
+		echo "Total cost:      ~\$$total_cost"
+		echo "================================================"
+		return
+	fi
+	[ -n "$total_cost" ] || return
+	color K G; printf "A\$"; color -; color b K G; printf "%s" "$total_cost"; color --
+}
+
+# vi: syntax=sh ts=4 noexpandtab

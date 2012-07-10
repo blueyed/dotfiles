@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+#    common: common stuff sourced by all scripts
+#
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+if [ -z "${BYOBU_INCLUDED_LIBS}" ]; then
+	# Needed to set up $BYOBU_CONFIG_DIR
+	. "${BYOBU_PREFIX}/lib/${PKG}/include/dirs"
+	
+	# Find command/type/which
+	if command -v; then
+		BYOBU_TEST="command -v"
+	elif type; then
+		BYOBU_TEST="type"
+	else
+		BYOBU_TEST="which"
+	fi
+
+	# If the backend is already set (eg. running `byobu-tmux`), do nothing.
+	if [ -z "${BYOBU_BACKEND}" ]; then
+		[ -r "/etc/$PKG/backend" ] && . "/etc/$PKG/backend"
+		[ -r "$BYOBU_CONFIG_DIR/backend" ] && . "$BYOBU_CONFIG_DIR/backend"
+		# Just in case there's no config file at all
+		if [ -z "${BYOBU_BACKEND}" ]; then
+			if [ -d "$BYOBU_CONFIG_DIR" ] && [ -r "$BYOBU_CONFIG_DIR/profile" ]; then
+				# Previous byobu configuration exists, default to screen
+				for i in screen tmux; do
+					$BYOBU_TEST $i >/dev/null && BYOBU_BACKEND="$i" && break
+				done
+				unset i
+			else
+				# New byobu configuration, default to tmux
+				for i in tmux screen; do
+					$BYOBU_TEST $i >/dev/null && BYOBU_BACKEND="$i" && break
+				done
+				unset i
+			fi
+			if ! $BYOBU_TEST "$BYOBU_BACKEND" >/dev/null; then
+				printf "%s\n" "ERROR: $PKG won't work without tmux or screen installed" 1>&2
+			fi
+		fi
+  	fi
+
+	# Creating backend cache
+	[ -d "$BYOBU_RUN_DIR/cache.$BYOBU_BACKEND" ] || mkdir -p "$BYOBU_RUN_DIR/cache.$BYOBU_BACKEND"
+
+	. "${BYOBU_PREFIX}/lib/${PKG}/include/shutil"
+	. "${BYOBU_PREFIX}/lib/${PKG}/include/constants"
+	BYOBU_INCLUDED_LIBS=1
+fi

@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+#    byobu-quiet - disable the hardstatus and all indicators
+#    Copyright (C) 2011 Canonical Ltd.
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+FLAG="$BYOBU_CONFIG_DIR/status.disable"
+
+# Clean up environment
+$BYOBU_SED -i "/hardstatus/d" "$BYOBU_CONFIG_DIR/keybindings" || true
+if [ "$1" = "--undo" ]; then
+	rm -f "$FLAG"
+else
+	touch "$FLAG"
+	# BUG: Need to make this dynamic and following
+	status="$USER@$(hostname)"
+	echo "hardstatus lastline '$status'" >> "$BYOBU_CONFIG_DIR/keybindings"
+fi
+$BYOBU_BACKEND -X at 0 source "$BYOBU_CONFIG_DIR/profile"
+
+# vi: syntax=sh ts=4 noexpandtab

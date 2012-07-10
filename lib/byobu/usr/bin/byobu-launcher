@@ -1,0 +1,52 @@
+#!/bin/sh -e
+#
+#    byobu-launcher - conditionally launch byobu
+#    Copyright (C) 2010 Canonical Ltd.
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+# Bad things happen if you run byobu, but you don't own your $HOME
+# ie, rather than "sudo byobu", you must run "sudo -H byobu"
+if [ -O "$HOME" ]; then
+	[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+	[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+	. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+	if [ -e "$BYOBU_CONFIG_DIR/disable-autolaunch" ]; then
+		false
+	else
+		case "$TERM" in
+			*screen*)
+				# Handle nesting
+				if [ -n "$LC_BYOBU" ] && [ "$LC_BYOBU" -gt 1 ]; then
+					# LC_BYOBU > 1, so user explicitly wants nested sessions
+					exec $BYOBU_PREFIX/bin/byobu "$@"
+				else
+					true
+				fi
+			;;
+			dumb)
+				# Dumb terminal, don't launch
+				false
+			;;
+			*)
+				exec $BYOBU_PREFIX/bin/byobu "$@"
+			;;
+		esac
+	fi
+fi
+false
+
+# vi: syntax=sh ts=4 noexpandtab

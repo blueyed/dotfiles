@@ -1,0 +1,111 @@
+#!/bin/sh -e
+#
+#    byobu-janitor - a collection of byobu tasks that ensure  a clean
+#                    environtment and smooth upgrades
+#
+#    Copyright (C) 2009 Canonical Ltd.
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
+
+# Ensure that all updates get run immediately
+rm -rf "$BYOBU_RUN_DIR/.last.$BYOBU_BACKEND"
+
+# Exit immediately, if we're not forced, and there is no reload flag
+FLAG="$BYOBU_RUN_DIR/reload-required"
+if [ "$1" != "--force" ] && [ ! -e "$FLAG" ]; then
+	exit 0
+fi
+
+# Set the rest of the variables
+DEFAULT_PROFILE="light"
+PROFILE="$BYOBU_CONFIG_DIR/profile"
+
+# Create byobu-exchange buffer file, with secure permissions, if it doesn't exist
+[ -e "$BYOBU_RUN_DIR/printscreen" ] || install -m 600 /dev/null "$BYOBU_RUN_DIR/printscreen"
+
+# Affects: users who launched using sudo, such that their config dir
+# is not writable by them
+if [ -d "$BYOBU_CONFIG_DIR" ] && [ ! -w "$BYOBU_CONFIG_DIR" ]; then
+	echo "ERROR: [$BYOBU_CONFIG_DIR] is not writable by the current user" 1>&2
+	exit 1
+fi
+
+# Affects: Upgrades from <= byobu 4.30
+# Clear out old style status configuration
+if ! grep -qs "^screen_upper_left=" "$BYOBU_CONFIG_DIR/status"; then
+	rm -f "$BYOBU_CONFIG_DIR/status" "$BYOBU_CONFIG_DIR/statusrc"
+fi
+
+# NOTE: Older version of Screen have an arbitrary limit of only being able
+# to change colors 16 times in this 'hardstatus string'.
+# Also committed in Upstream git, but not yet released.
+#  * http://savannah.gnu.org/bugs/?22146
+# If we could reliably tell if we had a patched screen, we'd do so here...
+MC=0
+
+# Affects: First runs with no configuration
+# Seed the configuration
+# Setup initial local user configuration
+[ -r "$BYOBU_CONFIG_DIR/color" ] || printf "BACKGROUND=k\nFOREGROUND=w\nMONOCHROME=$MC" > "$BYOBU_CONFIG_DIR/color"
+[ -r "$BYOBU_CONFIG_DIR/profile" ] || echo "source \$BYOBU_PREFIX/share/$PKG/profiles/common" > "$BYOBU_CONFIG_DIR/profile"
+[ -r "$BYOBU_CONFIG_DIR/profile.tmux" ] || echo "source \$BYOBU_PREFIX/share/$PKG/profiles/tmux" > "$BYOBU_CONFIG_DIR/profile.tmux"
+[ -r "$BYOBU_CONFIG_DIR/keybindings" ] || echo "source \$BYOBU_PREFIX/share/$PKG/keybindings/common" > "$BYOBU_CONFIG_DIR/keybindings"
+[ -r "$BYOBU_CONFIG_DIR/windows" ] || touch "$BYOBU_CONFIG_DIR/windows"
+[ -r "$BYOBU_CONFIG_DIR/backend" ] || echo "BYOBU_BACKEND=$BYOBU_BACKEND" > "$BYOBU_CONFIG_DIR/backend"
+[ -r "$HOME/.screenrc" ] || touch "$HOME/.screenrc"
+[ -r "$BYOBU_CONFIG_DIR/.tmux.conf" ] || touch "$BYOBU_CONFIG_DIR/.tmux.conf"
+for f in status statusrc; do
+	if [ ! -r "$BYOBU_CONFIG_DIR/$f" ]; then
+		# Copy from skeleton, if possible
+		cp -f "$BYOBU_PREFIX/share/$PKG/status/$f" "$BYOBU_CONFIG_DIR/$f"
+		# Enable ec2_cost, if we're in ec2 and seeding a new setup
+		if metadata_available; then
+			$BYOBU_SED -i -e "s/#ec2_cost/ec2_cost/g" "$($BYOBU_READLINK -f $BYOBU_CONFIG_DIR/$f)"
+		fi
+	fi
+done
+
+# Affects: Upgrades from <= byobu-2.70 that autolaunch
+# Update the byobu-launch line, if necessary
+if grep -qs " $PKG-launch$" "$HOME"/.profile; then
+	$PKG-launcher-install
+fi
+
+# Affects: Upgrades from <= byobu-2.78 which might have "motd+shell"
+# in their window list; update this to just "shell"
+if grep -qs "motd+shell" "$BYOBU_CONFIG_DIR/windows"; then
+	$BYOBU_SED -i -e "s/motd+shell/shell/g" "$($BYOBU_READLINK -f $BYOBU_CONFIG_DIR/windows)" || true
+fi
+
+# Affects: Upgrades from <= byobu 4.3, remove ec2_rates
+rm -f "$BYOBU_CONFIG_DIR/ec2_rates"
+
+# Affects: Upgrades from <= byobu 4.4, update "shell" -> "byobu-shell"
+if grep -qs " shell$" "$BYOBU_CONFIG_DIR/windows"; then
+	$BYOBU_SED -i -e "s/ shell$/ $PKG-shell/g" "$($BYOBU_READLINK -f $BYOBU_CONFIG_DIR/windows)" || true
+fi
+
+# Affects: Upgrades from <= byobu 4.22
+killall -u $USER byobu-statusd >/dev/null 2>&1 || true
+
+# Clean up flag (new and old)
+rm -f "$FLAG" "/var/run/screen/S-$USER/$PKG.reload-required"
+
+# vi: syntax=sh ts=4 noexpandtab

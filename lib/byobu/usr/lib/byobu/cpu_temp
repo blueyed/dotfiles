@@ -1,0 +1,54 @@
+#!/bin/sh -e
+#
+#    cpu_temp: cpu temperature
+#
+#    Copyright (C) 2008 Canonical Ltd.
+#    Copyright (C) 2011 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__cpu_temp_detail() {
+	local i
+	for i in $MONITORED_TEMP /sys/class/hwmon/hwmon*/temp*_input /sys/class/hwmon/hwmon*/device/temp*_input /proc/acpi/ibm/thermal /proc/acpi/thermal_zone/*/temperature; do
+		[ -r "$i" ] || continue
+		printf "%s\n" "$i:"
+		cat "$i"/*
+	done
+}
+
+__cpu_temp() {
+	local i t unit
+	for i in $MONITORED_TEMP /sys/class/hwmon/hwmon*/temp*_input /sys/class/hwmon/hwmon*/device/temp*_input /proc/acpi/ibm/thermal /proc/acpi/thermal_zone/*/temperature; do
+		case "$i" in
+			*temp*_input)
+				[ -s "$i" ] && read t < "$i" && t=$(($t/1000))
+			;;
+			*)
+				[ -s "$i" ] && t=$($BYOBU_SED -e "s/^[^0-9]\+//" -e "s/\s.*$//" "$i")
+			;;
+		esac
+		if [ -n "$t" ] && [ "$t" -gt 0 ]; then
+			unit="$ICON_C"
+			if [ "$TEMP" = "F" ]; then
+				t=$(($t*9/5 + 32))
+				unit="$ICON_F"
+			fi
+			color b k Y; printf "%s" "$t"; color -; color k Y; printf "%s" "$unit"; color --
+			break
+		fi
+	done
+}
+
+# vi: syntax=sh ts=4 noexpandtab

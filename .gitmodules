@@ -344,3 +344,6 @@
 [submodule "vim/bundle/gnupg"]
 	path = vim/bundle/gnupg
 	url = https://github.com/jamessan/vim-gnupg.git
+[submodule "vim/bundle/quickhl"]
+	path = vim/bundle/quickhl
+	url = https://github.com/t9md/vim-quickhl.git

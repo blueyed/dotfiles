@@ -347,3 +347,6 @@
 [submodule "vim/bundle/quickhl"]
 	path = vim/bundle/quickhl
 	url = https://github.com/t9md/vim-quickhl.git
+[submodule "vim/bundle/xdebug"]
+	path = vim/bundle/xdebug
+	url = https://github.com/vim-scripts/Xdebug.git

@@ -350,3 +350,6 @@
 [submodule "vim/bundle/xdebug"]
 	path = vim/bundle/xdebug
 	url = https://github.com/vim-scripts/Xdebug.git
+[submodule "vim/bundle/rails"]
+	path = vim/bundle/rails
+	url = https://github.com/tpope/vim-rails.git

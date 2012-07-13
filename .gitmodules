@@ -349,7 +349,7 @@
 	url = https://github.com/t9md/vim-quickhl.git
 [submodule "vim/bundle/xdebug"]
 	path = vim/bundle/xdebug
-	url = https://github.com/vim-scripts/Xdebug.git
+	url = https://github.com/joonty/vim-xdebug.git
 [submodule "vim/bundle/rails"]
 	path = vim/bundle/rails
 	url = https://github.com/tpope/vim-rails.git

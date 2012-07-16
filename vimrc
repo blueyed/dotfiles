@@ -30,6 +30,11 @@ if 1 " has('eval')
   let php_htmlInStrings = 1
 endif
 
+" Hack to enable 256 colors with e.g. "screen-bce" on CentOS 5.4
+if &term != "screen-256color" && &term[0:5] == "screen" && &t_Co == 8
+  set t_Co=256
+endif
+
 " Enable syntax {{{1
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.

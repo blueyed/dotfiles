@@ -98,10 +98,6 @@
 	path = vim/bundle/nerdtree
 	url = git://github.com/blueyed/nerdtree.git
 	ignore = untracked
-[submodule "vim/bundle/DBGp-Remote-Debugger-Interface"]
-	path = vim/bundle/DBGp-Remote-Debugger-Interface
-	url = git://github.com/blueyed/DBGp-Remote-Debugger-Interface.git
-	ignore = untracked
 [submodule "vim/bundle/lusty"]
 	path = vim/bundle/lusty
 	url = git://github.com/sjbach/lusty.git

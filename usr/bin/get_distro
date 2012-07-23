@@ -45,6 +45,14 @@ if ! (( $+distro )) && [[ -f /etc/synoinfo.conf ]]; then
   distro=$(grep '^synobios=' /etc/synoinfo.conf | sed -nr 's/^.*"(.*)"$/\1/p')
 fi
 
+if ! (( $+distro )) && [[ -n "$OSTYPE" ]]; then
+  case "$OSTYPE" in
+    darwin11.* ) distro="MacOS Lion ${OSTYPE#darwin}" ;;
+    darwin* ) distro="MacOS ${OSTYPE#darwin}" ;;
+    *) distro=$OSTYPE ;;
+  esac
+fi
+
 (( $+distro )) || distro="unknown"
 distro+=" ($(uname -m))"
 

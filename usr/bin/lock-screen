@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Lock the desktop / screen.
+
+macos_lock_tool="/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession"
+if [ -f "$macos_lock_tool" ]; then
+  "$macos_lock_tool" -suspend
+elif [ "$DESKTOP_SESSION" == "ubuntu"] && [ -f /usr/bin/gnome-screensaver-command ]; then
+  /usr/bin/gnome-screensaver-command -l
+else
+  echo "Error: no usable tool found to lock the screen."
+  exit 1
+fi
+  

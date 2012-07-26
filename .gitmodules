@@ -330,22 +330,22 @@
 	url = git://github.com/chrisbra/SudoEdit.vim.git
 [submodule "vim/bundle/speeddating"]
 	path = vim/bundle/speeddating
-	url = https://github.com/tpope/vim-speeddating.git
+	url = git://github.com/tpope/vim-speeddating.git
 [submodule "vim/bundle/ctrlp"]
 	path = vim/bundle/ctrlp
-	url = https://github.com/kien/ctrlp.vim.git
+	url = git://github.com/kien/ctrlp.vim.git
 [submodule "lib/zsh-completions"]
 	path = lib/zsh-completions
-	url = https://github.com/zsh-users/zsh-completions.git
+	url = git://github.com/zsh-users/zsh-completions.git
 [submodule "vim/bundle/gnupg"]
 	path = vim/bundle/gnupg
-	url = https://github.com/jamessan/vim-gnupg.git
+	url = git://github.com/jamessan/vim-gnupg.git
 [submodule "vim/bundle/quickhl"]
 	path = vim/bundle/quickhl
-	url = https://github.com/t9md/vim-quickhl.git
+	url = git://github.com/t9md/vim-quickhl.git
 [submodule "vim/bundle/xdebug"]
 	path = vim/bundle/xdebug
-	url = https://github.com/joonty/vim-xdebug.git
+	url = git://github.com/joonty/vim-xdebug.git
 [submodule "vim/bundle/rails"]
 	path = vim/bundle/rails
-	url = https://github.com/tpope/vim-rails.git
+	url = git://github.com/tpope/vim-rails.git

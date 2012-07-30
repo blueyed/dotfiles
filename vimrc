@@ -66,6 +66,7 @@ if 1
     echo "Creating cache dir ".vimcachedir
     call mkdir( vimcachedir, 'p', 0700 )
   endif
+  " XXX: not really a cache (https://github.com/tomtom/tmru_vim/issues/22)
   let g:tlib_cache = vimcachedir . '/tlib'
 
   let vimconfigdir=expand('~/.config/vim')
@@ -489,6 +490,7 @@ nmap    <leader>sc <Plug>Colorizer
 "   set grepprg=ack-grep\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
 " else
    " this is for Windows/cygwin and to add -H
+   " '$*' is not passed to the shell, but used by Vim
    set grepprg=grep\ -nH\ $*\ /dev/null
 " endif
 

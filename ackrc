@@ -1,4 +1,5 @@
 --type-add=php=.inc
+--type-set=smarty=.tpl
 --type-set=typoscript=.ts
 --ignore-dir=cache
 --ignore-dir=media

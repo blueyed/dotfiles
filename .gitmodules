@@ -349,3 +349,6 @@
 [submodule "vim/bundle/rails"]
 	path = vim/bundle/rails
 	url = git://github.com/tpope/vim-rails.git
+[submodule "vim/bundle/dbext"]
+	path = vim/bundle/dbext
+	url = git://github.com/vim-scripts/dbext.vim.git

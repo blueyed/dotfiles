@@ -3,5 +3,5 @@
 set -e
 
 cd ~/.dotfiles
-git pull
+~/.dotfiles/usr/bin/gup
 make

@@ -546,12 +546,7 @@ cnoremap <Right> <Space><BS><Right>
 
 " case only matters with mixed case expressions
 set ignorecase smartcase
-
-" being smart helps
 set smarttab
-"set smartindent
-" experimental: use cindent instead of smartindent
-set cindent
 
 " Tags
 if 1 " has('eval')

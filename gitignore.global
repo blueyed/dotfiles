@@ -1,7 +1,7 @@
 .DS_Store
 .svn
 *~
-.*.swp
+.*.sw?
 tags
 # vim tags like tags-ja in dotfiles/vim/bundle/autocomplpop
 tags-??

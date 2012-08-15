@@ -501,7 +501,7 @@ set showbreak=↪\
 function! ToggleLineNr()
   " relativenumber => number => nonumber/norelativenumber
   if exists('+relativenumber')
-    if &relativenumber | set number | elseif &number | set nonumber | else | set relativenumber | endif
+    if &number | set relativenumber | elseif &relativenumber | set norelativenumber | else | set number | endif
   else
     set number!
   endif
@@ -521,7 +521,8 @@ function! SetNumberWidth()
     set numberwidth=2
   endif
 endfun
-nmap <leader>sa :call ToggleLineNr()<CR>"}}}
+nmap <leader>sa :call ToggleLineNr()<CR>
+"}}}
 
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)

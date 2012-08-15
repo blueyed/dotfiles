@@ -650,6 +650,20 @@ endfunction
 noremap <Leader>; :call MyToggleLastChar(';')<cr>
 noremap <Leader>: :call MyToggleLastChar(':')<cr>
 
+set spl=de,en
+" Toggle spellang: de => en => de,en
+fun! MyToggleSpellLang()
+  if &spl == 'de,en'
+    set spl=en
+  elseif &spl == 'en'
+    set spl=de
+  else
+    set spl=de,en
+  endif
+  echo "Set spl to ".&spl
+endfun
+noremap <Leader>sts :call MyToggleSpellLang()<cr>
+
 noremap ö :
 
 " Grep in the current (potential unsaved) buffer {{{2

@@ -8,7 +8,9 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.1
+.stamps:
+	mkdir -p .stamps
 .stamps/migrate_byobu.2:
 	@# .local/share/byobu is handled independently (preferred), only use ~/.byobu
 	$(RM) -r ~/.local/share/byobu
@@ -20,8 +22,9 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@
-.stamps:
-	mkdir -p .stamps
+.stamps/submodules_rm.1:
+	$(RM) -r vim/bundle/DBGp-Remote-Debugger-Interface
+	$(RM) -r vim/bundle/dbext
 
 # Target to install a copy of .dotfiles, where Git is not available
 # (e.g. distributed with rsync)

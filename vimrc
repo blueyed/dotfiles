@@ -1057,6 +1057,11 @@ iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 iabbr ... …
 "}}}
 
+" ignore certain files for completion (used also by Command-T)
+set wildignore+=*.o,*.obj,.git,.svn
+set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
+set wildignorecase
+
 " Local config (if any)
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

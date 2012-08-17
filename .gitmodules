@@ -343,9 +343,6 @@
 [submodule "vim/bundle/quickhl"]
 	path = vim/bundle/quickhl
 	url = git://github.com/t9md/vim-quickhl.git
-[submodule "vim/bundle/xdebug"]
-	path = vim/bundle/xdebug
-	url = git://github.com/joonty/vim-xdebug.git
 [submodule "vim/bundle/rails"]
 	path = vim/bundle/rails
 	url = git://github.com/tpope/vim-rails.git

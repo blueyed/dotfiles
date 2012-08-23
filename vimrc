@@ -1063,7 +1063,9 @@ iabbr ... …
 " ignore certain files for completion (used also by Command-T)
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
-set wildignorecase
+if has('wildignorecase') " not on MacOS
+  set wildignorecase
+endif
 
 " Local config (if any)
 if filereadable(expand("~/.vimrc.local"))

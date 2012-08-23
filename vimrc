@@ -879,9 +879,9 @@ noremap <F5> :GundoToggle<cr>
 noremap <F11> :YRShow<cr>
 
 
-" taglist plugin
-nnoremap <silent> <F8> :TlistToggle<CR>
-"let Tlist_Process_File_Always = 1
+" tagbar plugin
+nnoremap <silent> <F8> :TagbarToggle<CR>
+nnoremap <silent> <Leader><F8> :TagbarOpenAutoClose<CR>
 
 " handling of matches items, like braces
 set showmatch

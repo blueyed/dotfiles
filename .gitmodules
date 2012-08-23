@@ -14,10 +14,6 @@
 	path = vim/bundle/ack
 	url = git://github.com/blueyed/ack.vim.git
 	ignore = untracked
-[submodule "vim/bundle/taglist"]
-	path = vim/bundle/taglist
-	url = git://github.com/vim-scripts/taglist.vim.git
-	ignore = untracked
 [submodule "vim/bundle/occur"]
 	path = vim/bundle/occur
 	url = git://github.com/vim-scripts/occur.vim.git

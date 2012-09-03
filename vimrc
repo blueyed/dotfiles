@@ -1063,6 +1063,7 @@ iabbr ... …
 " ignore certain files for completion (used also by Command-T)
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
+set wildignore+=*.sw?
 if has('wildignorecase') " not on MacOS
   set wildignorecase
 endif

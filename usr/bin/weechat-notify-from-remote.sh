@@ -26,6 +26,7 @@ chmod 600 $logfile
 # # user and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
+ssh_extra_config=$(dotfiles-decrypt 'U2FsdGVkX1831ASVSASVEdbccoXHM4T9QzI2Jk0KGvimOGjCKkN90lE2v61SrfCVNNwdQ9Lcr2kKl8k2PUS3lA==') # remote port forwarding etc
 
 # # this might be used to override $autossh_weechat_port
 # test -f ~/.dotfiles/dotfilesrc && source ~/.dotfiles/dotfilesrc
@@ -39,8 +40,8 @@ internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
 trap 'sig=$? ; echo TRAP:$sig >> $logfile ; if [ $sig -ne 1 ]; then $=kill_cmd ; exit ; fi' 0 2 3 15
 
 tail_cmd="tail -n0 -f .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
-call_cmd="ssh $userhost ssh $internalhost '$tail_cmd'"
-kill_cmd="ssh $userhost ssh $internalhost \"pkill -f '$tail_cmd'\""
+call_cmd="ssh $ssh_extra_config $userhost ssh $internalhost '$tail_cmd'"
+kill_cmd="ssh $ssh_extra_config $userhost ssh $internalhost \"pkill -f '$tail_cmd'\""
 
 date >> $logfile
 echo "Starting loop in $0..." >> $logfile
@@ -71,6 +72,6 @@ while true ; do
       sleep_failure=0 # reset on successful read
     done
 
-  echo "Sleeping $sleep_failure seconds after read/autossh failure..." >> $logfile
+  echo "Sleeping $sleep_failure seconds after read/ssh failure..." >> $logfile
   sleep $sleep_failure
 done

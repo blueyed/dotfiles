@@ -338,7 +338,7 @@
 	url = git://github.com/jamessan/vim-gnupg.git
 [submodule "vim/bundle/quickhl"]
 	path = vim/bundle/quickhl
-	url = git://github.com/t9md/vim-quickhl.git
+	url = git://github.com/blueyed/vim-quickhl.git
 [submodule "vim/bundle/rails"]
 	path = vim/bundle/rails
 	url = git://github.com/tpope/vim-rails.git

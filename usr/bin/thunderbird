@@ -5,4 +5,4 @@
 
 export LC_TIME=de_DE.UTF-8
 [ "$LC_ALL" != "$LC_TIME" ] && unset LC_ALL
-exec /usr/bin/thunderbird
+exec /usr/bin/thunderbird "$@"

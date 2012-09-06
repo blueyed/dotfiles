@@ -351,3 +351,6 @@
 [submodule "vim/bundle/tagbar"]
 	path = vim/bundle/tagbar
 	url = git://github.com/majutsushi/tagbar.git
+[submodule "vim/bundle/smarty"]
+	path = vim/bundle/smarty
+	url = git://github.com/vim-scripts/smarty.vim.git

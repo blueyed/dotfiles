@@ -124,7 +124,7 @@
 	ignore = untracked
 [submodule "vim/bundle/reporoot"]
 	path = vim/bundle/reporoot
-	url = git://github.com/vim-scripts/reporoot.vim.git
+	url = git://github.com/jmcantrell/vim-reporoot.git
 	ignore = untracked
 [submodule "vim/bundle/visualctrlg"]
 	path = vim/bundle/visualctrlg

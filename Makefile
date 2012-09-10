@@ -8,7 +8,7 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.2
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.3
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -22,8 +22,8 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@
-.stamps/submodules_rm.2:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist"; \
+.stamps/submodules_rm.3:
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop"; \
 	for i in $$rm_bundles; do \
 		cd $$i && git diff-index --exit-code --name-status HEAD \
 			&& $(RM) -r vim/bundle/$$i \

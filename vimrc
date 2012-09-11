@@ -1124,6 +1124,11 @@ if has('wildignorecase') " not on MacOS
   set wildignorecase
 endif
 
+let g:vdebug_keymap = {
+\    "run" : "<S-F5>",
+\}
+
+
 " Local config (if any)
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

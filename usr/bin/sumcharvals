@@ -8,6 +8,7 @@ if [[ $# -eq 0 ]]; then
   return 0
 fi
 local name=$1 sum=0
+unset i
 integer i
 for (( i=1; i <= $#name; i++ )) {
   (( sum+=##$name[i] ))

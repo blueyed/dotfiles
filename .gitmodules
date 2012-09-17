@@ -350,3 +350,6 @@
 [submodule "vim/bundle/smarty"]
 	path = vim/bundle/smarty
 	url = git://github.com/vim-scripts/smarty.vim.git
+[submodule "vim/bundle/tabular"]
+	path = vim/bundle/tabular
+	url = git://github.com/godlygeek/tabular.git

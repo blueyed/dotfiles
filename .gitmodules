@@ -353,3 +353,6 @@
 [submodule "vim/bundle/tabular"]
 	path = vim/bundle/tabular
 	url = git://github.com/godlygeek/tabular.git
+[submodule "vim/bundle/localvimrc"]
+	path = vim/bundle/localvimrc
+	url = git://github.com/embear/vim-localvimrc.git

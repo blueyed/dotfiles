@@ -351,6 +351,7 @@ set laststatus=2
 " Dim inactive windows using 'colorcolumn' setting
 " This tends to slow down redrawing, but is very useful.
 " Based on https://groups.google.com/d/msg/vim_use/IJU-Vk-QLJE/xz4hjPjCRBUJ
+" XXX: this will only work with lines containing text (i.e. not '~')
 function! s:DimInactiveWindows()
   for i in range(1, tabpagewinnr(tabpagenr(), '$'))
     let l:range = ""
@@ -369,7 +370,10 @@ function! s:DimInactiveWindows()
     call setwinvar(i, '&colorcolumn', l:range)
   endfor
 endfunction
-au WinEnter * call s:DimInactiveWindows()
+augroup DimInactiveWindows
+  au!
+  au WinEnter * call s:DimInactiveWindows()
+augroup END
 
 " statusline {{{
 " old

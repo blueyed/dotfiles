@@ -51,7 +51,13 @@ if 1 " has('eval')
   inoremap <expr><C-g>     neocomplcache#undo_completion()
   inoremap <expr><C-l>     neocomplcache#complete_common_string()
 
-  inoremap <expr><CR>  neocomplcache#smart_close_popup()
+  function! s:my_cr_function()
+    return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
+  endfunction
+  imap <expr><silent> <CR> <SID>my_cr_function()
+  imap <C-X><CR> <CR><Plug>AlwaysEnd
+  let g:endwise_no_mappings = 0
+
   inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
   " <C-h>, <BS>: close popup and delete backword char.
   inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"

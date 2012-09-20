@@ -228,7 +228,7 @@
 	ignore = untracked
 [submodule "vim/bundle/autoclose"]
 	path = vim/bundle/autoclose
-	url = git://github.com/blueyed/vim-autoclose.git
+	url = git://github.com/Townk/vim-autoclose.git
 	ignore = untracked
 [submodule "vim/bundle/pastebin"]
 	path = vim/bundle/pastebin

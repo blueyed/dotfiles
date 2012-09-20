@@ -259,7 +259,7 @@
 	url = git://github.com/Lokaltog/vim-easymotion.git
 [submodule "vim/bundle/cmdline-completion"]
 	path = vim/bundle/cmdline-completion
-	url = git://github.com/blueyed/cmdline-completion.git
+	url = git://github.com/vim-scripts/cmdline-completion.git
 [submodule "vim/bundle/endwise"]
 	path = vim/bundle/endwise
 	url = git://github.com/tpope/vim-endwise.git

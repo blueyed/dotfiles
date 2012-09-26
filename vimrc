@@ -334,6 +334,14 @@ if has("autocmd") " Autocommands {{{1
     "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
     "       \ endif
   augroup END "}}}
+
+  " automatically save and reload viminfo across Vim instances
+  " Source: http://vimhelp.appspot.com/vim_faq.txt.html#faq-17.3
+  augroup viminfo_onfocus
+    au!
+    au FocusLost   * wviminfo
+    au FocusGained * rviminfo
+  augroup end
 else
   set autoindent    " always set autoindenting on
 endif " has("autocmd") }}}

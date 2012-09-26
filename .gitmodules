@@ -359,3 +359,6 @@
 [submodule "vim/bundle/powerline"]
 	path = vim/bundle/powerline
 	url = git://github.com/Lokaltog/vim-powerline.git
+[submodule "vim/bundle/golden-ratio"]
+	path = vim/bundle/golden-ratio
+	url = git://github.com/roman/golden-ratio.git

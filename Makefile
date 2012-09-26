@@ -2,7 +2,8 @@ INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(f
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
-default: migrate install
+# first install/update, and than migrate (might update submodules to be removed)
+default: install migrate
 
 install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
@@ -25,6 +26,7 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 .stamps/submodules_rm.3:
 	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop"; \
 	for i in $$rm_bundles; do \
+		[ ! -d "$$i" ] && continue ; \
 		cd $$i && git diff-index --exit-code --name-status HEAD \
 			&& $(RM) -r vim/bundle/$$i \
 			|| { echo "Skipping removal of submodule $$i" ; } ; \

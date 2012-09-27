@@ -362,3 +362,6 @@
 [submodule "vim/bundle/golden-ratio"]
 	path = vim/bundle/golden-ratio
 	url = git://github.com/roman/golden-ratio.git
+[submodule "vim/bundle/afterimage"]
+	path = vim/bundle/afterimage
+	url = git://github.com/tpope/vim-afterimage.git

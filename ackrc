@@ -3,3 +3,4 @@
 --type-set=typoscript=.ts
 --ignore-dir=cache
 --ignore-dir=media
+--ignore-dir=asset

@@ -173,28 +173,12 @@ endif
 
 " }}}
 
-if 1 " use Pathogen? (or tplugin?) {{{1
-  if has("user_commands")
-    " enable pathogen, which allows for bundles in vim/bundle
-    set rtp+=~/.vim/bundle/pathogen
-    let g:pathogen_disabled = [ "supertab", "DBGp-Remote-Debugger-Interface" ]
-    call pathogen#infect()
-  endif
-else
-"  let g:tplugin#autoload_exclude = ['tplugin']
-  set rtp+=~/.vim/bundle/tplugin
-  runtime macros/tplugin.vim
-  TPlugin tlib
-  TPlugin tmru
-  TPlugin tcomment
-  TPlugin snipmate
-  TPlugin autoclose
-  TPlugin autocomplpop
-  TPlugin unimpaired
-  TPlugin surround
-  TPlugin swap
-  TPlugin easymotion
-end
+if has("user_commands")
+  " enable pathogen, which allows for bundles in vim/bundle
+  set rtp+=~/.vim/bundle/pathogen
+  let g:pathogen_disabled = [ "supertab" ]
+  call pathogen#infect()
+endif
 
 " Settings {{{1
 set nocompatible " This must be first, because it changes other options as a side effect.

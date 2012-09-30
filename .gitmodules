@@ -130,10 +130,6 @@
 	path = vim/bundle/visualctrlg
 	url = git://github.com/tyru/visualctrlg.vim.git
 	ignore = untracked
-[submodule "vim/bundle/tplugin"]
-	path = vim/bundle/tplugin
-	url = git://github.com/tomtom/tplugin_vim.git
-	ignore = untracked
 [submodule "vim/bundle/unimpaired"]
 	path = vim/bundle/unimpaired
 	url = git://github.com/blueyed/vim-unimpaired.git

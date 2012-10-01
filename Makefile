@@ -24,7 +24,7 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 	done
 	touch $@
 .stamps/submodules_rm.4:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop"; \ vim/bundle/tplugin
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin"; \
 	for i in $$rm_bundles; do \
 		[ ! -d "$$i" ] && continue ; \
 		cd $$i && git diff-index --exit-code --name-status HEAD \

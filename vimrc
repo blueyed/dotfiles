@@ -1091,6 +1091,19 @@ function! ToggleTooLongHL()
 endfunction
 " noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
 
+" capture output of a:cmd into a new tab via redirection
+" source: http://vim.wikia.com/wiki/Capture_ex_command_output
+function! TabMessage(cmd)
+  redir => message
+  silent execute a:cmd
+  redir END
+  tabnew
+  silent put=message
+  set nomodified
+endfunction
+command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
+
 " Swap ' and ` keys (` is much more useful) {{{2
 noremap ' `
 sunmap '

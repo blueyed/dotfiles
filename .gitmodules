@@ -361,3 +361,6 @@
 [submodule "vim/bundle/afterimage"]
 	path = vim/bundle/afterimage
 	url = git://github.com/tpope/vim-afterimage.git
+[submodule "lib/dircolors-solarized"]
+	path = lib/dircolors-solarized
+	url = git://github.com/seebi/dircolors-solarized.git

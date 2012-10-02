@@ -364,3 +364,6 @@
 [submodule "lib/dircolors-solarized"]
 	path = lib/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
+[submodule "lib/pentadactyl-solarized"]
+	path = lib/pentadactyl-solarized
+	url = git://github.com/claytron/pentadactyl-solarized.git

@@ -367,3 +367,6 @@
 [submodule "lib/pentadactyl-solarized"]
 	path = lib/pentadactyl-solarized
 	url = git://github.com/claytron/pentadactyl-solarized.git
+[submodule "vim/bundle/keepcase"]
+	path = vim/bundle/keepcase
+	url = git://github.com/vim-scripts/keepcase.vim.git

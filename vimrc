@@ -721,6 +721,11 @@ command! -range=% UnTrail
       \ keepjumps <line1>,<line2>call StripWhitespace()
 noremap <leader>st :UnTrail<CR>
 
+function! MyChangeToRepoRootOfCurrentFile()
+  exe 'RepoRoot '.expand('%')
+endfunction
+command! RR call MyChangeToRepoRootOfCurrentFile()
+
 " Toggle semicolon at end of line {{{2
 function! MyToggleLastChar(char)
   let ss = @/ | let save_cursor = getpos(".")

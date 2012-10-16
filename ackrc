@@ -1,6 +1,7 @@
 --type-add=php=.inc
 --type-set=smarty=.tpl
 --type-set=typoscript=.ts
+--type-set=sass=.scss,.sass
 --ignore-dir=cache
 --ignore-dir=media
 --ignore-dir=asset

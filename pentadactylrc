@@ -67,6 +67,23 @@ function shortenURLBitLy (url) {
 EOF
 map -silent gy -js shortenURLBitLy(buffer.URL)
 
+
+" Toggle hostname: append or remove '.localdomain' suffix
+" This is meant to easily switch between local/development and live
+" environment.
+javascript <<EOF
+function toggleDevLiveHost() {
+	let suffix = '.localdomain';
+	if( buffer.uri.host.indexOf(suffix, buffer.uri.host.length - suffix.length) !== -1 ) {
+		return String.replace(buffer.URL, suffix, '');
+	}
+	// append suffix
+	return String.replace(buffer.URL, /(\.\w{2,4})([\/:])/, "$1"+suffix+"$2");
+}
+EOF
+map gz -js dactyl.open(toggleDevLiveHost());
+
+	
 " Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
 " NOTE: gets triggered when opening a new window, too. With some Sync UI again in the status bar, this is not necessary anymore.
 "autocmd VimperatorEnter .* emenu Tools.Sync.Connect

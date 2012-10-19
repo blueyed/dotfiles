@@ -25,7 +25,7 @@ BYOBU_PREFIX="$HOME/.dotfiles/lib/byobu/usr"
 BYOBU_BACKEND=tmux
 PATH="$BYOBU_PREFIX/bin:$PATH"
 
-if ! type $BYOBU_BACKEND >/dev/null ; then
+if ! type $BYOBU_BACKEND >/dev/null 2>&1 ; then
   if [ -x /opt/bin/$BYOBU_BACKEND ]; then
     PATH=/opt/bin:$PATH
   fi

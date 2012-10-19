@@ -1176,6 +1176,12 @@ let g:vdebug_keymap = {
 \}
 
 
+" autoclose
+" Overwrite defaults with sane value, see
+" https://github.com/Townk/vim-autoclose/pull/40 (<ESC> instead of <C-e>)
+let g:AutoClosePumvisible = {"ENTER": "\<C-Y>", "ESC": "\<ESC>"}
+
+
 " Local config (if any)
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

@@ -1033,7 +1033,7 @@ set guioptions-=m
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 
-" set viminfo+=! " keep global uppercase variables. Used by tmru.
+set viminfo+=! " keep global uppercase variables. Used by localvimrc.
 
 " I feel dirty, plz rename kthxbye!
 behave mswin
@@ -1146,7 +1146,7 @@ endif
 
 if has('user_commands')
   " typos
-  command! Q q
+  command! -bang Q q<bang>
   command! W w
   command! Wq wq
   command! Wqa wqa

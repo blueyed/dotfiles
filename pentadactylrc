@@ -154,11 +154,12 @@ silent qmark r reddit.com
 silent qmark t twitter.com
 
 group! editor
-autocmd LocationChange .*           :set editor='gvim -f -c ''set ft=html spell | call cursor(<line>, <column>)'''
-autocmd LocationChange www.reddit.com,github.com,stackoverflow.com :set editor='gvim -f -c ''set ft=markdown spell | call cursor(<line>, <column>)'''
-autocmd LocationChange ^https?://mail\\..*   :set editor='gvim -f -c ''set ft=mail spell | call cursor(<line>, <column>)'''
-autocmd LocationChange ^https?://[^/]+/phpmyadmin/ :set editor='gvim -f -c ''set ft=html | call cursor(<line>, <column>)'''
-autocmd LocationChange ^https?://.*trac.*/wiki/ :set editor='gvim -f -c ''set ft=tracwiki | call cursor(<line>, <column>)'''
+js my_editor=(config.OS.isMacOSX ? 'mvim' : 'gvim') + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
+autocmd -js LocationChange .*           options.editor=my_editor.replace('{0}', 'html spell')
+autocmd -js LocationChange www.reddit.com,github.com,stackoverflow.com options.editor=my_editor.replace('{0}', 'markdown spell')
+autocmd -js LocationChange ^https?://mail\\..*   options.editor=my_editor.replace('{0}', 'mail spell')
+autocmd -js LocationChange ^https?://[^/]+/phpmyadmin/ options.editor=my_editor.replace('{0}', 'html')
+autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.replace('{0}', 'tracwiki')
 group default
 
 " passthrough certain keys, see "h key-sequence" for a list

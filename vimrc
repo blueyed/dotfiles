@@ -176,7 +176,7 @@ endif
 if has("user_commands")
   " enable pathogen, which allows for bundles in vim/bundle
   set rtp+=~/.vim/bundle/pathogen
-  let g:pathogen_disabled = [ "supertab" ]
+  let g:pathogen_disabled = [ "supertab", 'golden-ratio' ]
   call pathogen#infect()
 endif
 

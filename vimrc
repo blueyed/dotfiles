@@ -130,6 +130,10 @@ if 1
   endif
   " XXX: not really a cache (https://github.com/tomtom/tmru_vim/issues/22)
   let g:tlib_cache = vimcachedir . '/tlib'
+  let g:Powerline_cache_dir = vimcachedir . '/powerline'
+  if ! isdirectory(g:Powerline_cache_dir)
+    call mkdir( g:Powerline_cache_dir, 'p', 0700 )
+  endif
 
   let vimconfigdir=expand('~/.config/vim')
   if ! isdirectory(vimconfigdir)

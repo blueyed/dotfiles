@@ -370,3 +370,6 @@
 [submodule "vim/bundle/keepcase"]
 	path = vim/bundle/keepcase
 	url = git://github.com/vim-scripts/keepcase.vim.git
+[submodule "vim/bundle/php-indent"]
+	path = vim/bundle/php-indent
+	url = git://github.com/2072/PHP-Indenting-for-VIm.git

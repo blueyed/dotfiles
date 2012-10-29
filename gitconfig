@@ -4,6 +4,7 @@
 [alias]
 	a = add
 	ae = add -e
+	amend = commit --amend
 	alias = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'
 	c = commit -v
 	ci = commit -v

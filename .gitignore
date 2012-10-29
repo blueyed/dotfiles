@@ -5,7 +5,6 @@ pentadactyl/info
 vim/.netrwhist
 vim/.VimballRecord
 vim/bundle/_tplugin.vim
-vim/bundle/eclim
 # ignore for now, gets handled locally:
 vim/spell
 vim/undo

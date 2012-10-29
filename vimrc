@@ -1179,6 +1179,11 @@ let g:vdebug_keymap = {
 \    "run" : "<S-F5>",
 \}
 
+let g:localvimrc_sandbox = 0 " allow to adjust/set &path
+let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
+let g:localvimrc_debug = 0
+
+
 
 " autoclose
 " Overwrite defaults with sane value, see

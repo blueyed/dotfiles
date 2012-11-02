@@ -12,6 +12,21 @@ byobu (5.22) unreleased; urgency=low
     - change foreground color of free memory percentage to yellow,
       if its over 90% used
     - use a better variable name for memory usage
+  * usr/lib/byobu/custom, usr/share/man/man1/byobu.1:
+    - fix color for custom scripts; default to no color changes
+  * usr/bin/byobu-janitor, usr/lib/byobu/include/shutil: LP: #1071287
+    - ensure that we re-check metadata service availability each time
+      byobu-janitor runs
+    - move metadata_available flag to more ephemeral run dir
+    - drop timeout on metadata check to 5 seconds
+  * usr/lib/byobu/release: LP: #1068581
+    - simplify and use lsb_release -s -r when necessary
+  * usr/lib/byobu/include/constants: LP: #1068580
+    - test for the sed --follow-symlink option and only use it when
+      available
+  * usr/share/man/man1/byobu.1: LP: #1059237
+    - document that you can copy status scripts to ~/.byobu/bin and
+      modify them locally
 
   [ Jake Biesinger and Dustin Kirkland ]
   * usr/share/byobu/keybindings/common, usr/share/byobu/keybindings/f-

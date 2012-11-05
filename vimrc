@@ -744,6 +744,7 @@ function! MyToggleLastChar(char)
 endfunction
 noremap <Leader>; :call MyToggleLastChar(';')<cr>
 noremap <Leader>: :call MyToggleLastChar(':')<cr>
+noremap <Leader>, :call MyToggleLastChar(',')<cr>
 
 set spl=de,en
 " Toggle spellang: de => en => de,en

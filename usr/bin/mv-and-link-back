@@ -1,0 +1,57 @@
+#!/usr/bin/zsh
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: mv-and-link-back <source>... <target>"
+  exit 1 
+fi
+
+target=$argv[$#]
+sources=($argv[1,-2])
+
+remove_trailing_slashes() {
+  a=$1
+  while [[ $a =~ '/$' ]]; do
+    a=${a%/}
+  done
+  echo $a
+}
+
+# Remove trailing slashes from target
+target=$(remove_trailing_slashes $target)
+
+# target has to be a directory when having multiple sources
+if [[ $#sources > 1 ]]; then
+  if ! [[ -d $target ]]; then
+    echo "Error: target is not a directory"
+    exit 1
+  fi
+fi
+
+for source in $sources; do
+  if [[ -L $source ]]; then
+    echo "Warning: source is a symbolic link already, skipping: $source"
+    continue
+  fi
+  source_resolved=$(readlink -f $source) # resolve e.g. "." and ".."
+  [[ -n $source_resolved ]] && source=$source_resolved
+  source=$(remove_trailing_slashes $source) # this might be necessary when "readlink -f" fails
+
+  if [[ -d $target ]] ; then
+    mv_to=$target/$source:t
+  else
+    mv_to=$target
+  fi
+  if [[ -e $mv_to ]] ; then
+    echo "Error: target already exists: $mv_to"
+    exit 2
+  fi
+  # if [[ $source -ef $mv_to ]]; then
+  #   echo "Error: source and target are the same file already"
+  #   exit 1
+  # fi
+  echo mv $source $mv_to
+  mv $source $mv_to
+  echo ln -s $mv_to $source
+  ln -s $mv_to $source
+done
+

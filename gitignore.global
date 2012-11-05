@@ -8,3 +8,4 @@ tags-??
 # LibreOffice lock files
 .~lock.*#
 *.pyc
+.sass-cache

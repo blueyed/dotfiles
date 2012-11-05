@@ -968,7 +968,7 @@ noremap <F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> g<C-]>
 " expand abbr
-imap <F2> g<C-]>
+imap <F2> <C-]>
 noremap <F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 noremap <S-F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 noremap <F5> :GundoToggle<cr>

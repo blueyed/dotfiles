@@ -207,7 +207,7 @@ set incsearch   " do incremental searching
 " text is lost and it only works for putting the current register.
 "vnoremap p "_dp
 
-set wrap
+set nowrap
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd") " Autocommands {{{1

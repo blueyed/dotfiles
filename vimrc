@@ -991,6 +991,7 @@ set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
 set scrolloff=3 " scroll offset/margin (cursor at 4th line)
 set sidescroll=1
+set sidescrolloff=10
 
 " gets ignored by tmru
 set suffixes+=.tmp

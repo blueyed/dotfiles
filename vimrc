@@ -569,7 +569,8 @@ set nolist
 set pastetoggle=<leader>sp
 noremap <leader>sw :set wrap!<cr>
 noremap <leader>ss :set spell!<cr>
-nmap    <leader>sc <Plug>Colorizer
+nmap    <leader>sc :ColorToggle<cr>
+" let g:colorizer_fgcontrast=-1
 
 
 " Use Ack instead of Grep when available

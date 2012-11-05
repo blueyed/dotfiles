@@ -650,7 +650,7 @@ if 1 " has('eval')
   let g:fuf_splitPathMatching=1
 endif
 
-set cursorline
+" set cursorline
 "highlight CursorLine guibg=lightblue ctermbg=lightgray
 
 " Make the current status line stand out, e.g. with xoria256 (using the

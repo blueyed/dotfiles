@@ -1198,4 +1198,7 @@ if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
 
+nmap <C-D> :q<CR>
+
+
 " vim: fdm=marker

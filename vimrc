@@ -107,7 +107,7 @@ endif
 
 if 1 " has('eval')
   " Color scheme (after 'syntax on') {{{1
-  set background=light
+  set background=dark
   set rtp+=~/.vim/bundle/solarized
   let g:solarized_termcolors=256
   let g:solarized_italic=0

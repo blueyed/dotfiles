@@ -1,3 +1,5 @@
+finish " deactivated
+
 " Save current buffer and diff the file using Tortoise SVN
 map <silent> <Leader>td :up<CR>:silent !start TortoiseProc.exe /command:diff /path:"%:p" /notempfile /closeonend<CR>
 

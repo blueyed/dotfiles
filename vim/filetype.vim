@@ -5,5 +5,6 @@ endif
 augroup filetypedetect
   au! BufRead,BufNewFile *.ts             setfiletype typoscript
   au! BufRead,BufNewFile */doc{,s}/*.md   setfiletype markdown
+  au! BufRead,BufNewFile */apache/*.conf,*/apache2/*.conf   setfiletype apache
 augroup END
 

@@ -41,8 +41,8 @@ w_last=0
 [ -r "$BYOBU_RUN_DIR/width" ] && read w_last < $BYOBU_RUN_DIR/width 2>/dev/null 1>&2 || w_last=0
 for w in $width; do
 	if [ "$w" != "$w_last" ]; then
-		tmux set -g status-left-length $(($w*1/4)) >/dev/null 2>&1
-		tmux set -g status-right-length $(($w*3/4)) >/dev/null 2>&1
+		tmux set -g status-left-length $(($w*1/4)) | cat >/dev/null 2>&1
+		tmux set -g status-right-length $(($w*3/4)) | cat >/dev/null 2>&1
 		printf "$w" > $BYOBU_RUN_DIR/width
 		break
 	fi

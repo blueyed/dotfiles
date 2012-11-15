@@ -33,7 +33,7 @@ vmap <kMultiply> *
 nmap <silent> <Plug>VLToggle :let g:VeryLiteral = !g:VeryLiteral
   \\| echo "VeryLiteral " . (g:VeryLiteral ? "On" : "Off")<CR>
 if !hasmapto("<Plug>VLToggle")
-  nmap <unique> <Leader>vl <Plug>VLToggle
+  nmap <unique> <Leader>svl <Plug>VLToggle
 endif
 let &cpo = s:save_cpo | unlet s:save_cpo
 

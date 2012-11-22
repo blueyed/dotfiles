@@ -373,3 +373,6 @@
 [submodule "vim/bundle/php-indent"]
 	path = vim/bundle/php-indent
 	url = git://github.com/2072/PHP-Indenting-for-VIm.git
+[submodule "vim/bundle/harlequin"]
+	path = vim/bundle/harlequin
+	url = git://github.com/nielsmadan/harlequin.git

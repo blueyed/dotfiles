@@ -376,3 +376,6 @@
 [submodule "vim/bundle/harlequin"]
 	path = vim/bundle/harlequin
 	url = git://github.com/nielsmadan/harlequin.git
+[submodule "vim/bundle/splitjoin"]
+	path = vim/bundle/splitjoin
+	url = git://github.com/AndrewRadev/splitjoin.vim.git

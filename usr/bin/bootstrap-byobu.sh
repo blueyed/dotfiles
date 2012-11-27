@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # This script is meant to bootstrap byobu remotely.
-# This is used by e.g. byobu-on-host.
+# This is used by e.g. byobu_on_host.
 
 debug() {
   # echo "$@"

@@ -1111,7 +1111,7 @@ function! TabMessage(cmd)
   redir END
   tabnew
   silent put=message
-  set nomodified
+  set nomodified ft=vim
 endfunction
 command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
 

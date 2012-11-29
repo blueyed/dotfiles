@@ -184,7 +184,7 @@
 	ignore = untracked
 [submodule "vim/bundle/ragtag"]
 	path = vim/bundle/ragtag
-	url = git://github.com/smith/vim-ragtag.git
+	url = git://github.com/tpope/vim-ragtag.git
 	ignore = untracked
 [submodule "vim/bundle/cyclecolor"]
 	path = vim/bundle/cyclecolor

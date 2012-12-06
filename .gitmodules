@@ -379,3 +379,6 @@
 [submodule "vim/bundle/splitjoin"]
 	path = vim/bundle/splitjoin
 	url = git://github.com/AndrewRadev/splitjoin.vim.git
+[submodule "vim/bundle/yankstack"]
+	path = vim/bundle/yankstack
+	url = git://github.com/maxbrunsfeld/vim-yankstack.git

@@ -233,6 +233,7 @@ if has("autocmd") " Autocommands {{{1
   au BufNewFile,BufRead *zsh/functions* setfiletype zsh
 
   au FileType mail,markdown,gitcommit setlocal spell
+  autocmd FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
 
   " For all text files set 'textwidth' to 78 characters.
   " autocmd FileType text setlocal textwidth=78

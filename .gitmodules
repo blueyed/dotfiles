@@ -382,3 +382,6 @@
 [submodule "vim/bundle/yankstack"]
 	path = vim/bundle/yankstack
 	url = git://github.com/maxbrunsfeld/vim-yankstack.git
+[submodule "lib/zsh-syntax-highlighting"]
+	path = lib/zsh-syntax-highlighting
+	url = git://github.com/zsh-users/zsh-syntax-highlighting.git

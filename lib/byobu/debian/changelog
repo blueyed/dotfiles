@@ -1,4 +1,79 @@
-byobu (5.22) unreleased; urgency=low
+byobu (5.26) unreleased; urgency=low
+
+  * UNRELEASED
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Jan 2013 15:17:43 -0600
+
+byobu (5.25-0ubuntu1) raring; urgency=low
+
+  * usr/bin/byobu-status:
+    - move tmux-specific width code into tmux case block
+  * usr/bin/byobu-config, usr/bin/byobu-ctrl-a,
+    usr/share/doc/byobu/help.screen.txt:
+    - update python code for python3 compatibility
+  * usr/bin/byobu-select-session:
+    - update python code for python3 compatibility
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Jan 2013 15:17:35 -0600
+
+byobu (5.24-0ubuntu1) raring; urgency=low
+
+  * usr/lib/byobu/logo: LP: #1094716
+    - use the Apple unicode logo, rather than the Apple option symbol
+    - this is only visible from Mac terminals (much like the Ubuntu logo
+      is only visible from Ubuntu terminals)
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Jan 2013 09:49:44 -0600
+
+byobu (5.23-0ubuntu1) raring; urgency=low
+
+  [ Dustin Kirkland ]
+  * configure.ac, debian/control, debian/copyright, README,
+    usr/lib/byobu/rcs_cost, usr/share/man/man1/byobu.1,
+    usr/share/man/man1/byobu-config.1, usr/share/man/man1/byobu-ctrl-
+    a.1, usr/share/man/man1/byobu-enable.1, usr/share/man/man1/byobu-
+    janitor.1, usr/share/man/man1/byobu-launcher.1,
+    usr/share/man/man1/byobu-launcher-install.1,
+    usr/share/man/man1/byobu-launcher-uninstall.1,
+    usr/share/man/man1/byobu-layout.1, usr/share/man/man1/byobu-quiet.1,
+    usr/share/man/man1/byobu-reconnect-sockets.1,
+    usr/share/man/man1/byobu-screen.1, usr/share/man/man1/byobu-select-
+    backend.1, usr/share/man/man1/byobu-select-profile.1,
+    usr/share/man/man1/byobu-select-session.1, usr/share/man/man1/byobu-
+    shell.1, usr/share/man/man1/byobu-silent.1,
+    usr/share/man/man1/byobu-status.1, usr/share/man/man1/byobu-status-
+    detail.1, usr/share/man/man1/byobu-tmux.1:
+    - point to the new byobu.co website rather than the launchpad landing
+      page
+  * usr/share/byobu/profiles/common: LP: #1089008
+    - re-enable shift-pgup/shift-pgdn in the terminal buffer in screen,
+      to match our default in tmux
+  * === added directory usr/share/byobu/pixmaps/highcontrast,
+    debian/install, usr/share/byobu/pixmaps/highcontrast/byobu.svg:
+    - add a byobu high contrast icon, LP: #1082241
+    - simplify, removing detail
+  * usr/lib/byobu/distro, usr/lib/byobu/logo: LP: #1094716
+    - try to improve logo printing and distro detection on Mac
+  * debian/control, debian/rules, usr/bin/byobu-config, usr/bin/byobu-
+    select-session: LP: #1043048
+    - get our python code pep8 compliant
+      + except use tabs instead of spaces, and allow lines longer than
+        80 characters
+    - this should get byobu's python code working better with python3
+  * debian/postrm:
+    - fix lintian error
+
+  [ Dustin Kirkland and Philip Muškovac ]
+  * usr/lib/byobu/battery: LP: #1090831
+    - some batteries use "CHARGE" while others use "ENERGY"
+
+  [ Antonio Lorusso ]
+  * usr/bin/byobu-status: LP: #1018538, #1073145, #1020674
+    - fix select/copy/paste in iTerm2 and KDE
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 08 Jan 2013 22:39:54 -0600
+
+byobu (5.22-0ubuntu1) raring; urgency=low
 
   [ Dustin Kirkland ]
   * usr/bin/byobu-config, usr/bin/byobu-ctrl-a: LP: #1019743
@@ -27,6 +102,10 @@ byobu (5.22) unreleased; urgency=low
   * usr/share/man/man1/byobu.1: LP: #1059237
     - document that you can copy status scripts to ~/.byobu/bin and
       modify them locally
+  * usr/lib/byobu/include/shutil: LP: #1059232
+    - fix tmux color clearing
+  * usr/lib/byobu/include/common:
+    - remove trailing whitespace
 
   [ Jake Biesinger and Dustin Kirkland ]
   * usr/share/byobu/keybindings/common, usr/share/byobu/keybindings/f-
@@ -46,7 +125,7 @@ byobu (5.22) unreleased; urgency=low
       this enables a clean undo of bindings
     - document the changes in the help text
 
- -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 11 Jul 2012 12:02:34 -0500
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 05 Nov 2012 13:48:11 +0100
 
 byobu (5.21-0ubuntu1) quantal; urgency=low
 

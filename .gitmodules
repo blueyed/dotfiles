@@ -385,3 +385,6 @@
 [submodule "lib/zsh-syntax-highlighting"]
 	path = lib/zsh-syntax-highlighting
 	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "vim/bundle/coffee-script"]
+	path = vim/bundle/coffee-script
+	url = git://github.com/kchmck/vim-coffee-script.git

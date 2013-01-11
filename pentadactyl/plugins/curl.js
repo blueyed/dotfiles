@@ -1,32 +1,28 @@
 /* use strict */
-XML.ignoreWhitespace = false;
-XML.prettyPrinting = false;
 var INFO =
-<plugin name="curl" version="0.2"
-        href="http://dactyl.sf.net/pentadactyl/plugins#curl-plugin"
-        summary="Curl command-line generator"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        This plugin provides a means to generate a <tt>curl(1)</tt>
-        command-line from the data in a given form.
-    </p>
-    <item>
-        <tags>;C</tags>
-        <strut/>
-        <spec>;C</spec>
-        <description>
-            <p>
-                Generates a curl command-line from the data in the selected form.
-                The command includes the data from each form element, along with
-                the current User-Agent string and the cookies for the current
-                page.
-            </p>
-        </description>
-    </item>
-</plugin>;
+["plugin", { name: "curl",
+             version: "0.2",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#curl-plugin",
+             summary: "Curl command-line generator",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" },
+        "Kris Maglione"],
+    ["license", { href: "http://opensource.org/licenses/mit-license.php" },
+        "MIT"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+    ["p", {},
+        "This plugin provides a means to generate a ", ["tt", {}, "curl(1)"], " ",
+        "command-line from the data in a given form."],
+    ["item", {},
+        ["tags", {}, ";C"],
+        ["strut"],
+        ["spec", {}, ";C"],
+        ["description", {},
+            ["p", {},
+                "Generates a curl command-line from the data in the selected form. ",
+                "The command includes the data from each form element, along with ",
+                "the current User-Agent string and the cookies for the current ",
+                "page."]]]];
 
 hints.addMode('C', "Generate curl command for a form", function(elem) {
     if (elem.form)

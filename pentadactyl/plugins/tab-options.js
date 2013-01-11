@@ -11,7 +11,7 @@
  *
  * Documentation is at the tail of this file.
  */
-/* use strict */
+"use strict";
 
 let groupId = 0;
 let onUnload = overlay.overlayObject(gBrowser, {
@@ -119,60 +119,59 @@ group.options.add(["tabopen", "to"],
         }
     });
 
-XML.ignoreWhitespace = false;
-XML.prettyPrinting   = false;
 var INFO =
-<plugin name="tab-options" version="0.3"
-        href="http://dactyl.sf.net/pentadactyl/plugins#tab-options-plugin"
-        summary="Tab options"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://people.freebsd.org/~phk/">BEER-WARE</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        Adds extended tab options, including relative placement of new
-        tabs and more sensible focus changes after tab closure.
-    </p>
-    <item>
-        <tags>'tc' 'tabclose'</tags>
-        <spec>'tabclose' 'tc'</spec>
-        <type>stringlist</type> <default>{options.get("tabclose").stringDefaultValue}</default>
-        <description>
-            <p>
-                Tab closure options, in order of precedence. The
-                first item for which a valid tab exists is used.
-            </p>
-            <dl>
-            { template.map(options.get("tabclose").completer(), function ([k, v])
-                <><dt>{k}</dt> <dd>{v}</dd></>) }
-            </dl>
-            <note>
-                This option does not affect the default mappings for <k>d</k>
-                and <k>D</k>, which behave as documented.
-            </note>
-        </description>
-    </item>
-    <item>
-        <tags>'to' 'tabopen'</tags>
-        <spec>'tabopen' 'to'</spec>
-        <type>stringmap</type> <default>{options.get("tabopen").stringDefaultValue}</default>
-        <description>
-            <p>
-                New tab placement options. The keys in the <t>stringmap</t>
-                refer to the ways the tab was opened, while the values define
-                where such tabs are placed. The following keys are applicable:
-            </p>
-            <dl>
-            { template.map(options.get("tabopen").completer(null, { values: {} }), function ([k, v])
-                <><dt>{k}</dt> <dd>{v}</dd></>) }
-            </dl>
-            <p>As are the following values:</p>
-            <dl>
-            { template.map(options.get("tabopen").completer(null, { value: "" }), function ([k, v])
-                <><dt>{k}</dt> <dd>{v}</dd></>) }
-            </dl>
-        </description>
-    </item>
-</plugin>;
+["plugin", { name: "tab-options",
+             version: "0.3",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#tab-options-plugin",
+             summary: "Tab options",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" }, "Kris Maglione"],
+    ["license", { href: "http://people.freebsd.org/~phk/" }, "BEER-WARE"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+    ["p", {},
+        "Adds extended tab options, including relative placement of new",
+        "tabs and more sensible focus changes after tab closure."],
+
+    ["item", {},
+        ["tags", {}, "'tc' 'tabclose'"],
+        ["spec", {}, "'tabclose' 'tc'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, options.get("tabclose").stringDefaultValue],
+        ["description", {},
+            ["p", {},
+                "Tab closure options, in order of precedence. The ",
+                "first item for which a valid tab exists is used."],
+            ["dl", {},
+                template.map(options.get("tabclose").completer(),
+                             function ([k, v])
+                    [["dt", {}, k], ["dd", {}, v]])],
+            ["note", {},
+                "This option does not affect the default mappings for ",
+                ["k", {}, "d"], "and ", ["k", {}, "D"],
+                ", which behave as documented."]]],
+
+    ["item", {},
+        ["tags", {}, "'to' 'tabopen'"],
+        ["spec", {}, "'tabopen' 'to'"],
+        ["type", {}, "stringmap"],
+        ["default", {}, options.get("tabopen").stringDefaultValue],
+        ["description", {},
+            ["p", {},
+                "New tab placement options. The keys in the ",
+                ["t", {}, "stringmap"],
+                "refer to the ways the tab was opened, while the values define ",
+                "where such tabs are placed. The following keys are applicable:"],
+            ["dl", {},
+                template.map(options.get("tabopen")
+                                    .completer(null, { values: {} }),
+                             function ([k, v])
+                    [["dt", {}, k], ["dd", {}, v]])],
+            ["p", {}, "As are the following values:"],
+            ["dl", {},
+                template.map(options.get("tabopen")
+                                    .completer(null, { value: "" }),
+                             function ([k, v])
+                    [["dt", {}, k], ["dd", {}, v]])]]]
+];
 
 /* vim:se sts=4 sw=4 et: */

@@ -1,30 +1,30 @@
-/* use strict */
-XML.ignoreWhitespace = false;
-XML.prettyPrinting   = false;
+"use strict";
 var INFO =
-<plugin name="jscompletion" version="1.0.2"
-        href="http://dactyl.sf.net/pentadactyl/plugins#jscompletion-plugin"
-        summary="JavaScript completion enhancements"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://people.freebsd.org/~phk/">BEER-WARE</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        This plugin provides advanced completion functions for
-        DOM functions, eval, and some other special functions.
-        For instance,
-        <ex>:js content.document.getElementById("<k name="Tab" link="c_&lt;Tab>"/></ex>
-        should provide you with a list of all element IDs
-        present on the current web page. Many other DOM
-        methods are provided, along with their namespaced variants.
-    </p>
-</plugin>;
+["plugin", { name: "jscompletion",
+             version: "1.0.2",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#jscompletion-plugin",
+             summary: "JavaScript completion enhancements",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" },
+        "Kris Maglione"],
+    ["license", { href: "http://people.freebsd.org/~phk/" },
+        "BEER-WARE"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+    ["p", {},
+        "This plugin provides advanced completion functions for ",
+        "DOM functions, eval, and some other special functions. ",
+        "For instance, ",
+        "", ["ex", {}, ':js content.document.getElementById("',
+               ["k", { name: "Tab", link: "c_<Tab>" }], ], " ",
+        "should provide you with a list of all element IDs ",
+        "present on the current web page. Many other DOM ",
+        "methods are provided, along with their namespaced variants."]];
 
 function evalXPath(xpath, doc, namespace) {
     let res = doc.evaluate(xpath, doc,
         function getNamespace(prefix) ({
             html:       "http://www.w3.org/1999/xhtml",
-            dactyl:     NS.uri,
+            dactyl:     NS,
             ns:         namespace
         }[prefix]),
         XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
@@ -36,7 +36,7 @@ function evalXPath(xpath, doc, namespace) {
 let NAMESPACES = [
     ["http://purl.org/atom/ns#", "Atom 0.3"],
     ["http://www.w3.org/2005/Atom", "Atom 1.0"],
-    [NS.uri, "Dactyl"],
+    [NS, "Dactyl"],
     ["http://www.w3.org/2005/Atom", "RSS"],
     ["http://www.w3.org/2000/svg", "SVG"],
     ["http://www.mozilla.org/xbl", "XBL"],

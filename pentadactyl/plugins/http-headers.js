@@ -1,23 +1,24 @@
-/* use strict */
+"use strict";
 isGlobalModule = true;
 
-XML.prettyPrinting   = false;
-XML.ignoreWhitespace = false;
 var INFO =
-<plugin name="http-headers" version="0.5"
-        href="http://dactyl.sf.net/pentadactyl/plugins#http-headers-plugin"
-        summary="HTTP header info"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        Adds request and response headers to the <ex>:pageinfo</ex>
-        command, with the keys <em>h</em> and <em>H</em> respectively.
-        See also <o>pageinfo</o>.
-    </p>
-    <example><ex>:pageinfo hH</ex></example>
-</plugin>;
+["plugin", { name: "http-headers",
+             version: "0.5",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#http-headers-plugin",
+             summary: "HTTP header info",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" },
+        "Kris Maglione"],
+    ["license", { href: "http://opensource.org/licenses/mit-license.php" },
+        "MIT"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+
+    ["p", {},
+        "Adds request and response headers to the <ex>:pageinfo</ex> ",
+        "command, with the keys ", ["em", {}, "h"], " and ", ["em", {}, "H"], " respectively. ",
+        "See also ", ["o", {}, "pageinfo"], "."],
+
+    ["example", {}, ["ex", {}, ":pageinfo hH"]]];
 
 var { Buffer } = require("buffer");
 
@@ -54,8 +55,7 @@ var HttpObserver = Class("HttpObserver",
         return headers;
     },
 
-    getHeaders: function getHeaders(webProgress, request) {
-        let win = webProgress.DOMWindow;
+    getHeaders: function getHeaders(win, request) {
         request.QueryInterface(Ci.nsIChannel);
 
         let headers = overlay.getData(win.document, "headers", Object);
@@ -93,8 +93,13 @@ var HttpObserver = Class("HttpObserver",
             request.QueryInterface(Ci.nsIChannel).QueryInterface(Ci.nsIHttpChannel).QueryInterface(Ci.nsIRequest);
 
             if (request.loadFlags & request.LOAD_DOCUMENT_URI) {
-                let webProgress = request.loadGroup.groupObserver.QueryInterface(Ci.nsIWebProgress);
-                this.getHeaders(webProgress, request);
+                try {
+                    var win = request.notificationCallbacks.getInterface(Ci.nsIDOMWindow);
+                }
+                catch (e) {
+                    return;
+                }
+                this.getHeaders(win, request);
                 try {
                     webProgress.addProgressListener(this, Ci.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
                 }
@@ -105,9 +110,9 @@ var HttpObserver = Class("HttpObserver",
 
     onStateChange: util.wrapCallback(function(webProgress, request, stateFlags, status) {
         if ((stateFlags & this.STATE_START) && (stateFlags & this.STATE_IS_DOCUMENT))
-            this.getHeaders(webProgress, request);
+            this.getHeaders(webProgress.DOMWindow, request);
         else if ((stateFlags & this.STATE_STOP) && (stateFlags & this.STATE_IS_DOCUMENT)) {
-            this.getHeaders(webProgress, request);
+            this.getHeaders(webProgress.DOMWindow, request);
             try {
                 webProgress.removeProgressListener(this);
             } catch (e) {}

@@ -4,7 +4,7 @@
  *
  * Documentation is at the tail of this file.
  */
-/* use strict */
+"use strict";
 
 dactyl.assert("noscriptOverlay" in window,
               "This plugin requires the NoScript add-on.");
@@ -130,12 +130,12 @@ var onUnload = overlay.overlayObject(gBrowser, {
     }
 });
 
-highlight.loadCSS(<css>
+highlight.loadCSS(literal(/*
     NoScriptAllowed         color: green;
     NoScriptBlocked         color: #444; font-style: italic;
     NoScriptTemp            color: blue;
     NoScriptUntrusted       color: #c00; font-style: italic;
-</css>);
+*/));
 
 let groupProto = {};
 ["temp", "jsPolicy", "untrusted"].forEach(function (group)
@@ -232,10 +232,9 @@ prefs.set = function prefsSet(group, val) {
         setPref(p.pref, val.indexOf(p.text) >= 0);
     return val;
 }
-prefs.descs = function prefDescs(group) <dl>
-    { template.map(values(this[group]), function (pref)
-        <><dt>{pref.text}</dt> <dd>{pref.description}</dd></>) }
-</dl>;
+prefs.descs = function prefDescs(group) ["dl", {},
+    template.map(values(this[group]), function (pref)
+        [["dt", {}, pref.text], ["dd", {}, pref.description]])];
 
 function groupParams(group) ( {
     getter: function () prefs.get(group),
@@ -345,117 +344,117 @@ group.options.add(["script"],
             validator: params.validator || function () true
         }));
 
-XML.ignoreWhitespace = false;
-XML.prettyPrinting   = false;
 var INFO =
-<plugin name="noscript" version="0.8"
-        href="http://dactyl.sf.net/pentadactyl/plugins#noscript-plugin"
-        summary="NoScript integration"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        This plugin provides tight integration with the NoScript add-on.
-        In addition to commands and options to control the behavior of
-        NoScript, this plugin also provides integration with both the
-        {config.appName} and {config.host} sanitization systems sorely
-        lacking in the add-on itself. Namely, when data for a domain is
-        purged, all of its associated NoScript permissions are purged as
-        well, and temporary permissions are purged along with session
-        data.
-    </p>
-    <note>
-        As most options provided by this script directly alter NoScript
-        preferences, which are persistent, their values are automatically
-        preserved across restarts.
-    </note>
-    <item>
-        <tags>'script' 'noscript'</tags>
-        <strut/>
-        <spec>'script'</spec>
-        <type>boolean</type> <default>noscript</default>
-        <description>
-            <p>
-                When on, all sites are allowed to execute scripts and
-                load plugins. When off, only specifically allowed sites
-                may do so.
-            </p>
-        </description>
-    </item>
-    <item>
-        <tags>'nsf' 'noscript-forbid'</tags>
-        <spec>'noscript-forbid'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The set of permissions forbidden to untrusted sites.
-            </p>
-            { prefs.descs("forbid") }
-            <p>See also <o>noscript-objects</o>.</p>
-        </description>
-    </item>
-    <item>
-        <tags>'nsl' 'noscript-list'</tags>
-        <spec>'noscript-list'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The set of items to show in the main completion list and
-                NoScript menu.
-            </p>
-            { prefs.descs("list") }
-        </description>
-    </item>
-    <item>
-        <tags>'nso' 'noscript-objects'</tags>
-        <spec>'noscript-objects'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The list of objects which allowed to display. See also
-                <o>noscript-forbid</o>.
-            </p>
-            <example><ex>:map <k name="A-c" link="false"/></ex> <ex>:set nso!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
-        </description>
-    </item>
-    <item>
-        <tags>'nss' 'noscript-sites'</tags>
-        <spec>'noscript-sites'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The list of sites which are permanently allowed to execute
-                scripts.
-            </p>
-            <example><ex>:map <k name="A-s" link="false"/></ex> <ex>:set nss!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
-        </description>
-    </item>
-    <item>
-        <tags>'nst' 'noscript-tempsites'</tags>
-        <spec>'noscript-tempsites'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The list of sites which are temporarily allowed to execute
-                scripts. The value is not preserved across application
-                restarts.
-            </p>
-            <example><ex>:map <k name="A-S-s" link="false"/></ex> <ex>:set nst!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
-        </description>
-    </item>
-    <item>
-        <tags>'nsu' 'noscript-untrusted'</tags>
-        <spec>'noscript-untrusted'</spec>
-        <type>stringlist</type> <default></default>
-        <description>
-            <p>
-                The list of untrusted sites which are not allowed to activate,
-                nor are listed in the main completion lists or NoScript menu.
-            </p>
-            <example><ex>:map <k name="A-C-s" link="false"/></ex> <ex>:set nsu!=<k name="A-Tab" link="c_&lt;A-Tab>"/></ex></example>
-        </description>
-    </item>
-</plugin>;
+["plugin", { name: "noscript",
+             version: "0.8",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#noscript-plugin",
+             summary: "NoScript integration",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" }, "Kris Maglione"],
+    ["license", { href: "http://opensource.org/licenses/mit-license.php" }, "MIT"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+
+    ["p", {},
+        "This plugin provides tight integration with the NoScript add-on. ",
+        "In addition to commands and options to control the behavior of ",
+        "NoScript, this plugin also provides integration with both the ",
+        config.appName, " and ", config.host, " sanitization systems sorely ",
+        "lacking in the add-on itself. Namely, when data for a domain is ",
+        "purged, all of its associated NoScript permissions are purged as ",
+        "well, and temporary permissions are purged along with session ",
+        "data."],
+
+    ["note", {},
+        "As most options provided by this script directly alter NoScript ",
+        "preferences, which are persistent, their values are automatically ",
+        "preserved across restarts."],
+
+    ["item", {},
+        ["tags", {}, "'script' 'noscript'"],
+        ["strut", {}],
+        ["spec", {}, "'script'"],
+        ["type", {}, "boolean"],
+        ["default", {}, "noscript"],
+        ["description", {},
+            ["p", {},
+                "When on, all sites are allowed to execute scripts and ",
+                "load plugins. When off, only specifically allowed sites ",
+                "may do so."]]],
+
+    ["item", {},
+        ["tags", {}, "'nsf' 'noscript-forbid'"],
+        ["spec", {}, "'noscript-forbid'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The set of permissions forbidden to untrusted sites."],
+            prefs.descs("forbid"),
+            ["p", {},
+                "See also ", ["o", {}, "noscript-objects"], "."]]],
+
+    ["item", {},
+        ["tags", {}, "'nsl' 'noscript-list'"],
+        ["spec", {}, "'noscript-list'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The set of items to show in the main completion list and ",
+                "NoScript menu."],
+            prefs.descs("list")]],
+
+    ["item", {},
+        ["tags", {}, "'nso' 'noscript-objects'"],
+        ["spec", {}, "'noscript-objects'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The list of objects which allowed to display. See also ",
+                ["o", {}, "noscript-forbid"], "."],
+            ["example", {},
+                ["ex", {}, ":map ", ["k", { name: "A-c",  link: "false" }]], " ",
+                ["ex", {}, ":set nso!=", ["k", { name: "A-Tab", link: "c_<A-Tab>" }]]]]],
+
+    ["item", {},
+        ["tags", {}, "'nss' 'noscript-sites'"],
+        ["spec", {}, "'noscript-sites'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The list of sites which are permanently allowed to execute ",
+                "scripts."],
+            ["example", {},
+                ["ex", {}, ":map ", ["k", { name: "A-s", link: "false" }]], " ",
+                ["ex", {}, ":set nss!=", ["k", { name: "A-Tab", link: "c_<A-Tab>" }]]]]],
+
+    ["item", {},
+        ["tags", {}, "'nst' 'noscript-tempsites'"],
+        ["spec", {}, "'noscript-tempsites'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The list of sites which are temporarily allowed to execute ",
+                "scripts. The value is not preserved across application ",
+                "restarts."],
+            ["example", {},
+                ["ex", {}, ":map ", ["k", { name: "A-S-s", link: "false" }]], " ",
+                ["ex", {}, ":set nst!=", ["k", { name: "A-Tab", link: "c_<A-Tab>" }]]]]],
+
+    ["item", {},
+        ["tags", {}, "'nsu' 'noscript-untrusted'"],
+        ["spec", {}, "'noscript-untrusted'"],
+        ["type", {}, "stringlist"],
+        ["default", {}, ""],
+        ["description", {},
+            ["p", {},
+                "The list of untrusted sites which are not allowed to activate, ",
+                "nor are listed in the main completion lists or NoScript menu."],
+            ["example", {},
+                ["ex", {}, ":map ", ["k", { name: "A-C-s", link: "false" }]], " ",
+                ["ex", {}, ":set nsu!=", ["k", { name: "A-Tab", link: "c_<A-Tab>" }]]]]]];
 
 /* vim:se sts=4 sw=4 et: */

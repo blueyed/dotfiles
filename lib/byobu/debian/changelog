@@ -1,8 +1,39 @@
-byobu (5.26) unreleased; urgency=low
+byobu (5.28) unreleased; urgency=low
 
   * UNRELEASED
 
- -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Jan 2013 15:17:43 -0600
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 14 Jan 2013 15:27:36 -0600
+
+byobu (5.27-0ubuntu1) raring; urgency=low
+
+  * usr/bin/byobu-config: LP: #1097922, #1098102
+    - ensure byobu-config works even if ~/.profile doesn't exist
+  * usr/bin/byobu-ctrl-a: LP: #1098229
+    - fix typo that breaks ctrl-a selection behavior
+  * usr/bin/byobu: LP: #1026595
+    - fix readlink detection; we were using BYOBU_TEST before it was defined
+    - instead, try to greadlink -f .; operationally the same
+  * usr/lib/byobu/include/dirs: LP: #1025998
+    - more XDG annoyances
+    - use $HOME/.config/byobu as BYOBU_CONFIG_DIR if it exists
+  * === added symlink usr/bin/byobu-screen, === added symlink
+    usr/bin/byobu-tmux, === target is byobu: LP: #1022882
+    - add symlinks to repo, makes it easier to use byobu straight out of
+      bzr
+  * usr/bin/byobu-select-profile: LP: #946112
+    - fix byobu interactive color selection in tmux
+  * usr/lib/byobu/distro, usr/lib/byobu/release: LP: #1004722
+    - use sw_vers utility on Mac to determine distro and release
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 14 Jan 2013 15:27:34 -0600
+
+byobu (5.26-0ubuntu1) raring; urgency=low
+
+  [ Iain Lane ]
+  * usr/bin/byobu-select-session:
+    - Handle `screen -ls' returning 1. (LP: #1098341)
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 10 Jan 2013 16:36:21 -0600
 
 byobu (5.25-0ubuntu1) raring; urgency=low
 

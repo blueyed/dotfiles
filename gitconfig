@@ -34,6 +34,14 @@
 	tree = log --graph --decorate --pretty=oneline --abbrev-commit
 	up = !git fetch && git rebase
 	showtrackedignored = !\ncd \"${GIT_PREFIX}\" &&\nuntracked_list=$(git rev-parse --git-dir)/ignored-untracked.txt &&\ngit ls-files -o -i --exclude-standard >\"${untracked_list}\" &&\nGIT_INDEX_FILE=\"\" git ls-files -o -i --exclude-standard | grep -Fvxf \"${untracked_list}\" &&\nrm -rf \"${untracked_list}\"
+	switch = !legit switch \"$@\"
+	branches = !legit branches
+	sprout = !legit sprout \"$@\"
+	unpublish = !legit unpublish \"$@\"
+	harvest = !legit harvest \"$@\"
+	sync = !legit sync \"$@\"
+	publish = !legit publish \"$@\"
+	graft = !legit graft \"$@\"
 [color]
 	diff = auto
 	status = auto

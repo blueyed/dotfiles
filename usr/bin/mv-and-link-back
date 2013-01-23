@@ -22,7 +22,7 @@ target=$(remove_trailing_slashes $target)
 # target has to be a directory when having multiple sources
 if [[ $#sources > 1 ]]; then
   if ! [[ -d $target ]]; then
-    echo "Error: target is not a directory"
+    echo "Error: target is not a directory. But there are multiple sources."
     exit 1
   fi
 fi
@@ -49,9 +49,9 @@ for source in $sources; do
   #   echo "Error: source and target are the same file already"
   #   exit 1
   # fi
-  echo mv $source $mv_to
+  echo "DEBUG: mv $source $mv_to"
   mv $source $mv_to
-  echo ln -s $mv_to $source
+  echo "DEBUG: ln -s $mv_to $source"
   ln -s $mv_to $source
 done
 

@@ -5,8 +5,13 @@
 # This is useful to get an overview about which files have been touched
 # lately.
 
-for line in ${(f)"$(git status --short)"}; do
+for line in ${(f)"$(git status --short "$@")"}; do
 	st=$line[1,2] ; fname=$line[4,-1]
 	# echo -E $line | read -r st fname
-	echo "${$(stat -c %y $fname)[1,19]} $st $fname"
+	if [ -e $fname ]; then
+		echo "${$(stat -c %y $fname)[1,19]} $st $fname"
+	else
+		# deleted
+		echo "                    $st $fname"
+	fi
 done | sort -r

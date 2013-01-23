@@ -391,3 +391,6 @@
 [submodule "lib/legit"]
 	path = lib/legit
 	url = git://github.com/kennethreitz/legit.git
+[submodule "lib/powerline"]
+	path = lib/powerline
+	url = git://github.com/Lokaltog/powerline.git

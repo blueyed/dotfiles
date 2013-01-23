@@ -141,6 +141,9 @@ map <C-k> <Nop>
 " NoScript popup
 map <Leader>n -ex noscript popup
 
+" Toggle pocket sidebar
+nmap <Leader>p -ex emenu View.Sidebar.Pocket
+
 " Quickmarks
 silent qmark 0 hahler.de
 silent qmark c http://www.google.com/calendar

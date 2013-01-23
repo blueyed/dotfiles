@@ -11,7 +11,7 @@ FILE=$1
 # EDITOR=$(git config --get core.editor)
 # if [ -z $EDITOR ]; EDITOR=vim ; fi
 
-if [ $(basename "$FILE") = "COMMIT_EDITMSG" ]; then
+if [ "$(basename "$FILE")" = "COMMIT_EDITMSG" ]; then
   $EDITOR -c "/Changes" -c "normal zt" -c "set nohlsearch nospell sw=2" -c "sp" -c "normal gg" -c "resize 5" -c "set spell spl=en,de" "$@"
 else
   $EDITOR "$@"  

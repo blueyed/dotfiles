@@ -5,7 +5,7 @@
 #    Copyright (C) 2008 Canonical Ltd.
 #    Copyright (C) 2011 Dustin Kirkland
 #
-#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ __time_detail() {
 
 __time() {
 	case "$BYOBU_BACKEND" in
-		tmux)
-			date +"%H:%M:%S"
-		;;
 		screen)
 			printf "\0050c:\005s"
+		;;
+		tmux|*)
+			date +"%H:%M:%S"
 		;;
 	esac
 }

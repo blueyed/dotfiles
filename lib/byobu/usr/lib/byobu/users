@@ -7,7 +7,7 @@
 #    Copyright (C) 2011 Dustin Kirkland
 #
 #    Authors: Raphaël Pinson <raphink@ubuntu.com>
-#             Dustin Kirkland <kirkland@ubuntu.com>
+#             Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ __users_detail() {
 }
 
 __users() {
-	local count
+	local count=0
 	if [ "$USERS_DISTINCT" = "1" ]; then
 		count=$(pgrep -fl 'sshd:.*@' | cut -f3 -d\ | cut -f1 -d@ | sort -u | wc -l)
 	else
 		# Note: we'd like to use pgrep -c, however, this isn't available in
 		# busybox and some distro's pgrep (and it doesn't exit non-zero).
-		count=$(pgrep -f "^sshd:.*@" | wc -l) || return
+		count=$(pgrep -f "^sshd:.*@|^/usr/sbin/sshd -i" | wc -l) || return
 	fi
 	if [ $count -gt 0 ]; then
 		color b w r; printf "%d" "$count"; color -; color w r; printf "#"; color --

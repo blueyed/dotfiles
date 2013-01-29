@@ -2,9 +2,9 @@
 #
 #    entropy: system entropy
 #
-#    Copyright (C) 2011 Dustin Kirkland <dustin.kirkland@gmail.com>
+#    Copyright (C) 2011 Dustin Kirkland <kirkland@byobu.co>
 #
-#    Authors: Dustin Kirkland <dustin.kirkland@gmail.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -19,13 +19,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __entropy_detail() {
-	cat /proc/sys/kernel/random/entropy_avail
+	cat /proc/sys/kernel/random/entropy_avail 2>/dev/null
 }
 
 __entropy() {
-	local e=$(cat /proc/sys/kernel/random/entropy_avail)
-	[ -n "$e" ] || return
-	color K Y; printf "e%s" "$e"; color --
+	if [ -r /proc/sys/kernel/random/entropy_avail ]; then
+		local e=$(cat /proc/sys/kernel/random/entropy_avail)
+		[ -n "$e" ] || return
+		color K Y; printf "e%s" "$e"; color --
+	fi
 }
 
 # vi: syntax=sh ts=4 noexpandtab

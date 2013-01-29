@@ -3,7 +3,7 @@
 #    byobu-ctrl-a - set the ctrl-a behavior
 #    Copyright (C) 2011 Canonical Ltd.
 #
-#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -81,8 +81,8 @@ case "$bind_to" in
 	emacs)
 		case "$BYOBU_BACKEND" in
 			screen)
-				$BYOBU_SED -i -e "/^register x /d" -e "/^bindkey \"^\"/d" -e "/^escape escape \^${KEY}${key}/d" "$keybindings"
-				echo 'bindkey "^${KEY}"' >> "$keybindings"
+				$BYOBU_SED -i -e "/^register x /d" -e "/^bindkey /d" -e "/^escape /d" "$keybindings"
+				echo "bindkey \"^${KEY}\"" >> "$keybindings"
 				$BYOBU_BACKEND -X at 0 source "$BYOBU_CONFIG_DIR/profile"
 			;;
 			tmux)
@@ -98,9 +98,9 @@ case "$bind_to" in
 		case "$BYOBU_BACKEND" in
 			screen)
 				$BYOBU_SED -i -e "/^register x /d" -e "/^bindkey \"^\"/d" -e "/^escape /d" "$keybindings"
-				echo 'escape "^${KEY}${key}"' >> "$keybindings"
-				echo 'register x "^${KEY}"' >> "$keybindings"
-				echo 'bindkey "^${KEY}"' >> "$keybindings"
+				echo "escape \"^${KEY}${key}\"" >> "$keybindings"
+				echo "register x \"^${KEY}\"" >> "$keybindings"
+				echo "bindkey \"^${KEY}\"" >> "$keybindings"
 				$BYOBU_BACKEND -X at 0 source "$BYOBU_CONFIG_DIR/profile"
 			;;
 			tmux)

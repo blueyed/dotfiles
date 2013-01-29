@@ -4,7 +4,7 @@
 #
 #    Copyright (C) 2011 Dustin Kirkland
 #
-#    Authors: Dustin Kirkland <dustin.kirkland@gmail.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ for i in $all $all; do
 done
 
 # Disable all
-sed -i "s/^tmux_right=/#tmux_right=/" "$BYOBU_CONFIG_DIR/status"
+sed -i -e "s/^tmux_right=/#tmux_right=/" "$BYOBU_CONFIG_DIR/status"
 
 # Enable the next one
-sed -i "${next}s/^#tmux_right=/tmux_right=/" "$BYOBU_CONFIG_DIR/status"
+sed -i -e "${next}s/^#tmux_right=/tmux_right=/" "$BYOBU_CONFIG_DIR/status"

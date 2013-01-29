@@ -4,7 +4,7 @@
 #    Copyright (C) 2008 Canonical Ltd.
 #
 #    Authors: Nick Barcet <nick.barcet@ubuntu.com>
-#             Dustin Kirkland <kirkland@ubuntu.com>
+#             Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,11 @@ import string
 import subprocess
 import gettext
 import glob
-import snack
-from snack import *
-
+try:
+	import snack
+	from snack import *
+except:
+	error("Could not import the python snack module")
 PKG = "byobu"
 HOME = os.getenv("HOME")
 USER = os.getenv("USER")

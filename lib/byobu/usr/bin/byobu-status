@@ -4,7 +4,7 @@
 #
 #    Copyright (C) 2011 Dustin Kirkland
 #
-#    Authors: Dustin Kirkland <kirkland@ubuntu.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ case "$BYOBU_BACKEND" in
 		fi
 		for w in $width; do
 			if [ "$w" != "$w_last" ]; then
-				tmux set -g status-left-length $(($w*1/4))  | cat >/dev/null 2>&1
+				# go through cat due to possible tmux/epoll bug
+				tmux set -g status-left-length $(($w*1/4)) | cat >/dev/null 2>&1
 				tmux set -g status-right-length $(($w*3/4)) | cat >/dev/null 2>&1
 				printf "$w" > $BYOBU_RUN_DIR/width
 				break

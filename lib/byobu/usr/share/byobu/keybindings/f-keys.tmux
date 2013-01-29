@@ -1,9 +1,9 @@
 ###############################################################################
 #    byobu's tmux f-key keybindings
 #
-#    Copyright (C) 2011-2012 Dustin Kirkland <dustin.kirkland@gmail.com>
+#    Copyright (C) 2011-2012 Dustin Kirkland <kirkland@byobu.co>
 #
-#    Authors: Dustin Kirkland <dustin.kirkland@gmail.com>
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux.disable
 # Documented in: $BYOBU_PREFIX/share/doc/byobu/help.tmux.txt
 bind-key -n F1 new-window -k -n config byobu-config
 bind-key -n S-F1 new-window -k -n help '$BYOBU_PAGER $BYOBU_PREFIX/share/doc/byobu/help.tmux.txt'
-bind-key -n F2 new-window \; rename-window ""
+bind-key -n F2 new-window \; rename-window "$BYOBU_SHELL_TITLE"
 bind-key -n C-F2 display-panes \; split-window -h
 bind-key -n S-F2 display-panes \; split-window -v
 bind-key -n C-S-F2 new-session

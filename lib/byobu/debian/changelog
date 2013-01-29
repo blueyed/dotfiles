@@ -1,8 +1,136 @@
-byobu (5.28) unreleased; urgency=low
+byobu (5.31) unreleased; urgency=low
 
   * UNRELEASED
 
- -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 14 Jan 2013 15:27:36 -0600
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 28 Jan 2013 02:21:15 -0600
+
+byobu (5.30-0ubuntu1) raring; urgency=low
+
+  * usr/share/byobu/keybindings/f-keys.tmux:
+    - use $BYOBU_SHELL_TITLE in tmux too
+  * usr/share/byobu/windows/Makefile.am:
+    - fix lintian warning, install as DATA rather than SCRIPTS
+  * debian/po/de.po, debian/po/en_GB.po, debian/po/es.po,
+    debian/po/pt.po, debian/po/ru.po, debian/po/templates.pot,
+    debian/po/POTFILES.in:
+    - re-add this file, not sure when/how it got removed, fixes lintian
+  * usr/share/man/man1/byobu.1, usr/share/man/man1/byobu-quiet.1,
+    usr/share/man/man1/byobu-silent.1:
+    - fix lintian info messages
+  * NEWS:
+    - point to byobu.co in NEWS file
+  * usr/bin/byobu-select-profile:
+    - find a suitable hash sum utility (fixes Mac OS X)
+  * usr/lib/byobu/uptime:
+    - handle multiple white space with a single digit hour on Mac OS X
+  * usr/bin/byobu-select-profile, usr/bin/byobu-ugraph,
+    usr/lib/byobu/include/cycle-status, usr/lib/byobu/ip_address,
+    usr/lib/byobu/memory:
+    - the sed found in Mac OS X seems to really prefer a -e before expression
+  * usr/share/byobu/pixmaps/Byobu.png:
+    - image added for Mac OS X packaging
+  * usr/bin/byobu-config:
+    - throw an error message when we can't import snack
+  * Applications/Byobu.app/Contents/MacOS/Byobu:
+    - add an application launcher for Mac OS X
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 28 Jan 2013 02:21:12 -0600
+
+byobu (5.29-0ubuntu1) raring; urgency=low
+
+  [ Dustin Kirkland ]
+  * README:
+    - update build docs referencing git repo
+  * usr/lib/byobu/cpu_freq, usr/lib/byobu/date, usr/lib/byobu/entropy,
+    usr/lib/byobu/include/shutil, usr/lib/byobu/ip_address,
+    usr/lib/byobu/load_average, usr/lib/byobu/memory,
+    usr/lib/byobu/menu, usr/lib/byobu/processes, usr/lib/byobu/time,
+    usr/lib/byobu/time_utc, usr/lib/byobu/uptime, usr/lib/byobu/users:
+    - finally got my hands on a Mac OS X box!
+    - fixed a bunch of status scripts to work on Mac OS X
+  * AUTHORS, debian/copyright, po/bg.po, po/sv.po, README,
+    usr/bin/byobu-layout, usr/bin/byobu-reconnect-sockets,
+    usr/bin/byobu-select-session, usr/lib/byobu/entropy,
+    usr/lib/byobu/include/cycle-status, usr/lib/byobu/include/mondrian,
+    usr/lib/byobu/menu, usr/share/byobu/keybindings/f-keys.screen,
+    usr/share/byobu/keybindings/f-keys.screen.disable,
+    usr/share/byobu/keybindings/f-keys.tmux,
+    usr/share/byobu/keybindings/f-keys.tmux.disable:
+    - updated email address from kirkland@ubuntu.com to kirkland@byobu.co
+  * debian/copyright, debian/source_byobu.py, etc/profile.d/Z97-
+    byobu.sh, experimental/byobu-classroom, usr/bin/byobu,
+    usr/bin/byobu-config, usr/bin/byobu-ctrl-a, usr/bin/byobu-disable,
+    usr/bin/byobu-enable, usr/bin/byobu-export, usr/bin/byobu-janitor,
+    usr/bin/byobu-launch, usr/bin/byobu-launcher, usr/bin/byobu-
+    launcher-install, usr/bin/byobu-launcher-uninstall, usr/bin/byobu-
+    quiet, usr/bin/byobu-select-backend, usr/bin/byobu-select-profile,
+    usr/bin/byobu-shell, usr/bin/byobu-silent, usr/bin/byobu-status,
+    usr/bin/byobu-status-detail, usr/lib/byobu/apport,
+    usr/lib/byobu/arch, usr/lib/byobu/battery, usr/lib/byobu/color,
+    usr/lib/byobu/cpu_count, usr/lib/byobu/cpu_freq,
+    usr/lib/byobu/cpu_temp, usr/lib/byobu/custom, usr/lib/byobu/date,
+    usr/lib/byobu/disk, usr/lib/byobu/disk_io, usr/lib/byobu/distro,
+    usr/lib/byobu/ec2_cost, usr/lib/byobu/fan_speed,
+    usr/lib/byobu/hostname, usr/lib/byobu/include/common,
+    usr/lib/byobu/include/constants, usr/lib/byobu/include/dirs,
+    usr/lib/byobu/include/notify_osd, usr/lib/byobu/include/shutil,
+    usr/lib/byobu/ip_address, usr/lib/byobu/load_average,
+    usr/lib/byobu/logo, usr/lib/byobu/mail, usr/lib/byobu/memory,
+    usr/lib/byobu/network, usr/lib/byobu/notify_osd,
+    usr/lib/byobu/processes, usr/lib/byobu/raid, usr/lib/byobu/rcs_cost,
+    usr/lib/byobu/reboot_required, usr/lib/byobu/release,
+    usr/lib/byobu/services, usr/lib/byobu/swap, usr/lib/byobu/time,
+    usr/lib/byobu/time_utc, usr/lib/byobu/trash,
+    usr/lib/byobu/updates_available, usr/lib/byobu/uptime,
+    usr/lib/byobu/users, usr/lib/byobu/whoami,
+    usr/lib/byobu/wifi_quality, usr/share/byobu/profiles/byoburc,
+    usr/share/byobu/profiles/classroom, usr/share/byobu/profiles/common,
+    usr/share/byobu/profiles/NONE, usr/share/byobu/profiles/screenrc,
+    usr/share/byobu/profiles/tmux, usr/share/byobu/profiles/tmuxrc,
+    usr/share/byobu/status/status, usr/share/byobu/status/statusrc,
+    usr/share/byobu/tests/byobu-time-notifications,
+    usr/share/man/man1/byobu.1, usr/share/man/man1/byobu-config.1,
+    usr/share/man/man1/byobu-ctrl-a.1, usr/share/man/man1/byobu-
+    enable.1, usr/share/man/man1/byobu-export.1,
+    usr/share/man/man1/byobu-janitor.1, usr/share/man/man1/byobu-
+    launcher.1, usr/share/man/man1/byobu-launcher-install.1,
+    usr/share/man/man1/byobu-launcher-uninstall.1,
+    usr/share/man/man1/byobu-layout.1, usr/share/man/man1/byobu-quiet.1,
+    usr/share/man/man1/byobu-reconnect-sockets.1,
+    usr/share/man/man1/byobu-screen.1, usr/share/man/man1/byobu-select-
+    backend.1, usr/share/man/man1/byobu-select-profile.1,
+    usr/share/man/man1/byobu-select-session.1, usr/share/man/man1/byobu-
+    shell.1, usr/share/man/man1/byobu-silent.1,
+    usr/share/man/man1/byobu-status.1, usr/share/man/man1/byobu-status-
+    detail.1, usr/share/man/man1/byobu-tmux.1:
+    - updated email address from kirkland@ubuntu.com to kirkland@byobu.co
+  * usr/bin/byobu-select-session: LP: #1098102
+    - fix regression with Python2.6 compatibility, use Popen instead of
+      check_output
+
+  [ Przemek Wesolek ]
+  * usr/bin/byobu-status: LP: #1003938
+    - go through cat due to possible tmux/epoll bug
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sat, 19 Jan 2013 14:17:58 -0600
+
+byobu (5.28-0ubuntu1) raring; urgency=low
+
+  * usr/bin/byobu, usr/share/byobu/profiles/common: LP: #1031925
+    - 'byobu-screen -t foo' was hanging
+    - seems that screen's shelltitle command in our common profile
+      conflicts with the -t option on the command line
+    - add a hack to byobu that detects this, and avoids hanging
+    - set title to . otherwise (seems we need one printable character here)
+  * usr/bin/byobu-ctrl-a: LP: #1004031
+    - fix some bad problems introduced by single quotes
+    - escape double quotes instead
+    - clean up keybindings file with better sed's
+  * usr/lib/byobu/menu: LP: #881993
+    - merge, and update a little
+    - make sure we get the second-to-last byte on that line
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 15 Jan 2013 19:26:37 -0600
 
 byobu (5.27-0ubuntu1) raring; urgency=low
 

@@ -391,3 +391,6 @@
 [submodule "lib/powerline"]
 	path = lib/powerline
 	url = git://github.com/Lokaltog/powerline.git
+[submodule "vim/bundle/YouCompleteMe"]
+	path = vim/bundle/YouCompleteMe
+	url = git://github.com/Valloric/YouCompleteMe.git

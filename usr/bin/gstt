@@ -4,14 +4,40 @@
 #
 # This is useful to get an overview about which files have been touched
 # lately.
+#
+# Given the `-a` option it will call `git add -p` on all files (in sorted order).
 
-for line in ${(f)"$(git status --short "$@")"}; do
-	st=$line[1,2] ; fname=$line[4,-1]
-	# echo -E $line | read -r st fname
-	if [ -e $fname ]; then
-		echo "${$(stat -c %y $fname)[1,19]} $st $fname"
-	else
-		# deleted
-		echo "                    $st $fname"
-	fi
-done | sort -r
+while [[ $1 == -* ]] ; do
+	case $1 in
+		(-a) git_add=1 ;;
+		(--) shift ; break ;;
+		(-h)
+			printf 'usage: gstt [-a]\n'
+			printf '  -a      "call git add -p on files".\n'
+			return 0
+			;;
+		(*) printf "unkown option: '%s'\n" "$1" ; return 1 ;;
+	esac
+	shift
+done
+
+gstt() {
+	for line in ${(f)"$(git status --short "$@")"}; do
+		st=$line[1,2] ; fname=$line[4,-1]
+		# echo -E $line | read -r st fname
+		if [ -e $fname ]; then
+			echo "${$(stat -c %y $fname)[1,19]} $st $fname"
+		else
+			# deleted
+			echo "                    $st $fname"
+		fi
+	done | sort -r
+}
+
+if [[ $git_add = 1 ]]; then
+	for i in $(gstt | cut -b24-); do
+		git add -p $i
+	done
+else
+	gstt
+fi

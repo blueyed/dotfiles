@@ -995,9 +995,11 @@ function! eclim#tree#ListDir(dir, ...)
     endif
     let contents = split(eclim#util#System(ls . " '" . a:dir . "'"), '\n')
     if !b:view_hidden && &wildignore != ''
-      let pattern = substitute(escape(&wildignore, '.'), '\*', '.*', 'g')
+      let pattern = substitute(escape(&wildignore, '.~'), '\*', '.*', 'g')
       let pattern = '\(' . join(split(pattern, ','), '\|') . '\)$'
-      call filter(contents, 'v:val !~ pattern')
+      " Note: symlinks have a trailing @, so remove that before comparing
+      " against pattern
+      call filter(contents, 'substitute(v:val, "@$", "", "") !~ pattern')
     endif
     call map(contents, 'a:dir . v:val')
   else

@@ -88,8 +88,8 @@ function! EclimGetHtmlIndent(lnum)
 
     " handle case where previous line is a multi-line comment (<!-- -->) on one
     " line, which IndentAnything doesn't handle properly.
-    "if prevline =~ '^\s\+<!--.\{-}-->'
-    "  let adj = indent(prevlnum)
+    if prevline =~ '^\s\+<!--.\{-}-->'
+      let adj = indent(prevlnum)
 
     " handle <br> tags without '/>'
     if prevline =~ '<br\s*>'
@@ -119,11 +119,12 @@ function! HtmlIndentAnythingSettings()
   let b:singleQuoteStringRE = b:stringRE
   let b:doubleQuoteStringRE = b:stringRE
 
-  setlocal comments=sr:<!--,m:-,e:-->
-  let b:blockCommentStartRE  = '<!--'
-  let b:blockCommentMiddleRE = '-'
-  let b:blockCommentEndRE    = '-->'
-  let b:blockCommentMiddleExtra = 2
+  " Overwrites option for other filetypes that have html indenting (eg. php)
+  "setlocal comments=sr:<!--,m:-,e:-->
+  "let b:blockCommentStartRE  = '<!--'
+  "let b:blockCommentMiddleRE = '-'
+  "let b:blockCommentEndRE    = '-->'
+  "let b:blockCommentMiddleExtra = 2
 
   " Indent another level for each non-closed element tag.
   let b:indentTrios = [

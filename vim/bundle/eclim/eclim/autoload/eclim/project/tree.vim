@@ -41,17 +41,21 @@
   let s:shared_instances_by_names = {}
 " }}}
 
-" ProjectTree(...) {{{
-" Open a tree view of the current or specified projects.
-function! eclim#project#tree#ProjectTree(...)
+function! eclim#project#tree#ProjectTree(...) " {{{
+  " Open a tree view of the current or specified projects.
+
   " no project dirs supplied, use current project
   if len(a:000) == 0
     let name = eclim#project#util#GetCurrentProjectName()
-    if name == ''
-      call eclim#project#util#UnableToDetermineProject()
-      return
-    endif
     let names = [name]
+    if name == ''
+      if exists('t:cwd')
+        let names = [t:cwd]
+      else
+        call eclim#project#util#UnableToDetermineProject()
+        return
+      endif
+    endif
 
   " list of project names supplied
   elseif type(a:000[0]) == g:LIST_TYPE
@@ -75,18 +79,21 @@ function! eclim#project#tree#ProjectTree(...)
     endif
 
     let dir = eclim#project#util#GetProjectRoot(name)
-    if dir != ''
-      call add(dirs, dir)
-      let index += 1
-    else
-      call eclim#util#EchoWarning('Project not found: ' . name)
-      call remove(names_copy, index)
+    if dir == ''
+      let dir = expand(name, ':p')
+      if !isdirectory(dir)
+        call eclim#util#EchoWarning('Project not found: ' . name)
+        call remove(names_copy, index)
+        continue
+      endif
+      let names_copy[index] = fnamemodify(substitute(dir, '/$', '', ''), ':t')
     endif
+    call add(dirs, dir)
+    let index += 1
   endfor
   let names = names_copy
 
   if len(dirs) == 0
-    "call eclim#util#Echo('ProjectTree: No directories found for requested projects.')
     return
   endif
 
@@ -128,6 +135,7 @@ function! eclim#project#tree#ProjectTreeOpen(display, names, dirs) " {{{
     if line('$') > 1 || getline(1) !~ '^\s*$'
       setlocal nowrap nonumber
       setlocal foldmethod=manual foldtext=getline(v:foldstart)
+      exec 'setlocal statusline=' . escape(a:display, ' ')
       if !exists('t:project_tree_name')
         exec 'let t:project_tree_id = ' .
           \ substitute(bufname(shared), g:EclimProjectTreeTitle . '\(\d\+\)', '\1', '')
@@ -308,6 +316,12 @@ function! s:InfoLine() " {{{
     catch /E\(117\|700\)/
       " fall back to fugitive
       try
+        " fugitive calls a User autocmd, so stop if that one is triggering
+        " this one to prevent a recursive loop
+        if exists('b:eclim_fugative_autocmd')
+          return
+        endif
+
         " make sure fugitive has the git dir for the current project
         if !exists('b:git_dir') || (b:git_dir !~ '^\M' . b:roots[0])
           let cwd = ''
@@ -319,6 +333,10 @@ function! s:InfoLine() " {{{
           if exists('b:git_dir')
             unlet b:git_dir
           endif
+
+          " slight hack to prevent recursive autocmd loop with fugitive
+          let b:eclim_fugative_autocmd = 1
+
           silent! doautocmd fugitive BufReadPost %
 
           if cwd != ''
@@ -335,6 +353,8 @@ function! s:InfoLine() " {{{
         endif
       catch /E\(117\|700\)/
         " noop if the neither function was found
+      finally
+          silent! unlet b:eclim_fugative_autocmd
       endtry
     endtry
 

@@ -4,7 +4,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ function! eclim#common#buffers#Buffers(bang) " {{{
   endif
 
   let lines = []
+  let buflist = []
   let filelength = options['maxfilelength']
   let tabid = exists('*gettabvar') ? s:GetTabId() : 0
   let tabbuffers = tabpagebuflist()
@@ -67,6 +68,7 @@ function! eclim#common#buffers#Buffers(bang) " {{{
       endif
 
       call add(lines, s:BufferEntryToLine(buffer, filelength))
+      call add(buflist, buffer)
     endif
   endfor
 
@@ -76,7 +78,7 @@ function! eclim#common#buffers#Buffers(bang) " {{{
   call append(line('$'), ['', '" use ? to view help'])
   setlocal nomodifiable readonly
 
-  let b:eclim_buffers = buffers
+  let b:eclim_buffers = buflist
 
   " syntax
   set ft=eclim_buffers
@@ -221,7 +223,12 @@ function! eclim#common#buffers#TabEnter() " {{{
       " don't delete active buffers, just in case the tab has the wrong
       " eclim_tab_id
       if eclim_tab_id == s:tab_prev && buffer.status !~ 'a'
-        exec 'bdelete ' . buffer.bufnr
+        try
+          exec 'bdelete ' . buffer.bufnr
+        catch /E89/
+          " ignore since it happens when using bd! on the last buffer for
+          " another tab.
+        endtry
       endif
     endfor
   endif
@@ -256,6 +263,52 @@ function! eclim#common#buffers#TabLastOpenIn() " {{{
   if !exists('b:eclim_tab_id') || !other_tab
     let b:eclim_tab_id = s:GetTabId()
   endif
+endfunction " }}}
+
+function! eclim#common#buffers#OpenNextHiddenTabBuffer(current) " {{{
+  let allbuffers = eclim#common#buffers#GetBuffers()
+
+  " build list of buffers open in other tabs to exclude
+  let tabbuffers = []
+  let lasttab = tabpagenr('$')
+  let index = 1
+  while index <= lasttab
+    if index != tabpagenr()
+      for bnum in tabpagebuflist(index)
+        call add(tabbuffers, bnum)
+      endfor
+    endif
+    let index += 1
+  endwhile
+
+  " build list of buffers not open in any window, and last seen on the
+  " current tab.
+  let hiddenbuffers = []
+  for buffer in allbuffers
+    let bnum = buffer.bufnr
+    if bnum != a:current && index(tabbuffers, bnum) == -1 && bufwinnr(bnum) == -1
+      let eclim_tab_id = getbufvar(bnum, 'eclim_tab_id')
+      if eclim_tab_id != '' && eclim_tab_id != t:eclim_tab_id
+        continue
+      endif
+
+      if bnum < a:current
+        call insert(hiddenbuffers, bnum)
+      else
+        call add(hiddenbuffers, bnum)
+      endif
+    endif
+  endfor
+
+  " we found a hidden buffer, so open it
+  if len(hiddenbuffers) > 0
+    exec 'buffer ' . hiddenbuffers[0]
+    doautocmd BufEnter
+    doautocmd BufWinEnter
+    doautocmd BufReadPost
+    return hiddenbuffers[0]
+  endif
+  return 0
 endfunction " }}}
 
 function! s:BufferDelete() " {{{

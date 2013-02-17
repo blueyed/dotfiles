@@ -5,7 +5,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -54,17 +54,18 @@ function! eclim#php#util#UpdateSrcFile(validate) " {{{
         let command = command . ' -b'
       endif
     endif
-    let result = eclim#ExecuteEclim(command)
+    let result = eclim#Execute(command)
     if type(result) != g:LIST_TYPE
       return
     endif
 
-    if (g:EclimPhpHtmlValidate || a:validate) && !eclim#util#WillWrittenBufferClose()
-      " html validate
+    let html_validate = exists('b:EclimPhpHtmlValidate') ?
+      \ b:EclimPhpHtmlValidate : g:EclimPhpHtmlValidate
+    if html_validate && !eclim#util#WillWrittenBufferClose()
       let command = s:html_validate_command
       let command = substitute(command, '<project>', project, '')
       let command = substitute(command, '<file>', file, '')
-      let result_html = eclim#ExecuteEclim(command)
+      let result_html = eclim#Execute(command)
       if type(result_html) == g:LIST_TYPE
         let result += result_html
       endif

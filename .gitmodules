@@ -132,7 +132,7 @@
 	ignore = untracked
 [submodule "vim/bundle/unimpaired"]
 	path = vim/bundle/unimpaired
-	url = git://github.com/blueyed/vim-unimpaired.git
+	url = git://github.com/tpope/vim-unimpaired.git
 	ignore = untracked
 [submodule "vim/bundle/tmarks"]
 	path = vim/bundle/tmarks

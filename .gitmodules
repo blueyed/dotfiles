@@ -394,3 +394,6 @@
 [submodule "vim/bundle/YouCompleteMe"]
 	path = vim/bundle/YouCompleteMe
 	url = git://github.com/Valloric/YouCompleteMe.git
+[submodule "lib/git-meld"]
+	path = lib/git-meld
+	url = git://github.com/wmanley/git-meld.git

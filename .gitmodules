@@ -397,3 +397,6 @@
 [submodule "lib/git-meld"]
 	path = lib/git-meld
 	url = git://github.com/wmanley/git-meld.git
+[submodule "vim/bundle/scriptease"]
+	path = vim/bundle/scriptease
+	url = git://github.com/tpope/vim-scriptease.git

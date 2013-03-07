@@ -9,7 +9,8 @@
 
 while [[ $1 == -* ]] ; do
 	case $1 in
-		(-a) git_add=1 ;;
+		(-a) call_cmd=(git add -p) ;;
+		(-c) call_cmd=(git checkout -p) ;;
 		(--) shift ; break ;;
 		(-h)
 			printf 'usage: gstt [-a]\n'
@@ -34,9 +35,9 @@ gstt() {
 	done | sort -r
 }
 
-if [[ $git_add = 1 ]]; then
+if ((#call_cmd)); then
 	for i in $(gstt | cut -b24-); do
-		git add -p $i
+		$=call_cmd $i
 	done
 else
 	gstt

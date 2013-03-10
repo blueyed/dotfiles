@@ -37,7 +37,7 @@ gstt() {
 
 if ((#call_cmd)); then
 	for i in $(gstt | cut -b24-); do
-		$=call_cmd $i
+		$call_cmd $i
 	done
 else
 	gstt

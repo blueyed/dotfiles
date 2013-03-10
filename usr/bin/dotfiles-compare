@@ -3,31 +3,31 @@
 # Compare dotfiles in ~ with those in ~/.dotfiles.
 # These are typically symlinks, but not necessarily on Windows/Cygwin.
 
-CMD_COMP="/usr/bin/bcompare -filters=-tags*;-*.swp;-.git\\;-*.pyc"
+CMD_COMP=(/usr/bin/bcompare -filters=-tags\*;-\*.swp;-.git;-\*.pyc)
 
 # files
 for i in ~/.*(.); do
 	t=~/.dotfiles/${${i:t}#.}
 	test -f $t || continue
 	echo -n "$t... "
- 	cmp $i $t && { echo "files are identical."; continue; }
+	cmp $i $t && { echo "files are identical."; continue; }
 	echo "Comparing.."
- 	$=CMD_COMP $i $t
+	$CMD_COMP $i $t
 done
 
 # dirs
 for i in ~/.*(/) ~/*(/); do
 	if [[ ${i:t} == "autojump" ]] || [[ ${i:t} == ".config" ]]; then
-    continue
-  fi
+		continue
+	fi
 
 	t=~/.dotfiles/${${i:t}#.}
 	test -d $t || continue
 	echo -n "$t... "
 	if [[ $(diff -x .git -x tags -ur $i $t) != "" ]]; then
 		echo "Comparing.."
- 		echo $=CMD_COMP $i $t
- 		$=CMD_COMP $i $t
+		echo $CMD_COMP $i $t
+		$CMD_COMP $i $t
 	fi
 done
 

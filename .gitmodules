@@ -403,3 +403,6 @@
 [submodule "vim/bundle/textobj-user"]
 	path = vim/bundle/textobj-user
 	url = git://github.com/kana/vim-textobj-user.git
+[submodule "vim/bundle/textobj-function"]
+	path = vim/bundle/textobj-function
+	url = git://github.com/kana/vim-textobj-function.git

@@ -406,3 +406,6 @@
 [submodule "vim/bundle/textobj-function"]
 	path = vim/bundle/textobj-function
 	url = git://github.com/kana/vim-textobj-function.git
+[submodule "vim/bundle/tbone"]
+	path = vim/bundle/tbone
+	url = git://github.com/tpope/vim-tbone.git

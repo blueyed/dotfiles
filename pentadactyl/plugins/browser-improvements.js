@@ -1,22 +1,17 @@
-/* use strict */
-XML.ignoreWhitespace = false;
-XML.prettyPrinting   = false;
+"use strict";
 var INFO =
-<plugin name="browser-improvements" version="0.3"
-        href="http://dactyl.sf.net/pentadactyl/plugins#browser-improvements-plugin"
-        summary="Browser Consistency Improvements"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        This plugin provides various browser consistency improvements, including:
-    </p>
-    <ul>
-        <li>Middle clicking on a form submit button opens the resulting page in a new tab.</li>
-        <li>Pressing <k name="C-Return" link="false"/> while a textarea or select element is focused submits the form.</li>
-    </ul>
-</plugin>;
+["plugin", { name: "browser-improvements", version: "0.3",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#browser-improvements-plugin",
+             summary: "Browser Consistency Improvements",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" }, "Kris Maglione"],
+    ["license", { href: "http://opensource.org/licenses/mit-license.php" }, "MIT"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+    ["p", {},
+        "This plugin provides various browser consistency improvements, including:"],
+    ["ul", {},
+        ["li", {}, "Middle clicking on a form submit button opens the resulting page in a new tab."],
+        ["li", {}, "Pressing ", ["k", { name: "C-Return", link: "false" }], " while a textarea or select element is focused submits the form."]]];
 
 function clickListener(event) {
     let elem = event.originalTarget;

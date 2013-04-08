@@ -1,4 +1,4 @@
-/* use strict */
+"use strict";
 var INFO =
 ["plugin", { name: "curl",
              version: "0.2",
@@ -33,18 +33,19 @@ hints.addMode('C', "Generate curl command for a form", function(elem) {
     if (!url || /^javascript:/.test(url))
         return;
 
-    url = services.io.newURI(url, null, util.newURI(elem.ownerDocument.URL)).spec;
+    url = util.newURI(url, null,
+                      elem.ownerDocument.documentURIObject).spec;
 
-    let escape = util.closure.shellEscape;
+    let { shellEscape } = util.closure;
 
     dactyl.clipboardWrite(["curl"].concat(
         [].concat(
-            [["--form-string", escape(datum)] for ([n, datum] in Iterator(elements || []))],
-            postData != null && !elements.length ? [["-d", escape("")]] : [],
-            [["-H", escape("Cookie: " + elem.ownerDocument.cookie)],
-             ["-A", escape(navigator.userAgent)],
-             [escape(url)]]
-        ).map(function(e) e.join(" ")).join(" \\\n\t")).join(" "), true);
+            [["--form-string", shellEscape(datum)] for ([n, datum] in Iterator(elements || []))],
+            postData != null && !elements.length ? [["-d", shellEscape("")]] : [],
+            [["-H", shellEscape("Cookie: " + elem.ownerDocument.cookie)],
+             ["-A", shellEscape(navigator.userAgent)],
+             [shellEscape(url)]]
+        ).map(function(e) e.join(" ")).join(" \\\n     ")).join(" "), true);
 });
 
 /* vim:se sts=4 sw=4 et: */

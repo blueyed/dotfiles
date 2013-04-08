@@ -1,26 +1,28 @@
-/* use strict */
-XML.ignoreWhitespace = false;
-XML.prettyPrinting = false;
+"use strict";
 var INFO =
-<plugin name="jQuery" version="1.5.1"
-        href="http://dactyl.sf.net/pentadactyl/plugins#jQuery-plugin"
-        summary="jQuery integration"
-        xmlns={NS}>
-    <author email="maglione.k@gmail.com">Kris Maglione</author>
-    <author href="http://ejohn.org/">John Resig</author>
-    <author>Dojo Foundation</author>
-    <license href="http://opensource.org/licenses/mit-license.php">MIT</license>
-    <license href="http://opensource.org/licenses/bsd-license.php">BSD</license>
-    <project name="Pentadactyl" min-version="1.0"/>
-    <p>
-        This plugin provides basic jQuery integration. With it enabled,
-        jQuery's <tt>$</tt> function is available for any web page, with the
-        full power of jQuery. It also provides <tt>$w</tt>,
-        <tt>$d</tt>, and <tt>$b</tt> objects which refer to the
-        the content <tt>window</tt>, <tt>document</tt>, and
-        <tt>body</tt> respectively.
-    </p>
-</plugin>;
+["plugin", { name: "jQuery",
+             version: "1.5.1",
+             href: "http://dactyl.sf.net/pentadactyl/plugins#jQuery-plugin",
+             summary: "jQuery integration",
+             xmlns: "dactyl" },
+    ["author", { email: "maglione.k@gmail.com" },
+        "Kris Maglione"],
+    ["author", { href: "http://ejohn.org/" },
+        "John Resig"],
+    ["author", {},
+        "Dojo Foundation"],
+    ["license", { href: "http://opensource.org/licenses/mit-license.php" },
+        "MIT"],
+    ["license", { href: "http://opensource.org/licenses/bsd-license.php" },
+        "BSD"],
+    ["project", { name: "Pentadactyl", "min-version": "1.0" }],
+    ["p", {},
+        "This plugin provides basic jQuery integration. With it enabled, ",
+        "jQuery's ", ["tt", {}, "$"], " function is available for any web page, with the ",
+        "full power of jQuery. It also provides <tt>$w</tt>, ",
+        ["tt", {}, "$d"], ", and ", ["tt", {}, "$b"], " objects which refer to the ",
+        "the content ", ["tt", {}, "window"], ", ", ["tt", {}, "document"], ", and ",
+        ["tt", {}, "body"], " respectively. "]];
 
 memoize(this, "jQuery", function () {
     let listener = Class(XPCOM([Ci.nsIStreamListener]), {
@@ -84,7 +86,7 @@ userContext.__defineGetter__("$b", function () (content.document.body || content
  * Date: Wed Feb 23 13:55:29 2011 -0500
  */
 let line = Components.stack.lineNumber + 1;
-let code = atob(String.replace(<![CDATA[
+let code = atob(String.replace(literal(/*
 H4sIAOyEmk0CA6x9iZbiRrbgr4DGJy2ZSDLTS0+3yCim1rbf2FXuLvez/UjsF5JCIBASJcjNwL/Mt8yX
 zb03Vgmyym9mfMqJFPty48bdFea3Vbot6ioULIl25q2XzkIR7Rq5vW2qXjYsNj8XVVbfQ+JYxGJY1Zn8
 6XEtOed/G4thJnNxW27/vZD3+70YrkUjq62qEfevDq7VDFst8rCf/MdETKPdnWh6Cc/C4DoYiEHwLIiG
@@ -575,6 +577,6 @@ ph31vAYByEMfMA9DM+H5mvhBnnoHi9zMTWEtKml5aLdzKXZ5s60Xm/475dI4yjalIZTNVKuhGByoBUau
 WqBaMamL/sPGTP/FqJt9GIf4waCQZCNuomyJ5kzLxZgSjo7PciBqGoyWRTqsckPhnsKxjU+u5y9fXj7n
 FDGfGtVWh1MWLR0GF3VNvf5kOmrloNFDzVEjXardsEg6+MB7Kx8InTj2QfVWrMIEKFhUXrISEM7El5Em
 box7vlYto94kLr0YGWLg2hTLPo1ThkxkUpVeSFBhImiPkuE+Cm95uqLu//o/SjsVzJ5LAQA=
-]]>, /\n/g, ""));
+*/), /\n/g, ""));
 
 /* vim:se sts=4 sw=4 et: */

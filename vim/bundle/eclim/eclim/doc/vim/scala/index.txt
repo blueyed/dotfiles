@@ -1,0 +1,10 @@
+*vim-scala-index*
+
+Scala
+*****
+
+- Scala Code Completion (vim-scala-complete)
+- Scala Validation (vim-scala-validate)
+- Scala Search (vim-scala-search)
+
+vim:ft=eclimhelp

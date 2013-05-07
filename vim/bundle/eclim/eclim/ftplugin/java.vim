@@ -5,7 +5,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -36,11 +36,15 @@ if !exists("g:EclimJavaCompilerAutoDetect")
   let g:EclimJavaCompilerAutoDetect = 1
 endif
 
+if !exists("g:EclimJavaSyntasticEnabled")
+  let g:EclimJavaSyntasticEnabled = 0
+endif
+
 " }}}
 
 " Options {{{
 
-setlocal completefunc=eclim#java#complete#CodeComplete
+exec 'setlocal ' . g:EclimCompletionMethod . '=eclim#java#complete#CodeComplete'
 
 if g:EclimJavaSetCommonOptions
   " allow cpp keywords in java files (delete, friend, union, template, etc).
@@ -89,6 +93,11 @@ if g:EclimJavaCompilerAutoDetect
   endif
 endif
 
+" disable syntastic
+if exists('g:loaded_syntastic_plugin') && !g:EclimJavaSyntasticEnabled
+  let g:syntastic_java_checkers = []
+endif
+
 " }}}
 
 " Abbreviations {{{
@@ -105,8 +114,7 @@ endif
 if &ft == 'java'
   augroup eclim_java
     autocmd! BufWritePost <buffer>
-    autocmd BufWritePost <buffer>
-      \ call eclim#lang#UpdateSrcFile('java', g:EclimJavaValidate)
+    autocmd BufWritePost <buffer> call eclim#lang#UpdateSrcFile('java')
   augroup END
 endif
 

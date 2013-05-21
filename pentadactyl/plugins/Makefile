@@ -6,6 +6,6 @@ DACTYL_PLUGINS := browser-improvements curl http-headers jQuery jscompletion nos
 
 update:
 	for f in $(DACTYL_PLUGINS); do \
-		wget http://dactyl.sourceforge.net/plugins/$$f-dev.js -O $$f.js; \
+		wget http://5digits.org/plugins/$$f-dev.js -O $$f.js; \
 	done
 

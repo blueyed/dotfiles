@@ -90,7 +90,29 @@ map gz -js dactyl.open(toggleDevLiveHost());
 "autocmd VimperatorEnter .* emenu Tools.Sync.Sync Now
 "autocmd VimperatorLeavePre .* emenu Tools.Sync.Sync Now
 
-colorscheme blueyed
+
+" Setup colors(cheme)
+colorscheme solarized-light
+
+" colorscheme blueyed
+"  " TODO: see TabVisited extension: https://bugzilla.mozilla.org/show_bug.cgi?id=487242
+"  " Pimp colors/layout
+"  hi -append Hint font-size:12px !important;font-weight:normal !important;background:#fff !important;border:1px solid red !important;color:#000 !important;font-family:"DejaVu Sans Mono", monospace !important; padding:1px 3px !important;
+"  hi -append StatusLine background-color:#ddd !important; color:#000 !important; border-bottom:1px solid #666 !important; border-top:1px solid #666 !important
+"
+"  " Make the "Find hit TOP, continuing at BOTTOM" more prominent
+"  hi StatusWarningMsg -append background-color:blue ! important; color:white ! important;
+"
+"
+"  style -name blueyedchrome chrome://* <<EOM
+"  	tab.tabbrowser-tab[selected="true"] { font-size:1.2em !important; font-weight:bold !important; color:#000 !important }
+"
+"  	/* http://kb.mozillazine.org/User:Dickvl */
+"  	.tabbrowser-tab[unread="true"] .tab-text {}
+"  	.tabbrowser-tab:not([unread="true"]) .tab-text {}
+"  	.tabbrowser-tab[selected="true"] .tab-text {}
+"  EOM
+
 
 set errorbells visualbell
 

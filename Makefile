@@ -132,3 +132,6 @@ setup_zsh:
 		chsh -s ${ZSH_PATH} ; \
 	fi
 	@# obsolete/buggy?!:	-o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ]
+
+tags:
+	ctags -R --exclude=YouCompleteMe .

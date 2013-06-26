@@ -1187,6 +1187,10 @@ let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
 let g:localvimrc_debug = 0
 
+" Do not autoload/autosave 'default' session
+let g:session_autoload = 'no'
+let g:session_autosave = 'no'
+
 
 
 " autoclose

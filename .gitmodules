@@ -414,3 +414,6 @@
 [submodule "vim/bundle/visual-star-search"]
 	path = vim/bundle/visual-star-search
 	url = git@github.com:nelstrom/vim-visual-star-search.git
+[submodule "vim/bundle/abolish"]
+	path = vim/bundle/abolish
+	url = git@github.com:tpope/vim-abolish.git

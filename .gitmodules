@@ -417,3 +417,6 @@
 [submodule "vim/bundle/abolish"]
 	path = vim/bundle/abolish
 	url = git@github.com:tpope/vim-abolish.git
+[submodule "vim/bundle/colorscheme-detailed"]
+	path = vim/bundle/colorscheme-detailed
+	url = git@github.com:rking/vim-detailed.git

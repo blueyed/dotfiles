@@ -161,9 +161,10 @@ if 1
     if ! isdirectory(s:new_tmru_files_dir)
       call mkdir(s:new_tmru_files_dir, 'p', 0700)
     endif
-    execute '!mv '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
+    execute '!mv -i '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
     " execute '!rm -r '.shellescape(g:tlib_cache)
   endif
+  let g:tmru_file = s:new_tmru_files
 end
 
 if has('persistent_undo')

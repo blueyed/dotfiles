@@ -40,6 +40,10 @@ if !exists("g:EclimJavaSyntasticEnabled")
   let g:EclimJavaSyntasticEnabled = 0
 endif
 
+if !exists('g:EclimJavaCallHierarchyDefaultAction')
+  let g:EclimJavaCallHierarchyDefaultAction = g:EclimDefaultFileOpenAction
+endif
+
 " }}}
 
 " Options {{{
@@ -201,6 +205,12 @@ if !exists(":JavaDocSearch")
   command -buffer -nargs=*
     \ -complete=customlist,eclim#java#search#CommandCompleteJavaSearch
     \ JavaDocSearch :call eclim#java#search#SearchAndDisplay('java_docsearch', '<args>')
+endif
+
+if !exists(":JavaCallHierarchy")
+  command -buffer -bang JavaCallHierarchy
+    \ :call eclim#lang#hierarchy#CallHierarchy(
+      \ 'java', g:EclimJavaCallHierarchyDefaultAction, '<bang>')
 endif
 
 if !exists(":JavaHierarchy")

@@ -9,7 +9,7 @@
 
 while [[ $1 == -* ]] ; do
 	case $1 in
-		(-a) call_cmd=(git add -p) ;;
+		(-a) call_cmd=(git add -p) ; call_cmd_for_unknown=(git add) ;;
 		(-c) call_cmd=(git checkout -p) ;;
 		(--) shift ; break ;;
 		(-h)
@@ -36,8 +36,24 @@ gstt() {
 }
 
 if ((#call_cmd)); then
-	for i in $(gstt | cut -b24-); do
-		$call_cmd $i
+	for i in ${(f)"$(gstt "$@")"}; do
+		wd_status=$(echo $i | cut -b22)
+		if [[ $wd_status == ' ' ]]; then
+			# skip: already in index (would result in "No changes." for "git add")
+			continue
+		fi
+		fname=$(echo $i | cut -b24-)
+		echo "--- $i ---"
+		ls -l $fname
+		if [[ $wd_status == '?' ]] && [[ ${#call_cmd_for_unknown} -gt 0 ]]; then
+			read -q "yn?Add the file? (y/n) "
+			echo
+			if [[ $yn == 'y' ]]; then
+				$call_cmd_for_unknown $fname
+			fi
+		else
+			$call_cmd $fname
+		fi
 	done
 else
 	gstt

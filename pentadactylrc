@@ -41,8 +41,17 @@ nmap -s -b ä ]]
 group prevnext
 au LocationChange .* set previouspattern='^voriges Angebot$',^<$,^<(?!<),[^<]<$,'^(prev|previous|früher|zurück|Vorherige)$','(vorige Seite|next page)',^(<<|«|‹)$,^«,«$,^‹,'\b(prev|previous|zurück)\b'
 au LocationChange .* set nextpattern='^nächstes Angebot$',^>$,^>(?!>),[^>]>$,'^(next|more|weiter|später)$','(nächste Seite|next page)',^(>>|»|›)$,^»,»$,›$,'\b(next|more|weiter|vor(wärts)?)\b'
-au LocationChange www.xing.com set previouspattern=^Zurück$
-au LocationChange www.xing.com set nextpattern=^Weiter$
+au LocationChange www.xing.com set previouspattern=^Zurück$ nextpattern=^Weiter$
+" TODO test
+au LocationChange www.xda-developers.com set previouspattern='^newer entries$' nextpattern='^older entries$'
+" heise.de: start page and comments
+au LocationChange www.heise.de set previouspattern='^Neuere$',^<<$ nextpattern='^Ältere$',^>>$
+" forum.xda-developers.com
+au LocationChange ://[^]+/showthread\.php\? set previouspattern='^<$'
+au LocationChange ://[^]+/showthread\.php\? set nextpattern='^>$'
+
+" XXX: something likge that (google for it)
+" autocmd LocationChange .* js modes.passAllKeys = /google\.com/.test(buffer.URL)
 group default
 
 set popups=tab,resized
@@ -73,6 +82,22 @@ map -silent gy -js shortenURLBitLy(buffer.URL)
 " environment.
 javascript <<EOF
 function toggleDevLiveHost() {
+	// NOTE: <John-Galt> blueyed: let uri = buffer.uri.clone(); uri.host = whatever; uri.spec
+
+	// first check custom maps of hostnames to toggle
+	let customtoggle = {
+		'www.betterplace.org': 'www.bp42.com',
+	}
+	for( var i in customtoggle ) {
+		if( buffer.uri.host === i ) {
+			return String.replace(buffer.URL, i, customtoggle[i]);
+		}
+		if( buffer.uri.host === customtoggle[i] ) {
+			return String.replace(buffer.URL, customtoggle[i], i);
+		}
+	}
+
+	// then prepend/remove suffix
 	let suffix = '.localdomain';
 	if( buffer.uri.host.indexOf(suffix, buffer.uri.host.length - suffix.length) !== -1 ) {
 		return String.replace(buffer.URL, suffix, '');
@@ -83,7 +108,7 @@ function toggleDevLiveHost() {
 EOF
 map gz -js dactyl.open(toggleDevLiveHost());
 
-	
+
 " Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
 " NOTE: gets triggered when opening a new window, too. With some Sync UI again in the status bar, this is not necessary anymore.
 "autocmd VimperatorEnter .* emenu Tools.Sync.Connect
@@ -94,17 +119,16 @@ map gz -js dactyl.open(toggleDevLiveHost());
 " Setup colors(cheme)
 colorscheme solarized-light
 
-" colorscheme blueyed
-"  " TODO: see TabVisited extension: https://bugzilla.mozilla.org/show_bug.cgi?id=487242
-"  " Pimp colors/layout
-"  hi -append Hint font-size:12px !important;font-weight:normal !important;background:#fff !important;border:1px solid red !important;color:#000 !important;font-family:"DejaVu Sans Mono", monospace !important; padding:1px 3px !important;
-"  hi -append StatusLine background-color:#ddd !important; color:#000 !important; border-bottom:1px solid #666 !important; border-top:1px solid #666 !important
+" Pimp colors/layout
+hi -append Hint font-size:10px !important;font-weight:normal !important;background:#fff !important;border:1px solid red !important;color:#000 !important;font-family:"DejaVu Sans Mono", monospace !important; padding:1px 3px !important;
+" hi -append StatusLine background-color:#ddd !important; color:#000 !important; border-bottom:1px solid #666 !important; border-top:1px solid #666 !important
 "
-"  " Make the "Find hit TOP, continuing at BOTTOM" more prominent
-"  hi StatusWarningMsg -append background-color:blue ! important; color:white ! important;
+" " Make the "Find hit TOP, continuing at BOTTOM" more prominent
+" hi StatusWarningMsg -append background-color:blue ! important; color:white ! important;
 "
 "
-"  style -name blueyedchrome chrome://* <<EOM
+" TODO: see TabVisited extension: https://bugzilla.mozilla.org/show_bug.cgi?id=487242
+" style -name blueyedchrome chrome://* <<EOM
 "  	tab.tabbrowser-tab[selected="true"] { font-size:1.2em !important; font-weight:bold !important; color:#000 !important }
 "
 "  	/* http://kb.mozillazine.org/User:Dickvl */

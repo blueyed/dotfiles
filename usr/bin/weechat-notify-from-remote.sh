@@ -1,6 +1,7 @@
 #!/usr/bin/zsh
 #   NB: zsh is used for "$=" mainly, where `eval` failed to work with `trap`
 #       (quoting).
+#   TODO: use $call_cmd (as array for execution)
 #
 # Connect remotely (via SSH) to a host running weechat and tail-f/read the
 # logfile containing any highlights.
@@ -56,7 +57,7 @@ while true ; do
       echo date time number channel nick delim message >> $logfile
       echo "$date" "$time" "$number" "$channel" "$nick" "$delim" "$message" >> $logfile
 
-      title="${nick} @ ${channel}"
+      title="weechat: ${nick} @ ${channel}"
       body="$message"
       notify-send --category=im.received -t 15000 "$title" "$body"
       # kdialog --passivepopup  "${message}" --title "${nick} @ ${channel}" 30

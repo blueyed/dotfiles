@@ -2,6 +2,15 @@
 --type-set=smarty=.tpl
 --type-set=typoscript=.ts
 --type-set=sass=.scss,.sass
+# think-big / kiezhelden / …
 --ignore-dir=cache
 --ignore-dir=media
 --ignore-dir=asset
+
+# ack 2.0
+--ignore-file=is:tags
+# --ignore-file=ext:jpg
+# --ignore-file=match:/pattern/
+# --ignore-file=firstlinematch:/pattern/
+# --type-set=ctags=tags
+# --noctags

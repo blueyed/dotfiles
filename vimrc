@@ -156,11 +156,11 @@ if 1
   let g:tlib_persistent = vimsharedir
   let s:old_tmru_files = expand('~/.cache/vim/tlib/tmru/files')
   let s:new_tmru_files = vimsharedir.'/tmru/files'
+  let s:new_tmru_files_dir = fnamemodify(s:new_tmru_files, ':h')
+  if ! isdirectory(s:new_tmru_files_dir)
+    call mkdir(s:new_tmru_files_dir, 'p', 0700)
+  endif
   if filereadable(s:old_tmru_files)
-    let s:new_tmru_files_dir = fnamemodify(s:new_tmru_files, ':h')
-    if ! isdirectory(s:new_tmru_files_dir)
-      call mkdir(s:new_tmru_files_dir, 'p', 0700)
-    endif
     execute '!mv -i '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
     " execute '!rm -r '.shellescape(g:tlib_cache)
   endif

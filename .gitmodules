@@ -416,3 +416,6 @@
 [submodule "vim/bundle/colorscheme-detailed"]
 	path = vim/bundle/colorscheme-detailed
 	url = git@github.com:rking/vim-detailed.git
+[submodule "vim/bundle/less"]
+	path = vim/bundle/less
+	url = git@github.com:groenewege/vim-less.git

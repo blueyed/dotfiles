@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION=5.44
+VERSION=5.48
 PKG="byobu"
 
 # All sorts of things go wrong if you don't own your $HOME dir.
@@ -130,7 +130,7 @@ case $BYOBU_BACKEND in
 		# Check if our terminfo supports 256 colors
 		if $BYOBU_TEST tput >/dev/null; then
 			if [ "$(tput colors 2>/dev/null || echo 0)" = "256" ]; then
-				SCREEN_TERM="-T screen"
+				SCREEN_TERM="-T screen-256color"
 			fi
 		fi
 		# Some users want to maintain separate configurations
@@ -166,7 +166,7 @@ if [ "$#" = "0" ]; then
 				exec tmux $SCREEN_TERM $BYOBU_PROFILE
 			;;
 			screen)
-				exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE -t ''
+				exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE
 			;;
 		esac
 	else
@@ -182,7 +182,7 @@ if [ "$#" = "0" ]; then
 						exec tmux $SCREEN_TERM $BYOBU_PROFILE $DEFAULT_WINDOW
 					;;
 					screen)
-						exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE -t '' $DEFAULT_WINDOW
+						exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE $DEFAULT_WINDOW
 					;;
 				esac
 			;;
@@ -195,7 +195,7 @@ else
 			exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_PROFILE "$@"
 		;;
 		screen)
-			exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE -t '' "$@"
+			exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE "$@"
 		;;
 	esac
 fi

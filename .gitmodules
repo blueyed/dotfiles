@@ -419,3 +419,6 @@
 [submodule "vim/bundle/less"]
 	path = vim/bundle/less
 	url = git@github.com:groenewege/vim-less.git
+[submodule "vim/bundle/textobj-indent"]
+	path = vim/bundle/textobj-indent
+	url = git@github.com:kana/vim-textobj-indent.git

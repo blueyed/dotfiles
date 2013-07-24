@@ -422,3 +422,6 @@
 [submodule "vim/bundle/textobj-indent"]
 	path = vim/bundle/textobj-indent
 	url = git@github.com:kana/vim-textobj-indent.git
+[submodule "vim/bundle/xpath"]
+	path = vim/bundle/xpath
+	url = git@github.com:actionshrimp/vim-xpath.git

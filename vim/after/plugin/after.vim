@@ -2,4 +2,5 @@
 
 " Remove eunuch's W command ("save all files")
 " https://github.com/tpope/vim-eunuch/issues/9
-delcommand W
+"delcommand W
+command! W w

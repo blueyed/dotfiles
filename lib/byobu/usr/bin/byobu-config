@@ -29,11 +29,20 @@ import string
 import subprocess
 import gettext
 import glob
+
+
+def error(msg):
+	print("ERROR: %s" % msg)
+	sys.exit(1)
+
+
 try:
 	import snack
 	from snack import *
 except:
 	error("Could not import the python snack module")
+
+
 PKG = "byobu"
 HOME = os.getenv("HOME")
 USER = os.getenv("USER")
@@ -74,7 +83,9 @@ def ioctl_GWINSZ(fd):
 def reload_required():
 	try:
 		if not os.path.exists(BYOBU_CONFIG_DIR):
-			os.makedirs(BYOBU_CONFIG_DIR, 0o755)
+			# 493 (decimal) is 0755 (octal)
+			# Use decimal for portability across all python versions
+			os.makedirs(BYOBU_CONFIG_DIR, 493)
 		f = open(RELOAD_FLAG, 'w')
 		f.close()
 		if BYOBU_BACKEND == "screen":
@@ -265,16 +276,20 @@ def getesckey():
 	line = ""
 	if BYOBU_BACKEND == "tmux":
 		path = BYOBU_CONFIG_DIR + '/keybindings.tmux'
-		for l in open(path):
-			if l.startswith("set -g prefix "):
-				line = l
+		if os.path.exists(path):
+			for l in open(path):
+				if l.startswith("set -g prefix "):
+					line = l
+		else:
+			return DEF_ESC
 	else:
 		path = BYOBU_CONFIG_DIR + '/keybindings'
-		for l in open(path):
-			if l.startswith("escape "):
-				line = l
-	if not os.path.exists(path):
-		return DEF_ESC
+		if os.path.exists(path):
+			for l in open(path):
+				if l.startswith("escape "):
+					line = l
+		else:
+			return DEF_ESC
 	if line == "":
 		return DEF_ESC
 	esc = line[line.find('^') + 1]

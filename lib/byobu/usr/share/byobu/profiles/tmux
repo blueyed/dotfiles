@@ -22,16 +22,16 @@
 
 # Initialize environment, clean up
 set-environment -g BYOBU_BACKEND tmux
-new-window -d byobu-janitor
+new-session -d byobu-janitor
 set -s escape-time 0
 
-# Change to Screen's ctrl-a escape sequence
-source /usr/share/doc/tmux/examples/screen-keys.conf
-# On Archlinux, this file is not under the same directory
-source /usr/share/tmux/screen-keys.conf
+# Change to Screen's ctrl-a escape sequence and use screen-like keys
+source $BYOBU_PREFIX/share/byobu/keybindings/tmux-screen-keys.conf
 
-# Add F12 to the prefix list
-set -g prefix ^A,F12
+# Add ^A, F12 to the prefix list
+set -g prefix ^A
+# Note, prefix2 only available in tmux 1.6+
+set -g prefix2 F12
 
 # Byobu's Keybindings
 source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux
@@ -57,13 +57,13 @@ set-window-option -g window-status-fg $BYOBU_LIGHT
 set-window-option -g window-status-current-attr reverse
 set-window-option -g window-status-current-bg $BYOBU_DARK
 set-window-option -g window-status-current-fg $BYOBU_LIGHT
-set-window-option -g window-status-alert-bg $BYOBU_DARK
-set-window-option -g window-status-alert-fg $BYOBU_LIGHT
-set-window-option -g window-status-alert-attr bold
+#set-window-option -g window-status-alert-bg $BYOBU_DARK
+#set-window-option -g window-status-alert-fg $BYOBU_LIGHT
+#set-window-option -g window-status-alert-attr bold
 set-window-option -g window-status-activity-bg $BYOBU_DARK
 set-window-option -g window-status-activity-fg $BYOBU_LIGHT
 set-window-option -g window-status-activity-attr bold
-set-window-option -g automatic-rename off
+set-window-option -g automatic-rename on
 set-window-option -g aggressive-resize on
 set-window-option -g monitor-activity on
 

@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byobu/.screenrc byobu/.tmux.conf gemrc gitconfig gitattributes.global gitignore.global gvimrc hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources xsessionrc
+INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) $(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) byobu/.screenrc byobu/.tmux.conf $(wildcard config/fontconfig/conf.d/*) $(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global gvimrc hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl pentadactylrc railsrc screenrc screenrc.common subversion/servers terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources xsessionrc
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 
@@ -9,7 +9,7 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.6
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.8
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -23,8 +23,8 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@
-.stamps/submodules_rm.6:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline"; \
+.stamps/submodules_rm.8:
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose"; \
 	for i in $$rm_bundles; do \
 		[ ! -d "$$i" ] || [ ! -e "$$i/.git" ] && continue ; \
 		( cd $$i && gst=$$(git status --short --untracked-files=normal 2>&1) && [ "$$gst" = "" ] || { echo "Repo not clean ($$i): $$gst" ; false ; } ; ) \
@@ -132,3 +132,6 @@ setup_zsh:
 		chsh -s ${ZSH_PATH} ; \
 	fi
 	@# obsolete/buggy?!:	-o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ]
+
+tags:
+	ctags -R --exclude=YouCompleteMe .

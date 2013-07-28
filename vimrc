@@ -156,14 +156,15 @@ if 1
   let g:tlib_persistent = vimsharedir
   let s:old_tmru_files = expand('~/.cache/vim/tlib/tmru/files')
   let s:new_tmru_files = vimsharedir.'/tmru/files'
+  let s:new_tmru_files_dir = fnamemodify(s:new_tmru_files, ':h')
+  if ! isdirectory(s:new_tmru_files_dir)
+    call mkdir(s:new_tmru_files_dir, 'p', 0700)
+  endif
   if filereadable(s:old_tmru_files)
-    let s:new_tmru_files_dir = fnamemodify(s:new_tmru_files, ':h')
-    if ! isdirectory(s:new_tmru_files_dir)
-      call mkdir(s:new_tmru_files_dir, 'p', 0700)
-    endif
-    execute '!mv '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
+    execute '!mv -i '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
     " execute '!rm -r '.shellescape(g:tlib_cache)
   endif
+  let g:tmru_file = s:new_tmru_files
 end
 
 if has('persistent_undo')
@@ -1186,6 +1187,10 @@ let g:vdebug_keymap = {
 let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
 let g:localvimrc_debug = 0
+
+" Do not autoload/autosave 'default' session
+let g:session_autoload = 'no'
+let g:session_autosave = 'no'
 
 
 

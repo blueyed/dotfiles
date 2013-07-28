@@ -12,7 +12,7 @@
 	ignore = untracked
 [submodule "vim/bundle/ack"]
 	path = vim/bundle/ack
-	url = git://github.com/blueyed/ack.vim.git
+	url = git://github.com/mileszs/ack.vim.git
 	ignore = untracked
 [submodule "vim/bundle/occur"]
 	path = vim/bundle/occur
@@ -24,7 +24,7 @@
 	ignore = untracked
 [submodule "vim/bundle/session"]
 	path = vim/bundle/session
-	url = git://github.com/vim-scripts/session.vim--Odding.git
+	url = git://github.com/xolox/vim-session.git
 	ignore = untracked
 [submodule "vim/bundle/bufkill"]
 	path = vim/bundle/bufkill
@@ -84,7 +84,7 @@
 	ignore = untracked
 [submodule "vim/bundle/snipmate"]
 	path = vim/bundle/snipmate
-	url = git://github.com/MarcWeber/snipmate.vim.git
+	url = git://github.com/garbas/vim-snipmate.git
 	ignore = untracked
 [submodule "vim/bundle/tcomment"]
 	path = vim/bundle/tcomment
@@ -154,10 +154,6 @@
 	path = vim/bundle/easytags
 	url = git://github.com/xolox/vim-easytags.git
 	ignore = untracked
-[submodule "vim/bundle/zoomwin"]
-	path = vim/bundle/zoomwin
-	url = git://github.com/vim-scripts/ZoomWin.git
-	ignore = untracked
 [submodule "vim/bundle/maximize"]
 	path = vim/bundle/maximize
 	url = git://github.com/ervandew/maximize.git
@@ -222,10 +218,6 @@
 	path = vim/bundle/xterm-color-table
 	url = git://github.com/guns/xterm-color-table.vim.git
 	ignore = untracked
-[submodule "vim/bundle/autoclose"]
-	path = vim/bundle/autoclose
-	url = git://github.com/Townk/vim-autoclose.git
-	ignore = untracked
 [submodule "vim/bundle/pastebin"]
 	path = vim/bundle/pastebin
 	url = git://github.com/mattn/pastebin-vim.git
@@ -289,9 +281,6 @@
 [submodule "vim/bundle/colorizer"]
 	path = vim/bundle/colorizer
 	url = git://github.com/lilydjwg/colorizer.git
-[submodule "vim/bundle/snipmate-snippets"]
-	path = vim/bundle/snipmate-snippets
-	url = git://github.com/honza/snipmate-snippets.git
 [submodule "vim/bundle/pac"]
 	path = vim/bundle/pac
 	url = git://github.com/vim-scripts/pac.vim.git
@@ -397,3 +386,42 @@
 [submodule "lib/git-meld"]
 	path = lib/git-meld
 	url = git://github.com/wmanley/git-meld.git
+[submodule "vim/bundle/scriptease"]
+	path = vim/bundle/scriptease
+	url = git://github.com/tpope/vim-scriptease.git
+[submodule "vim/bundle/textobj-user"]
+	path = vim/bundle/textobj-user
+	url = git://github.com/kana/vim-textobj-user.git
+[submodule "vim/bundle/textobj-function"]
+	path = vim/bundle/textobj-function
+	url = git://github.com/kana/vim-textobj-function.git
+[submodule "vim/bundle/tbone"]
+	path = vim/bundle/tbone
+	url = git://github.com/tpope/vim-tbone.git
+[submodule "vim/bundle/snippets"]
+	path = vim/bundle/snippets
+	url = git://github.com/honza/vim-snippets.git
+[submodule "vim/bundle/vim-misc"]
+	path = vim/bundle/vim-misc
+	url = git://github.com/xolox/vim-misc.git
+[submodule "vim/bundle/delimitMate"]
+	path = vim/bundle/delimitMate
+	url = git@github.com:Raimondi/delimitMate.git
+[submodule "vim/bundle/visual-star-search"]
+	path = vim/bundle/visual-star-search
+	url = git@github.com:nelstrom/vim-visual-star-search.git
+[submodule "vim/bundle/abolish"]
+	path = vim/bundle/abolish
+	url = git@github.com:tpope/vim-abolish.git
+[submodule "vim/bundle/colorscheme-detailed"]
+	path = vim/bundle/colorscheme-detailed
+	url = git@github.com:rking/vim-detailed.git
+[submodule "vim/bundle/less"]
+	path = vim/bundle/less
+	url = git@github.com:groenewege/vim-less.git
+[submodule "vim/bundle/textobj-indent"]
+	path = vim/bundle/textobj-indent
+	url = git@github.com:kana/vim-textobj-indent.git
+[submodule "vim/bundle/xpath"]
+	path = vim/bundle/xpath
+	url = git@github.com:actionshrimp/vim-xpath.git

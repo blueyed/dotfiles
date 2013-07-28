@@ -22,10 +22,11 @@ and some convenient keybindings:
     Ctrl-Shift-F5                Change status bar's color randomly
   F6                             Detach session and then logout
     Shift-F6                     Detach session and do not logout
+    Alt-F6                       Detach all clients but yourself
     Ctrl-F6                      Kill split in focus
   F7                             Enter scrollback history
     Alt-PageUp/PageDown          Enter and move through scrollback
-  F8                             Change the current window's name
+  F8                             Rename the current window
     Shift-F8                     Toggle through split arrangements
     Ctrl-F8                      Restore a split-pane layout
     Ctrl-Shift-F8                Save the current split-pane layout
@@ -37,4 +38,4 @@ and some convenient keybindings:
     Ctrl-F11                     Join window into a vertical split
   F12                            Escape sequence
     Shift-F12                    Toggle on/off Byobu's keybindings
-    Ctrl-Shift-F12               Modrian squares
+    Ctrl-Shift-F12               Mondrian squares

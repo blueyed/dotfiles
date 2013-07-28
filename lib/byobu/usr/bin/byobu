@@ -2,6 +2,7 @@
 #
 #    byobu - wrapper script
 #    Copyright (C) 2008-2009 Canonical Ltd.
+#    Copyright (C) 2008-2013 Dustin Kirkland
 #
 #    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
@@ -17,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION=5.31
+VERSION=5.48
 PKG="byobu"
 
 # All sorts of things go wrong if you don't own your $HOME dir.
@@ -59,16 +60,22 @@ esac
 # At this point, we're sure BYOBU_BACKEND is properly defined
 export BYOBU_BACKEND
 
+# Store the parent tty
+export BYOBU_TTY=$(tty)
+
 # Add a version argument for debugging purposes
 if [ "$#" = "1" ]; then
 	case "$1" in
 		-v|--version)
 			echo "$PKG version $VERSION"
+			if $BYOBU_TEST bash >/dev/null 2>&1; then
+				# Check ulimits
+				u=$(bash -c "ulimit -n")
+				[ "$u" = "unlimited" ] || [ $u -ge 15 ] || echo "WARNING: ulimit -n is too low" 1>&2
+				u=$(bash -c "ulimit -u")
+				[ "$u" = "unlimited" ] || [ $u -ge 1600 ] || echo "WARNING: ulimit -u is too low" 1>&2
+			fi
 			exec $BYOBU_BACKEND $BYOBU_ARG_VERSION
-			# Check ulimits
-			[ $(ulimit -n) -ge 15 ] || echo "WARNING: ulimit -n is too low" 1>&2
-			[ $(ulimit -u) -ge 1600 ] || echo "WARNING: ulimit -u is too low" 1>&2
-
 			exit 0
 		;;
 	esac
@@ -85,7 +92,7 @@ byobu-janitor --force
 # Set the window title
 [ -r "$BYOBU_CONFIG_DIR/statusrc" ] && . "$BYOBU_CONFIG_DIR/statusrc"
 . $BYOBU_PREFIX/lib/$PKG/ip_address
-[ -n "$BYOBU_NO_TITLE" ] || printf "\033]0;${USER}@${HOSTNAME:-$(hostname)} ($(__ip_address t)) - ${PKG}\007"
+[ -n "$BYOBU_NO_TITLE" ] || printf "\033]0;${USER}@$(hostname) ($(__ip_address t)) - ${PKG}\007"
 
 # Drop a symlink to the ssh socket in $HOME, since we can ensure that exists
 if [ -S "$SSH_AUTH_SOCK" ] && [ ! -h "$SSH_AUTH_SOCK" ]; then
@@ -123,7 +130,7 @@ case $BYOBU_BACKEND in
 		# Check if our terminfo supports 256 colors
 		if $BYOBU_TEST tput >/dev/null; then
 			if [ "$(tput colors 2>/dev/null || echo 0)" = "256" ]; then
-				SCREEN_TERM="-T screen"
+				SCREEN_TERM="-T screen-256color"
 			fi
 		fi
 		# Some users want to maintain separate configurations
@@ -140,18 +147,8 @@ case $BYOBU_BACKEND in
 				-*r*|-*d*|-*D*|-*S*|-ls|-list)
 					BYOBU_SESSION_NAME=
 				;;
-				-t)
-					shelltitle=1
-				;;
 			esac
 		done
-		if [ -n "$shelltitle" ]; then
-			unset shelltitle
-			unset BYOBU_SHELL_TITLE
-		else
-			BYOBU_SHELL_TITLE="-t ."
-
-		fi
 		sessions=$($BYOBU_BACKEND -wipe 2>/dev/null) || true
 	;;
 esac
@@ -164,7 +161,14 @@ esac
 if [ "$#" = "0" ]; then
 	if [ "$CUSTOM_WINDOW_SET" = "1" ]; then
 		# Start new custom window set session
-		exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE $BYOBU_SHELL_TITLE
+		case $BYOBU_BACKEND in
+			tmux)
+				exec tmux $SCREEN_TERM $BYOBU_PROFILE
+			;;
+			screen)
+				exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE
+			;;
+		esac
 	else
 		case "$sessions" in
 			*\(*\)*)
@@ -173,13 +177,27 @@ if [ "$#" = "0" ]; then
 			;;
 			*)
 				# Start new default session
-				exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE $BYOBU_SHELL_TITLE $DEFAULT_WINDOW
+				case $BYOBU_BACKEND in
+					tmux)
+						exec tmux $SCREEN_TERM $BYOBU_PROFILE $DEFAULT_WINDOW
+					;;
+					screen)
+						exec screen $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE $DEFAULT_WINDOW
+					;;
+				esac
 			;;
 		esac
 	fi
 else
 	# Launch with command line args
-	exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE $BYOBU_SHELL_TITLE "$@"
+	case $BYOBU_BACKEND in
+		tmux)
+			exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_PROFILE "$@"
+		;;
+		screen)
+			exec $BYOBU_BACKEND $SCREEN_TERM $BYOBU_SESSION_NAME $BYOBU_PROFILE "$@"
+		;;
+	esac
 fi
 
 # vi: syntax=sh ts=4 noexpandtab

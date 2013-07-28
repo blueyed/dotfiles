@@ -51,7 +51,7 @@ The background colors of the \fBbyobu\fP status lines can be adjusted by editing
 
 \fBdistro\fP \- OS/distribution name of the release running on the current system as reported by \fBlsb_release(1)\fP or \fI/etc/issue\fP; displayed in the lower bar in bold black text toward the left on a grey background; you may override the detected release with DISTRO=Whatever in \fI$BYOBU_CONFIG_DIR/statusrc\fP
 
-\fBec2_cost\fP \- an estimation of the cost of the current boot of the system in terms of the Amazon EC2 billing model; displayed in the lower bar toward the right in green text on a black background; there is a leading '~' to indicate that this is an estimation, and the monetary units are US Dollars '$'; if not running in EC2, this plugin is disabled unless EC2_ESTIMATE=1 in \fI~/.byobu/statusrc\fP
+\fBec2_cost\fP \- an estimation of the cost of the current boot of the system in terms of the Amazon EC2 billing model; displayed in the lower bar toward the right in green text on a black background; the monetary units are US Dollars '$'; this plugin only works when an AWS-compatible metadata server is available at \fIhttp://169.254.169.254\fP
 
 \fBentropy\fP \- a count of the system's current entropy in bytes; displayed in the lower bar toward the right in yellow text on a dark grey background; there is a leading 'e' to indicate 'entropy'
 
@@ -107,7 +107,7 @@ The background colors of the \fBbyobu\fP status lines can be adjusted by editing
 
 \fBwhoami\fP \- the name of the user who owns the screen session; displayed in the upper bar toward the far right in bold black text on a grey background
 
-\fBwifi_quality\fP \- the connection rate and signal quality of the wifi connection; displayed in the lower bar toward the right in black text on a cyan background; the connection rate is in 'Mb/s' and the signal quality is as a percentage with a trailing '%'; override the default interface by specifying an alternate interface with MONITORED_NETWORK=wlan0 in \fI$BYOBU_CONFIG_DIR/statusrc\fP
+\fBwifi_quality\fP \- the connection rate and signal quality of the wifi connection; displayed in the lower bar toward the right in white text on a cyan background; the connection rate is in 'Mb/s' and the signal quality is as a percentage with a trailing '%'; override the default interface by specifying an alternate interface with MONITORED_NETWORK=wlan0 in \fI$BYOBU_CONFIG_DIR/statusrc\fP
 
 .SH SESSIONS
 
@@ -200,6 +200,8 @@ For Byobu colors to work properly, older versions of GNU Screen require a 1-line
  * http://savannah.gnu.org/bugs/?22146
 
 PuTTY users have reported that the F2, F3, and F4 shortcut keys are not working properly.  PuTTY sends the same escape sequences as the linux console for F1-F4 by default.  You can fix this problem in the PuTTY config, Terminal -> Keyboard -> Function keys: Xterm R6.  See: \fIhttp://www.mail-archive.com/screen-users@gnu.org/msg01525.html\fP
+
+PuTTY users should configure enable UTF-8 characters in order to fix status refresh issues.  You can fix this problem in the PuTTY configuration, Window -> Translation: select UTF-8.
 
 Apple Mac OSX terminal users have reported 'flashing text'.  You can fix this in the advanced settings of the terminal application, with 'Declare Terminal As: xterm-color'.
 

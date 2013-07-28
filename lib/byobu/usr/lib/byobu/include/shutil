@@ -52,37 +52,37 @@ color_screen() {
 
 color_map() {
 	case "$1" in
-		k) _RET="black" ;;
-		r) _RET="red" ;;
-		g) _RET="green" ;;
-		y) _RET="yellow" ;;
-		b) _RET="blue" ;;
-		m) _RET="magenta" ;;
-		c) _RET="cyan" ;;
-		w) _RET="white" ;;
-		d) _RET="color0" ;;
-		K) _RET="#555555" ;;
-		R) _RET="#FF0000" ;;
-		G) _RET="#00FF00" ;;
-		Y) _RET="#FFFF00" ;;
-		B) _RET="#0000FF" ;;
-		M) _RET="#FF00FF" ;;
-		C) _RET="#00FFFF" ;;
-		W) _RET="#FFFFFF" ;;
+		"k") _RET="black" ;;
+		"r") _RET="red" ;;
+		"g") _RET="green" ;;
+		"y") _RET="yellow" ;;
+		"b") _RET="blue" ;;
+		"m") _RET="magenta" ;;
+		"c") _RET="cyan" ;;
+		"w") _RET="white" ;;
+		"d") _RET="black" ;;
+		"K") _RET="brightblack" ;;
+		"R") _RET="brightred" ;;
+		"G") _RET="brightgreen" ;;
+		"Y") _RET="brightyellow" ;;
+		"B") _RET="brightblue" ;;
+		"M") _RET="brightmagenta" ;;
+		"C") _RET="brightcyan" ;;
+		"W") _RET="brightwhite" ;;
 		*) _RET= ;;
 	esac
 }
 
 attr_map() {
 	case "$1" in
-		d) _RET=,dim ;;
-		u) _RET=,underscore ;;
-		b) _RET=,bold ;;
-		r) _RET=,reverse ;;
-		s) _RET=,standout ;;
-		B) _RET=,blinking ;;
-		h) _RET=,hidden ;;
-		i) _RET=,italics ;;
+		"d") _RET=,dim ;;
+		"u") _RET=,underscore ;;
+		"b") _RET=,bold ;;
+		"r") _RET=,reverse ;;
+		"s") _RET=,standout ;;
+		"B") _RET=,blinking ;;
+		"h") _RET=,hidden ;;
+		"i") _RET=,italics ;;
 		*) _RET= ;;
 	esac
 }
@@ -218,7 +218,7 @@ metadata_available() {
 		# Must seed the cache
 		if [ -e /etc/ec2_version ] || [ -e /usr/sbin/update-grub-legacy-ec2 ]; then
 			# This *looks* like a machine with metadata, so background a potentially slow check
-			wget -q -O "$cache" --timeout=10 --tries=1 http://169.254.169.254 2>/dev/null &
+			wget -q -O- --timeout=10 --tries=1 http://169.254.169.254 </dev/null >"$cache" 2>/dev/null &
 			sleep 0.02
 			[ -s "$cache" ] && x=1
 		fi

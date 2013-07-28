@@ -24,6 +24,14 @@
 " }}}
 
 " Global Varables {{{
+  if !exists('g:EclimTempFilesEnable')
+    let g:EclimTempFilesEnable = 1
+  endif
+
+  if !exists('g:EclimFileTypeValidate')
+    let g:EclimFileTypeValidate = 1
+  endif
+
   if !exists('g:EclimRefactorDiffOrientation')
     let g:EclimRefactorDiffOrientation = 'vertical'
   endif
@@ -209,9 +217,21 @@ function! eclim#lang#Search(command, singleResultAction, argline)
 
 endfunction " }}}
 
-" UpdateSrcFile(validate) {{{
-" Updates the src file on the server w/ the changes made to the current file.
-function! eclim#lang#UpdateSrcFile(lang, validate)
+function! eclim#lang#UpdateSrcFile(lang, ...) " {{{
+  " Updates the src file on the server w/ the changes made to the current file.
+  " Optional arg:
+  "   validate: when 1 force the validation to execute, when 0 prevent it.
+
+  if !a:0
+    " per lang setting
+    exec 'let validate = g:Eclim' . toupper(a:lang[0]) . a:lang[1:] . 'Validate'
+    " global setting
+    let validate = validate && g:EclimFileTypeValidate
+  else
+    " arg override
+    let validate = a:1
+  endif
+
   let project = eclim#project#util#GetCurrentProjectName()
   if project != ""
     let file = eclim#project#util#GetProjectRelativeFilePath()
@@ -219,7 +239,7 @@ function! eclim#lang#UpdateSrcFile(lang, validate)
     let command = substitute(command, '<lang>', a:lang, '')
     let command = substitute(command, '<project>', project, '')
     let command = substitute(command, '<file>', file, '')
-    if a:validate && !eclim#util#WillWrittenBufferClose()
+    if validate && !eclim#util#WillWrittenBufferClose()
       let command = command . ' -v'
       if eclim#project#problems#IsProblemsList() &&
        \ g:EclimProjectProblemsUpdateOnSave
@@ -237,7 +257,7 @@ function! eclim#lang#UpdateSrcFile(lang, validate)
     endif
 
     call eclim#project#problems#ProblemsUpdate('save')
-  elseif a:validate && expand('<amatch>') == ''
+  elseif validate && expand('<amatch>') == ''
     call eclim#project#util#IsCurrentFileInProject()
   endif
 endfunction " }}}
@@ -274,9 +294,14 @@ function! eclim#lang#Validate(type, on_save, ...)
   endif
 endfunction " }}}
 
-" SilentUpdate([temp], [temp_write]) {{{
-" Silently updates the current source file w/out validation.
-function! eclim#lang#SilentUpdate(...)
+function! eclim#lang#SilentUpdate(...) " {{{
+  " Silently updates the current source file w/out validation.
+  " Optional args:
+  "   temp: construct a temp file path for the current file and return that path
+  "         (default is to not create a temp file)
+  "   temp_write: when constructing a temp file path, whether or not to write
+  "               the current file's contents to that path (default is to do so)
+
   " i couldn't reproduce the issue, but at least one person experienced the
   " cursor moving on update and breaking code completion:
   " http://sourceforge.net/tracker/index.php?func=detail&aid=1995319&group_id=145869&atid=763323
@@ -284,7 +309,7 @@ function! eclim#lang#SilentUpdate(...)
   let file = eclim#project#util#GetProjectRelativeFilePath()
   if file != ''
     try
-      if a:0 && a:1
+      if a:0 && a:1 && g:EclimTempFilesEnable
         " don't create temp files if no server is available to clean them up.
         let project = eclim#project#util#GetCurrentProjectName()
         let workspace = eclim#project#util#GetProjectWorkspace(project)

@@ -1,7 +1,9 @@
 bazaar/plugins/*/.bzr
 byobu/color
 vimperator/info
+vimperator/plugins.OUT/
 pentadactyl/info
+pentadactyl/plugins.OUT/
 vim/.netrwhist
 vim/.VimballRecord
 vim/bundle/_tplugin.vim

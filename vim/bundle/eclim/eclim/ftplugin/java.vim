@@ -5,7 +5,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -36,11 +36,19 @@ if !exists("g:EclimJavaCompilerAutoDetect")
   let g:EclimJavaCompilerAutoDetect = 1
 endif
 
+if !exists("g:EclimJavaSyntasticEnabled")
+  let g:EclimJavaSyntasticEnabled = 0
+endif
+
+if !exists('g:EclimJavaCallHierarchyDefaultAction')
+  let g:EclimJavaCallHierarchyDefaultAction = g:EclimDefaultFileOpenAction
+endif
+
 " }}}
 
 " Options {{{
 
-setlocal completefunc=eclim#java#complete#CodeComplete
+exec 'setlocal ' . g:EclimCompletionMethod . '=eclim#java#complete#CodeComplete'
 
 if g:EclimJavaSetCommonOptions
   " allow cpp keywords in java files (delete, friend, union, template, etc).
@@ -89,6 +97,11 @@ if g:EclimJavaCompilerAutoDetect
   endif
 endif
 
+" disable syntastic
+if exists('g:loaded_syntastic_plugin') && !g:EclimJavaSyntasticEnabled
+  let g:syntastic_java_checkers = []
+endif
+
 " }}}
 
 " Abbreviations {{{
@@ -105,8 +118,7 @@ endif
 if &ft == 'java'
   augroup eclim_java
     autocmd! BufWritePost <buffer>
-    autocmd BufWritePost <buffer>
-      \ call eclim#lang#UpdateSrcFile('java', g:EclimJavaValidate)
+    autocmd BufWritePost <buffer> call eclim#lang#UpdateSrcFile('java')
   augroup END
 endif
 
@@ -193,6 +205,12 @@ if !exists(":JavaDocSearch")
   command -buffer -nargs=*
     \ -complete=customlist,eclim#java#search#CommandCompleteJavaSearch
     \ JavaDocSearch :call eclim#java#search#SearchAndDisplay('java_docsearch', '<args>')
+endif
+
+if !exists(":JavaCallHierarchy")
+  command -buffer -bang JavaCallHierarchy
+    \ :call eclim#lang#hierarchy#CallHierarchy(
+      \ 'java', g:EclimJavaCallHierarchyDefaultAction, '<bang>')
 endif
 
 if !exists(":JavaHierarchy")

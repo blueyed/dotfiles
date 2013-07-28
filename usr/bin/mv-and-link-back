@@ -15,6 +15,9 @@ remove_trailing_slashes() {
   done
   echo $a
 }
+relpath() {
+  python -c "import os.path; print os.path.relpath('$1','${2:-$PWD}')"
+}
 
 # Remove trailing slashes from target
 target=$(remove_trailing_slashes $target)
@@ -49,9 +52,16 @@ for source in $sources; do
   #   echo "Error: source and target are the same file already"
   #   exit 1
   # fi
-  echo "DEBUG: mv $source $mv_to"
-  mv $source $mv_to
-  echo "DEBUG: ln -s $mv_to $source"
-  ln -s $mv_to $source
+
+  # move:
+  cmd=(mv $source $mv_to)
+  echo "DEBUG: $cmd"
+  $cmd
+
+  # link:
+  link_to=$(relpath $mv_to $source:h)
+  cmd=(ln -s $link_to $source)
+  echo "DEBUG: $cmd"
+  $cmd
 done
 

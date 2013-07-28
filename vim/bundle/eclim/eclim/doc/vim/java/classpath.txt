@@ -1,0 +1,294 @@
+*vim-java-classpath*
+
+Eclipse Classpath Editing
+*************************
+
+Source code completion, searching, auto imports, all rely on a
+properly configured classpath.  When you first create a project, a
+.classpath file is created in the project's root directory.  If you
+created the project on an existing code-base, eclim will attempt to
+setup the .classpath file with any source code directories or
+libraries in the project.
+
+Regardless of the state of your project you will at some point need to
+update the classpath.  The primary method of doing so, is to directly
+edit the .classpath to add, update, or remove entries as needed. To
+help you do this, eclim provides several commands to ease the creation
+of new classpath entries and variables.
+
+Note: All of the commands described below are only available while editing
+  the .classpath file in vim.When you write the .classpath file, Vim
+  will issue a command to the eclim server to update the project's
+  classpath, and will report any errors via vim's location list (:help
+  location-list).In addition to directly editing the .classpath file,
+  you may also use maven's support for maintaining the eclipse
+  classpath.  For users who use ivy (http://jayasoft.org/ivy), eclim
+  also provides a means to auto update the eclipse classpath when
+  saving changes to your ivy.xml.
+
+*:NewSrcEntry_java*
+
+- :NewSrcEntry <dir> [<dir> ...] - Adds a new entry for one or more
+  source code directories relative to the project's root directory.
+
+  >
+     <classpathentry kind="src" path="src/java"/>
+
+  <
+
+  This command supports command completion of directories relative to
+  the .classpath file.
+
+*:NewProjectEntry_java*
+
+- :NewProjectEntry <project> [<project> ...] - Adds a new entry for
+  one or more dependencies on other projects.
+
+  >
+     <classpathentry exported="true" kind="src" path="/a_project"/>
+
+  <
+
+  This command supports command completion of project names.
+
+*:NewJarEntry_java*
+
+- :NewJarEntry <file> [<file> ...] - Adds a new entry for one or more
+  jar file dependencies.  If the jar file is not in a folder under the
+  project root, you must use an absolute path (apparent limitation
+  with Eclipse).
+
+  >
+     <classpathentry exported="true" kind="lib" path="lib/hibernate-4.0.jar"/>
+
+  <
+
+*:NewVarEntry_java*
+
+- :NewVarEntry <VAR/file> [<VAR/file> ...] - Just like NewJarEntry
+  except an Eclipse "var" entry is created.  When a jar entry
+  references an absolute path, you should instead use a var entry.
+  The var entry allows you to define a base dir as a variable (ex.
+  USER_HOME = /home/username), and then reference files relative to
+  that variable.
+
+  >
+     <classpathentry exported="true" kind="var" path="USER_HOME/lib/hibernate-4.0.jar"/>
+
+  <
+
+  This allows you to share .classpath files with other developers
+  without each having a local copy with environment specific paths.
+
+  To add new base classpath variables, you can edit
+  $ECLIPSE_HOME/plugins/org.eclim_version/classpath_variables.properties
+
+  By default, a USER_HOME variable is created that defaults to the
+  java System property "user.home" and you can add more as needed.
+
+  This command supports command completion of Eclipse variable names
+  as well as the files and directories beneath the path the variable
+  represents.
+
+  To manage the classpath variables, eclim also provides the following
+  commands.
+
+  *:VariableList*
+  - :VariableList - Lists all the currently available classpath
+    variables and their corresponding values.
+
+  *:VariableCreate*
+  - :VariableCreate <name> <path> - Creates or updates the variable
+    with the supplied name.
+
+  *:VariableDelete*
+  - :VariableDelete <name> - Deletes the variable with the supplied
+    name.
+
+*classpath-src-javadocs*
+
+
+Source and Javadoc location
+===========================
+
+For your 'var' and 'lib' classpath entries you can configure the
+location for that entry's source code and javadocs, like the example
+below, allowing you to jump to the source (|:JavaSearch|) or lookup
+the docs (|:JavaDocSearch|) of classes, etc found in that library.
+Note that the javadoc location must be a url, whether it be on the
+local file system (file:) or remote (http:).
+
+>
+
+   <classpathentry exported="true" kind="lib" path="lib/hibernate-4.0.jar"
+       sourcepath="<path>">
+     <attributes>
+       <attribute value="file:<javadoc>" name="javadoc_location"/>
+     </attributes>
+   </classpath>
+
+<
+
+
+*classpath-maven*
+
+
+Maven
+=====
+
+Maven (http://maven.apache.org) comes bundled with an Eclipse plugin
+that allows you to easily maintain your .classpath file based on your
+pom.xml (or project.xml for maven 1.x users).
+
+Note: For additional information on the Eclipse plugin from maven, you may
+  visit their online documentation for maven 1.x
+  (http://maven.apache.org/maven-1.x/plugins/eclipse/) or maven 2.x
+  (http://maven.apache.org/guides/mini/guide-ide-eclipse.html).
+
+*:MvnRepo* *:MavenRepo*
+
+- Initial Setup
+
+  To initialize maven's support for updating the eclipse classpath you
+  first need to set the M2_REPO (or MAVEN_REPO for 1.x) classpath
+  variable in the Eclipse workspace by executing the following command
+  in vim:
+
+  maven 2.x:
+
+  >
+     :MvnRepo
+
+  <
+
+  maven 1.x:
+
+  >
+     :MavenRepo
+
+  <
+
+- Updating your .classpath
+
+  Once you have performed the initial setup, updating the Eclipse
+  .classpath file is as easy as executing the following at a command
+  line:
+
+  maven 2.x:
+
+  >
+     mvn eclipse:eclipse
+
+  <
+
+  maven 1.x:
+
+  >
+     maven eclipse
+
+  <
+
+  or in Vim:
+
+  maven 2.x:
+
+  >
+     :Mvn eclipse:eclipse
+
+  <
+
+  maven 1.x:
+
+  >
+     :Maven eclipse
+
+  <
+
+  *classpath-maven-pom*
+  For maven 2.x users, eclim also provides support for auto updating
+  the .classpath for your project every time you save your pom.xml
+  file.  Any entries found in the pom.xml that are not in the
+  .classpath will be added, any entries that differ in version will be
+  updated, and any stale entries deleted. This behavior can be
+  disabled by adding the following setting to your vimrc:
+
+  >
+     let g:EclimMavenPomClasspathUpdate = 0
+
+  <
+
+- Search Online Maven Repository
+
+  Eclim also provides the command :MvnDependencySearch
+  (:MavenDependencySearch for 1.x) which allows you to search for
+  dependencies in the online maven repository as described in the
+  maven documentation (|:MvnDependencySearch|).
+
+*classpath-ivy*
+
+
+Ivy
+===
+
+For users of ivy (http://jayasoft.org/ivy), eclim provides support for
+auto updating the .classpath for your project every time you save your
+ivy.xml file.  Any entries found in the ivy.xml that are not in the
+.classpath will be added, any entries that differ in version will be
+updated, and any stale entries deleted.
+
+*:IvyRepo*
+
+- Initial Setup
+
+  Before you can start utilizing the auto updating support, you must
+  first set the location of your ivy repository (ivy cache).  This is
+  the directory where ivy will download the dependencies to and where
+  eclipse will then pick them up to be added to your project's
+  classpath.
+
+  To set the repository location you can use the :IvyRepo command
+  which is made available when editing an ivy.xml file.
+
+  >
+     :IvyRepo ~/.ivy2/cache/
+
+  <
+
+  If you fail to set this prior to writing the ivy.xml file, eclim
+  will emit an error notifying you that you first need to set the
+  IVY_REPO variable via this command.
+
+- Updating your .classpath
+
+  Once you have performed the initial setup, updating the Eclipse
+  .classpath file is as easy as saving your ivy.xml file (:w) and
+  letting eclim do the rest.
+
+- Preserving manually added entries
+
+  When utilizing the ivy support, eclim will attempt to remove any
+  stale entries from your .classpath file.  If you have some manually
+  added entries, these may be removed as well.  To prevent this you
+  can add a classpath entry attribute notifying eclim that the entry
+  should be preserved.
+
+  Ex.
+
+  >
+     <classpathentry kind="lib" path="lib/j2ee-1.4.jar">
+       <attributes>
+         <attribute name="eclim.preserve" value="true"/>
+       </attributes>
+     </classpathentry>
+
+  <
+
+*:IvyDependencySearch*
+
+- Search Online Maven Repository
+
+  Eclim also provides the command :IvyDependencySearch which allows
+  you to search for dependencies in the online maven repository as
+  described in the maven documentation (|:MvnDependencySearch|).
+
+vim:ft=eclimhelp

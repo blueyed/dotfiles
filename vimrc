@@ -573,6 +573,7 @@ noremap <leader>sw :set wrap!<cr>
 noremap <leader>ss :set spell!<cr>
 nmap    <leader>sc :ColorToggle<cr>
 " let g:colorizer_fgcontrast=-1
+let g:colorizer_startup = 0
 
 
 " Use Ack instead of Grep when available

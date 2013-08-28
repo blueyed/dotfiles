@@ -82,10 +82,6 @@
 	path = vim/bundle/supertab
 	url = git://github.com/ervandew/supertab.git
 	ignore = untracked
-[submodule "vim/bundle/snipmate"]
-	path = vim/bundle/snipmate
-	url = git://github.com/garbas/vim-snipmate.git
-	ignore = untracked
 [submodule "vim/bundle/tcomment"]
 	path = vim/bundle/tcomment
 	url = git://github.com/tomtom/tcomment_vim.git

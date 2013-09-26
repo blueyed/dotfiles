@@ -572,6 +572,9 @@ set pastetoggle=<leader>sp
 noremap <leader>sw :set wrap!<cr>
 noremap <leader>ss :set spell!<cr>
 nmap    <leader>sc :ColorToggle<cr>
+nmap    <leader>sq :QuickfixsignsToggle<cr>
+nmap    <leader>si :IndentGuidesToggle<cr>
+
 " let g:colorizer_fgcontrast=-1
 let g:colorizer_startup = 0
 

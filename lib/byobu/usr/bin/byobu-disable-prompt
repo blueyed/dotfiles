@@ -1,9 +1,7 @@
 #!/bin/sh -e
 #
-#    distro: grab the distro/os
-#
-#    Copyright (C) 2008 Canonical Ltd.
-#    Copyright (C) 2011 Dustin Kirkland
+#    byobu-disable-prompt
+#    Copyright (C) 2013 Dustin Kirkland
 #
 #    Authors: Dustin Kirkland <kirkland@byobu.co>
 #
@@ -19,19 +17,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__distro_detail() {
-	lsb_release -a 2>/dev/null
-}
+PKG="byobu"
+[ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
+[ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="/usr" || export BYOBU_PREFIX
+. "${BYOBU_PREFIX}/lib/${PKG}/include/common"
 
-__distro() {
-	local DISTRO="${DISTRO}"
-	if [ -n "$DISTRO" ]; then
-		# user defined
-		true
+$BYOBU_SED -i -e "/#byobu-prompt#$/d" "$HOME/.bashrc"
+
+if [ "$1" != "--no-reload" ]; then
+	if [ -n "$TMUX" ] && [ "$SHELL" = "/bin/bash" ]; then
+		tmux send-keys " . ~/.bashrc" \; send-keys Enter
 	else
-		DISTRO="$BYOBU_DISTRO"
+		echo
+		echo "You will need to reload your shell configuration for this to take effect..."
+		echo "  . ~/.bashrc"
+		echo
 	fi
-	color bold2; printf "%s" "$DISTRO"; color --
-}
+fi
 
 # vi: syntax=sh ts=4 noexpandtab

@@ -54,6 +54,7 @@ unbind-key -n S-M-Down
 unbind-key -n S-M-Left
 unbind-key -n S-M-Right
 unbind-key -n F5
+unbind-key -n M-F5
 unbind-key -n S-F5
 unbind-key -n C-F5
 unbind-key -n C-S-F5
@@ -69,10 +70,12 @@ unbind-key -n C-F8
 unbind-key -n C-S-F8
 unbind-key -n S-F8
 unbind-key -n F9
+unbind-key -n S-F9
 unbind-key -n M-F11
 unbind-key -n C-F11
 unbind-key -n S-F11
-bind-key -n S-F12 source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux
+bind-key -n S-F12 source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux \; display-message "Byobu F-keys: ENABLED"
+unbind-key -n M-F12
 unbind-key -n C-S-F12
 unbind-key -n M-IC
 unbind-key -n C-a

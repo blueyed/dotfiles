@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION=5.48
+VERSION=5.61
 PKG="byobu"
 
 # All sorts of things go wrong if you don't own your $HOME dir.
@@ -103,12 +103,12 @@ case $BYOBU_BACKEND in
 	tmux)
 		# Use 256 colors if possible
 		if $BYOBU_TEST tput >/dev/null; then
-			if [ "$(tput colors 2>/dev/null || echo 0)" = "256" ] || [ "$COLORTERM" = "gnome-terminal" ] || [ "$TERM" = "xterm" ]; then
+			if [ "$(tput colors 2>/dev/null || echo 0)" = "256" ] || [ "$COLORTERM" = "gnome-terminal" ] || [ "$TERM" = "xterm" ] || [ "$TERM" = "xterm-256color" ]; then
 				[ -z "$SCREEN_TERM" ] && SCREEN_TERM="-2"
 			fi
 		fi
 		BYOBU_PROFILE="-f $BYOBU_PREFIX/share/$PKG/profiles/tmuxrc"
-		DEFAULT_WINDOW="new-session ${BYOBU_PREFIX}/bin/byobu-shell"
+		DEFAULT_WINDOW="new-session -n - ${BYOBU_PREFIX}/bin/byobu-shell"
 		sessions=$($BYOBU_BACKEND list-sessions 2>/dev/null) || true
 	;;
 	screen)

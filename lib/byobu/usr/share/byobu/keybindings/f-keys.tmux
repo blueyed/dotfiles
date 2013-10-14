@@ -28,7 +28,7 @@ source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux.disable
 # Documented in: $BYOBU_PREFIX/share/doc/byobu/help.tmux.txt
 bind-key -n F1 new-window -k -n config byobu-config
 bind-key -n S-F1 new-window -k -n help '$BYOBU_PAGER $BYOBU_PREFIX/share/doc/byobu/help.tmux.txt'
-bind-key -n F2 new-window \; rename-window ""
+bind-key -n F2 new-window \; rename-window "-"
 bind-key -n C-F2 display-panes \; split-window -h
 bind-key -n S-F2 display-panes \; split-window -v
 bind-key -n C-S-F2 new-session
@@ -53,7 +53,7 @@ bind-key -n M-S-Down resize-pane -D
 bind-key -n M-S-Left resize-pane -L
 bind-key -n M-S-Right resize-pane -R
 bind-key -n F5 source $BYOBU_PREFIX/share/byobu/profiles/tmuxrc
-#bind-key -n F5 source "$BYOBU_PREFIX/share/byobu/profiles/tmuxrc" \; run-shell "$BYOBU_PREFIX/lib/byobu/include/tmux-detach-all-but-current-client"
+bind-key -n M-F5 run-shell '$BYOBU_PREFIX/lib/byobu/include/toggle-utf8' \; source $BYOBU_PREFIX/share/byobu/profiles/tmuxrc
 bind-key -n S-F5 new-window -k "$BYOBU_PREFIX/lib/byobu/include/cycle-status" \; source $BYOBU_PREFIX/share/byobu/profiles/tmuxrc
 bind-key -n C-F5 send-keys ". $BYOBU_PREFIX/bin/byobu-reconnect-sockets" \; send-keys Enter
 bind-key -n C-S-F5 new-window -d "byobu-select-profile -r"
@@ -64,16 +64,18 @@ bind-key -n C-F6 kill-pane
 bind-key -n F7 copy-mode
 bind-key -n M-NPage copy-mode \; send-keys NPage
 bind-key -n M-PPage copy-mode \; send-keys PPage
-bind-key -n F8 command-prompt -p "(rename-window)" "rename-window '%%'"
+bind-key -n F8 command-prompt -p "(rename-window)" -I "#W" "rename-window '%%'"
 bind-key -n S-F8 next-layout
 bind-key -n C-F8 new-window -k "byobu-layout restore; clear; $SHELL"
 bind-key -n C-S-F8 command-prompt -p "Save byobu layout as:" "run-shell \"byobu-layout save '%%'\""
 bind-key -n F9 new-window -k -n config byobu-config
+bind-key -n S-F9 capture-pane -S -32768 \; save-buffer "$BYOBU_RUN_DIR/printscreen" \; delete-buffer \; new-window -n "PRINTSCREEN" "view $BYOBU_RUN_DIR/printscreen"
 bind-key -n M-F11 break-pane
 bind-key -n C-F11 join-pane -h -s :. -t :-1
 bind-key -n S-F11 join-pane -v -s :. -t :-1
-bind-key -n S-F12 source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux.disable
+bind-key -n S-F12 source $BYOBU_PREFIX/share/byobu/keybindings/f-keys.tmux.disable \; display-message "Byobu F-keys: DISABLED"
 bind-key -n C-S-F12 new-window $BYOBU_PREFIX/lib/byobu/include/mondrian
+bind-key -n M-F12 source $BYOBU_PREFIX/share/byobu/keybindings/mouse.tmux.enable
 bind-key -n M-IC paste-buffer
 
 bind-key -n C-a new-window -n "ctrl-a" "byobu-ctrl-a"

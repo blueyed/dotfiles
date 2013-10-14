@@ -1,0 +1,50 @@
+#    byobu's bashrc -- colorize the prompt
+#    Copyright (C) 2013 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Ensure that we're in a tmux or screen session
+case "$TERM" in
+	xterm)
+		# Try to ensure we have 256 colors
+		export TERM="xterm-256color"
+	;;
+esac
+if [ -n "$TMUX" ] || [ "${TERMCAP#*screen}" != "${TERMCAP}" ]; then
+	# Ensure that we're in bash, in a byobu environment
+	if [ -n "$BYOBU_BACKEND" ] && [ "$SHELL" = "/bin/bash" ]; then
+		case "$BYOBU_DISTRO" in
+			"Ubuntu")
+				# Use Ubuntu colors (grey / aubergine / orange)
+				[ -n "$BYOBU_CHARMAP" ] || BYOBU_CHARMAP=$(locale charmap 2>/dev/null || echo)
+				PROMPT_COMMAND='prompt_status="$? "; if [[ $prompt_status == "0 " ]]; then prompt_status=; fi'
+				case "$BYOBU_CHARMAP" in
+					"UTF-8")
+						# MATHEMATICAL RIGHT DOUBLE ANGLE BRACKET (U+27EB, Pe): ⟫
+						PS1="${debian_chroot:+($debian_chroot)}\[\e[38;5;202m\]\$prompt_status\[\e[38;5;245m\]\u\[\e[00m\]@\[\e[38;5;5m\]\h\[\e[00m\]:\[\e[38;5;172m\]\w\[\e[00m\]⟫ "
+					;;
+					*)
+						# Simple ASCII greater-than sign
+						PS1="${debian_chroot:+($debian_chroot)}\[\e[38;5;202m\]\$prompt_status\[\e[38;5;245m\]\u\[\e[00m\]@\[\e[38;5;5m\]\h\[\e[00m\]:\[\e[38;5;172m\]\w\[\e[00m\]> "
+					;;
+				esac
+			;;
+			*)
+				# Use Byobu colors (green / blue / red)
+				PS1="${debian_chroot:+($debian_chroot)}\[\e[31m\]\$prompt_status\[\e[00;32m\]\u\[\e[00m\]@\[\e[00;36m\]\h\[\e[00m\]:\[\e[00;31m\]\w\[\e[00m\]\$ "
+			;;
+		esac
+	fi
+fi

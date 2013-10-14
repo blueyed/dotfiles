@@ -34,6 +34,7 @@ PKG="byobu"
 for i in "${BYOBU_PREFIX}/share/$PKG/status/status" "${BYOBU_PREFIX}/share/$PKG/status/statusrc" "$BYOBU_CONFIG_DIR/status" "$BYOBU_CONFIG_DIR/statusrc" "$BYOBU_CONFIG_DIR/color" "$BYOBU_CONFIG_DIR/color.tmux"; do
 	[ -r "$i" ] && . "$i"
 done
+. "${BYOBU_PREFIX}/lib/${PKG}/include/icons"
 
 case "$BYOBU_BACKEND" in
 	screen)
@@ -62,14 +63,6 @@ case "$BYOBU_BACKEND" in
 				break
 			fi
 		done
-		# Do first-run procedures, if necessary
-		if [ -n "$TMUX" ]; then
-			if [ ! -e "$BYOBU_RUN_DIR/${TMUX#*,}" ]; then
-				# Clear initial window name
-				tmux rename-window ""
-				touch "$BYOBU_RUN_DIR/${TMUX#*,}"
-			fi
-		fi
 	;;
 esac
 

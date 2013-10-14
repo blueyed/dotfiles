@@ -17,6 +17,7 @@ and some convenient keybindings:
     Ctrl-Shift-F3/F4             Move a window
     Shift-Alt-Left/Right/Up/Down Resize a split
   F5                             Reload profile, refresh status
+    Alt-F5                       Toggle UTF-8 support, refresh status
     Shift-F5                     Toggle through status lines
     Ctrl-F5                      Reconnect ssh/gpg/dbus sockets
     Ctrl-Shift-F5                Change status bar's color randomly
@@ -31,6 +32,7 @@ and some convenient keybindings:
     Ctrl-F8                      Restore a split-pane layout
     Ctrl-Shift-F8                Save the current split-pane layout
   F9                             Launch byobu-config window
+    Shift-F9                     Save history to $BYOBU_RUN_DIR/printscreen
   F10                            * Used by X11 *
   F11                            * Used by X11 *
     Alt-F11                      Expand split to a full window
@@ -38,4 +40,5 @@ and some convenient keybindings:
     Ctrl-F11                     Join window into a vertical split
   F12                            Escape sequence
     Shift-F12                    Toggle on/off Byobu's keybindings
+    Alt-F12                      Toggle on/off Byobu's mouse support
     Ctrl-Shift-F12               Mondrian squares

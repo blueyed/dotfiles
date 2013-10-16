@@ -164,7 +164,7 @@
 	ignore = untracked
 [submodule "vim/bundle/sparkup"]
 	path = vim/bundle/sparkup
-	url = git://github.com/blueyed/sparkup.git
+	url = git://github.com/rstacruz/sparkup.git
 	ignore = untracked
 [submodule "vim/bundle/zenburn"]
 	path = vim/bundle/zenburn
@@ -421,3 +421,6 @@
 [submodule "vim/bundle/xpath"]
 	path = vim/bundle/xpath
 	url = git@github.com:actionshrimp/vim-xpath.git
+[submodule "vim/bundle/django-pony"]
+	path = vim/bundle/django-pony
+	url = git://github.com/jmcomets/vim-pony.git

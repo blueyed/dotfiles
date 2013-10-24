@@ -424,3 +424,6 @@
 [submodule "vim/bundle/django-pony"]
 	path = vim/bundle/django-pony
 	url = git://github.com/jmcomets/vim-pony.git
+[submodule "vim/bundle/python-pep8-indent"]
+	path = vim/bundle/python-pep8-indent
+	url = git://github.com/hynek/vim-python-pep8-indent.git

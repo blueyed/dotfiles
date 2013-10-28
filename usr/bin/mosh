@@ -1,0 +1,8 @@
+#!/bin/sh
+# Wrapper around /usr/bin/mosh, which enables mouse forwarding
+#
+# Source: https://github.com/keithw/mosh/issues/101#issuecomment-12317162
+
+perl -E ' print "\e[?1005h\e[?1002h" '
+
+/usr/bin/mosh "$@"

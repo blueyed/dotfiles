@@ -1,8 +1,15 @@
 #!/bin/sh
 # Wrapper around /usr/bin/mosh, which enables mouse forwarding
+# (handled by tmux, weechat, … (but not by zsh))
 #
 # Source: https://github.com/keithw/mosh/issues/101#issuecomment-12317162
+#
+# NOTE: uses 1006 (SGR) instead of 1005 (extenden/utf), as recommended in
+# http://leonerds-code.blogspot.co.uk/2012/04/wide-mouse-support-in-libvterm.html
 
-perl -E ' print "\e[?1005h\e[?1002h" '
+perl -E ' print "\e[?1006h\e[?1002h" '
 
 /usr/bin/mosh "$@"
+
+# unset workaround
+perl -E ' print "\e[?1006l\e[?1002l" '

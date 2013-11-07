@@ -104,7 +104,7 @@
 	ignore = untracked
 [submodule "vim/bundle/ultisnips"]
 	path = vim/bundle/ultisnips
-	url = git://github.com/SirVer/ultisnips.git
+	url = git://github.com/MarcWeber/ultisnips.git
 	ignore = untracked
 [submodule "vim/bundle/molokai"]
 	path = vim/bundle/molokai

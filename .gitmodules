@@ -154,10 +154,6 @@
 	path = vim/bundle/maximize
 	url = git://github.com/ervandew/maximize.git
 	ignore = untracked
-[submodule "vim/bundle/outlook"]
-	path = vim/bundle/outlook
-	url = git://github.com/vim-scripts/OutlookVim.git
-	ignore = untracked
 [submodule "vim/bundle/yankring"]
 	path = vim/bundle/yankring
 	url = git://github.com/vim-scripts/YankRing.vim.git

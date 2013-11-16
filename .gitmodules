@@ -28,7 +28,7 @@
 	ignore = untracked
 [submodule "vim/bundle/bufkill"]
 	path = vim/bundle/bufkill
-	url = git://github.com/vim-scripts/bufkill.vim.git
+	url = git://github.com/blueyed/bufkill.vim.git
 	ignore = untracked
 [submodule "vim/bundle/command-t"]
 	path = vim/bundle/command-t

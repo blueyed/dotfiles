@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION=5.61
+VERSION=5.65
 PKG="byobu"
 
 # All sorts of things go wrong if you don't own your $HOME dir.
@@ -52,6 +52,7 @@ export BYOBU_CHARMAP=$(locale charmap)
 . "${BYOBU_PREFIX}/lib/${PKG}/include/common"
 
 # Override backend if we can determine intentions from argv[0]
+[ -r "$HOME/.$PKG/backend" ] && . "$HOME/.$PKG/backend"
 case "$0" in
 	*byobu-screen) BYOBU_BACKEND="screen" ;;
 	*byobu-tmux) BYOBU_BACKEND="tmux" ;;
@@ -97,6 +98,7 @@ byobu-janitor --force
 # Drop a symlink to the ssh socket in $HOME, since we can ensure that exists
 if [ -S "$SSH_AUTH_SOCK" ] && [ ! -h "$SSH_AUTH_SOCK" ]; then
 	ln -sf "$SSH_AUTH_SOCK" "$BYOBU_CONFIG_DIR/.ssh-agent"
+	export SSH_AUTH_SOCK="$BYOBU_CONFIG_DIR/.ssh-agent"
 fi
 
 case $BYOBU_BACKEND in

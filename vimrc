@@ -980,6 +980,9 @@ noremap <S-F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cach
 noremap <F5> :GundoToggle<cr>
 noremap <F11> :YRShow<cr>
 
+" map ö/ä to brackets used by unimpaired (more accessible on a German keyboard layout)
+nnoremap ö [
+nnoremap ä ]
 
 " tagbar plugin
 nnoremap <silent> <F8> :TagbarToggle<CR>

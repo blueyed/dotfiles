@@ -216,7 +216,7 @@
 	ignore = untracked
 [submodule "vim/bundle/solarized"]
 	path = vim/bundle/solarized
-	url = git://github.com/altercation/vim-colors-solarized.git
+	url = git://github.com/blueyed/vim-colors-solarized.git
 	ignore = untracked
 [submodule "vim/bundle/bufexplorer"]
 	path = vim/bundle/bufexplorer

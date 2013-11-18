@@ -429,3 +429,6 @@
 [submodule "vim/bundle/gf-python"]
 	path = vim/bundle/gf-python
 	url = https://github.com/mkomitee/vim-gf-python.git
+[submodule "lib/mc-solarized"]
+	path = lib/mc-solarized
+	url = git@github.com:peel/mc.git

@@ -432,3 +432,6 @@
 [submodule "lib/mc-solarized"]
 	path = lib/mc-solarized
 	url = git@github.com:peel/mc.git
+[submodule "vim/bundle/tmux-navigator"]
+	path = vim/bundle/tmux-navigator
+	url = git://github.com/christoomey/vim-tmux-navigator.git

@@ -435,3 +435,6 @@
 [submodule "vim/bundle/tmux-navigator"]
 	path = vim/bundle/tmux-navigator
 	url = git://github.com/christoomey/vim-tmux-navigator.git
+[submodule "vim/bundle/colorscheme-gruvbox"]
+	path = vim/bundle/colorscheme-gruvbox
+	url = git://github.com/morhetz/gruvbox.git

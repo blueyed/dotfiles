@@ -5,7 +5,8 @@ INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) \
 	gvimrc hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc screenrc screenrc.common subversion/servers \
 	terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
-	xsessionrc
+	xsessionrc \
+	$(wildcard config/*/*)
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
 

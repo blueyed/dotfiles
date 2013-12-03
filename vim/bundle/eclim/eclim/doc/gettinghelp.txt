@@ -12,10 +12,8 @@ to one of the eclim mailing lists:
 
 - eclim-user (http://groups.google.com/group/eclim-user): For all
   questions regarding installation, usage, troubleshooting, etc.
-
-- eclim-dev (http://groups.google.com/group/eclim-dev): For all eclim
-  development related discussions.
-
+- eclim-dev (http://groups.google.com/group/eclim-dev): For all
+  eclim development related discussions.
 
 IRC (#eclim on freenode.net)
 ============================
@@ -41,11 +39,8 @@ new issue on eclim's github issue tracker
 When reporting a bug, please include the following information:
 
 - What OS are you on?
-
   - Linux users: please include the distro and version.
-
 - What version of eclim, vim, and eclipse are you using?
-
   - Linux users: please indicate whether you installed eclipse via
     your distro's package manager or not, and if not, please indicate
     what distribution of eclipse you are using ("Eclipse Classic",

@@ -3,7 +3,7 @@
 Ruby
 ****
 
-- Ruby Build Path (vim-ruby-buildpath)
+- Ruby Interpreters / Build Path (vim-ruby-buildpath)
 - Ruby Code Completion (vim-ruby-complete)
 - Ruby Validation (vim-ruby-validate)
 - Ruby Search (vim-ruby-search)

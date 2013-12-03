@@ -194,8 +194,6 @@ endfunction " }}}
 function! eclim#python#django#find#TemplateFind()
   let project_dir = eclim#python#django#util#GetProjectPath()
   if project_dir == ''
-    call eclim#util#EchoError(
-      \ 'Unable to locate django project path with manage.py and settings.py')
     return
   endif
 

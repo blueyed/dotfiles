@@ -53,7 +53,7 @@ file, etc).
      <attributes>
        <attribute value="http://hibernate.org/hib_docs/v3/api" name="javadoc_location"/>
      </attributes>
-   </classpath>
+   </classpathentry>
 
 <
 
@@ -85,33 +85,25 @@ Vim Settings (|vim-settings|)
 
 *g:EclimJavaDocSearchSingleResult*
 
-- g:EclimJavaDocSearchSingleResult (Default: 'open') - Determines what
-  action to take when only a singe result is found.
-
+- g:EclimJavaDocSearchSingleResult (Default: 'open') - Determines
+  what action to take when only a singe result is found.
   Possible values include:
 
   - 'open' - open the result in a browser.
-
   - 'lopen' - open the temp window to display the result.
-
 - g:EclimLocationListHeight (Default: 10) - Sets the height in lines
   of the location list window when eclim opens it to display search
   results.
-
 Eclim Settings (|vim-settings|)
 
 - org.eclim.user.name - Used as the name portion of the author tag.
   Consult the settings page (|vim-settings|) for more info.
-
-- org.eclim.user.email - Used as the email portion of the author tag.
-  Consult the settings page (|vim-settings|) for more info.
-
+- org.eclim.user.email - Used as the email portion of the author
+  tag. Consult the settings page (|vim-settings|) for more info.
 - org.eclim.java.doc.dest (Default: doc) - The project relative
   directory where the javadocs with be written to.
-
 - org.eclim.java.doc.packagenames - Optional space separated list of
   package names to run javadoc against.
-
 - org.eclim.java.doc.sourcepath - The project relative javadoc
   sourcepath to use.  This should be a space separated list of project
   relative source directories which you want javadoc to be executed

@@ -19,8 +19,8 @@ Creating your first project
 Once you've got eclimd running, open an instance of vim and create
 your project like so:
 
-Note: Android Users: the android section below contains additional info
-  regarding the creation of android projects.Maven Users: you may
+Note: Android Users: the android section below contains additional
+  info regarding the creation of android projects.Maven Users: you may
   refer to the maven section below for an alternate way to create a
   java project.
 
@@ -62,13 +62,9 @@ but in all cases eclim will provide you with commands to manage this
 file:
 
 - java, android - .classpath file (|vim-java-classpath|)
-
 - php, ruby - .buildpath file (|vim-dltk-buildpath|)
-
 - c, c++ - .cproject, managed via the |:CProjectConfigs| command
-
 - python - .ropeproject (see the rope docs (|python-rope|))
-
 Once you've created your project you can use the :ProjectList command
 to list the available projects and you should see your newly created
 one in the list.
@@ -100,13 +96,9 @@ languages are very similar.  Please see the relevant docs for your
 language for more details:
 
 - java and android (|vim-java-classpath|)
-
 - php and ruby (|vim-dltk-buildpath|)
-
 - c and c++ (|:CProjectConfigs|)
-
 - python (|python-rope|)
-
 For the purpose of this example we will assume that you will store
 your source files at:
 
@@ -164,29 +156,22 @@ Writing code in your new project
 Now that you have a project created, you can start writing code and
 utilize the features that eclim provides.
 
-Note: Below we'll walk through a trivial java example, but some of the
-  steps apply to all the languages that eclim supports, although the
-  command names may differ a bit.  For additional docs on working with
-  the language of your choice, please see the relevant section of the
-  docs:
+Note: Below we'll walk through a trivial java example, but some of
+  the steps apply to all the languages that eclim supports, although
+  the command names may differ a bit.  For additional docs on working
+  with the language of your choice, please see the relevant section of
+  the docs:
 
   - c/c++ (|vim-c-index|)
-
   - java (|vim-java-index|)
-
   - php (|vim-php-index|)
-
   - python (|vim-python-index|)
-
   - ruby (|vim-ruby-index|)
-
   - etc. (|vim-index|)
-
 Lets get started writing our first java application using eclim.
 
-1. First, navigate to your new project's source directory (src/java in
-   this example) and create any necessary package directories:
-
+1. First, navigate to your new project's source directory (src/java
+   in this example) and create any necessary package directories:
    >
       $ cd /path/to/my_project/src/java
       $ mkdir -p org/test/
@@ -194,7 +179,6 @@ Lets get started writing our first java application using eclim.
    <
 
 2. Then start editing your first java source file:
-
    >
       $ vim org/test/TestMain.java
 
@@ -213,10 +197,9 @@ Lets get started writing our first java application using eclim.
 
    <
 
-3. You can start to use some of the core features now.  For example,
-   lets add the following code to the main method so we can test
-   eclim's source code validation:
-
+3. You can start to use some of the core features now.  For
+   example, lets add the following code to the main method so we can
+   test eclim's source code validation:
    >
       System.
 
@@ -227,10 +210,9 @@ Lets get started writing our first java application using eclim.
    error message is printed at the bottom of your vim window.  You can
    also run :lopen to view all the errors in the file at once.
 
-4. Now lets try out code completion.  Place your cursor on the '.' of
-   'System.' and start insert mode in vim using 'a', then follow the
-   example below:
-
+4. Now lets try out code completion.  Place your cursor on the '.'
+   of 'System.' and start insert mode in vim using 'a', then follow
+   the example below:
    >
       System.<ctrl-x><ctrl-u>             // starts the completion mode
       System.<ctrl-n>                     // cycle through the completion suggestions
@@ -242,9 +224,8 @@ Lets get started writing our first java application using eclim.
 
    <
 
-5. After saving the file you should have no more validation errors, so
-   now we can run the code like so:
-
+5. After saving the file you should have no more validation errors,
+   so now we can run the code like so:
    >
       :Java
 
@@ -279,28 +260,24 @@ project's information:
 Note: at any point in this process you can use Ctrl+C to cancel the
 project creation.
 
-1. First you will be asked to choose the target android platform. If
-   you have only one platform installed on your system, this prompt
+1. First you will be asked to choose the target android platform.
+   If you have only one platform installed on your system, this prompt
    will be skipped and that platform will be used when creating the
    project. If you have no platforms installed then you will receive
    an error directing you to install a platform using the Android SDK
    Manager. If you install a new platform you will need to either
    restart eclipse/eclimd or run the eclim supplied |:AndroidReload|
    command.
-
 2. Next you will be asked to supply a package name (Ex:
    com.mycompany.myapp).
-
 3. Then you will need to supply a name for your application.
-
-4. The next prompt will ask you if you are creating a library project
-   or not. Most likely you are not, so type 'n' here to proceed.
-
+4. The next prompt will ask you if you are creating a library
+   project or not. Most likely you are not, so type 'n' here to
+   proceed.
 5. Lastly, if you are not creating a library project, you will be
    asked whether or not you want to have a new android activity
    created for you and if so, you will be asked for the name of that
    activity.
-
 Once you've finished supplying the necessary information, your android
 project will be created. An android project is simply a specialized
 java project, so you can now leverage all the eclim provided java
@@ -316,9 +293,8 @@ Creating your first project with maven can be accomplished using the
 same method as any other java project, or you can utilize some of
 maven's built in features to get your project started.
 
-1. Run maven's generate archetype to create the project directory and
-   samples:
-
+1. Run maven's generate archetype to create the project directory
+   and samples:
    >
       $ mvn archetype:generate
 
@@ -327,7 +303,6 @@ maven's built in features to get your project started.
 2. Once you've created the initial project directory, cd into that
    directory and run the following command to generate the necessary
    eclipse files:
-
    >
       $ cd <project_dir>
       $ mvn eclipse:eclipse
@@ -336,12 +311,9 @@ maven's built in features to get your project started.
 
 3. Now you can start an instance of vim at the project's root
    directory and run the following commands to:
-
    - set the necessary eclipse classpath variable to point to your
      maven repository.
-
    - import your new project into eclipse.
-
    >
       $ vim
       :MvnRepo

@@ -30,21 +30,17 @@ completion here to alleviate having to type the full name):
 Another way is to simply run :JUnit with no arguments and let it
 decide what to run based on the current context of the cursor:
 
-- If you have a junit test file open and the cursor is not inside one
-  of the test methods, then all of the current file's test methods
+- If you have a junit test file open and the cursor is not inside
+  one of the test methods, then all of the current file's test methods
   will be executed.
-
 - If the cursor is on or inside of a test method, then just that
   method will be run.
-
-- If you have a regular class open and run :JUnit, eclim will attempt
-  to locate the corresponding test and run it.
-
-- If the cursor is on or inside of a method in a regular class, eclim
-  will attempt to locate the test and then locate the corresponding
-  test method for the current method in that test and run just that
-  test method.
-
+- If you have a regular class open and run :JUnit, eclim will
+  attempt to locate the corresponding test and run it.
+- If the cursor is on or inside of a method in a regular class,
+  eclim will attempt to locate the test and then locate the
+  corresponding test method for the current method in that test and
+  run just that test method.
 If you'd like to run all tests for the current file, regardless of
 whether the cursor is on a method or not, you can do so by running
 :JUnit with the '%' argument:
@@ -126,11 +122,11 @@ has the same fully qualified class name as the target class with a
 So for the test org.foo.bar.BazTest, the exepected class being tested
 would be org.foo.bar.Baz.
 
-Note: Eclim also supports tests with a 'Test' prefix instead of a suffix
-  and in the case of neither a 'Test' prefix or suffix, it will search
-  for a class of the same name in a different package should you
-  perhaps use a package convention for your tests rather than a class
-  name convention.
+Note: Eclim also supports tests with a 'Test' prefix instead of a
+  suffix and in the case of neither a 'Test' prefix or suffix, it will
+  search for a class of the same name in a different package should
+  you perhaps use a package convention for your tests rather than a
+  class name convention.
 
 When invoking :JUnitImpl from within org.foo.bar.BazTest, eclim will
 locate the class org.foo.bar.Baz and generate a list of methods to
@@ -151,7 +147,6 @@ Eclim Settings (|vim-settings|)
 
 - org.eclim.java.junit.output_dir - Defines the project relative
   location of the junit test results.
-
   Ex.
 
   >
@@ -163,7 +158,6 @@ Eclim Settings (|vim-settings|)
 
 - org.eclim.java.junit.jvmargs - Json formatted list of strings to
   supply as args to the jvm when forking to run unit tests.
-
   Ex.
 
   >
@@ -176,7 +170,6 @@ Eclim Settings (|vim-settings|)
 - org.eclim.java.junit.sysprops - Json formatted list of strings to
   supply as system properties to the jvm when forking to run unit
   tests.
-
   Ex.
 
   >
@@ -189,7 +182,6 @@ Eclim Settings (|vim-settings|)
 - org.eclim.java.junit.envvars - Json formatted list of strings to
   supply as environment variables to the jvm when forking to run unit
   tests.
-
   Ex.
 
   >
@@ -210,13 +202,12 @@ to support monitoring of failed tests via vim's error format, eclim
 provides a custom TestNG listener which must be installed into your
 build environment.
 
-1. The first step is to place the eclim-testng.jar file in your TestNG
-   classpath you have configured for ant.  You can find this jar file
-   in your $ECLIPSE_HOME/plugins/org.eclim.jdt_version/ directory.
-
+1. The first step is to place the eclim-testng.jar file in your
+   TestNG classpath you have configured for ant.  You can find this
+   jar file in your $ECLIPSE_HOME/plugins/org.eclim.jdt_version/
+   directory.
 2. The second step is to add the listener attribute to your testng
    task which references the required eclim testng listener:
-
    >
         ...
       <testng ... listener="org.eclim.testng.TestNgListener">

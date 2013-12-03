@@ -42,7 +42,8 @@ Note: If you are still using Eclipse 3.7 (Indigo) you will need to
 <
 
 
-Note: If your eclipse home path contains a space, be sure to quote it:>
+Note: If your eclipse home path contains a space, be sure to quote
+  it:>
 
      > ant "-Declipse.home=C:/Program Files/eclipse"
 
@@ -51,13 +52,54 @@ Note: If your eclipse home path contains a space, be sure to quote it:>
 
 This will build and deploy eclim to your eclipse and vim directories.
 
-Note: If your vimfiles directory is not located at the default location
-  for your OS, then you can specify the location using the "vim.files"
-  property:>
+Note: If your vimfiles directory is not located at the default
+  location for your OS, then you can specify the location using the
+  "vim.files" property:>
 
      $ ant -Dvim.files=<your vimfiles dir>
 
   <
+
+
+When the build starts, it will first examine your eclipse installation
+to find what eclipse plugins are available. It will then use that list
+to determine which eclim features/plugins should be built and will
+output a list like the one below showing what will be built vs what
+will be skipped:
+
+>
+
+   [echo] ${eclipse}: /opt/eclipse
+   [echo] # Skipping org.eclim.adt, missing com.android.ide.eclipse.adt
+   [echo] # Skipping org.eclim.dltk, missing org.eclipse.dltk.core
+   [echo] # Skipping org.eclim.dltkruby, missing org.eclipse.dltk.ruby
+   [echo] # Skipping org.eclim.pdt, missing org.eclipse.php
+   [echo] Plugins:
+   [echo]   org.eclim.cdt
+   [echo]   org.eclim.jdt
+   [echo]   org.eclim.python
+   [echo]   org.eclim.sdt
+   [echo]   org.eclim.wst
+
+<
+
+
+In this case we can see that four eclim plugins will be skipped along
+with the eclipse feature that would be required to build those
+plugins. If you see an eclipse feature in that list that you know you
+have, it may be the case that you installed it as a regular user, so
+that feature was installed in your user local eclipse directory. In
+that case you will need to notify the build of that directory so it
+can examine it as well (just replace the <version> portion below with
+the actual version found in your ~/.eclipse directory):
+
+>
+
+   $ ant \
+       -Declipse.home=/opt/eclipse \
+       -Declipse.local=$HOME/.eclipse/org.eclipse.platform_<version>
+
+<
 
 
 If you don't want to supply the eclipse home directory, or any other
@@ -136,9 +178,8 @@ doing so.
 To build the installer you first need a couple external tools
 installed:
 
-- sphinx (http://sphinx.pocoo.org): Sphinx is used to build the eclim
-  documentation which is included in the installer.
-
+- sphinx (http://sphinx.pocoo.org): Sphinx is used to build the
+  eclim documentation which is included in the installer.
   Eclim also uses a custom sphinx theme which is included in eclim as
   a git submodule. So before you can build the installer you will need
   to initialize the submodule:
@@ -153,12 +194,10 @@ installed:
   diagrams which are generated using plantuml
   (http://plantuml.sourceforge.net/) (included in the eclim source
   tree) which in turn requires graphviz (http://www.graphviz.org/).
-
-- formic (http://github.com/ervandew/formic): The eclim installer has
-  been developed using the formic framework, and requires it to build
-  the installer distributables.  Formic doesn't currently have an
-  official release, so you'll need to check out the source code:
-
+- formic (http://github.com/ervandew/formic): The eclim installer
+  has been developed using the formic framework, and requires it to
+  build the installer distributables.  Formic doesn't currently have
+  an official release, so you'll need to check out the source code:
   >
      $ git clone git://github.com/ervandew/formic.git
 

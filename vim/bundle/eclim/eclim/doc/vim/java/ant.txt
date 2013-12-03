@@ -24,35 +24,26 @@ which performs the following steps:
 
 - Saves any previous 'makeprg' and 'errorformat' option settings so
   that you can define your own settings for the :make command.
-
-- Sets 'makeprg' to execute ant with the -find option so that it will
-  search for your build.xml file in the current directory or in a
+- Sets 'makeprg' to execute ant with the -find option so that it
+  will search for your build.xml file in the current directory or in a
   parent directory.
-
 - Sets 'errorformat' to recognize the following errors:
-
   - javac errors.
-
   - javadoc errors.
-
   - jasper jsp compilattion errors.
-
   - junit errors / failures.
-
   - cactus errors / failures.
-
 - Executes :make.
-
-- Restores your previous 'makeprg' and 'errorformat' option settings.
-
+- Restores your previous 'makeprg' and 'errorformat' option
+  settings.
 Additionally, if g:EclimMakeLCD (|vim-core-eclim#g:EclimMakeLCD|) is
 enabled (which it is by default), then the execution of ant will be
 performed from the current buffer's project root directory, ensuring
 that ant's build file discovery method is performed from the buffer's
 working directory and not your own.
 
-Note: :Ant also supports use of '!' (:Ant!) just like :make does, which
-  tells Vim not to jump to the first error if one exists.
+Note: :Ant also supports use of '!' (:Ant!) just like :make does,
+  which tells Vim not to jump to the first error if one exists.
 
 The :Ant command also has the added benefit of command completion.
 
@@ -64,10 +55,10 @@ The :Ant command also has the added benefit of command completion.
 <
 
 
-Warning: If your ant file has a lot of imports, then the command completion
-  may be slow as Eclipse parses all the imports when creating the ant
-  model.  You will notice the same slow behavior when using Eclipse
-  directly to perform ant code completion.
+Warning: If your ant file has a lot of imports, then the command
+  completion may be slow as Eclipse parses all the imports when
+  creating the ant model.  You will notice the same slow behavior when
+  using Eclipse directly to perform ant code completion.
 
 
 Code Completion
@@ -91,10 +82,10 @@ Screenshot of completion in action:
 
 [image]
 
-Warning: If your ant file has a lot of imports, then the code completion may
-  be slow as Eclipse parses all the imports when creating the ant
-  model.  You will notice the same slow behavior when using Eclipse
-  directly.
+Warning: If your ant file has a lot of imports, then the code
+  completion may be slow as Eclipse parses all the imports when
+  creating the ant model.  You will notice the same slow behavior when
+  using Eclipse directly.
 
 
 Validation
@@ -111,11 +102,8 @@ child elements are valid, etc., but it does perform the following:
 
 - If a default target is specified, validate that it exists and that
   the target dependencies exist.
-
 - Check for missing dependencies.
-
 - Check for circular dependencies.
-
 Eclim also combines the above validation with xml validation
 (|xml-validation|) to validate that the ant file is well formed.
 
@@ -182,11 +170,10 @@ Vim Settings (|vim-settings|)
 
 *g:EclimAntCompilerAdditionalErrorFormat*
 
-- g:EclimAntCompilerAdditionalErrorFormat (Default: '') - Since there
-  are many more ant tasks beyond javac, javadoc, etc., eclim provides
-  this variable as a means to add error format information for any
-  additional ant tasks that you may be using.
-
+- g:EclimAntCompilerAdditionalErrorFormat (Default: '') - Since
+  there are many more ant tasks beyond javac, javadoc, etc., eclim
+  provides this variable as a means to add error format information
+  for any additional ant tasks that you may be using.
   Example: Adding support for xslt
 
   >
@@ -196,9 +183,9 @@ Vim Settings (|vim-settings|)
 
   <
 
-  Note: The xslt task is a bit flaky when it comes to reporting the file
-    name on errors, so the above format will catch successful runs as
-    well.  If anyone has a better solution, please submit it.
+  Note: The xslt task is a bit flaky when it comes to reporting the
+    file name on errors, so the above format will catch successful
+    runs as well.  If anyone has a better solution, please submit it.
 
 *g:EclimAntErrorsEnabled*
 
@@ -209,12 +196,10 @@ Vim Settings (|vim-settings|)
   property, task, etc.) and build failure messages which occur under
   normal usage (junit task failed due to test failure, javac failures
   due to compile error, etc.) leading to false positives.
-
 *g:EclimAntValidate*
 
 - g:EclimAntValidate (Default: 1) - If set to 0, disables ant xml
   validation when saving the file.
-
 
 Suggested Mappings
 ==================
@@ -225,7 +210,6 @@ place your mappings there (:help ftplugin-name).
 
 - Lookup and open the documentation for the ant element under the
   cursor with <enter>.
-
   >
      noremap <silent> <buffer> <cr> :AntDoc<cr>
 

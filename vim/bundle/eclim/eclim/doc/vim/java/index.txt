@@ -32,7 +32,6 @@ To make use of these mappings, simply create a ftplugin file for java
 and place your mappings there (:help ftplugin-name).
 
 - Import the class under the cursor with <leader>i (:h mapleader):
-
   >
      nnoremap <silent> <buffer> <leader>i :JavaImport<cr>
 
@@ -40,7 +39,6 @@ and place your mappings there (:help ftplugin-name).
 
 - Search for the javadocs of the element under the cursor with
   <leader>d.
-
   >
      nnoremap <silent> <buffer> <leader>d :JavaDocSearch -x declarations<cr>
 
@@ -48,7 +46,6 @@ and place your mappings there (:help ftplugin-name).
 
 - Perform a context sensitive search of the element under the cursor
   with <enter>.
-
   >
      nnoremap <silent> <buffer> <cr> :JavaSearchContext<cr>
 

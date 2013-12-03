@@ -19,14 +19,12 @@ Note: Please note that this command is not intended to be a full
 
 The :Java will locate the main class to run using the following steps:
 
-1. if the first argument is '%' (:Java %) then run the current class.
-
-2. if the setting |org.eclim.java.run.mainclass| is set, then use the
-   value as the fully qualified class name to run.
-
-3. lastly, attempt to locate a class containing a static main method,
-   if only one is found, use that class.
-
+1. if the first argument is '%' (:Java %) then run the current
+   class.
+2. if the setting |org.eclim.java.run.mainclass| is set, then use
+   the value as the fully qualified class name to run.
+3. lastly, attempt to locate a class containing a static main
+   method, if only one is found, use that class.
 
 Configuration
 -------------
@@ -37,10 +35,8 @@ Eclim Settings (|vim-settings|)
 
 - org.eclim.java.run.mainclass - Fully qualified name of the class
   containing the main method.
-
 - org.eclim.java.run.jvmargs - Json formatted list of default jvm
   args.
-
 *:JavaClasspath*
 
 
@@ -101,15 +97,12 @@ Example content:
 
 [image]
 
-- Line 1 consists of the process id followed by either the class name
-  the process was started with or the path to the jar file.
-
+- Line 1 consists of the process id followed by either the class
+  name the process was started with or the path to the jar file.
 - Lines 2 - 5 contains links that when you hit <enter> on, will open
   another window displaying the requested additional info.
-
 - Lines 7 - 13 is a foldable block which contains a list of all the
   arguments passed to the main method of the process.
-
 - Lines 15 - 21 is a foldable block which contains a list of all the
   arguments passed to the JVM.
 

@@ -15,7 +15,6 @@ invoked using the :JavaFormat command described below.
 - :JavaFormat - Formats the current visual selection (or the current
   line, if nothing is selected). To format the whole file, use
   :%JavaFormat.
-
 Given the following file:
 
 >

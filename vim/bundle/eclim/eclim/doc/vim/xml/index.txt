@@ -44,19 +44,18 @@ Note: When opening urls, these commands rely on netrw (:help netrw).
 
 *:DtdDefinition*
 
-- :DtdDefinition [<element>] - When invoked, this command will attempt
-  to locate the dtd declaration in the current xml file and open the
-  dtd in a new split window.  If you supply an element name when
-  invoking the command, it will attempt to locate and jump to the
+- :DtdDefinition [<element>] - When invoked, this command will
+  attempt to locate the dtd declaration in the current xml file and
+  open the dtd in a new split window.  If you supply an element name
+  when invoking the command, it will attempt to locate and jump to the
   definition of that element within the dtd.  If no element name is
   supplied, but the cursor is located on an element name when invoke,
   that element name will be used.
-
 *:XsdDefinition*
 
-- :XsdDefinition [<element>] - Behaves like :DtdDefinition except this
-  command locates and opens the corresponding schema definition file.
-
+- :XsdDefinition [<element>] - Behaves like :DtdDefinition except
+  this command locates and opens the corresponding schema definition
+  file.
 *xml-validation*
 
 
@@ -124,11 +123,9 @@ Vim Settings (|vim-settings|)
 
 - g:EclimXmlValidate (Defualt: 1) - If set to 0, disables xml
   validation when saving the file.
-
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)
-
 *dtd*
 
 
@@ -163,11 +160,9 @@ Vim Settings (|vim-settings|)
 
 - g:EclimDtdValidate (Default: 1) - If set to 0, disables validation
   when saving the file.
-
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)
-
 *xsd*
 
 
@@ -202,7 +197,6 @@ Vim Settings (|vim-settings|)
 
 - g:EclimXsdValidate (Default: 1) - If set to 0, disables validation
   when saving the file.
-
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)

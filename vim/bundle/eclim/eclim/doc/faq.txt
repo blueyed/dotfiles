@@ -43,31 +43,23 @@ For Windows users there are a couple alternatives to the unsupported
 .eclimrc:
 
 1. Your first option is to add a new environment variable:
-
-   - Windows 2000: Control Panel ‣ System ‣ Advanced ‣ Environment Variables
-     Windows XP: Control Panel ‣ Performance And Maintenance ‣ System ‣ Advanced ‣ Environment Variables
-
-   - Under "User variables..." click "New..."
-     Variable Name: ECLIMD_OPTS
-     Variable Value: -Dosgi.instance.area.default=@user.home/another_workspace
-
+      - Windows 2000: Control Panel ‣ System ‣ Advanced ‣ Environment
+        Variables Windows XP: Control Panel ‣ Performance And Maintenance
+        ‣ System ‣ Advanced ‣ Environment Variables
+      - Under "User variables..." click "New..." Variable Name:
+        ECLIMD_OPTS Variable Value:
+        -Dosgi.instance.area.default=@user.home/another_workspace
    - Then you can start eclimd as normal (via the eclimd.bat file).
-
-2. The second option is to create a shortcut to the eclimd.bat file:
-
+2. The second option is to create a shortcut to the eclimd.bat
+   file:
    - In Windows Explorer, open your eclipse folder.
-
-   - Hold down the right mouse button and drag the eclimd.bat file to
-     where you want the shortcut to exist (like your desktop) and
+   - Hold down the right mouse button and drag the eclimd.bat file
+     to where you want the shortcut to exist (like your desktop) and
      release the right mouse button.
-
    - Choose "Create Shortcut(s) Here"
-
    - Right click the shortcut and choose "Properties"
-
-   - On the "Shortcut" tab edit the "Target:" field and append:
-     -Dosgi.instance.area.default=@user.home/another_workspace
-
+      - On the "Shortcut" tab edit the "Target:" field and append:
+        -Dosgi.instance.area.default=@user.home/another_workspace
 *eclim_proxy*
 
 
@@ -112,17 +104,15 @@ How do I specify jvm memory arguments for eclim (fix OutOfMemory errors).
 If you are using the headless version of eclimd, then you have a
 couple options:
 
-1. pass the necessary jvm args to eclimd. For example, to increase the
-   heap size:
-
+1. pass the necessary jvm args to eclimd. For example, to increase
+   the heap size:
    >
       $ eclimd -Xmx256M
 
    <
 
-2. if you are using a unix variant, then you can add the necessary vm
-   args to a .eclimrc file in your home directory.
-
+2. if you are using a unix variant, then you can add the necessary
+   vm args to a .eclimrc file in your home directory.
    >
       # increase heap size
       -Xmx256M
@@ -170,22 +160,19 @@ property according to your setup:
 
 1. Headless eclimd users on any unix variant (Linux, OSX, etc) can
    simply add the property your .eclimrc file in your home directory:
-
    >
       # set the default file encoding
       file.encoding=utf-8
 
    <
 
-2. Headless eclimd users on Windows can add the system property (eg.
-   -Dfile.encoding=utf-8) using the same steps described above, for
-   setting the workspace location.
-
+2. Headless eclimd users on Windows can add the system property
+   (eg. -Dfile.encoding=utf-8) using the same steps described above,
+   for setting the workspace location.
 3. Headed eclimd users can add the system property (eg.
    -Dfile.encoding=utf-8) to your eclipse.ini file found in your
    eclipse install's root directory. Be sure to add the property on a
    new line after the -vmargs line:
-
    >
       ...
       -vmargs
@@ -254,13 +241,11 @@ starting eclimd, please see the faq devoted to this.
 I'm editing a [java, python, php, etc] file and code completion doesn't work.
 -----------------------------------------------------------------------------
 
-- If you receive the message "E764: Option 'completefunc' is not set",
-  please see the file type section below.
-
+- If you receive the message "E764: Option 'completefunc' is not
+  set", please see the file type section below.
 - Next step is to make sure that the current file is in an eclipse
   project by running the following command in the vim windows
   containing the file you are working on.
-
   >
      :ProjectInfo
 
@@ -273,7 +258,6 @@ I'm editing a [java, python, php, etc] file and code completion doesn't work.
 - If the correct project info is found, then try running the
   completion again, if it still doesn't return any results run the
   command:
-
   >
      :messages
 
@@ -365,9 +349,8 @@ incompatibilities.
 
 - Spring IDE: At least one user has reported that eclim's java
   validation no longer works after installing the Spring IDE.
-
-- viPlugin: Attempting to open a file using the embedded gvim support
-  fails if viPlugin is installed.  This issue has been reported on the
-  viPlugin site.
+- viPlugin: Attempting to open a file using the embedded gvim
+  support fails if viPlugin is installed.  This issue has been
+  reported on the viPlugin site.
 
 vim:ft=eclimhelp

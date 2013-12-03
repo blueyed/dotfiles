@@ -20,9 +20,8 @@ your .buildpath.
 
 *:NewSrcEntry_dltk*
 
-- :NewSrcEntry <dir> [<dir> ...] - Adds one or more new entries which
-  reference source directories in your project.
-
+- :NewSrcEntry <dir> [<dir> ...] - Adds one or more new entries
+  which reference source directories in your project.
   >
      <buildpathentry external="true" kind="lib" path="src/php"/>
 
@@ -33,9 +32,8 @@ your .buildpath.
 
 *:NewLibEntry_dltk*
 
-- :NewLibEntry <dir> [<dir> ...] - Adds one or more new entries which
-  reference external source directories.
-
+- :NewLibEntry <dir> [<dir> ...] - Adds one or more new entries
+  which reference external source directories.
   >
      <buildpathentry external="true" kind="lib" path="/usr/local/php/cake_1.1.16.5421"/>
 
@@ -47,7 +45,6 @@ your .buildpath.
 
 - :NewProjectEntry <project> [<project> ...] - Adds one or more new
   entries which reference other projects.
-
   >
      <buildpathentry combineaccessrules="false" kind="prj" path="/test_project"/>
 

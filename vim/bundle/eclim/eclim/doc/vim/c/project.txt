@@ -50,9 +50,10 @@ cursor over the relevant "|add|" link and hit <enter>.  You will then
 be prompted to enter an appropriate value.  For your convenience, tab
 completion is provided where possible.
 
-Note: Despite the odd looking value in the includes path section above, to
-  add the entry you simply need to supply the project relative path,
-  "includes/" in this case, when prompted by the add command.
+Note: Despite the odd looking value in the includes path section
+  above, to add the entry you simply need to supply the project
+  relative path, "includes/" in this case, when prompted by the add
+  command.
 
 If at any point you would like to remove a value, you can move the
 cursor over the line of the value you would like to remove and hit D

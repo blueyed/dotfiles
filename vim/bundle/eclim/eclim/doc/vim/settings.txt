@@ -9,18 +9,14 @@ settings.
 There are two types of settings available:
 
 - Eclim global / project settings.
-
   These are settings that reside in your Eclipse workspace and are
   used to control certain aspects of the eclim server's behavior.
   These settings can be viewed and modified using one of the following
   commands:
 
   - :EclimSettings (|vim-core-eclim#:EclimSettings|)
-
   - |:ProjectSettings|
-
 - Vim global variable settings.
-
   These are your typical global Vim variables which can be set within
   your vimrc file.
 
@@ -47,12 +43,10 @@ When adding a new setting, deciding between an Eclipse preference or a
 Vim global variable is a matter of answering the following:
 
 - Will this setting vary from one project to another?
-
   Yes: Add this setting an Eclipse preference.
 
 - Does eclim need access to this setting regardless of whether an
   Eclipse instance is running or not?
-
   Yes: Add this setting a Vim global variable.
 
 vim:ft=eclimhelp

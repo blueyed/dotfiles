@@ -20,19 +20,14 @@ Vim Settings (|vim-settings|)
 
 *g:EclimScalaSearchSingleResult*
 
-- g:EclimScalaSearchSingleResult (Default: 'split') - Determines what
-  action to take when a only a single result is found.
-
+- g:EclimScalaSearchSingleResult (Default: 'split') - Determines
+  what action to take when a only a single result is found.
   Possible values include:
 
   - 'split' - open the result in a new window via "split".
-
   - 'edit' - open the result in the current window.
-
   - 'tabnew' - open the result in a new tab.
-
   - 'lopen' - open the location list to display the result.
-
   This setting overrides the global default for all supported language
   types which can be set using the g:EclimDefaultFileOpenAction
   setting which accepts the same possible values.

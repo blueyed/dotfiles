@@ -74,22 +74,19 @@ command with a '!':
 Getters / Setters
 =================
 
-- :JavaGetSet - Generates both getters and setters for the field under
-  the cursor or for all fields in the specified range.
-
+- :JavaGetSet - Generates both getters and setters for the field
+  under the cursor or for all fields in the specified range.
 *:JavaGet*
 
 - :JavaGet - Generates getters for the field under the cursor or for
   all fields in the specified range.
-
 *:JavaSet*
 
 - :JavaSet - Generates setters for the field under the cursor or for
   all fields in the specified range.
-
-Note: If you would like to generate the indexed getter or setter then you
-  can suffix the appropriate command above with '!' and if the
-  property is an array, an indexed accessor will be created.>
+Note: If you would like to generate the indexed getter or setter
+  then you can suffix the appropriate command above with '!' and if
+  the property is an array, an indexed accessor will be created.>
 
      :JavaGetSet!
 

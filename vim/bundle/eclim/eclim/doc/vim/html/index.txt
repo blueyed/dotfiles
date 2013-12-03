@@ -76,13 +76,11 @@ Vim Settings (|vim-settings|)
 
 *g:EclimHtmlValidate*
 
-- g:EclimHtmlValidate (Default: 1) - If set to 0, disables validation
-  when saving the file.
-
+- g:EclimHtmlValidate (Default: 1) - If set to 0, disables
+  validation when saving the file.
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)
-
 *css*
 
 
@@ -141,7 +139,6 @@ Vim Settings (|vim-settings|)
 
 - g:EclimCssValidate (Default: 1) - If set to 0, disables validation
   when saving the file.
-
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)

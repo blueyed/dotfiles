@@ -30,13 +30,10 @@ current file.  In this buffer you can perform the following actions
 using the specified key bindings:
 
 - <cr> - view the contents of the revision under the cursor.
-
-- d - diff the revision under the cursor against the current contents.
-
+- d - diff the revision under the cursor against the current
+  contents.
 - r - revert the current file to the revision under the cursor.
-
 - c - clear the local history for the file.
-
 *:HistoryClear*
 
 :HistoryClear[!] - Clears the local history for the current file.
@@ -60,12 +57,11 @@ Configuration
 
 Eclipse Settings
 
-- When writing to the local history, eclim simply proxies the request
-  to eclipse, so all eclipse settings are honored.  To modify these
-  settings you currently have to do so inside of the eclipse gui.
-  First shut down eclimd if you are running a headless version, then
-  open the eclipse gui and navigate to:
-
+- When writing to the local history, eclim simply proxies the
+  request to eclipse, so all eclipse settings are honored.  To modify
+  these settings you currently have to do so inside of the eclipse
+  gui. First shut down eclimd if you are running a headless version,
+  then open the eclipse gui and navigate to:
   Window ‣ Preferences ‣ General ‣ Workspace ‣ Local History
 
   And there you can edit your settings as necessary.
@@ -79,7 +75,6 @@ Vim Settings (|vim-settings|)
   disabled by default unless gvim was started from the eclipse gui, in
   which case eclim will honor the default eclipse editor behavior and
   update the local history.
-
 *g:EclimHistoryDiffOrientation*
 
 - g:EclimHistoryDiffOrientation (Default: 'vertical') - When

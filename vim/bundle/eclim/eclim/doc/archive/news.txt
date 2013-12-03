@@ -7,9 +7,9 @@ Eclim News Archive
 2011-09-10
 ==========
 
-Eclim 1.7.2 (|1.7.2|) is now available.
-This version fixes running the installer with java 7 as well as several other
-small bug fixes and improvements.
+   Eclim 1.7.2 (|1.7.2|) is now available.
+   This version fixes running the installer with java 7 as well as several other
+   small bug fixes and improvements.
 
 I'd also like to announce the #eclim channel on freenode.
 
@@ -17,203 +17,196 @@ I'd also like to announce the #eclim channel on freenode.
 2011-07-02
 ==========
 
-Eclim 1.7.1 (|1.7.1|) is now available.
-This is a bug fix release.
+   Eclim 1.7.1 (|1.7.1|) is now available.
+   This is a bug fix release.
 
 
 2011-06-26
 ==========
 
-Eclim 1.7.0 (|1.7.0|) is now available.
-The most notable changes are:
+   Eclim 1.7.0 (|1.7.0|) is now available.
+   The most notable changes are:
 
 - Eclim has been upgraded to support Eclipse 3.7 (Indigo).
-
   Note: Eclim now requires Eclipse 3.7.
 
 
 2011-04-16
 ==========
 
-Eclim 1.6.3 (|1.6.3|) is now available.
-This is primarily a bug fix release.
+   Eclim 1.6.3 (|1.6.3|) is now available.
+   This is primarily a bug fix release.
 
 
 2011-02-26
 ==========
 
-Eclim 1.6.2 (|1.6.2|) is now available.
-This is mostly a bug fix release, but please note that a handful of vim
-features have been broken out into separate projects and are no longer shipped
-with eclim.
+   Eclim 1.6.2 (|1.6.2|) is now available.
+   This is mostly a bug fix release, but please note that a handful of vim
+   features have been broken out into separate projects and are no longer shipped
+   with eclim.
 
 
 2010-10-23
 ==========
 
-Eclim 1.6.1 (|1.6.1|) is now available.
-This is mostly a bug fix release with a few minor features tossed in.
+   Eclim 1.6.1 (|1.6.1|) is now available.
+   This is mostly a bug fix release with a few minor features tossed in.
 
 
 2010-08-01
 ==========
 
-Eclim 1.6.0 (|1.6.0|) is now available.
-The most notable changes are:
+   Eclim 1.6.0 (|1.6.0|) is now available.
+   The most notable changes are:
 
 - Eclim has been upgraded to support Eclipse 3.6 (Helios).
-
   Note: Eclim now requires Eclipse 3.6.
 
 
 2010-06-26
 ==========
 
-Eclim 1.5.8 (|1.5.8|) is now available.
-This is a bug fix release for the installer as well as some php and ruby
-features.
+   Eclim 1.5.8 (|1.5.8|) is now available.
+   This is a bug fix release for the installer as well as some php and ruby
+   features.
 
 
 2010-06-20
 ==========
 
-Eclim 1.5.7 (|1.5.7|) is now available.
-The main focus of this release is bug fixes and improving the installer.
+   Eclim 1.5.7 (|1.5.7|) is now available.
+   The main focus of this release is bug fixes and improving the installer.
 
 
 2010-03-06
 ==========
 
-Eclim 1.5.6 (|1.5.6|) is now available.
+   Eclim 1.5.6 (|1.5.6|) is now available.
 
 
 2010-02-22
 ==========
 
-Eclim 1.5.5 (|1.5.5|) is now available.
-This is a bug fix release for the eclim installer.
+   Eclim 1.5.5 (|1.5.5|) is now available.
+   This is a bug fix release for the eclim installer.
 
 
 2009-12-18
 ==========
 
-Eclim 1.5.4 (|1.5.4|) is now available.
-This is primarily a bug fix release for OSX users.
+   Eclim 1.5.4 (|1.5.4|) is now available.
+   This is primarily a bug fix release for OSX users.
 
 
 2009-12-12
 ==========
 
-Eclim 1.5.3 (|1.5.3|) is now available.
+   Eclim 1.5.3 (|1.5.3|) is now available.
 
 
 2009-08-30
 ==========
 
-Eclim 1.5.2 (|1.5.2|) is now available.
+   Eclim 1.5.2 (|1.5.2|) is now available.
 
 
 2009-07-18
 ==========
 
-Eclim 1.5.1 (|1.5.1|) is now available.
-This is primarily a bug fix release
+   Eclim 1.5.1 (|1.5.1|) is now available.
+   This is primarily a bug fix release
 
 
 2009-07-12
 ==========
 
-Eclim 1.5.0 (|1.5.0|) is now available.
-The most notable changes are:
+   Eclim 1.5.0 (|1.5.0|) is now available.
+   The most notable changes are:
 
 - Eclim has been upgraded to support Eclipse 3.5 (Galileo).
-
   Note: Eclim now requires Eclipse 3.5.
 
 - Ruby support has been added using the eclipse dltk
   (http://eclipse.org/dltk/).
 
-
 2009-06-14
 ==========
 
-Eclim 1.4.9 (|1.4.9|) is now available.
-This is primarily a bug fix release, with a few refinements.
+   Eclim 1.4.9 (|1.4.9|) is now available.
+   This is primarily a bug fix release, with a few refinements.
 
 
 2009-05-30
 ==========
 
-Eclim 1.4.8 (|1.4.8|) is now available.
-This is primarily a bug fix release with a few enhancements.
+   Eclim 1.4.8 (|1.4.8|) is now available.
+   This is primarily a bug fix release with a few enhancements.
 
 
 2009-05-02
 ==========
 
-Eclim 1.4.7 (|1.4.7|) is now available.
-This is a bug fix release which resolves an installation on unix based
-operating systems.
+   Eclim 1.4.7 (|1.4.7|) is now available.
+   This is a bug fix release which resolves an installation on unix based
+   operating systems.
 
 
 2009-05-02
 ==========
 
-Eclim 1.4.6 (|1.4.6|) is now available.
-The major highlight of this release is support for c/c++ using the
-eclipse cdt (http://eclipse.org/cdt/) plugin.
+   Eclim 1.4.6 (|1.4.6|) is now available.
+   The major highlight of this release is support for c/c++ using the
+   eclipse cdt (http://eclipse.org/cdt/) plugin.
 
 
 2009-04-04
 ==========
 
-Eclim 1.4.5 (|1.4.5|) is now available.
-This is primarily a bug fix release.
+   Eclim 1.4.5 (|1.4.5|) is now available.
+   This is primarily a bug fix release.
 
 
 2009-01-10
 ==========
 
-Eclim 1.4.4 (|1.4.4|) is now available.
-Highlights of this release include:
+   Eclim 1.4.4 (|1.4.4|) is now available.
+   Highlights of this release include:
 
 - re-enabled php support
-
 - added ability to run eclimd inside of eclipse gui
-
 - added support for embedding gvim in eclipse
-
 
 2008-11-15
 ==========
 
-Eclim 1.4.3 (|1.4.3|) is now available.
-This release focuses on updating the installer to support ganymede's p2 for
-upgrading / installing external dependencies and adding additional python
-support.
+   Eclim 1.4.3 (|1.4.3|) is now available.
+   This release focuses on updating the installer to support ganymede's p2 for
+   upgrading / installing external dependencies and adding additional python
+   support.
 
 
 2008-09-30
 ==========
 
-Eclim 1.4.2 (|1.4.2|) is now available.
-This is primary a bug fix release.
+   Eclim 1.4.2 (|1.4.2|) is now available.
+   This is primary a bug fix release.
 
 
 2008-08-24
 ==========
 
-Eclim 1.4.1 (|1.4.1|) is now available.
-This is primary a bug fix release, but there are some new features included
-as well.
+   Eclim 1.4.1 (|1.4.1|) is now available.
+   This is primary a bug fix release, but there are some new features included
+   as well.
 
 
 2008-07-27
 ==========
 
-Eclim 1.4.0 (|1.4.0|) is now available.
-Please note that eclim now requires the latest version of eclipse (http://eclipse.org)
-(Ganymede, 3.4.x).
+   Eclim 1.4.0 (|1.4.0|) is now available.
+   Please note that eclim now requires the latest version of eclipse (http://eclipse.org)
+   (Ganymede, 3.4.x).
 
 Also note that the eclipse pdt plugin which serves as the base for
 eclim's php support has not yet been released for the latest version
@@ -229,58 +222,54 @@ other GPL projects in the future.
 2008-03-11
 ==========
 
-Eclim 1.3.5 (|1.3.5|) is now available.
-You can view the release notes (|release notes|) for
-more info.
+   Eclim 1.3.5 (|1.3.5|) is now available.
+   You can view the release notes (|release notes|) for
+   more info.
 
 
 2008-02-05
 ==========
 
-Eclim 1.3.4 (|1.3.4|) is now available.
-This release fixes a few minor bugs, improves the installer to account for
-eclipse installs with per user plugin locations, and adds php support.
+   Eclim 1.3.4 (|1.3.4|) is now available.
+   This release fixes a few minor bugs, improves the installer to account for
+   eclipse installs with per user plugin locations, and adds php support.
 
 
 2007-12-15
 ==========
 
-Eclim 1.3.3 (|1.3.3|) is now available.
-This release fixes some installer issues.  If you have already installed
-1.3.2, then there is no need to upgrade to 1.3.3.
+   Eclim 1.3.3 (|1.3.3|) is now available.
+   This release fixes some installer issues.  If you have already installed
+   1.3.2, then there is no need to upgrade to 1.3.3.
 
 
 2007-12-04
 ==========
 
-Eclim 1.3.2 (|1.3.2|) is now available.
+   Eclim 1.3.2 (|1.3.2|) is now available.
 
 
 2007-07-13
 ==========
 
-Eclim 1.3.1 (|1.3.1|) is now available.
-This is only a bug fix release.
+   Eclim 1.3.1 (|1.3.1|) is now available.
+   This is only a bug fix release.
 
 
 2007-07-01
 ==========
 
-Eclim 1.3.0 (|1.3.0|) is now available.
-The most notable changes are:
+   Eclim 1.3.0 (|1.3.0|) is now available.
+   The most notable changes are:
 
 - Eclim has been upgraded to support Eclipse 3.3.
-
   Note: Eclim now requires Eclipse 3.3 and JDK 1.5.
 
 - A new graphical installer (|installer|) built on the formic
   (http://github.com/ervandew/formic/) installer framework.
-
 - New functionality based on and requiring the eclipse wst
   (http://eclipse.org/webtools/).
-
 - Many more changes (|changes|).
-
 
 2006-10-09
 ==========
@@ -303,8 +292,8 @@ download the updated version or execute the following within vim:
 2006-10-08
 ==========
 
-Eclim 1.2.3 is now available.
-This is primarily a bug fix release.
+   Eclim 1.2.3 is now available.
+   This is primarily a bug fix release.
 
 Please view the release notes (|release notes|) for more info.
 
@@ -312,10 +301,10 @@ Please view the release notes (|release notes|) for more info.
 2006-09-08
 ==========
 
-Eclim 1.2.2 is now available.
-The previous release introduced two new bugs that managed to slip through the
-cracks.  These have now been fixed including a third that had been around for
-some time but went previously unnoticed.
+   Eclim 1.2.2 is now available.
+   The previous release introduced two new bugs that managed to slip through the
+   cracks.  These have now been fixed including a third that had been around for
+   some time but went previously unnoticed.
 
 To see a list of fixes you may view the release notes (|release
 notes|).
@@ -324,9 +313,9 @@ notes|).
 2006-09-07
 ==========
 
-Eclim 1.2.1 is now available.
-This is primarily a bug fix release, but some new functionality has been
-added as well. This release should resolve all known issues.
+   Eclim 1.2.1 is now available.
+   This is primarily a bug fix release, but some new functionality has been
+   added as well. This release should resolve all known issues.
 
 To see a list of what's new / changed, be sure to take a look at the
 release notes (|release notes|).
@@ -349,24 +338,24 @@ If any other issues are encountered please report them.
 2006-07-16
 ==========
 
-Eclim 1.2.0 is now available.
-This release requires Eclipse 3.2 (http://eclipse.org/downloads).
+   Eclim 1.2.0 is now available.
+   This release requires Eclipse 3.2 (http://eclipse.org/downloads).
 
 To see a list of what's new / changed, be sure to take a look at the
 release notes (|release notes|).
 
-Warning: The layout of eclim plugins within the Vim runtimepath has changed.
-  Please read the <a href="changes.html#upgrade_1.2.0">details</a> in
-  the release notes and take the appropriate action prior to
-  upgrading.
+Warning: The layout of eclim plugins within the Vim runtimepath has
+  changed. Please read the <a
+  href="changes.html#upgrade_1.2.0">details</a> in the release notes
+  and take the appropriate action prior to upgrading.
 
 
 2006-05-07
 ==========
 
-Eclim 1.1.2 is now available.
-Before upgrading, you should upgrade your Vim installation to the stable
-release of Vim 7.0 or greater.
+   Eclim 1.1.2 is now available.
+   Before upgrading, you should upgrade your Vim installation to the stable
+   release of Vim 7.0 or greater.
 
 To see a list of what's new / changed, be sure to take a look at the
 release notes (|release notes|).
@@ -375,10 +364,10 @@ release notes (|release notes|).
 2006-02-19
 ==========
 
-New version of eclim (1.1.1) is now available.
-This is mostly a bug fix release will a few new additions.
-Please note, that this latest version requires Eclipse version 3.1.2 for some
-bug fixes and improvements.
+   New version of eclim (1.1.1) is now available.
+   This is mostly a bug fix release will a few new additions.
+   Please note, that this latest version requires Eclipse version 3.1.2 for some
+   bug fixes and improvements.
 
 To see a list of what's new / changed, be sure to take a look at the
 release notes (|release notes|).
@@ -387,8 +376,8 @@ release notes (|release notes|).
 2005-12-26
 ==========
 
-New version of eclim (1.1.0) is now available.
-All questions, issues, suggestions are welcome and encouraged.
+   New version of eclim (1.1.0) is now available.
+   All questions, issues, suggestions are welcome and encouraged.
 
 To see a list of what's new / changed, be sure to take a look at the
 release notes (|release notes|).
@@ -412,16 +401,12 @@ Several new additions over the past couple weeks:
 
 - Java code completion: Integrated into Vim via Vim 7's new "User
   Defined Completion".
-
-- Added eclim command line support for creating and updating projects,
-  including Vim support for editing Eclipse .classpath files and
-  updating Eclipse upon writing of those files.
-
+- Added eclim command line support for creating and updating
+  projects, including Vim support for editing Eclipse .classpath files
+  and updating Eclipse upon writing of those files.
 - Integrated nailgun (http://www.martiansoftware.com/nailgun/) to
   greatly improve the command line client performance.
-
 - Started documenting eclim and its features.
-
 With the addition of these features I'm going to stop adding new
 functionality for the time being and focus on testing and ensuring
 that everything works as expected on Windows.
@@ -443,9 +428,10 @@ request just returns a list of possible results to import for a given
 request and the editor (Vim in this case) handles prompting the user
 and updating the code.
 
-Note: The Vim integration now requires Vim 7.  Even though Vim 7 is still
-  alpha, I haven't had any major issues with it and the new additions
-  to the Vim scripting language are just too good to pass up.
+Note: The Vim integration now requires Vim 7.  Even though Vim 7 is
+  still alpha, I haven't had any major issues with it and the new
+  additions to the Vim scripting language are just too good to pass
+  up.
 
 My next step is to start documenting everything and testing on a
 Windows environment to ensure there aren't any compatibility issues.

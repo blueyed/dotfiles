@@ -36,11 +36,9 @@ Vim Settings (|vim-settings|)
 *g:EclimPythonInterpreter*
 
 - g:EclimPythonInterpreter = 'python'
-
 *g:EclimDjangoAdmin*
 
 - g:EclimDjangoAdmin = 'django-admin.py'
-
 
 Django python support
 =====================
@@ -129,9 +127,8 @@ While editing django html templates, the command :DjangoFind which
 will attempt to locate the relevant resource depending on what is
 under the cursor.
 
-- If on a user defined tag, attempt to find the tag definition within
-  the python tag definition file.
-
+- If on a user defined tag, attempt to find the tag definition
+  within the python tag definition file.
   Ex.
 
   >
@@ -142,7 +139,6 @@ under the cursor.
 
 - If on a user defined filter, attempt to find the filter definition
   within the python filter definition file.
-
   Ex.
 
   >
@@ -151,9 +147,8 @@ under the cursor.
 
   <
 
-- If on the tag/filter definition portion of of a 'load' tag, attempt
-  to find the definition file.
-
+- If on the tag/filter definition portion of of a 'load' tag,
+  attempt to find the definition file.
   Ex.
 
   >
@@ -162,9 +157,8 @@ under the cursor.
 
   <
 
-- If on a reference to a template for ethier an 'extends' or 'include'
-  tag, attempt to find that template file.
-
+- If on a reference to a template for ethier an 'extends' or
+  'include' tag, attempt to find that template file.
   Ex.
 
   >
@@ -175,7 +169,6 @@ under the cursor.
 
 - If on static file reference, as defined in a 'src' or 'href'
   attribute of an element, attempt to find that static file.
-
   Ex.
 
   >
@@ -206,7 +199,6 @@ Vim Settings (|vim-settings|)
 - g:HtmlDjangoUserBodyElements - List of lists, where each list
   contains the name of the start and end tag, as well as any
   intermediary tags of any custom tags which have a body.
-
   Ex.
 
   >
@@ -226,25 +218,21 @@ Vim Settings (|vim-settings|)
 - g:HtmlDjangoUserTags - This setting is a list of any non-body tags
   which don't require indentation or matchit support.  The items
   configured here will be used for syntax highlighting.
-
 *g:HtmlDjangoUserFilters*
 
-- g:HtmlDjangoUserFilters - This settings contains a list of any user
-  defined django filters.  It is currently used for syntax
+- g:HtmlDjangoUserFilters - This settings contains a list of any
+  user defined django filters.  It is currently used for syntax
   highlighting.
-
 *g:HtmlDjangoCompleteEndTag*
 
 - g:HtmlDjangoCompleteEndTag (Default: 1) - When set to 0, disables
   the auto completion of end tags.
-
 *g:EclimDjangoStaticPaths*
 
 - g:EclimDjangoStaticPaths - Used as a list of directories to search
   when looking for static files (js, css, etc). Expected to be a list
   of absolute or django project relative (relative to directory
   containing manage.py and settings.py) directories.
-
   Ex.
 
   >

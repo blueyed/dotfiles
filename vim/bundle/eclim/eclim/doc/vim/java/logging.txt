@@ -45,25 +45,23 @@ Vim Settings (|vim-settings|)
 
 *g:EclimLoggingDisabled*
 
-- g:EclimLoggingDisabled (Default: 0) - If set to a value greater than
-  0, then this plugin will be disabled.
-
+- g:EclimLoggingDisabled (Default: 0) - If set to a value greater
+  than 0, then this plugin will be disabled.
 Eclim Settings (|vim-settings|)
 
 *org.eclim.java.logging.impl*
 
 - org.eclim.java.logging.impl (Default: "commons-logging") -
   Determines which logging implementation to use.
-
   Possible values include "commons-logging", "slf4j", "log4j", "jdk",
   and "custom".
 
 *org.eclim.java.logging.template*
 
-- org.eclim.java.logging.template (Default: 'logger.gst') - Determines
-  the name of the template to use for the custom logger.  The name
-  must be a file name relative to ~/.eclim/resources/jdt/templates/.
-
+- org.eclim.java.logging.template (Default: 'logger.gst') -
+  Determines the name of the template to use for the custom logger.
+  The name must be a file name relative to
+  ~/.eclim/resources/jdt/templates/.
 *log4j*
 
 
@@ -99,7 +97,7 @@ Vim Settings (|vim-settings|)
 
 *g:EclimLog4jValidate*
 
-- g:EclimLog4jValidate (Default: 1) - If set to 0, disables validation
-  when saving the file.
+- g:EclimLog4jValidate (Default: 1) - If set to 0, disables
+  validation when saving the file.
 
 vim:ft=eclimhelp

@@ -447,3 +447,6 @@
 [submodule "lib/tmuxstart"]
 	path = lib/tmuxstart
 	url = git://github.com/treyhunner/tmuxstart.git
+[submodule "lib/tmuxifier"]
+	path = lib/tmuxifier
+	url = git://github.com/jimeh/tmuxifier.git

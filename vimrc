@@ -536,6 +536,18 @@ map <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
 nn gt :<C-U>exec v:count1 . (tabpagenr('$') == 1 ? 'bn' : 'tabnext')<CR>
 nn gT :<C-U>exec v:count1 . (tabpagenr('$') == 1 ? 'bp' : 'tabprevious')<CR>
 
+
+" TODO: $PWD as in %~
+fun! MyGetPrettyPWD()
+  let pwd=fnamemodify(getcwd(), ':~')
+  let pwd=substitute(pwd, '/$', '', '')
+  " TODO: use output from "hash -d" (cached) and shorten accordingly
+  return pwd
+endfun
+" set titlestring=[vim]\ %<%{expand(\"%:~:.\")}%M%R\ [%{MyGetPrettyPWD()}]
+set titlestring=[vim]\ %<%{expand(\"%:~:.\")}%M%R
+
+
 " Opens a tab edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>t
 map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>

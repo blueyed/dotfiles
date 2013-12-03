@@ -438,3 +438,6 @@
 [submodule "vim/bundle/colorscheme-gruvbox"]
 	path = vim/bundle/colorscheme-gruvbox
 	url = git://github.com/morhetz/gruvbox.git
+[submodule "vim/bundle/pytest"]
+	path = vim/bundle/pytest
+	url = git://github.com/alfredodeza/pytest.vim.git

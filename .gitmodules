@@ -441,3 +441,6 @@
 [submodule "vim/bundle/pytest"]
 	path = vim/bundle/pytest
 	url = git://github.com/alfredodeza/pytest.vim.git
+[submodule "vim/bundle/pytest-vim-compiler"]
+	path = vim/bundle/pytest-vim-compiler
+	url = git://github.com/5long/pytest-vim-compiler.git

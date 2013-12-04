@@ -447,3 +447,6 @@
 [submodule "lib/tmuxifier"]
 	path = lib/tmuxifier
 	url = git://github.com/jimeh/tmuxifier.git
+[submodule "vim/bundle/airline"]
+	path = vim/bundle/airline
+	url = git://github.com/bling/vim-airline.git

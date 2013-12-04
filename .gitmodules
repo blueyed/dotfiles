@@ -444,9 +444,6 @@
 [submodule "vim/bundle/pytest-vim-compiler"]
 	path = vim/bundle/pytest-vim-compiler
 	url = git://github.com/5long/pytest-vim-compiler.git
-[submodule "lib/tmuxstart"]
-	path = lib/tmuxstart
-	url = git://github.com/treyhunner/tmuxstart.git
 [submodule "lib/tmuxifier"]
 	path = lib/tmuxifier
 	url = git://github.com/jimeh/tmuxifier.git

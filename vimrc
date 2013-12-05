@@ -735,14 +735,17 @@ nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 if 1 " has('eval') {{{1
 " Strip trailing whitespace {{{2
-function! StripWhitespace () range
-    let old_query = getreg('/')
-    exe 'keepjumps '.a:firstline.','.a:lastline.'substitute/[\\]\@<!\s\+$//e'
-    call setreg('/', old_query)
+function! StripWhitespace(line1, line2)
+  let old_query = getreg('/')
+  let save_cursor = getpos(".")
+  let old_linenum = line('.')
+  exe 'keepjumps '.a:line1.','.a:line2.'substitute/[\\]\@<!\s\+$//e'
+  call setreg('/', old_query)
+  call setpos('.', save_cursor)
+  " keepjumps exe "normal " . old_linenum . "G"
 endfunction
-command! -range=% UnTrail
-      \ keepjumps <line1>,<line2>call StripWhitespace()
-noremap <leader>st :UnTrail<CR>
+command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
+noremap <leader>st :Untrail<CR>
 
 function! MyChangeToRepoRootOfCurrentFile()
   exe 'RepoRoot '.expand('%')

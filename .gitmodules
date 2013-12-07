@@ -462,3 +462,6 @@
 [submodule "vim/bundle/colorscheme-base16"]
 	path = vim/bundle/colorscheme-base16
 	url = git://github.com/chriskempson/base16-vim.git
+[submodule "vim/bundle/unite"]
+	path = vim/bundle/unite
+	url = git://github.com/Shougo/unite.vim.git

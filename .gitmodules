@@ -471,3 +471,6 @@
 [submodule "vim/bundle/startify"]
 	path = vim/bundle/startify
 	url = git://github.com/mhinz/vim-startify.git
+[submodule "vim/bundle/colorscheme-jellybeans"]
+	path = vim/bundle/colorscheme-jellybeans
+	url = git://github.com/nanotech/jellybeans.vim.git

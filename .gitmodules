@@ -468,3 +468,6 @@
 [submodule "vim/bundle/vimproc"]
 	path = vim/bundle/vimproc
 	url = git://github.com/Shougo/vimproc.vim.git
+[submodule "vim/bundle/startify"]
+	path = vim/bundle/startify
+	url = git://github.com/mhinz/vim-startify.git

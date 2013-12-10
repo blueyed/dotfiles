@@ -2,6 +2,7 @@
 --type-set=smarty=.tpl
 --type-set=typoscript=.ts
 --type-set=sass=.scss,.sass
+--type-set=less=.less
 # think-big / kiezhelden / …
 --ignore-dir=cache
 --ignore-dir=media

@@ -375,9 +375,6 @@
 [submodule "vim/bundle/YouCompleteMe"]
 	path = vim/bundle/YouCompleteMe
 	url = git://github.com/Valloric/YouCompleteMe.git
-[submodule "lib/git-meld"]
-	path = lib/git-meld
-	url = git://github.com/wmanley/git-meld.git
 [submodule "vim/bundle/scriptease"]
 	path = vim/bundle/scriptease
 	url = git://github.com/tpope/vim-scriptease.git
@@ -453,3 +450,24 @@
 [submodule "vim/bundle/django-template-textobjects"]
 	path = vim/bundle/django-template-textobjects
 	url = git://github.com/mjbrownie/django-template-textobjects.git
+[submodule "lib/base16/base16-gnome-terminal"]
+	path = lib/base16/base16-gnome-terminal
+	url = git://github.com/chriskempson/base16-gnome-terminal.git
+[submodule "lib/base16/base16-shell"]
+	path = lib/base16/base16-shell
+	url = git://github.com/chriskempson/base16-shell.git
+[submodule "vim/bundle/colorscheme-base16"]
+	path = vim/bundle/colorscheme-base16
+	url = git://github.com/chriskempson/base16-vim.git
+[submodule "vim/bundle/unite"]
+	path = vim/bundle/unite
+	url = git://github.com/Shougo/unite.vim.git
+[submodule "vim/bundle/vimproc"]
+	path = vim/bundle/vimproc
+	url = git://github.com/Shougo/vimproc.vim.git
+[submodule "vim/bundle/startify"]
+	path = vim/bundle/startify
+	url = git://github.com/mhinz/vim-startify.git
+[submodule "vim/bundle/colorscheme-jellybeans"]
+	path = vim/bundle/colorscheme-jellybeans
+	url = git://github.com/nanotech/jellybeans.vim.git

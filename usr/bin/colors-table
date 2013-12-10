@@ -4,7 +4,17 @@
 
 autoload -U colors && colors
 
-for b in ${(k)bg}; do
+local -a bgs
+if [[ $1 != "" ]]; then
+	bgs=($1)
+else
+	bgs=(${(k)bg})
+fi
+
+for b in $bgs; do
+	if (( $#bgs > 1 )); then
+		echo "bg: $b"
+	fi
 	for c in ${(k)fg}; do
 		print -nP %{${bg_no_bold[$b]}%}
 		print -nP %{${fg_no_bold[$c]}%} ${(l.$((COLUMNS/2-1)).)c}

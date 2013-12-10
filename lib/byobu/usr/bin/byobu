@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION=5.67
+VERSION=5.68
 PKG="byobu"
 
 # All sorts of things go wrong if you don't own your $HOME dir.
@@ -63,6 +63,9 @@ export BYOBU_BACKEND
 
 # Store the parent tty
 export BYOBU_TTY=$(tty)
+
+# Get the default window name
+[ -n "$BYOBU_WINDOW_NAME" ] || BYOBU_WINDOW_NAME=-
 
 # Add a version argument for debugging purposes
 if [ "$#" = "1" ]; then
@@ -110,7 +113,7 @@ case $BYOBU_BACKEND in
 			fi
 		fi
 		BYOBU_PROFILE="-f $BYOBU_PREFIX/share/$PKG/profiles/tmuxrc"
-		DEFAULT_WINDOW="new-session -n - ${BYOBU_PREFIX}/bin/byobu-shell"
+		DEFAULT_WINDOW="new-session -n $BYOBU_WINDOW_NAME ${BYOBU_PREFIX}/bin/byobu-shell"
 		sessions=$($BYOBU_BACKEND list-sessions 2>/dev/null) || true
 	;;
 	screen)

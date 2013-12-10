@@ -37,7 +37,7 @@ task :update_submodules do
     if line =~ /^\* (.*?) \w+\.\.\.\w+/
       sm_path = $1
     elsif sm_path and line =~ /^  >/
-      puts "Skipping submodule #{sm_path}, which is ahead locally."
+      puts "Skipping submodule #{sm_path}, which is ahead locally (new commits)."
       submodules.delete(sm_path)
       sm_path = nil
     end
@@ -153,7 +153,7 @@ task :diff do
 end
 
 desc "Upgrade submodules to current master"
-task :upgrade do
+task :upgrade => [:update_submodules] do
   ignore_modified = true
   system %Q{ git diff --cached --exit-code > /dev/null } or raise "The git index is not clean."
 
@@ -197,7 +197,7 @@ task :upgrade do
       puts "Merged FETCH_HEAD:\n" + output
     end
 
-    output = %x[cd #{path} && git merge --ff-only FETCH_HEAD 2>&1]
+    output = %x[cd #{path} && git merge --ff --ff-only FETCH_HEAD 2>&1]
     if ! output.split("\n")[-1] =~ /^Already up-to-date.( Yeeah!)?/
       puts output
     else
@@ -205,7 +205,15 @@ task :upgrade do
       # TODO: pull result
     end
     if not $?.success?
-      raise "Merging FETCH_HEAD failed: " + output
+      puts $?
+      if output =~ /^error: Your local changes to the following files would be overwritten by merge:/
+        output = %x[cd #{path} && git stash save "Stashed by rake upgrade" 2>&1 && git merge --ff --ff-only FETCH_HEAD 2>&1 && git stash pop 2>&1]
+        puts $?
+        puts output if $my_verbose and $my_verbose > 1
+      end
+      if not $?.success?
+        raise "Merging FETCH_HEAD failed: " + output
+      end
     end
     next
 

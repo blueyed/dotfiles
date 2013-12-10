@@ -35,4 +35,5 @@ debug "Using SHELL: $SHELL"
 debug "Using PATH:  $PATH"
 
 # exec $SHELL -xv -c $BYOBU_PREFIX/bin/byobu
-exec $SHELL -c $BYOBU_PREFIX/bin/byobu
+# exec $SHELL -c $BYOBU_PREFIX/bin/byobu
+exec $BYOBU_PREFIX/bin/byobu

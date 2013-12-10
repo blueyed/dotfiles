@@ -11,5 +11,9 @@ perl -E ' print "\e[?1006h\e[?1002h" '
 
 /usr/bin/mosh "$@"
 
+r=$?
+
 # unset workaround
 perl -E ' print "\e[?1006l\e[?1002l" '
+
+return $r

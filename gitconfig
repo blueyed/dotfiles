@@ -5,7 +5,8 @@
 	a = add
 	ae = add -e
 	amend = commit --amend
-	alias = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'
+	# use "aliases" instead of "alias", which is used by hub; ref: https://github.com/defunkt/hub/issues/303
+	aliases = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'
 	c = commit -v
 	ci = commit -v
 	ca = commit -v -a
@@ -22,6 +23,7 @@
 	f = fetch
 	ll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
 	l = log --abbrev-commit --graph --decorate --submodule=log
+	rb = rebase -i @{u}
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbi = rebase --interactive
@@ -42,19 +44,25 @@
 	sync = !legit sync \"$@\"
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
+[browser "open-in-running-browser"]
+	cmd = open-in-running-browser
+[web]
+	browser = open-in-running-browser
+
 [color]
 	diff = auto
 	status = auto
 	branch = auto
 	ui = true
-
 [color "diff"]
 	whitespace = red reverse
+
 [core]
 	attributesfile = ~/.gitattributes.global
 	excludesfile = ~/.gitignore.global
 	editor = vim
-	whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
+	# use default..
+	# whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol,blank-at-eol
 	; buggy(?) with Git 1.7.1 on CentOS 6.0 for submodules, see commit message.
 	; autocrlf = input
 [diff]
@@ -73,6 +81,11 @@
 [merge "dpkg-mergechangelogs"]
 	name = debian/changelog merge driver
 	driver = dpkg-mergechangelogs -m %O %A %B %A
+# "git-meld":
+[treediff]
+	tool = bc3
+[treediff "bc3"]
+	cmd = bcompare
 [format]
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
@@ -92,3 +105,6 @@
 [diff "odf"]
 	binary = true
 	textconv = odt2txt
+
+; [pager]
+; 	status = true

@@ -471,3 +471,6 @@
 [submodule "vim/bundle/colorscheme-jellybeans"]
 	path = vim/bundle/colorscheme-jellybeans
 	url = git://github.com/nanotech/jellybeans.vim.git
+[submodule "vim/bundle/exchange"]
+	path = vim/bundle/exchange
+	url = git://github.com/tommcdo/vim-exchange.git

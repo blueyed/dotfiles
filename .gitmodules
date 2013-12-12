@@ -474,3 +474,6 @@
 [submodule "vim/bundle/exchange"]
 	path = vim/bundle/exchange
 	url = git://github.com/tommcdo/vim-exchange.git
+[submodule "vim/bundle/cursorcross"]
+	path = vim/bundle/cursorcross
+	url = git://github.com/mtth/cursorcross.vim.git

@@ -477,3 +477,6 @@
 [submodule "vim/bundle/cursorcross"]
 	path = vim/bundle/cursorcross
 	url = git://github.com/mtth/cursorcross.vim.git
+[submodule "vim/bundle/ag"]
+	path = vim/bundle/ag
+	url = git://github.com/ervandew/ag.git

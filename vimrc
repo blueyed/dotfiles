@@ -346,6 +346,15 @@ set isfname-==
 " Always display the status line
 set laststatus=2
 
+if has('gui_running')
+  " Generic GUI options
+  set guioptions-=T " hide toolbar
+  if has('vim_starting')
+    set lines=55 columns=100
+  endif
+  set guifont=Ubuntu\ Mono\ For\ Powerline\ 12,DejaVu\ Sans\ Mono\ 10
+endif
+
 " Dim inactive windows using 'colorcolumn' setting
 " This tends to slow down redrawing, but is very useful.
 " Based on https://groups.google.com/d/msg/vim_use/IJU-Vk-QLJE/xz4hjPjCRBUJ

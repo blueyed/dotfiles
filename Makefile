@@ -2,7 +2,7 @@ INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) \
 	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) \
 	byobu/.screenrc byobu/.tmux.conf \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
-	gvimrc hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
+	hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc screenrc screenrc.common subversion/servers \
 	terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
 	xsessionrc \

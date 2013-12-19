@@ -9,7 +9,8 @@ if exists(":PhpSearchContext")
 endif
 
 " php-funclist.txt generated using:
-" curl http://www.php.net/manual/en/indexes.php | sed '/class="indexentry"/!d' | grep -oP '>[^<]+</a>'|cut -b2- | sed 's~()</a>~~' > php-funclist.txt
+" curl http://www.php.net/manual/en/indexes.functions.php | sed '/class="index"/!d' | grep -oP '>[^<]+</a> - .*</li>' | cut -b2- | sed 's~</a> - ~ ; ~; s~</li>$~~' > php-funclist.txt
+" curl http://www.php.net/manual/en/indexes.functions.php | sed '/class="index"/!d' | grep -oP '>[^<]+</a>'|cut -b2- | sed 's~</a>~~' > php-funclist.txt
 augroup WezsPHPStuff
 au BufEnter *.php set dictionary-=~/.vim/php-funclist.txt dictionary+=~/.vim/php-funclist.txt
 au BufLeave *.php set dictionary-=~/.vim/php-funclist.txt
@@ -53,6 +54,7 @@ endfunction
 command! -nargs=1 PhpLookup call OpenPhpFunction("<args>")
 
 function! SetupPhpHelp()
+  " TODO: use pman with none/flaky internet connection
   if has('unix') && ! has('gui_running') && executable('pman')
     " Use pman for help, installed via 'pear install doc.php.net/pman'
     " see http://bjori.blogspot.com/2010/01/unix-manual-pages-for-php-functions.html

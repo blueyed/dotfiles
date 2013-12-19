@@ -9,15 +9,19 @@
 
 while [[ $1 == -* ]] ; do
 	case $1 in
-		(-a) call_cmd=(git add -p) ; call_cmd_for_unknown=(git add) ;;
+		(-a) call_cmd=(git add -p)
+		     call_cmd_for_unknown=(git add)
+		     call_cmd_for_rm=(git rm) ;;
 		(-c) call_cmd=(git checkout -p) ;;
 		(--) shift ; break ;;
 		(-h)
-			printf 'usage: gstt [-a]\n'
-			printf '  -a      "call git add -p on files".\n'
+			printf 'List files according to `git status`, sorted by last modification date.'
+			printf 'Usage: gstt [-a|-c]\n'
+			printf '  -a      call `git add (-p)` / `git rm` on files.\n'
+			printf '  -c      call `git checkout -p` on files.\n'
 			return 0
 			;;
-		(*) printf "unkown option: '%s'\n" "$1" ; return 1 ;;
+		(*) printf "Unkown option: '%s'\n" "$1" ; return 1 ;;
 	esac
 	shift
 done
@@ -27,7 +31,11 @@ gstt() {
 		st=$line[1,2] ; fname=$line[4,-1]
 		# echo -E $line | read -r st fname
 		if [ -e $fname ]; then
-			echo "${$(stat -c %y $fname)[1,19]} $st $fname"
+			# TODO: quoting
+			# stat: invalid option -- 'v'
+			# Try 'stat --help' for more information.
+			#  ?? -v
+			echo "${$(stat -c %y -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
 		else
 			# deleted
 			echo "                    $st $fname"
@@ -44,17 +52,34 @@ if ((#call_cmd)); then
 		fi
 		fname=$(echo $i | cut -b24-)
 		echo "--- $i ---"
-		ls -l $fname
+		if [[ $wd_status != "D" ]]; then
+			ls -ld $fname
+		fi
 		if [[ $wd_status == '?' ]] && [[ ${#call_cmd_for_unknown} -gt 0 ]]; then
-			read -q "yn?Add the file? (y/n) "
+			if [[ -d $fname ]]; then
+				ls -l $fname
+				read -q "yn?Add the dir? (y/n) "
+			else
+				read -q "yn?Add the file? (y/n) "
+			fi
 			echo
 			if [[ $yn == 'y' ]]; then
 				$call_cmd_for_unknown $fname
+			fi
+		elif [[ $wd_status == 'D' ]] && [[ ${#call_cmd_for_rm} -gt 0 ]]; then
+			if [[ -d $fname ]]; then
+				read -q "yn?Remove the dir? (y/n) "
+			else
+				read -q "yn?Remove the file? (y/n) "
+			fi
+			echo
+			if [[ $yn == 'y' ]]; then
+				$call_cmd_for_rm $fname
 			fi
 		else
 			$call_cmd $fname
 		fi
 	done
 else
-	gstt
+	gstt "$@"
 fi

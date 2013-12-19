@@ -539,7 +539,11 @@ function! eclim#project#util#ProjectList(workspace) " {{{
 endfunction " }}}
 
 function! eclim#project#util#ProjectNatures(project) " {{{
-  " Prints nature info one or all projects.
+  " Prints nature info of one or all projects.
+
+  if !eclim#EclimAvailable()
+    return
+  endif
 
   let command = s:command_natures
   if a:project != ''
@@ -769,7 +773,9 @@ function! eclim#project#util#ProjectTab(project) " {{{
     let is_project = 0
     let dir = expand(project, ':p')
     if !isdirectory(dir)
-      call eclim#util#EchoError("No project '" . project . "' found.")
+      if eclim#EclimAvailable(0)
+        call eclim#util#EchoError("No project '" . project . "' found.")
+      endif
       return
     endif
     let project = fnamemodify(substitute(dir, '/$', '', ''), ':t')
@@ -919,12 +925,7 @@ function! eclim#project#util#GetProjects() " {{{
   "   name: The name of the project.
   "   path: The root path of the project.
   "   links: List of linked paths.
-
   let instances = eclim#client#nailgun#GetEclimdInstances()
-  if type(instances) != g:DICT_TYPE
-    let s:workspace_projects = {}
-    return []
-  endif
 
   if keys(s:workspace_projects) != keys(instances)
     let s:workspace_projects = {}
@@ -1156,8 +1157,18 @@ function! eclim#project#util#IsCurrentFileInProject(...) " {{{
   " Optional args:
   "   echo_error (default: 1): when non-0, echo an error to the user if project
   "                            could not be determined.
-  if eclim#project#util#GetCurrentProjectName() == ''
-    if (a:0 == 0 || a:1) && g:eclimd_running
+
+  let echo = a:0 ? a:1 : 1
+  if !echo
+    silent let project = eclim#project#util#GetCurrentProjectName()
+  else
+    let project = eclim#project#util#GetCurrentProjectName()
+  endif
+
+  if project == ''
+    " if eclimd isn't available, then that could be the reason the project
+    " couldn't be determined, so don't hide that message with this one.
+    if echo && eclim#EclimAvailable(0)
       call eclim#util#EchoError('Unable to determine the project. ' .
         \ 'Check that the current file is in a valid project.')
     endif
@@ -1195,7 +1206,9 @@ function! eclim#project#util#RefreshFile() " {{{
 endfunction " }}}
 
 function! eclim#project#util#UnableToDetermineProject() " {{{
-  if g:eclimd_running
+  " if eclimd isn't available, then that could be the reason the project
+  " couldn't be determined, so don't hide that message with this one.
+  if eclim#EclimAvailable(0)
     call eclim#util#EchoError("Unable to determine the project. " .
       \ "Please specify a project name or " .
       \ "execute from a valid project directory.")

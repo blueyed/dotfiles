@@ -92,7 +92,6 @@ let s:sql_dialects = {
     \ 'postgresql': 'plsql.vim',
     \ 'postgresql_psycopg2': 'plsql.vim',
     \ 'sqlite3': 'sql.vim',
-    \ 'oracle': 'sqloracle.vim',
   \ }
 
 " }}}
@@ -138,7 +137,7 @@ function! eclim#python#django#manage#Manage(args)
         call eclim#util#EchoError(error)
       else
         let engine = eclim#python#django#util#GetSqlEngine(path)
-        let dialect = has_key(s:sql_dialects, engine) ? s:sql_dialects[engine] : 'plsql.vim'
+        let dialect = has_key(s:sql_dialects, engine) ? s:sql_dialects[engine] : 'plsql'
 
         let filename = expand('%')
         let name = '__' . action . '__'

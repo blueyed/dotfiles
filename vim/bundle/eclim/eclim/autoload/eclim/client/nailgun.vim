@@ -34,17 +34,14 @@ function! eclim#client#nailgun#ChooseEclimdInstance(...) " {{{
   " prompting the user.  If the optional 'dir' argument is supplied and that dir
   " is a subdirectory of one of the workspaces, then that workspace will be
   " returned.
-  " Option args:
+  " Optional args:
   "   dir
 
-  let instances = eclim#client#nailgun#GetEclimdInstances()
-  if type(instances) == g:NUMBER_TYPE
-    call eclim#util#Echo(printf(
-      \ 'No eclimd instances found running (eclimd created file not found %s)',
-      \ eclim#UserHome() . '/.eclim/.eclimd_instances'))
+  if !eclim#EclimAvailable()
     return
   endif
 
+  let instances = eclim#client#nailgun#GetEclimdInstances()
   if len(instances) == 1
     return instances[keys(instances)[0]]
   endif
@@ -91,9 +88,10 @@ function! eclim#client#nailgun#ChooseEclimdInstance(...) " {{{
 endfunction " }}}
 
 function! eclim#client#nailgun#GetEclimdInstances() " {{{
+  " Returns a dict with eclimd instances.
   let instances = {}
-  let dotinstances = eclim#UserHome() . '/.eclim/.eclimd_instances'
-  if filereadable(dotinstances)
+  if eclim#EclimAvailable()
+    let dotinstances = eclim#UserHome() . '/.eclim/.eclimd_instances'
     let lines = readfile(dotinstances)
     for line in lines
       if line !~ '^{'
@@ -102,8 +100,8 @@ function! eclim#client#nailgun#GetEclimdInstances() " {{{
       let values = eval(line)
       let instances[values.workspace] = values
     endfor
-    return instances
   endif
+  return instances
 endfunction " }}}
 
 function! eclim#client#nailgun#Execute(instance, command, ...) " {{{

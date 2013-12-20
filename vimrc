@@ -69,18 +69,18 @@ if 1 " has('eval')
   let g:neocomplcache_enable_auto_select = 1
 
   " Enable omni completion.
-  autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-  autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+  au FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  au FileType python setlocal omnifunc=pythoncomplete#Complete
+  au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
   " Enable heavy omni completion.
   if !exists('g:neocomplcache_omni_patterns')
     let g:neocomplcache_omni_patterns = {}
   endif
   let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-  "autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+  "au FileType ruby setlocal omnifunc=rubycomplete#Complete
   let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
   let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
   let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
@@ -224,7 +224,7 @@ endif
   "   "   let g:airline_section_b = airline#section#create_left(['ffenc','file'])
   "   "   let g:airline_section_c = airline#section#create(['%{getcwd()}'])
   " endfunction
-  " autocmd VimEnter * call AirlineInit()
+  " au VimEnter * call AirlineInit()
 
   let g:_cache_airline_filename_base = ''
   let g:_cache_airline_filename_r = ''
@@ -255,7 +255,7 @@ if (&t_Co > 2 || has("gui_running"))
     " XXX: using "Spell" (without "@") will disable spell checking with e.g. ft=mail!
     syn cluster @Spell add=MyTodo
   endfunction
-  autocmd Syntax * call MyHighlightTodo()
+  au Syntax * call MyHighlightTodo()
   hi def link MyTodo Todo
 endif
 
@@ -377,26 +377,26 @@ if has("autocmd") " Autocommands {{{1
   au!
 
   " Enable soft-wrapping for text files
-  autocmd FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
+  au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
 
 
   au FileType mail,markdown,gitcommit setlocal spell
-  autocmd FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
+  au FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
 
   " For all text files set 'textwidth' to 78 characters.
-  " autocmd FileType text setlocal textwidth=78
+  " au FileType text setlocal textwidth=78
 
   " When editing a file, always jump to the last known cursor position.
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).
-  autocmd BufReadPost *
+  au BufReadPost *
     \ if &ft != 'gitcommit' && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp' && line("'\"") > 0 && line("'\"") <= line("$") |
     \   exe 'normal! g`"zv' |
     \ endif
 
   " Automatically load .vimrc source when saved
-  autocmd BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
-  autocmd BufWritePost $MYGVIMRC,~/.dotfiles/gvimrc source $MYGVIMRC
+  au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
+  au BufWritePost $MYGVIMRC,~/.dotfiles/gvimrc source $MYGVIMRC
   augroup END
 
   au BufNewFile,BufRead *pentadactylrc*,*.penta set filetype=pentadactyl.vim
@@ -411,11 +411,11 @@ if has("autocmd") " Autocommands {{{1
 
   " autocommands for fugitive {{{2
   " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
-  autocmd User fugitive
+  au User fugitive
     \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)' |
     \   nnoremap <buffer> .. :edit %:h<CR> |
     \ endif
-  autocmd BufReadPost fugitive://* set bufhidden=delete
+  au BufReadPost fugitive://* set bufhidden=delete
 
   " Expand tabs for Debian changelog. This is probably not the correct way.
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
@@ -459,14 +459,14 @@ if has("autocmd") " Autocommands {{{1
   augroup vimrcExEOLWS
     au!
     highlight EOLWS ctermbg=red guibg=red
-    autocmd InsertEnter * call MyAuGroupEOLWS("i")
+    au InsertEnter * call MyAuGroupEOLWS("i")
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments), only for normal buffers:
-    autocmd InsertLeave,BufWinEnter * call MyAuGroupEOLWS("n")
+    au InsertLeave,BufWinEnter * call MyAuGroupEOLWS("n")
       " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
 
     " add this for Python (via python_highlight_all?!):
-    " autocmd FileType python
+    " au FileType python
     "       \ if g:MyAuGroupEOLWSactive |
     "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
     "       \ endif
@@ -841,7 +841,7 @@ endif
 " 1}}}
 
 " Automatic line numbers {{{
-" autocmd BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
+" au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set nonumber
 let &showbreak = '↪ '
 function! ToggleLineNr()
@@ -894,16 +894,16 @@ set wildmode=list:longest,list:full
 " set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
 if has("autocmd") && exists("+omnifunc")
   augroup filetype_omnifunc
-    au!
-  autocmd Filetype *
+  au!
+  au Filetype *
     \   if &omnifunc == "" |
     \     setlocal omnifunc=syntaxcomplete#Complete |
     \   endif
   " use eclim for PHP omnicompletion (does not pollute quickfix window and is better in general)
-  "  autocmd Filetype php setlocal omnifunc=eclim#php#complete#CodeComplete
+  "  au Filetype php setlocal omnifunc=eclim#php#complete#CodeComplete
   " ref: https://github.com/Valloric/YouCompleteMe/issues/103#issuecomment-14149318
   " NOTE: this is done via g:EclimCompletionMethod now instead
-  " autocmd Filetype * runtime! autoload/eclim/<amatch>/complete.vim
+  " au Filetype * runtime! autoload/eclim/<amatch>/complete.vim
   "   \	| let s:cfunc = 'eclim#'.expand('<amatch>').'#complete#CodeComplete'
   "   \	| if exists('*'.s:cfunc) | let &l:omnifunc=s:cfunc | endif
   augroup END
@@ -994,8 +994,8 @@ nnoremap <expr> <leader>gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 " :clist (view list of errors)
 " :cn, :cp (move around list of errors)
 " NOTE: should be provided by checksyntax plugin
-" autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
-" autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+" au BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
+" au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 if 1 " has('eval') {{{1
 " Strip trailing whitespace {{{2
@@ -1117,8 +1117,8 @@ function! s:CloseIfOnlyControlWinLeft()
   endif
 endfunction
 augroup CloseIfOnlyControlWinLeft
-  autocmd!
-  autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
+  au!
+  au WinEnter * call s:CloseIfOnlyControlWinLeft()
 augroup END
 
 
@@ -1134,8 +1134,8 @@ fun! MyAutoCheckTime()
   endif
 endfun
 augroup MyAutoChecktime
-  autocmd!
-  autocmd FocusGained,BufEnter,CursorHold * call MyAutoCheckTime()
+  au!
+  au FocusGained,BufEnter,CursorHold * call MyAutoCheckTime()
 augroup END
 command! NoAutoChecktime let b:autochecktime=0
 
@@ -1230,8 +1230,8 @@ function! QFixToggle(forced)
 endfunction
 " used to track manual opening of the quickfix, e.g. via `:copen`
 augroup QFixToggle
-  autocmd!
-  autocmd BufWinEnter quickfix let g:qfix_buf = bufnr("%")
+  au!
+  au BufWinEnter quickfix let g:qfix_buf = bufnr("%")
 augroup END
 
 " 2}}}
@@ -1608,6 +1608,6 @@ nmap <C-D> :q<CR>
 
     " Check if the new file (with git-diff prefix removed) is readable and
     " edit that instead (copy'n'paste from shell)
-    autocmd BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^[abiw]/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
+    au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^[abiw]/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
 " vim: fdm=marker

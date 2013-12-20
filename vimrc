@@ -218,7 +218,6 @@ if has("user_commands")
   " Themes
   " Airline:
   let g:airline_powerline_fonts = 1
-endif
   " to test
   let g:airline#extensions#branch#use_vcscommand = 1
   let g:airline#extensions#tabline#enabled = 1
@@ -265,7 +264,7 @@ endif
 if 1 " has('eval')
   " Color scheme (after 'syntax on') {{{1
 
-  set bg = dark
+  set bg=dark
 
   set rtp+=~/.vim/bundle/solarized
   " NOTE: use 16 for solarized gnome-terminal scheme

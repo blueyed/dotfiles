@@ -226,15 +226,9 @@ endif
   " endfunction
   " au VimEnter * call AirlineInit()
 
-  let g:_cache_airline_filename_base = ''
-  let g:_cache_airline_filename_r = ''
   fun! Airline_filename()
-    let s:base = expand('%:p')
-    if s:base != g:_cache_airline_filename_base
-      let g:_cache_airline_filename_base = s:base
-      let g:_cache_airline_filename_r = ShortenFilename() . (&modified ? '[++]' : '')
-    endif
-    return g:_cache_airline_filename_r
+    " let s:base = expand('%:p')
+    return ShortenFilename() . (&modified ? '[++]' : '')
   endfun
   call airline#parts#define_function('file', 'Airline_filename')
 
@@ -378,8 +372,6 @@ if has("autocmd") " Autocommands {{{1
 
   " Enable soft-wrapping for text files
   au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
-
-
   au FileType mail,markdown,gitcommit setlocal spell
   au FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
 
@@ -538,17 +530,27 @@ endif
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
 
+let s:_cache_shorten_path = {}
+fun! ShortenPath(path)
+  if ! exists('s:_cache_shorten_path[a:path]')
+    let s:_cache_shorten_path[a:path] = system('shorten_path '.shellescape(a:path))
+  endif
+  return s:_cache_shorten_path[a:path]
+endfun
+
 " Shorten a given filename by truncating path segments.
 function! ShortenFilename(...)
-  " get bufname from a:1, defaulting to bufname('%') {{{
+  " Args: bufname ('%' for default), maxlength
   " echomsg "ShortenFilename:" string(a:000)
+
+  " get bufname from a:1, defaulting to bufname('%') {{{
   if a:0 && a:1 != '%'
     let bufname = a:1
   else
     let bufname = bufname("%")
     if len(bufname)
+      let bufname = ShortenPath(fnamemodify(bufname, ':p'))
       let bufname = fnamemodify(bufname, ":~:.")
-      let bufname = system('shorten_path '.shellescape(bufname))
     else
       if len(&ft)
         " use &ft for name (e.g. with 'startify'

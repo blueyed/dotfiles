@@ -1,3 +1,12 @@
+" PROFILE
+" exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
+" profile! file **
+
+" Use NeoComplCache, if YouCompleteMe is not available (needs compilation)
+let s:has_ycm = filereadable(expand('~/.vim/bundle/YouCompleteMe/python/ycm_core.*', 1, 1)[0])
+let s:use_ycm = s:has_ycm
+let s:use_neocomplcache = ! s:use_ycm
+
 if 1 " has('eval')
   let mapleader = ","
   let g:my_full_name = "Daniel Hahler"

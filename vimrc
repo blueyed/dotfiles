@@ -13,6 +13,36 @@ if 1 " has('eval')
 
   let g:snips_author = g:my_full_name
 
+  " TAB is used by YouCompleteMe/SuperTab
+  let g:UltiSnipsExpandTrigger="<c-j>"
+  let g:UltiSnipsJumpForwardTrigger="<c-j>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+  let g:UltiSnipsListSnippets = "<c-b>"
+  let g:UltiSnipsEditSplit='vsplit'
+  " let g:UltiSnips.always_use_first_snippet = 1
+  augroup UltiSnipsConfig
+    au!
+    au FileType smarty UltiSnipsAddFiletypes smarty.html.javascript.php
+    au FileType html   UltiSnipsAddFiletypes html.javascript.php
+  augroup END
+
+  if !exists('g:UltiSnips') | let g:UltiSnips = {} | endif
+  let g:UltiSnips.load_early = 1
+  let g:UltiSnips.UltiSnips_ft_filter = {
+        \ 'default' : {'filetypes': ["FILETYPE", "all"] },
+        \ 'html'    : {'filetypes': ["html", "javascript", "all"] },
+        \ 'python'  : {'filetypes': ["python", "django", "all"] },
+        \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "all"] },
+        \ }
+  let g:UltiSnips.snipmate_ft_filter = {
+        \ 'default' : {'filetypes': ["FILETYPE", "_"] },
+        \ 'html'    : {'filetypes': ["html", "javascript", "_"] },
+        \ 'python'  : {'filetypes': ["python", "django", "_"] },
+        \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "_"] },
+        \ }
+     "\ 'html'  : {'filetypes': ["html", "javascript"], 'dir-regex': '[._]vim$' },
+
+
   if has('win32') || has('win64')
     " replace ~/vimfiles with ~/.vim in runtimepath
     " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )

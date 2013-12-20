@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Shorten path according to hashed dir list ('hash -d' in Zsh)
+#
+# This is used from vimrc.
+
+# TODO: handle $HOME?! currently done by Vim
+# TODO: relative to current dir?! currently done by Vim
+
+path="$1"
+
+hash_file=$HOME/.cache/hashd
+
+if ! [ -f $hash_file ]; then
+  zsh -i -c 'hash -d' > $hash_file
+fi
+
+IFS='
+'
+for line in $(cat $hash_file); do
+  var=${line%%=*}
+  val=${line#*=}
+  # TODO: match only at beginning?!
+  # echo "$var => $val"
+  new=${path#$val}
+  if [ "$new" != "$path" ]; then
+    new="~$var$new"
+    echo -n $new
+    exit
+  fi
+done
+echo -n $path

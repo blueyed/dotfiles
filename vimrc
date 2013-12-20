@@ -390,38 +390,46 @@ endif
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
-if has('statusline')
-set statusline=%!MyStatusLine('Enter')
-function! FileSize()
-  let bytes = getfsize(expand("%:p"))
-  if bytes <= 0
-    return ""
-  endif
-  if bytes < 1024
-    return bytes
-  else
-    return (bytes / 1024) . "K"
-  endif
-endfunction
 
 " Shorten a given filename by truncating path segments.
-function! ShortenFilename(bufname, maxlen)
-  if getbufvar(bufnr(a:bufname), '&filetype') == 'help'
-    return fnamemodify(a:bufname, ':t')
+function! ShortenFilename(...)
+  " get bufname from a:1, defaulting to bufname('%') {{{
+  " echomsg "ShortenFilename:" string(a:000)
+  if a:0 && a:1 != '%'
+    let bufname = a:1
+  else
+    let bufname = bufname("%")
+    if len(bufname)
+      let bufname = fnamemodify(bufname, ":~:.")
+      let bufname = system('shorten_path '.shellescape(bufname))
+    else
+      if len(&ft)
+        " use &ft for name (e.g. with 'startify'
+        let bufname = '['.&ft.']'
+      else
+        " TODO: get Vim's original "[No Name]" somehow
+        let bufname = '[No Name]'
+      endif
+    endif
+  endif  " }}}
+  let maxlen = a:0>1 ? a:2 : winwidth(0)-50
+
+  if getbufvar(bufnr(bufname), '&filetype') == 'help'
+    return fnamemodify(bufname, ':t')
   endif
 
   let maxlen_of_parts = 7 " including slash/dot
   let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
 
   let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
-  let parts = split(a:bufname, '\ze['.escape(s:PS, '\').']')
+  let parts = split(bufname, '\ze['.escape(s:PS, '\').']')
   let i = 0
   let n = len(parts)
   let wholepath = '' " used for symlink check
   while i < n
     let wholepath .= parts[i]
     " Shorten part, if necessary:
-    if i<n-1 && len(a:bufname) > a:maxlen && len(parts[i]) > maxlen_of_parts
+    if i<n-1 && len(bufname) > maxlen && len(parts[i]) > maxlen_of_parts
       " Let's see if there are dots or hyphens to truncate at, e.g.
       " 'vim-pkg-debian' => 'v-p-d…'
       let w = split(parts[i], '\ze[._-]')
@@ -452,6 +460,20 @@ function! ShortenFilename(bufname, maxlen)
   return r
 endfunction
 
+
+if has('statusline') && 0 " disabled {{{
+set statusline=%!MyStatusLine('Enter')
+function! FileSize()
+  let bytes = getfsize(expand("%:p"))
+  if bytes <= 0
+    return ""
+  endif
+  if bytes < 1024
+    return bytes
+  else
+    return (bytes / 1024) . "K"
+  endif
+endfunction
 
 " colorize start of statusline according to file status,
 " source: http://www.reddit.com/r/vim/comments/gexi6/a_smarter_statusline_code_in_comments/c1n2oo5
@@ -526,7 +548,7 @@ fun! MyStatusLine(mode)
   let r += [' %P']    "percent through file
   return join(r, '')
 endfunction
-endif
+endif "}}}
 "}}}
 
 
@@ -553,8 +575,60 @@ fun! MyGetPrettyPWD()
   " TODO: use output from "hash -d" (cached) and shorten accordingly
   return pwd
 endfun
-" set titlestring=[vim]\ %<%{expand(\"%:~:.\")}%M%R\ [%{MyGetPrettyPWD()}]
-set titlestring=[vim]\ %<%{expand(\"%:~:.\")}%M%R
+
+
+" titlestring handling, with tmux support {{{
+" Change tmux window name (used in window list) {{{
+if len($TMUX_PANE)
+  if len($_tmux_title_is_auto_set)
+    " Use exported state from Zsh (if any)
+    let g:tmux_auto_rename_window = $_tmux_title_is_auto_set
+  else
+    " look at tmux' automatic-rename option
+    let s:tmux_auto_set = system('tmux show-window-options -t $TMUX_PANE -v automatic-rename 2>/dev/null')
+    if v:shell_error
+      let s:tmux_auto_set = system('tmux show-window-options -t $TMUX_PANE | grep "^automatic-rename" | cut -f2 -d\ ')
+    endif
+    " TODO: look for marker (﻿) at end of current title
+    let g:tmux_auto_rename_window = s:tmux_auto_set =~ '^off' ? 0 : 1
+  endif
+endif " }}}
+augroup tmuxtitle
+  au!
+  " FocusGained: not working with tmux, but should (when coming back from
+  " another pane)
+  au FocusGained,BufWinEnter,WinEnter * call MySetTmuxWindowTitle(ShortenFilename('%', 15))
+augroup END
+
+fun! MyGetPrettyFileDir()
+  " TODO: use shorten_path / abstract it
+  let dir=expand('%:~:h')
+  if len(dir) && dir != '.'
+    return '('.dir.')'
+  endif
+  return ''
+endfun
+
+fun! MySetTmuxWindowTitle(title)
+  " return early, if not changed
+  if a:title == g:_last_tmux_win_title | return | endif
+
+  " call tmux according to g:tmux_auto_rename_window setting
+  if exists('g:tmux_auto_rename_window') && g:tmux_auto_rename_window
+    " tmux title: prefix and marker for "auto-renamed"
+    let s:tmux_title = '✐ '.a:title.'﻿'
+    call system('tmux rename-window -t $TMUX_PANE '.shellescape(s:tmux_title))
+    let g:_last_tmux_win_title = a:title
+  endif
+endfun
+let g:_last_tmux_win_title = ''
+
+set title
+set titlestring=vim:\ %t%M%R%(\ %<%{MyGetPrettyFileDir()}%)
+
+" Append $TERM_USERATHOST_SUFFIX to title (set via zsh, used for SSH)
+let &titlestring .= $TERM_USERATHOST_SUFFIX
+"}}}
 
 
 " Opens a tab edit command with the path of the currently edited file filled in

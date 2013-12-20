@@ -197,12 +197,14 @@ set fileformats=unix,dos
 set backspace=indent,eol,start
 set confirm " ask for confirmation by default (instead of silently failing)
 set splitright splitbelow
-set nobackup
-set nowritebackup
 set history=1000
 set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
+
+set backup " enable backup (default off)
+set writebackup " keep a backup while writing the file (default on)
+set backupcopy=yes  " important to keep the file descriptor (inotify)
 
 " This is an alternative that also works in block mode, but the deleted
 " text is lost and it only works for putting the current register.

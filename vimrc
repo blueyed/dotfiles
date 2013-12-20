@@ -655,19 +655,19 @@ vmap P p :call setreg('"', getreg('0')) <CR>
 " Press ^F from insert mode to insert the current file name
 imap <C-F> <C-R>=expand("%")<CR>
 
-imap <C-L> <Space>=><Space>
+" imap <C-L> <Space>=><Space>
 
 " Display extra whitespace
 set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
-set fillchars=fold:-
+" set fillchars=stl:^,stlnc:-,vert:\|,fold:-,diff:-
+set fillchars=vert:\|,fold:·,stl:\ ,stlnc:\ ,diff:-
 nnoremap <silent> <leader>sl :set list!<CR>
 inoremap <silent> <leader>sl <C-o>:set list!<CR>
 set nolist
 
 " toggle settings, mnemonic "set paste", "set wrap", ..
+" NOTE: see also unimpaired
 set pastetoggle=<leader>sp
-noremap <leader>sw :set wrap!<cr>
-noremap <leader>ss :set spell!<cr>
 nmap    <leader>sc :ColorToggle<cr>
 nmap    <leader>sq :QuickfixsignsToggle<cr>
 nmap    <leader>si :IndentGuidesToggle<cr>
@@ -675,7 +675,7 @@ nmap    <leader>si :IndentGuidesToggle<cr>
 " let g:colorizer_fgcontrast=-1
 let g:colorizer_startup = 0
 
-
+" OLD: Ack/Ag setup, handled via ag plugin {{{
 " Use Ack instead of Grep when available
 " if executable("ack")
 "   set grepprg=ack\ -H\ --nogroup\ --nocolor\ --ignore-dir=tmp\ --ignore-dir=coverage
@@ -687,14 +687,36 @@ let g:colorizer_startup = 0
    set grepprg=grep\ -nH\ $*\ /dev/null
 " endif
 
-" Line numbers"{{{
-" au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
+if executable("ag")
+  let g:ackprg = 'ag --nogroup --nocolor --column'
+  " command alias, http://stackoverflow.com/a/3879737/15690
+  " if re-used, use a function
+  " cnoreabbrev <expr> Ag ((getcmdtype() is# ':' && getcmdline() is# 'Ag')?('Ack'):('Ag'))
+endif
+" 1}}}
+
+" Automatic line numbers {{{
+" autocmd BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set nonumber
-set showbreak=↪\ 
+let &showbreak = '↪ '
 function! ToggleLineNr()
-  " relativenumber => number => nonumber/norelativenumber
+  " states: [start] => norelative/number => relative/number => relative/nonumber => nonumber/norelative
   if exists('+relativenumber')
-    if &number | set relativenumber | elseif &relativenumber | set norelativenumber | else | set number | endif
+    if &relativenumber
+      if &number
+        set relativenumber nonumber
+      else
+        set norelativenumber nonumber
+      endif
+    else
+      if &number
+        set relativenumber number
+      else
+        " init:
+        set norelativenumber number
+      endif
+    endif
+    " if &number | set relativenumber | elseif &relativenumber | set norelativenumber | else | set number | endif
   else
     set number!
   endif
@@ -706,6 +728,7 @@ function! ToggleLineNr()
   endif
 endfunction
 function! SetNumberWidth()
+  " NOTE: 'numberwidth' will get expanded by Vim automatically to fit the last line
   if &number
     if has('float')
       let &l:numberwidth = float2nr(ceil(log10(line('$'))))
@@ -725,10 +748,20 @@ set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
 " set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
 if has("autocmd") && exists("+omnifunc")
+  augroup filetype_omnifunc
+    au!
   autocmd Filetype *
     \   if &omnifunc == "" |
     \     setlocal omnifunc=syntaxcomplete#Complete |
     \   endif
+  " use eclim for PHP omnicompletion (does not pollute quickfix window and is better in general)
+  "  autocmd Filetype php setlocal omnifunc=eclim#php#complete#CodeComplete
+  " ref: https://github.com/Valloric/YouCompleteMe/issues/103#issuecomment-14149318
+  " NOTE: this is done via g:EclimCompletionMethod now instead
+  " autocmd Filetype * runtime! autoload/eclim/<amatch>/complete.vim
+  "   \	| let s:cfunc = 'eclim#'.expand('<amatch>').'#complete#CodeComplete'
+  "   \	| if exists('*'.s:cfunc) | let &l:omnifunc=s:cfunc | endif
+  augroup END
 endif
 
 
@@ -754,7 +787,7 @@ if 1 " has('eval')
 endif
 
 " set cursorline
-"highlight CursorLine guibg=lightblue ctermbg=lightgray
+" highlight CursorLine guibg=lightblue ctermbg=lightgray
 
 " Make the current status line stand out, e.g. with xoria256 (using the
 " PreProc colors from there)
@@ -766,11 +799,12 @@ endif
 set hidden
 
 " consider existing windows (but not tabs) when opening files, e.g. from quickfix
+" set switchbuf=useopen,usetab
 set switchbuf=useopen
 
 " Maps for jj and kj to act as Esc (kj is idempotent in normal mode)
-ino jj <esc>
-cno jj <c-c>
+" ino jk <esc>
+" cno jk <c-c>
 " ino kj <esc>
 " cno kj <c-c>
 
@@ -806,9 +840,9 @@ endif
 "vmap > >gv
 "vmap < <gv
 
-" Make `gp` select the last pasted text
+" Make `<leader>gp` select the last pasted text
 " (http://vim.wikia.com/wiki/Selecting_your_pasted_text).
-nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+nnoremap <expr> <leader>gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " Syntax Checking entire file (Python)
 " Usage: :make (check file)
@@ -842,7 +876,7 @@ function! MyToggleLastChar(char)
   let ss = @/ | let save_cursor = getpos(".")
   try
     exe 's/\([^'.escape(a:char,'/').']\)$/\1'.escape(a:char,'/').'/'
-	catch /^Vim\%((\a\+)\)\=:E486: Pattern not found/
+  catch /^Vim\%((\a\+)\)\=:E486: Pattern not found/
     exe 's/'.escape(a:char, '/').'$//'
   finally
     let @/ = ss | call setpos('.', save_cursor)
@@ -852,7 +886,8 @@ noremap <Leader>; :call MyToggleLastChar(';')<cr>
 noremap <Leader>: :call MyToggleLastChar(':')<cr>
 noremap <Leader>, :call MyToggleLastChar(',')<cr>
 
-set spl=de,en
+" use 'en_us' also to work around matchit considering 'en' as 'endif'
+set spl=de,en_us
 " Toggle spellang: de => en => de,en
 fun! MyToggleSpellLang()
   if &spl == 'de,en'
@@ -871,7 +906,7 @@ noremap ö :
 " Grep in the current (potential unsaved) buffer {{{2
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
 fun! GrepCurrentBuffer(q)
-	let save_cursor = getpos(".")
+  let save_cursor = getpos(".")
   let save_errorformat = &errorformat
   try
     set errorformat=%f:%l:%m
@@ -937,18 +972,27 @@ function! s:CloseIfOnlyControlWinLeft()
   endif
 endfunction
 augroup CloseIfOnlyControlWinLeft
-au!
-autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
+  autocmd!
+  autocmd WinEnter * call s:CloseIfOnlyControlWinLeft()
 augroup END
 
 
 " Check for file modifications automatically
-augroup AutoChecktime
-au!
-autocmd FocusGained * checktime
-autocmd BufEnter * checktime
-autocmd CursorHold * checktime
+" (current buffer only)
+" Use :NoAutoChecktime to disable it (uses b:autochecktime)
+fun! MyAutoCheckTime()
+  " only check timestamp for normal files
+  if &buftype != '' | return | endif
+  if ! exists('b:autochecktime') || b:autochecktime
+    checktime %
+    let b:autochecktime = 1
+  endif
+endfun
+augroup MyAutoChecktime
+  autocmd!
+  autocmd FocusGained,BufEnter,CursorHold * call MyAutoCheckTime()
 augroup END
+command! NoAutoChecktime let b:autochecktime=0
 
 " setup b:VCSCommandVCSType
 function! SetupVCSType()
@@ -1060,6 +1104,10 @@ endif " 1}}} eval guard
 nnoremap <C-s> :up<CR>
 inoremap <C-s> <Esc>:up<CR>
 
+" swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U)
+nnoremap <C-z> <C-y>
+nnoremap <C-y> <C-z>
+
 " defined in php-doc.vim
 " nnoremap <Leader>d :call PhpDocSingle()<CR>
 
@@ -1075,20 +1123,28 @@ noremap <F1> :tab<Space>:help<Space>
 noremap <F2> g<C-]>
 " expand abbr
 imap <F2> <C-]>
-noremap <F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
-noremap <S-F3> :if exists('g:tmru_world')<cr>:let g:tmru_world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
+noremap <F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
+noremap <S-F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
+" XXX: mapping does not work (autoclose?!)
+" noremap <F3> :CtrlPMRUFiles
 noremap <F5> :GundoToggle<cr>
-noremap <F11> :YRShow<cr>
+" noremap <F11> :YRShow<cr>
+if has('gui_running')
+  map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
+endif
 
 " map ö/ä to brackets used by unimpaired (more accessible on a German keyboard layout)
-nnoremap ö [
-nnoremap ä ]
+nmap ö [
+nmap ä ]
+" for one hand:
+nmap äj :cnext<cr>
+nmap äk :cprev<cr>
 
 " tagbar plugin
 nnoremap <silent> <F8> :TagbarToggle<CR>
 nnoremap <silent> <Leader><F8> :TagbarOpenAutoClose<CR>
 
-" handling of matches items, like braces
+" handling of matched items, like braces
 set showmatch
 set matchtime=3
 " deactivated, causes keys to be ignored when typed too fast (?)
@@ -1101,12 +1157,23 @@ set nostartofline " do not go to start of line automatically when moving
 set scrolloff=3 " scroll offset/margin (cursor at 4th line)
 set sidescroll=1
 set sidescrolloff=10
+set commentstring=#\ %s
 
-" gets ignored by tmru
+" 'suffixes' get ignored by tmru
 set suffixes+=.tmp
 set suffixes+=.pyc
+" set suffixes+=.sw?
 
-set commentstring=#\ %s
+" NERDTree {{{
+" Show hidden files *except* the known temp files, system files & VCS files
+let NERDTreeShowHidden = 1
+let NERDTreeIgnore = []
+for suffix in split(&suffixes, ',')
+    let NERDTreeIgnore += [ escape(suffix, '.~') . '$' ]
+endfor
+let NERDTreeIgnore += ['^\.bundle$', '^\.bzr$', '^\.git$', '^\.hg$', '^\.sass-cache$', '^\.svn$', '^\.$', '^\.\.$', '^Thumbs\.db$']
+let NERDTreeIgnore += ['__pycache__', '.ropeproject']
+" }}}
 
 " Smart way to move btw. windows {{{2
 " (use cursor keys to not overwrite C-l (redraw))
@@ -1133,10 +1200,26 @@ vmap <Del> "_x
 
 map _  <Plug>(operator-replace)
 
+function! TabIsEmpty()
+  return winnr('$') == 1 && len(expand('%')) == 0 && line2byte(line('$') + 1) <= 2
+endfunction
+
+function! WindowIsEmpty()
+  return len(expand('%')) == 0 && line2byte(line('$') + 1) <= 2
+endfunction
+
+function! MyEditConfig(path)
+  exec (WindowIsEmpty() ? 'e' : 'sp') a:path
+endfunction
+
 " edit vimrc shortcut
-nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
+" nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
+nnoremap <leader>ev :call MyEditConfig(resolve($MYVIMRC))<cr>
 " edit zshrc shortcut
-nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
+nnoremap <leader>ez :call MyEditConfig(resolve("~/.zshrc"))<cr>
+nnoremap <leader>et :call MyEditConfig(resolve("~/.tmux.common.conf"))<cr>
+" edit .lvimrc shortcut (in repository root)
+nnoremap <leader>elv :call MyEditConfig(GetRepoRoot(expand('%')).'/.lvimrc')<cr>
 
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc
@@ -1144,19 +1227,38 @@ nnoremap <leader>ez <C-w><C-s><C-l>:exec "e ".resolve("~/.zshrc")<cr>
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
+" formatoptions:
+set formatoptions+=r " Insert comment leader after hitting <Enter>
+set formatoptions+=o " Insert comment leader after hitting o or O in normal mode
+set formatoptions+=t " Auto-wrap text using textwidth
+set formatoptions+=c " Autowrap comments using textwidth
+set formatoptions+=b " Do not wrap if you modify a line after textwidth
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
-set guioptions-=m
+set formatoptions+=q " Allow formatting of comments with "gq".
+set formatoptions+=q " Allow formatting of comments with "gq".
+set formatoptions+=t " Auto-wrap text using textwidth
+set formatoptions+=n " Recognize numbered lists
+
+" menu
+" set guioptions-=m
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 
 set viminfo+=! " keep global uppercase variables. Used by localvimrc.
 
-" I feel dirty, plz rename kthxbye!
-behave mswin
+set selectmode=
+set mousemodel=popup " extend/popup/pupup_setpos
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 " set clipboard=unnamed
+" do not mess with X selection by default
+set clipboard=
+
+
+" Enable mouse
 set mouse=a
+" Make mouse work with Vim in tmux
+set ttymouse=xterm2
 
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
@@ -1166,11 +1268,11 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 map <c-w>_ :MaximizeWindow<cr>
 
 " Exit with ÄÄ (German keyboard layout)
-noremap ÄÄ :confirm qall<cr>
-inoremap ÄÄ <C-O>:confirm qall<cr>
-cnoremap ÄÄ <C-C>:confirm qall<cr>
-onoremap ÄÄ <C-C>:confirm qall<cr>
-noremap ää :confirm q<cr>
+nnoremap ÄÄ :confirm qall<cr>
+" inoremap ÄÄ <C-O>:confirm qall<cr>
+" cnoremap ÄÄ <C-C>:confirm qall<cr>
+" onoremap ÄÄ <C-C>:confirm qall<cr>
+nnoremap ää :confirm q<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
 nnoremap <Leader>gd :Gdiff<cr>
@@ -1182,9 +1284,12 @@ function! MyCloseDiff()
     return
   endif
 
+  diffoff " safety net / required to workaround powerline issue
+
   " close current buffer if alternate is not fugitive but current one is
   if bufname('#') !~ '^fugitive:' && bufname('%') =~ '^fugitive:'
     if bufwinnr("#") == -1
+      " XXX: does not work reliable
       b #
       bd #
     else
@@ -1212,17 +1317,20 @@ function! ToggleTooLongHL()
 endfunction
 " noremap <silent> <leader>sl :call ToggleTooLongHL()<cr>
 
-" capture output of a:cmd into a new tab via redirection
+" Capture output of a:cmd into a new tab via redirection
 " source: http://vim.wikia.com/wiki/Capture_ex_command_output
-function! TabMessage(cmd)
+function! RedirMessage(cmd, newcmd)
+  " Default to "message" for command
+  if empty(a:cmd) | let cmd = 'message' | else | let cmd = a:cmd | endif
   redir => message
-  silent execute a:cmd
+    silent execute cmd
   redir END
-  tabnew
+  exec a:newcmd
   silent put=message
   set nomodified ft=vim
 endfunction
-command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+command! -nargs=* -complete=command TabMessage call RedirMessage(<q-args>, 'tabnew')
+command! -nargs=* -complete=command BufMessage call RedirMessage(<q-args>, 'new')
 
 
 " Swap ' and ` keys (` is much more useful) {{{2
@@ -1252,6 +1360,10 @@ if has("folding")
   " set foldlevel=1
   " set foldnestmax=2
   " set foldtext=strpart(getline(v:foldstart),0,50).'\ ...\ '.substitute(getline(v:foldend),'^[\ #]*','','g').'\ '
+
+  " set foldcolumn=2
+  " <2-LeftMouse>     Open fold, or select word or % match.
+  nnoremap <expr> <2-LeftMouse> foldclosed(line('.')) == -1 ? "\<2-LeftMouse>" : 'zo'
 endif
 
 if has('eval')
@@ -1276,10 +1388,16 @@ iabbr sg Sehr geehrte Damen und Herren,<cr>
 iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 iabbr LG Liebe Grüße,<cr>Daniel.
 iabbr VG Viele Grüße,<cr>Daniel.
+" ellipsis
 iabbr ... …
+" sign "checkmark"
+iabbr scm ✓
+iabbr sgh Sehr geehrter Herr<space>
+iabbr sgf Sehr geehrte Frau<space>
 "}}}
 
 " ignore certain files for completion (used also by Command-T)
+" TODO: merge with &suffixes?!
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
 set wildignore+=*.sw?
@@ -1287,13 +1405,42 @@ if has('wildignorecase') " not on MacOS
   set wildignorecase
 endif
 
+" allow for tab-completion in vim, but ignore them with command-t
+let g:CommandTWildIgnore=&wildignore . ",**/bower_components/*"
+      \ .',htdocs/asset/**'
+      \ .',htdocs/media/**'
+      \ .',static/_build/**'
+      \ .',**/node_modules/**'
+
 let g:vdebug_keymap = {
 \    "run" : "<S-F5>",
 \}
 
+" LocalVimRC {{{
 let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
 let g:localvimrc_debug = 0
+
+" Helper method for .lvimrc files to finish
+fun! MyLocalVimrcAlreadySourced(...)
+  " let sfile = expand(a:sfile)
+  let sfile = g:localvimrc_script
+  let guard_key = expand(sfile).getftime(sfile)
+  if exists('b:local_vimrc_sourced')
+    if type(b:local_vimrc_sourced) != type({})
+      echomsg "warning: b:local_vimrc_sourced is not a dict!"
+      let b:local_vimrc_sourced = {}
+    endif
+    if has_key(b:local_vimrc_sourced, guard_key)
+      return 1
+    endif
+  else
+    let b:local_vimrc_sourced = {}
+  endif
+  let b:local_vimrc_sourced[guard_key] = 1
+  return 0
+endfun
+" }}}
 
 " Do not autoload/autosave 'default' session
 let g:session_autoload = 'no'
@@ -1314,5 +1461,8 @@ endif
 
 nmap <C-D> :q<CR>
 
+    " Check if the new file (with git-diff prefix removed) is readable and
+    " edit that instead (copy'n'paste from shell)
+    autocmd BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^[abiw]/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
 " vim: fdm=marker

@@ -1,4 +1,5 @@
-INSTALL_FILES := ackrc aptitude/config autojump $(wildcard bazaar/plugins/*) \
+INSTALL_FILES := ackrc agignore aptitude/config autojump \
+	$(wildcard bazaar/plugins/*) \
 	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) \
 	byobu/.screenrc byobu/.tmux.conf \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \

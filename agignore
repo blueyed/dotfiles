@@ -1,0 +1,7 @@
+# Global ignore file for `ag` (/usr/local/src/the_silver_searcher/)
+# cache/
+# media/
+# asset/
+tags
+_build/
+# node_modules

@@ -181,8 +181,160 @@ endif
 if has("user_commands")
   " enable pathogen, which allows for bundles in vim/bundle
   set rtp+=~/.vim/bundle/pathogen
-  let g:pathogen_disabled = [ "supertab", 'golden-ratio' ]
+  " filetype off
+
+  let g:pathogen_disabled = [ 'golden-ratio', 'yankring' ]
+
+  if ! s:use_ycm
+    call add(g:pathogen_disabled, 'YouCompleteMe')
+  endif
+  if ! s:use_neocomplcache
+    call add(g:pathogen_disabled, 'neocomplcache')
+  endif
+  " if s:use_ycm || s:use_neocomplcache
+  "   call add(g:pathogen_disabled, 'supertab')
+  " endif
+    " call add(g:pathogen_disabled, 'YouCompleteMe')
+    call add(g:pathogen_disabled, 'neocomplcache')
+  " EXPERIMENTAL: auto-popups and experimenting with SuperTab
+  let g:ycm_key_list_select_completion = []
+  let g:ycm_key_list_select_previous_completion = []
+
+  "
+  " TO BE REMOVED"
+  let g:pathogen_disabled += [ "powerline-vim" ]
+  let g:pathogen_disabled += [ "shymenu" ]
   call pathogen#infect()
+
+  " Themes
+  " Airline:
+  let g:airline_powerline_fonts = 1
+endif
+  " to test
+  let g:airline#extensions#branch#use_vcscommand = 1
+  let g:airline#extensions#tabline#enabled = 1
+  let g:airline#extensions#tmuxline#enabled = 1
+  let g:airline#extensions#whitespace#enabled = 0
+
+  let g:airline#extensions#tagbar#flags = 'f'  " full hierarchy of tag (with scope), see tagbar-statusline
+  " see airline-predefined-parts
+  "   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
+  " function! AirlineInit()
+  "   "   let g:airline_section_a = airline#section#create(['mode', ' ', 'foo'])
+  "   "   let g:airline_section_b = airline#section#create_left(['ffenc','file'])
+  "   "   let g:airline_section_c = airline#section#create(['%{getcwd()}'])
+  " endfunction
+  " autocmd VimEnter * call AirlineInit()
+
+  let g:_cache_airline_filename_base = ''
+  let g:_cache_airline_filename_r = ''
+  fun! Airline_filename()
+    let s:base = expand('%:p')
+    if s:base != g:_cache_airline_filename_base
+      let g:_cache_airline_filename_base = s:base
+      let g:_cache_airline_filename_r = ShortenFilename() . (&modified ? '[++]' : '')
+    endif
+    return g:_cache_airline_filename_r
+  endfun
+  call airline#parts#define_function('file', 'Airline_filename')
+
+  filetype plugin indent on
+endif
+
+" Enable syntax {{{1
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+" if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
+if (&t_Co > 2 || has("gui_running"))
+  syntax on " after 'filetype plugin indent on' (ref:
+  set hlsearch
+
+  " Inject "TODO highlighting" via @Spell cluster (e.g. into cssComment)
+  function! MyHighlightTodo()
+    syn keyword MyTodo	  FIXME NOTE TODO OPTIMIZE XXX TODO: XXX:
+    " XXX: using "Spell" (without "@") will disable spell checking with e.g. ft=mail!
+    syn cluster @Spell add=MyTodo
+  endfunction
+  autocmd Syntax * call MyHighlightTodo()
+  hi def link MyTodo Todo
+endif
+
+if 1 " has('eval')
+  " Color scheme (after 'syntax on') {{{1
+
+  set bg = dark
+
+  set rtp+=~/.vim/bundle/solarized
+  " NOTE: use 16 for solarized gnome-terminal scheme
+  " let g:solarized_termcolors=256
+  if $HAS_SOLARIZED_COLORS == 1 || $COLORTERM == 'gnome-terminal'
+    " term with solarized color palette
+    let g:solarized_termcolors=16
+  else
+    let g:solarized_termcolors=256
+  endif
+  " base16 (set of schemes)
+  " We use a prepared 256color table:
+  let base16colorspace = 256
+
+  " Function to setup a base16 theme (Vim and shell)
+  fun! Base16Scheme(...)
+    if a:0
+      let name = a:1
+    else
+      if g:colors_name =~ '^base16-'
+        let name = substitute(g:colors_name, '^base16-', '', '')
+        echomsg "Reloading..."
+      else
+        echoerr "Base16Scheme: no name provided and current scheme is not base16 based"
+        return
+      endif
+    endif
+    " BASE16_SHELL_DIR points at the location of base16 shell files
+    " (https://github.com/chriskempson/base16-shell)
+    if len($BASE16_SHELL_DIR)
+      " if len($BASE16_SCHEME)
+        let shell_file = expand("$BASE16_SHELL_DIR/base16-".name.".dark.sh")
+        if !filereadable(shell_file)
+          echoerr "Base16Scheme: shell file does not exist: ".shell_file
+          return
+        endif
+        " Source the file
+        exe 'silent !source '.shellescape(shell_file)
+        if v:shell_error | echoerr "Could not source base16 shell file: ".shell_file | endif
+      " endif
+    else
+      " echomsg '$BASE16_SHELL_DIR is not set: cannot source shell script!'
+    endif
+    exec 'colorscheme base16-'.name
+  endfun
+
+  " Define Base16Scheme command to setup a scheme
+  function! s:get_base16_themes(a, l, p)
+    let files = split(globpath(&rtp, 'colors/base16-'.a:a.'*'), "\n")
+    return map(files, 'substitute(fnamemodify(v:val, ":t:r"), "base16-", "", "")')
+  endfunction
+  command! -nargs=? -complete=customlist,<sid>get_base16_themes Base16Scheme call Base16Scheme(<f-args>)
+
+
+  " " base16 scheme setup based on env
+  " if len($BASE16_SCHEME)
+  "   " echomsg "Using theme:" $BASE16_SCHEME
+  "   exec 'Base16Scheme '.substitute($BASE16_SCHEME, '\.dark', '', '')
+  " else
+  "   Base16Scheme solarized
+  " endif
+  " colorscheme jellybeans
+
+  if &bg == 'dark'
+    colorscheme jellybeans
+  else
+    " Base16Scheme solarized
+    colorscheme solarized
+    " pimp colors (base16-solarized)
+    " hi Search ctermfg=130 ctermbg=21 cterm=underline
+    " hi IncSearch ctermfg=130 ctermbg=21 cterm=reverse
+  endif
 endif
 
 " Settings {{{1

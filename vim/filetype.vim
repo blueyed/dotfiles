@@ -13,5 +13,7 @@ augroup filetypedetect
   au! BufRead,BufNewFile *.haml           setfiletype haml
   au! BufRead,BufNewFile *.pac            setfiletype pac
   au! BufRead,BufNewFile *zsh/functions*  setfiletype zsh
+  au! BufNewFile,BufRead *pentadactylrc*,*.penta setfiletype pentadactyl.vim
+  au! BufNewFile,BufRead *vimperatorrc*,*.vimp   setfiletype vimperator.vim
 augroup END
 

@@ -376,16 +376,9 @@ if has("autocmd") " Autocommands {{{1
   augroup vimrcEx
   au!
 
-  " Set File type to 'text' for files ending in .txt
-  autocmd BufNewFile,BufRead *.txt setfiletype text
-
   " Enable soft-wrapping for text files
   autocmd FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
 
-  au BufNewFile,BufRead /etc/network/interfaces,/etc/environment setfiletype conf
-  au BufRead,BufNewFile *.haml         setfiletype haml
-  au BufRead,BufNewFile *.pac          setl filetype=pac
-  au BufNewFile,BufRead *zsh/functions* setfiletype zsh
 
   au FileType mail,markdown,gitcommit setlocal spell
   autocmd FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default

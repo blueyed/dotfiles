@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+# NOTE: there is git --autostash now..
+#
 # Source: http://jasoncodes.com/posts/gup-git-rebase
 
 set -e
+# set -x
 
 # use `git-up` if installed
 # (probably: https://github.com/aanand/git-up)
@@ -29,7 +32,7 @@ TEMPFILE="`mktemp -t gup.XXXXXX`"
 trap '{ rm -f "$TEMPFILE"; }' EXIT
 
 # if we're behind upstream, we need to update
-if git status | grep "# Your branch" > "$TEMPFILE"
+if git status | grep -P "^(# )?Your branch" > "$TEMPFILE"
 then
 
   # extract tracking branch from message

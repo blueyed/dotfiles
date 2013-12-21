@@ -446,7 +446,7 @@
 	url = git://github.com/jimeh/tmuxifier.git
 [submodule "vim/bundle/airline"]
 	path = vim/bundle/airline
-	url = git://github.com/bling/vim-airline.git
+	url = git://github.com/blueyed/vim-airline.git
 [submodule "vim/bundle/django-template-textobjects"]
 	path = vim/bundle/django-template-textobjects
 	url = git://github.com/mjbrownie/django-template-textobjects.git

@@ -567,7 +567,7 @@ endif
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
 
-
+" Shorten a given filename by truncating path segments.
 let s:_cache_shorten_path = {}
 fun! ShortenPath(path)
   if ! exists('s:_cache_shorten_path[a:path]')
@@ -577,7 +577,8 @@ fun! ShortenPath(path)
 endfun
 
 " Shorten a given filename by truncating path segments.
-function! ShortenFilename(...)
+let g:_cache_shorten_filename = {}
+function! ShortenFilename(...)  " {{{
   " Args: bufname ('%' for default), maxlength
   " echomsg "ShortenFilename:" string(a:000)
 
@@ -586,24 +587,38 @@ function! ShortenFilename(...)
     let bufname = a:1
   else
     let bufname = bufname("%")
-    if len(bufname)
-      let bufname = ShortenPath(fnamemodify(bufname, ':p'))
-      let bufname = fnamemodify(bufname, ":~:.")
-    else
+    if !len(bufname)
       if len(&ft)
         " use &ft for name (e.g. with 'startify'
-        let bufname = '['.&ft.']'
+        return '['.&ft.']'
       else
         " TODO: get Vim's original "[No Name]" somehow
-        let bufname = '[No Name]'
+        return '[No Name]'
       endif
+    end
+
+    if getbufvar(bufnr(bufname), '&filetype') == 'help'
+      return '[?] '.fnamemodify(bufname, ':t')
     endif
-  endif  " }}}
+
+    if bufname =~ '^__'
+      return bufname
+    endif
+  endif
+
+  " maxlen from a:2 (used for cache key)
   let maxlen = a:0>1 ? a:2 : winwidth(0)-50
 
-  if getbufvar(bufnr(bufname), '&filetype') == 'help'
-    return fnamemodify(bufname, ':t')
+  " Check for cache:
+  let cache_key = escape(bufname.'::'.getcwd().'::'.maxlen, "'")
+  if exists("g:_cache_shorten_filename['".cache_key."']")
+    return g:_cache_shorten_filename[cache_key]
   endif
+
+  let fullpath = fnamemodify(bufname, ':p')
+  let bufname = ShortenPath(fullpath)
+  let bufname = fnamemodify(bufname, ":~:.")
+  " }}}
 
   let maxlen_of_parts = 7 " including slash/dot
   let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
@@ -644,8 +659,11 @@ function! ShortenFilename(...)
     let i += 1
   endwhile
   let r = join(parts, '')
+  if exists('cache_key')
+    let g:_cache_shorten_filename[cache_key] = r
+  endif
   return r
-endfunction
+endfunction "}}}
 
 
 if has('statusline') && 0 " disabled {{{

@@ -480,3 +480,6 @@
 [submodule "vim/bundle/ag"]
 	path = vim/bundle/ag
 	url = git://github.com/ervandew/ag.git
+[submodule "vim/bundle/ipython"]
+	path = vim/bundle/ipython
+	url = git://github.com/ivanov/vim-ipython.git

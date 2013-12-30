@@ -64,48 +64,51 @@ if 1 " has('eval')
   let g:syntastic_auto_loc_list=1
 
   " neocomplcache
-  let g:neocomplcache_enable_at_startup = 1
-  let g:neocomplcache_enable_smart_case = 1
-  let g:neocomplcache_enable_camel_case_completion = 1
-  let g:neocomplcache_enable_underbar_completion = 1
-  let g:neocomplcache_min_syntax_length = 3
-  let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+  if s:use_neocomplcache
+    let g:neocomplcache_enable_at_startup = 1
+    let g:neocomplcache_enable_smart_case = 1
+    let g:neocomplcache_enable_camel_case_completion = 1
+    let g:neocomplcache_enable_underbar_completion = 1
+    let g:neocomplcache_min_syntax_length = 3
+    let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
 
-  " Define dictionary.
-  " let g:neocomplcache_dictionary_filetype_lists = {
-  "     \ 'default' : '',
-  "     \ 'vimshell' : $HOME.'/.vimshell_hist',
-  "     \ 'scheme' : $HOME.'/.gosh_completions'
-  "     \ }
+    " Define dictionary.
+    " let g:neocomplcache_dictionary_filetype_lists = {
+    "     \ 'default' : '',
+    "     \ 'vimshell' : $HOME.'/.vimshell_hist',
+    "     \ 'scheme' : $HOME.'/.gosh_completions'
+    "     \ }
 
-  " Define keyword.
-  if !exists('g:neocomplcache_keyword_patterns')
-    let g:neocomplcache_keyword_patterns = {}
+    " Define keyword.
+    if !exists('g:neocomplcache_keyword_patterns')
+      let g:neocomplcache_keyword_patterns = {}
+    endif
+    let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+
+    " Plugin key-mappings.
+    " imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+    " smap <C-k>     <Plug>(neocomplcache_snippets_expand)
+    inoremap <expr><C-g>     neocomplcache#undo_completion()
+    inoremap <expr><C-l>     neocomplcache#complete_common_string()
+
+    function! s:my_cr_function()
+      return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
+    endfunction
+    imap <expr><silent> <CR> <SID>my_cr_function()
+
+    " <C-h>, <BS>: close popup and delete backword char.
+    inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+    inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+    inoremap <expr><C-y>  neocomplcache#close_popup()
+    inoremap <expr><C-e>  neocomplcache#cancel_popup()
+
+    " AutoComplPop like behavior.
+    let g:neocomplcache_enable_auto_select = 1
   endif
-  let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 
-  " Plugin key-mappings.
-  " imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-  " smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-  inoremap <expr><C-g>     neocomplcache#undo_completion()
-  inoremap <expr><C-l>     neocomplcache#complete_common_string()
-
-  function! s:my_cr_function()
-    return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
-  endfunction
-  imap <expr><silent> <CR> <SID>my_cr_function()
   imap <C-X><CR> <CR><Plug>AlwaysEnd
   let g:endwise_no_mappings = 0
-
   inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-  " <C-h>, <BS>: close popup and delete backword char.
-  inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-  inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-  inoremap <expr><C-y>  neocomplcache#close_popup()
-  inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
-  " AutoComplPop like behavior.
-  let g:neocomplcache_enable_auto_select = 1
 
   " Enable omni completion.
   au FileType css setlocal omnifunc=csscomplete#CompleteCSS

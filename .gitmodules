@@ -483,3 +483,6 @@
 [submodule "vim/bundle/ipython"]
 	path = vim/bundle/ipython
 	url = git://github.com/ivanov/vim-ipython.git
+[submodule "vim/bundle/vinegar"]
+	path = vim/bundle/vinegar
+	url = git://github.com/tpope/vim-vinegar.git

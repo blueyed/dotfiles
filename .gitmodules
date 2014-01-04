@@ -486,3 +486,6 @@
 [submodule "vim/bundle/vinegar"]
 	path = vim/bundle/vinegar
 	url = git://github.com/tpope/vim-vinegar.git
+[submodule "lib/sack"]
+	path = lib/sack
+	url = git://github.com/sampson-chen/sack.git

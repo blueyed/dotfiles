@@ -236,8 +236,7 @@ if has("user_commands")
   " if s:use_ycm || s:use_neocomplcache
   "   call add(g:pathogen_disabled, 'supertab')
   " endif
-    " call add(g:pathogen_disabled, 'YouCompleteMe')
-    call add(g:pathogen_disabled, 'neocomplcache')
+
   " EXPERIMENTAL: auto-popups and experimenting with SuperTab
   let g:ycm_key_list_select_completion = []
   let g:ycm_key_list_select_previous_completion = []

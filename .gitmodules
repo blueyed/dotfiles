@@ -489,3 +489,6 @@
 [submodule "lib/sack"]
 	path = lib/sack
 	url = git://github.com/sampson-chen/sack.git
+[submodule "vim/bundle/color_highlight"]
+	path = vim/bundle/color_highlight
+	url = git://github.com/chrisbra/color_highlight.git

@@ -492,3 +492,6 @@
 [submodule "vim/bundle/color_highlight"]
 	path = vim/bundle/color_highlight
 	url = git://github.com/chrisbra/color_highlight.git
+[submodule "vim/bundle/colorscheme-vividchalk"]
+	path = vim/bundle/colorscheme-vividchalk
+	url = git://github.com/tpope/vim-vividchalk.git

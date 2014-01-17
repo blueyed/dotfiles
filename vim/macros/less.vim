@@ -130,7 +130,7 @@ noremap <script> <C-U> <C-U><SID>L
 
 " Scroll one line backward
 noremap <script> k <C-Y><SID>L
-map y k
+" map y k
 map <C-Y> k
 map <C-P> k
 map <C-K> k

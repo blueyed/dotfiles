@@ -1,6 +1,6 @@
 " Vim script to work like "less"
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2006 Dec 05
+" Last Change:	2012 May 18
 
 " Avoid loading this file twice, allow the user to define his own script.
 if exists("loaded_less")
@@ -37,7 +37,7 @@ endif
 
 set nocp
 syntax on
-set so=5
+set so=0
 set hlsearch
 set incsearch
 nohlsearch
@@ -94,7 +94,8 @@ map <Esc><Space> <Space>
 fun! s:NextPage()
   if line(".") == line("$")
     if argidx() + 1 >= argc()
-      quit
+      " Don't quit at the end of the last file
+      return
     endif
     next
     1
@@ -164,7 +165,7 @@ endif
 
 fun! s:Forward()
   " Searching forward
-  noremap <script> n M$nzt<SID>L
+  noremap <script> n H$nzt<SID>L
   if &wrap
     noremap <script> N H0Nzt<SID>L
   else

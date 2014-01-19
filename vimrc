@@ -424,12 +424,16 @@ if has("autocmd") " Autocommands {{{1
   " NOTE: read viminfo/marks, but removed: causes issues with jumplist sync
   " across Vim instances
     " \   rviminfo |
-  " NOTE: might fail with "E19: Mark has invalid line number"
-  au BufReadPost *
-    \ if ! exists('b:autojumped_init') && &ft != 'gitcommit' && &ft != 'diff' && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp' |
-    \   let b:autojumped_init = 1 |
-    \   exe 'normal! g`"zv' |
-    \ endif
+  " NOTE: removed for SVN commit messages: && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp' 
+  fun! AutojumpLastPosition()
+    if ! exists('b:autojumped_init')
+      let b:autojumped_init = 1
+      if &ft != 'gitcommit' && &ft != 'diff' && ! &diff && line("'\"") <= line("$")
+        exe 'normal! g`"zv'
+      endif
+    endif
+  endfun
+  au BufReadPost * call AutojumpLastPosition()
   " }}}
 
   " Automatically load .vimrc source when saved

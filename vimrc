@@ -63,6 +63,32 @@ if 1 " has('eval')
   let g:syntastic_auto_jump=1
   let g:syntastic_auto_loc_list=1
 
+  " YouCompleteMe {{{
+  let g:ycm_filetype_blacklist = {}
+  let g:ycm_complete_in_comments = 1
+  let g:ycm_complete_in_strings = 1
+  let g:ycm_collect_identifiers_from_comments_and_strings = 1
+  " Deactivated: causes huge RAM usage (YCM issue 595)
+  " let g:ycm_collect_identifiers_from_tags_files = 1
+
+  " EXPERIMENTAL: auto-popups and experimenting with SuperTab
+  let g:ycm_key_list_select_completion = []
+  let g:ycm_key_list_select_previous_completion = []
+
+  " " disable trigger for 'php' (slow; trigger it manually)
+  " let g:ycm_semantic_triggers =  {
+  "   \   'c' : ['->', '.'],
+  "   \   'objc' : ['->', '.'],
+  "   \   'cpp,objcpp' : ['->', '.', '::'],
+  "   \   'perl' : ['->'],
+  "   \   'php' : [],
+  "   \   'cs,java,javascript,d,vim,ruby,python,perl6,scala,vb,elixir' : ['.'],
+  "   \   'lua' : ['.', ':'],
+  "   \   'erlang' : [':'],
+  "   \ }
+  " }}}
+
+
   " neocomplcache
   if s:use_neocomplcache
     let g:neocomplcache_enable_at_startup = 1
@@ -236,10 +262,6 @@ if has("user_commands")
   " if s:use_ycm || s:use_neocomplcache
   "   call add(g:pathogen_disabled, 'supertab')
   " endif
-
-  " EXPERIMENTAL: auto-popups and experimenting with SuperTab
-  let g:ycm_key_list_select_completion = []
-  let g:ycm_key_list_select_previous_completion = []
 
   "
   " TO BE REMOVED"

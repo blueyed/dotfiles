@@ -418,13 +418,19 @@ if has("autocmd") " Autocommands {{{1
   " For all text files set 'textwidth' to 78 characters.
   " au FileType text setlocal textwidth=78
 
-  " When editing a file, always jump to the last known cursor position.
+  " Jump to last known cursor position on BufReadPost {{{
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).
+  " NOTE: read viminfo/marks, but removed: causes issues with jumplist sync
+  " across Vim instances
+    " \   rviminfo |
+  " NOTE: might fail with "E19: Mark has invalid line number"
   au BufReadPost *
-    \ if &ft != 'gitcommit' && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp' && line("'\"") > 0 && line("'\"") <= line("$") |
+    \ if ! exists('b:autojumped_init') && &ft != 'gitcommit' && &ft != 'diff' && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp' |
+    \   let b:autojumped_init = 1 |
     \   exe 'normal! g`"zv' |
     \ endif
+  " }}}
 
   " Automatically load .vimrc source when saved
   au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC

@@ -1092,12 +1092,20 @@ nnoremap <expr> <leader>gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 if 1 " has('eval') {{{1
 " Strip trailing whitespace {{{2
 function! StripWhitespace(line1, line2)
-  let old_query = getreg('/')
-  let save_cursor = getpos(".")
-  let old_linenum = line('.')
-  exe 'keepjumps '.a:line1.','.a:line2.'substitute/[\\]\@<!\s\+$//e'
-  call setreg('/', old_query)
-  call setpos('.', save_cursor)
+  if exists('*winsaveview')
+    let oldview = winsaveview()
+  else
+    let old_query = getreg('/')
+    let save_cursor = getpos(".")
+  endif
+  " let old_linenum = line('.')
+  exe 'keepjumps keeppatterns '.a:line1.','.a:line2.'substitute/[\\]\@<!\s\+$//e'
+  if exists('oldview')
+    call winrestview(oldview)
+  else
+    call setpos('.', save_cursor)
+  endif
+  " call setreg('/', old_query)
   " keepjumps exe "normal " . old_linenum . "G"
 endfunction
 command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)

@@ -7,7 +7,7 @@ autocmd!
 map , <Leader>
 set urlseparator='\|'
 " set guioptions+=N
-set gui=menu,tabs,addons
+set gui=menu,tabs,navigation
 
 set tabnumbers
 
@@ -211,9 +211,11 @@ silent qmark t twitter.com
 
 " group! editor
 " js my_editor=(config.OS.isMacOSX ? 'mvim' : 'gvim') + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
-js my_editor='gvim' + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
+" NOTE: no support for "<column>" and "<line"> with Vimperator: http://code.google.com/p/vimperator-labs/issues/detail?id=875
+" js my_editor='gvim' + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
+js my_editor='gvim' + ' -f -c "set ft={0}"'
 autocmd -js LocationChange .*           options.editor=my_editor.replace('{0}', 'html spell')
-autocmd -js LocationChange www.reddit.com,github.com,stackoverflow.com options.editor=my_editor.replace('{0}', 'markdown spell')
+autocmd -js LocationChange (www\.reddit\.com|github\.com|stackoverflow\.com)/ options.editor=my_editor.replace('{0}', 'markdown spell')
 autocmd -js LocationChange ^https?://mail\\..*   options.editor=my_editor.replace('{0}', 'mail spell')
 autocmd -js LocationChange ^https?://[^/]+/phpmyadmin/ options.editor=my_editor.replace('{0}', 'html')
 autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.replace('{0}', 'tracwiki')
@@ -240,7 +242,9 @@ set hintchars=asdfgöälkjh
 " add suggestion,history to completion list
 " set complete=search,location,file,suggestion
 " set complete=slfbhSt
-set complete=slfSt
+" NOTE: removed "f" (local files), might spin up diskstation (via autofs)
+" set complete=slfSt
+set complete=slSt
 
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
 nnoremap <silent> zz :centerselect<CR>

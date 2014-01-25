@@ -271,6 +271,10 @@ au PageLoad .* -js function area(w) w.innerWidth * w.innerHeight; buffer.allFram
 
 nnoremap <leader>c :js buffer.openContextMenu()<cr>
 
+" remap for smooth scrolling
+map j <Down>
+map k <Up>
+
 source! ~/.pentadactylrc.local
 
 " vim: set ft=pentadactyl.vim:

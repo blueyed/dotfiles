@@ -143,5 +143,9 @@ setup_zsh:
 	fi
 	@# obsolete/buggy?!:	-o "$(shell zsh -i -c env|grep '^ZSH=')" != "" ]
 
+# Upgrade all submodules
+upgrade:
+	rake upgrade
+
 tags:
 	ctags -R --exclude=YouCompleteMe .

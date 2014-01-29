@@ -1521,7 +1521,7 @@ nnoremap ää :confirm q<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
 nnoremap <Leader>gd :Gdiff<cr>
-" Close any corresponding diff buffer
+" Close any corresponding fugitive diff buffer.
 function! MyCloseDiff()
   if (&diff == 0 || getbufvar('#', '&diff') == 0)
         \ && (bufname('%') !~ '^fugitive:' && bufname('#') !~ '^fugitive:')
@@ -1531,10 +1531,10 @@ function! MyCloseDiff()
 
   diffoff " safety net / required to workaround powerline issue
 
-  " close current buffer if alternate is not fugitive but current one is
+  " Close current buffer if alternate is not fugitive but current one is.
   if bufname('#') !~ '^fugitive:' && bufname('%') =~ '^fugitive:'
     if bufwinnr("#") == -1
-      " XXX: does not work reliable
+      " XXX: might not work reliable (old comment)
       b #
       bd #
     else

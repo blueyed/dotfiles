@@ -495,3 +495,6 @@
 [submodule "vim/bundle/colorscheme-vividchalk"]
 	path = vim/bundle/colorscheme-vividchalk
 	url = git://github.com/tpope/vim-vividchalk.git
+[submodule "vim/bundle/markdown-folding"]
+	path = vim/bundle/markdown-folding
+	url = git://github.com/nelstrom/vim-markdown-folding.git

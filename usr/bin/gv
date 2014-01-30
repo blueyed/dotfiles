@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Focus any existing window.
+wmctrl -a 'vim[G]' || true
+
+# Execute/contact vim.
+# server-name: First letter used in titlestring, v:servername is uppercase.
+# -p: new tab page
+gvim -p --servername 'GLOBAL' --remote-tab-silent "$@"
+

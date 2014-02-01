@@ -2,12 +2,169 @@
 " exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
 " profile! file **
 
-" Use NeoComplCache, if YouCompleteMe is not available (needs compilation)
+" Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
 let s:has_ycm = filereadable(expand('~/.vim/bundle/YouCompleteMe/python/ycm_core.*', 1, 1)[0])
 let s:use_ycm = s:has_ycm
+" let s:use_ycm = 0
 let s:use_neocomplcache = ! s:use_ycm
+" }}}
 
-if 1 " has('eval')
+" Settings {{{1
+set nocompatible " This must be first, because it changes other options as a side effect.
+set hidden
+set encoding=utf8
+" Prefer unix fileformat
+" set fileformat=unix
+set fileformats=unix,dos
+
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+set confirm " ask for confirmation by default (instead of silently failing)
+set splitright splitbelow
+set history=1000
+set ruler   " show the cursor position all the time
+set showcmd   " display incomplete commands
+set incsearch   " do incremental searching
+
+set backup " enable backup (default off)
+set writebackup " keep a backup while writing the file (default on)
+set backupcopy=yes  " important to keep the file descriptor (inotify)
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+"vnoremap p "_dp
+
+set nowrap
+
+set autoindent    " always set autoindenting on (fallback after 'indentexpr')
+
+set tabstop=2
+set shiftwidth=2
+set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
+set expandtab
+set iskeyword+=-
+" remove '=' from filename characters; for completion of FOO=/path/to/file
+set isfname-==
+
+set laststatus=2  " Always display the statusline
+
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+
+" use short timeout after Escape sequence in terminal mode (for keycodes)
+set ttimeoutlen=10
+
+" Format options {{{2
+set formatoptions+=r " Insert comment leader after hitting <Enter>
+set formatoptions+=o " Insert comment leader after hitting o or O in normal mode
+set formatoptions+=t " Auto-wrap text using textwidth
+set formatoptions+=c " Autowrap comments using textwidth
+set formatoptions+=b " Do not wrap if you modify a line after textwidth
+set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
+set formatoptions+=q " Allow formatting of comments with "gq".
+set formatoptions+=q " Allow formatting of comments with "gq".
+set formatoptions+=t " Auto-wrap text using textwidth
+set formatoptions+=n " Recognize numbered lists
+" }}}
+
+" set guioptions-=m
+
+set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
+set viminfo+=! " keep global uppercase variables. Used by localvimrc.
+
+set selectmode=
+set mousemodel=popup " extend/popup/pupup_setpos
+set keymodel-=stopsel " do not stop visual selection with cursor keys
+set selection=inclusive
+" set clipboard=unnamed
+" do not mess with X selection by default
+set clipboard=
+
+" Enable mouse
+set mouse=a
+" Make mouse work with Vim in tmux
+set ttymouse=xterm2
+
+set showmatch  " show matching pairs
+set matchtime=3
+" Jump to matching bracket when typing the closing one.
+" Deactivated, causes keys to be ignored when typed too fast (?).
+"inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+"inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+
+set sessionoptions+=unix,slash " for unix/windows compatibility
+set nostartofline " do not go to start of line automatically when moving
+set scrolloff=3 " scroll offset/margin (cursor at 4th line)
+set sidescroll=1
+set sidescrolloff=10
+set commentstring=#\ %s
+
+" 'suffixes' get ignored by tmru
+set suffixes+=.tmp
+set suffixes+=.pyc
+" set suffixes+=.sw?
+
+" case only matters with mixed case expressions
+set ignorecase smartcase
+set smarttab
+
+set wildmenu
+" move cursor instead of selecting entries (wildmenu)
+cnoremap <Left> <Space><BS><Left>
+cnoremap <Right> <Space><BS><Right>
+
+" consider existing windows (but not tabs) when opening files, e.g. from quickfix
+" set switchbuf=useopen,usetab
+set switchbuf=useopen
+
+" Display extra whitespace
+" set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:❯,precedes:❮
+" set fillchars=stl:^,stlnc:-,vert:\|,fold:-,diff:-
+" set fillchars=vert:\|,fold:·,stl:\ ,stlnc:━,diff:⣿
+set fillchars=vert:\ ,fold:\ ,stl:\ ,stlnc:\ ,diff:⣿
+
+" Do not display "Pattern not found" messages during YouCompleteMe completion.
+" Patch: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
+try
+  set shortmess+=c
+catch /E539: Illegal character/
+endtry
+
+set nolist
+set listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
+" Experimental: setup listchars diffenrently for insert mode {{{
+" fun! MySetupList(mode)
+"   if a:mode == 'i'
+"     let b:has_list=&list
+"     if ! &list
+"       " set listchars-=eol:¬
+"     endif
+"     set list
+"   else
+"     if !(exists('b:has_list') && b:has_list)
+"       set nolist
+"     endif
+"     " set listchars+=eol:¬
+"   endif
+" endfun
+" augroup trailing
+"   au!
+"   au InsertEnter * call MySetupList('i')
+"   au InsertLeave * call MySetupList('n')
+" augroup END
+" }}}
+
+" Generic GUI options. {{{2
+if has('gui_running')
+  set guioptions-=T " hide toolbar
+  if has('vim_starting')
+    set lines=55 columns=100
+  endif
+  set guifont=Ubuntu\ Mono\ For\ Powerline\ 12,DejaVu\ Sans\ Mono\ 10
+endif
+
+if 1 " has('eval') / `let` may not be available.
   let mapleader = ","
   let g:my_full_name = "Daniel Hahler"
 
@@ -130,13 +287,18 @@ if 1 " has('eval')
 
     " AutoComplPop like behavior.
     let g:neocomplcache_enable_auto_select = 1
+
+    " Enable heavy omni completion.
+    if !exists('g:neocomplcache_omni_patterns')
+      let g:neocomplcache_omni_patterns = {}
+    endif
   endif
 
   imap <C-X><CR> <CR><Plug>AlwaysEnd
-  let g:endwise_no_mappings = 0
+  " let g:endwise_no_mappings = 0  " must be unset
   inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
-  " Enable omni completion.
+  " Setup omni completion.
   au FileType css setlocal omnifunc=csscomplete#CompleteCSS
   au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
   au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
@@ -382,43 +544,17 @@ if 1 " has('eval')
   " endif
   " colorscheme jellybeans
 
-  if &bg == 'dark'
-    colorscheme jellybeans
-  else
-    " Base16Scheme solarized
-    colorscheme solarized
-    " pimp colors (base16-solarized)
-    " hi Search ctermfg=130 ctermbg=21 cterm=underline
-    " hi IncSearch ctermfg=130 ctermbg=21 cterm=reverse
-  endif
+  " if &bg == 'dark'
+  "   colorscheme jellybeans
+  " else
+  "   " Base16Scheme solarized
+  "   colorscheme solarized
+  "   " pimp colors (base16-solarized)
+  "   " hi Search ctermfg=130 ctermbg=21 cterm=underline
+  "   " hi IncSearch ctermfg=130 ctermbg=21 cterm=reverse
+  " endif
+  colorscheme solarized
 endif
-
-" Settings {{{1
-set nocompatible " This must be first, because it changes other options as a side effect.
-set encoding=utf8
-" Prefer unix fileformat
-" set fileformat=unix
-set fileformats=unix,dos
-
-
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-set confirm " ask for confirmation by default (instead of silently failing)
-set splitright splitbelow
-set history=1000
-set ruler   " show the cursor position all the time
-set showcmd   " display incomplete commands
-set incsearch   " do incremental searching
-
-set backup " enable backup (default off)
-set writebackup " keep a backup while writing the file (default on)
-set backupcopy=yes  " important to keep the file descriptor (inotify)
-
-" This is an alternative that also works in block mode, but the deleted
-" text is lost and it only works for putting the current register.
-"vnoremap p "_dp
-
-set nowrap
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd") " Autocommands {{{1
@@ -543,28 +679,7 @@ if has("autocmd") " Autocommands {{{1
     au FocusLost   * wviminfo
     au FocusGained * rviminfo
   augroup end
-else
-  set autoindent    " always set autoindenting on
 endif " has("autocmd") }}}
-
-set tabstop=2
-set shiftwidth=2
-set expandtab
-set iskeyword+=-
-" remove '=' from filename characters; for completion of FOO=/path/to/file
-set isfname-==
-
-" Always display the status line
-set laststatus=2
-
-if has('gui_running')
-  " Generic GUI options
-  set guioptions-=T " hide toolbar
-  if has('vim_starting')
-    set lines=55 columns=100
-  endif
-  set guifont=Ubuntu\ Mono\ For\ Powerline\ 12,DejaVu\ Sans\ Mono\ 10
-endif
 
 " Dim inactive windows using 'colorcolumn' setting
 " This tends to slow down redrawing, but is very useful.
@@ -699,8 +814,7 @@ function! ShortenFilename(...)  " {{{
   return r
 endfunction "}}}
 
-
-if has('statusline') && 0 " disabled {{{
+if 0 && has('statusline') " disabled {{{
 set statusline=%!MyStatusLine('Enter')
 function! FileSize()
   let bytes = getfsize(expand("%:p"))
@@ -894,14 +1008,6 @@ imap <C-F> <C-R>=expand("%")<CR>
 
 " imap <C-L> <Space>=><Space>
 
-" Display extra whitespace
-set list listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
-" set fillchars=stl:^,stlnc:-,vert:\|,fold:-,diff:-
-set fillchars=vert:\|,fold:·,stl:\ ,stlnc:\ ,diff:-
-nnoremap <silent> <leader>sl :set list!<CR>
-inoremap <silent> <leader>sl <C-o>:set list!<CR>
-set nolist
-
 " toggle settings, mnemonic "set paste", "set wrap", ..
 " NOTE: see also unimpaired
 set pastetoggle=<leader>sp
@@ -1001,27 +1107,6 @@ if has("autocmd") && exists("+omnifunc")
   augroup END
 endif
 
-
-set wildmenu
-" move cursor instead of selecting entries (wildmenu)
-cnoremap <Left> <Space><BS><Left>
-cnoremap <Right> <Space><BS><Right>
-
-" case only matters with mixed case expressions
-set ignorecase smartcase
-set smarttab
-
-" Tags
-if 1 " has('eval')
-  let g:Tlist_Ctags_Cmd="ctags --exclude='*.js'"
-endif
-set tags=./tags;
-" Look for tags file in parent directories, upto "/"
-set tags+=tags;/
-
-if 1 " has('eval')
-  let g:fuf_splitPathMatching=1
-endif
 
 " set cursorline
 " highlight CursorLine guibg=lightblue ctermbg=lightgray
@@ -1263,17 +1348,24 @@ let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'cnf'
 let g:tmruSize = 500
 let g:tlib#cache#purge_days = 365
+" let g:tmru#display_relative_filename = 1 " default: 0
+" let g:tlib#input#format_filename = 'r' " default: 'l', required for
+" display_relative_filename
+let g:tmru_world = {}
+let g:tmru_world.cache_var = 'g:tmru_cache'
+let g:tmru#drop = 0 " do not `:drop` to files in existing windows. XXX: should use/follow &switchbuf maybe?! XXX: not documented
+let g:tmru_sessions = 9 " disable
 
 " Easytags
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
 let g:easytags_cmd = 'ctags'
 let g:easytags_suppress_ctags_warning = 1
-let g:easytags_dynamic_files = 1
+" let g:easytags_dynamic_files = 1
 let g:easytags_resolve_links = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 
-" command-t plugin
+" command-t plugin {{{
 let g:CommandTMaxFiles=50000
 let g:CommandTMaxHeight=20
 if has("autocmd") && exists(":CommandTFlush") && has("ruby")
@@ -1288,6 +1380,8 @@ map <leader>tt :CommandT<CR>
 map <leader>t. :execute "CommandT ".expand("%:p:h")<cr>
 map <leader>t  :CommandT<space>
 map <leader>tb :CommandTBuffer<CR>
+" }}}
+
 
 " supertab
 let g:SuperTabLongestEnhanced=1
@@ -1389,26 +1483,6 @@ nmap äk :cprev<cr>
 nnoremap <silent> <F8> :TagbarToggle<CR>
 nnoremap <silent> <Leader><F8> :TagbarOpenAutoClose<CR>
 
-" handling of matched items, like braces
-set showmatch
-set matchtime=3
-" deactivated, causes keys to be ignored when typed too fast (?)
-"inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-"inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-"inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-
-set sessionoptions+=unix,slash " for unix/windows compatibility
-set nostartofline " do not go to start of line automatically when moving
-set scrolloff=3 " scroll offset/margin (cursor at 4th line)
-set sidescroll=1
-set sidescrolloff=10
-set commentstring=#\ %s
-
-" 'suffixes' get ignored by tmru
-set suffixes+=.tmp
-set suffixes+=.pyc
-" set suffixes+=.sw?
-
 " NERDTree {{{
 " Show hidden files *except* the known temp files, system files & VCS files
 let NERDTreeShowHidden = 1
@@ -1472,44 +1546,13 @@ nnoremap <leader>elv :call MyEditConfig(GetRepoRoot(expand('%')).'/.lvimrc')<cr>
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
-" formatoptions:
-set formatoptions+=r " Insert comment leader after hitting <Enter>
-set formatoptions+=o " Insert comment leader after hitting o or O in normal mode
-set formatoptions+=t " Auto-wrap text using textwidth
-set formatoptions+=c " Autowrap comments using textwidth
-set formatoptions+=b " Do not wrap if you modify a line after textwidth
-set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
-set formatoptions+=q " Allow formatting of comments with "gq".
-set formatoptions+=q " Allow formatting of comments with "gq".
-set formatoptions+=t " Auto-wrap text using textwidth
-set formatoptions+=n " Recognize numbered lists
-
-" menu
-" set guioptions-=m
-
-set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
-
-set viminfo+=! " keep global uppercase variables. Used by localvimrc.
-
-set selectmode=
-set mousemodel=popup " extend/popup/pupup_setpos
-set keymodel-=stopsel " do not stop visual selection with cursor keys
-set selection=inclusive
-" set clipboard=unnamed
-" do not mess with X selection by default
-set clipboard=
-
-
-" Enable mouse
-set mouse=a
-" Make mouse work with Vim in tmux
-set ttymouse=xterm2
 
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
 
-" remap CTRL-W_ using maximize.vim (smarter and toggles)
+" Remap CTRL-W_ using maximize.vim (smarter and toggles).
+" NOTE: using `Ctrl-W o` currently mainly (via ZoomWin).
 map <c-w>_ :MaximizeWindow<cr>
 
 " Exit with ÄÄ (German keyboard layout)
@@ -1578,7 +1621,7 @@ command! -nargs=* -complete=command TabMessage call RedirMessage(<q-args>, 'tabn
 command! -nargs=* -complete=command BufMessage call RedirMessage(<q-args>, 'new')
 
 
-" Swap ' and ` keys (` is much more useful) {{{2
+" Swap ' and ` keys (` is more useful, but requires shift on a German keyboard) {{{2
 noremap ' `
 sunmap '
 noremap ` '

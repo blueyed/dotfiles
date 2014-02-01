@@ -1,0 +1,19 @@
+#!/usr/bin/zsh -i
+#
+# Execute a given command on the first reachable host.
+#
+# Syntax: on_first_host 'cmd %s' hostA hostB
+
+on_first_host() {
+  cmd=$1
+  shift
+  for host; do
+    echo "Trying $host..."
+    ping -c1 -w2 -q $host > /dev/null || continue
+    cmd=($(printf $cmd $host))
+    echo "Executing: $cmd"
+    $=cmd
+    return
+  done
+}
+on_first_host "$@"

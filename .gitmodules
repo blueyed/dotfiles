@@ -501,3 +501,6 @@
 [submodule "vim/bundle/runVimTests"]
 	path = vim/bundle/runVimTests
 	url = git://github.com/inkarkat/runVimTests.git
+[submodule "vim/bundle/VimTAP"]
+	path = vim/bundle/VimTAP
+	url = git://github.com/vim-scripts/VimTAP.git

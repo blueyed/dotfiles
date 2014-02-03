@@ -246,14 +246,18 @@ if 1 " has('eval') / `let` may not be available.
   " }}}
 
 
-  " neocomplcache
   if s:use_neocomplcache
+  " neocomplcache {{{
+    let g:neocomplcache_cursor_hold_i_time = 300 " default
     let g:neocomplcache_enable_at_startup = 1
-    let g:neocomplcache_enable_smart_case = 1
     let g:neocomplcache_enable_camel_case_completion = 1
+    let g:neocomplcache_enable_cursor_hold_i = 1
+    " let g:neocomplcache_enable_debug = 1
+    let g:neocomplcache_enable_ignore_case = 0
+    let g:neocomplcache_enable_smart_case = 1
     let g:neocomplcache_enable_underbar_completion = 1
-    let g:neocomplcache_min_syntax_length = 3
     let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+    let g:neocomplcache_min_syntax_length = 3
 
     " Define dictionary.
     " let g:neocomplcache_dictionary_filetype_lists = {
@@ -262,37 +266,70 @@ if 1 " has('eval') / `let` may not be available.
     "     \ 'scheme' : $HOME.'/.gosh_completions'
     "     \ }
 
-    " Define keyword.
-    if !exists('g:neocomplcache_keyword_patterns')
-      let g:neocomplcache_keyword_patterns = {}
-    endif
-    let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-
     " Plugin key-mappings.
     " imap <C-k>     <Plug>(neocomplcache_snippets_expand)
     " smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-    inoremap <expr><C-g>     neocomplcache#undo_completion()
-    inoremap <expr><C-l>     neocomplcache#complete_common_string()
+    " inoremap <expr><C-g>     neocomplcache#undo_completion()
+    " inoremap <expr><C-l>     neocomplcache#complete_common_string()
 
-    function! s:my_cr_function()
-      return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
-    endfunction
-    imap <expr><silent> <CR> <SID>my_cr_function()
+    " if exists(':<Plug>DiscretionaryEnd') " needs to come after pathogen
+      function! s:my_cr_function()
+        return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
+      endfunction
+    " else
+      " function! s:my_cr_function()
+      "   return pumvisible() ? neocomplcache#close_popup() : "\<CR>"
+      " endfunction
+    " endif
+    " imap <expr><silent> <CR> <SID>my_cr_function()
 
+    " inoremap <CR> <C-R>=neocomplcache#smart_close_popup()<CR>
+
+    " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
     " <C-h>, <BS>: close popup and delete backword char.
     inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
     inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-    inoremap <expr><C-y>  neocomplcache#close_popup()
-    inoremap <expr><C-e>  neocomplcache#cancel_popup()
+    " interferes with i_CTRL-Y (copy char above)
+    " inoremap <expr><C-y>  neocomplcache#close_popup()
+    " used by sparkup / not necessary:
+    " inoremap <expr><C-e>  neocomplcache#cancel_popup()
 
-    " AutoComplPop like behavior.
+    " let g:neocomplcache_enable_insert_char_pre=1
+
+    " auto-select first entry
     let g:neocomplcache_enable_auto_select = 1
+
+    " Force overwriting completefunc set by eclim
+    let g:neocomplcache_force_overwrite_completefunc = 1
+    " XXX: exists() does not work with autoload function
+    augroup neocomplcachefiletype
+    au!
+    " au FileType * let f='eclim#'.&filetype.'#complete#CodeComplete' | if exists('*'.f) | exec('setlocal omnifunc='.f) | endif
+
+    " imap <C-X><CR> <CR><Plug>AlwaysEnd
+    " let g:endwise_no_mappings = 1
+
+    " Enable omni completion.
+    au FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    au FileType python setlocal omnifunc=pythoncomplete#Complete
+    au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+    "au FileType ruby setlocal omnifunc=rubycomplete#Complete
+    augroup END
 
     " Enable heavy omni completion.
     if !exists('g:neocomplcache_omni_patterns')
       let g:neocomplcache_omni_patterns = {}
     endif
-  endif
+    let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+    let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+    let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+    let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+  else
+    " disable loading of neocomplcache
+    let g:loaded_neocomplcache = 1
+  endif " }}}
 
   imap <C-X><CR> <CR><Plug>AlwaysEnd
   " let g:endwise_no_mappings = 0  " must be unset

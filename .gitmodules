@@ -498,3 +498,6 @@
 [submodule "vim/bundle/markdown-folding"]
 	path = vim/bundle/markdown-folding
 	url = git://github.com/nelstrom/vim-markdown-folding.git
+[submodule "vim/bundle/runVimTests"]
+	path = vim/bundle/runVimTests
+	url = git://github.com/inkarkat/runVimTests.git

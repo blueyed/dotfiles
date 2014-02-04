@@ -507,3 +507,6 @@
 [submodule "vim/bundle/notes"]
 	path = vim/bundle/notes
 	url = git://github.com/xolox/vim-notes.git
+[submodule "vim/bundle/quicktask"]
+	path = vim/bundle/quicktask
+	url = git://github.com/aaronbieber/vim-quicktask.git

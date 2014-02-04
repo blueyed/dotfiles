@@ -518,6 +518,7 @@ if 1 " has('eval')
   else
     let g:solarized_termcolors=256
   endif
+  let g:solarized_hitrail=0
   " base16 (set of schemes)
   " We use a prepared 256color table:
   let base16colorspace = 256
@@ -632,10 +633,6 @@ if has("autocmd") " Autocommands {{{1
   "   au FocusLost * stopinsert
   " endif
 
-  au BufReadPost * if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) |
-        \ if exists(':DetectIndent') | DetectIndent | endif |
-      \ endif
-
   " autocommands for fugitive {{{2
   " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
   au User fugitive
@@ -664,12 +661,13 @@ if has("autocmd") " Autocommands {{{1
 
   augroup END
 
-  " Whitespace highlighting {{{2
+  " Trailing whitespace highlighting {{{2
+  " Map to toogle EOLWS syntax highlighting
   noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
         \:call MyAuGroupEOLWS(mode())<cr>
   let g:MyAuGroupEOLWSactive = 0
   function! MyAuGroupEOLWS(mode)
-    if g:MyAuGroupEOLWSactive && &bt == ""
+    if g:MyAuGroupEOLWSactive && &buftype == ''
       hi EOLWS ctermbg=red guibg=red
       syn clear EOLWS
       " match whitespace not preceded by a backslash
@@ -685,7 +683,9 @@ if has("autocmd") " Autocommands {{{1
   endfunction
   augroup vimrcExEOLWS
     au!
-    highlight EOLWS ctermbg=red guibg=red
+    " highlight EOLWS ctermbg=red guibg=red
+    " based on solarizedTrailingSpace
+    highlight EOLWS term=underline cterm=underline ctermfg=1
     au InsertEnter * call MyAuGroupEOLWS("i")
     " highlight trailing whitespace, space before tab and tab not at the
     " beginning of the line (except in comments), only for normal buffers:
@@ -703,8 +703,8 @@ if has("autocmd") " Autocommands {{{1
   " Source: http://vimhelp.appspot.com/vim_faq.txt.html#faq-17.3
   augroup viminfo_onfocus
     au!
-    au FocusLost   * wviminfo
-    au FocusGained * rviminfo
+    " au FocusLost   * wviminfo
+    " au FocusGained * rviminfo
   augroup end
 endif " has("autocmd") }}}
 
@@ -739,6 +739,7 @@ if exists('+colorcolumn')
   augroup END
 endif
 
+
 " statusline {{{
 " old
 " set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
@@ -746,6 +747,9 @@ endif
 " Shorten a given filename by truncating path segments.
 let s:_cache_shorten_path = {}
 fun! ShortenPath(path)
+  if ! len(a:path)
+    return ''
+  endif
   if ! exists('s:_cache_shorten_path[a:path]')
     let s:_cache_shorten_path[a:path] = system('shorten_path '.shellescape(a:path))
   endif
@@ -791,9 +795,9 @@ function! ShortenFilename(...)  " {{{
     return g:_cache_shorten_filename[cache_key]
   endif
 
-  let fullpath = fnamemodify(bufname, ':p')
-  let bufname = ShortenPath(fullpath)
-  let bufname = fnamemodify(bufname, ":~:.")
+  " let fullpath = fnamemodify(bufname, ':p')
+  let bufname = fnamemodify(bufname, ":p:~:.")
+  let bufname = ShortenPath(bufname)
   " }}}
 
   let maxlen_of_parts = 7 " including slash/dot
@@ -935,6 +939,7 @@ endif "}}}
 " Hide search highlighting
 if has('extra_search')
   nnoremap <silent> <Leader>h :set hlsearch!<CR>:set hlsearch?<CR>
+  nnoremap <silent> <Leader><C-l> :nohlsearch<CR><C-l>
   nnoremap <silent> <C-l> :nohlsearch<CR><C-l>
 endif
 
@@ -977,7 +982,7 @@ augroup tmuxtitle
   au!
   " FocusGained: not working with tmux, but should (when coming back from
   " another pane)
-  au FocusGained,BufWinEnter,WinEnter * call MySetTmuxWindowTitle(ShortenFilename('%', 15))
+  au BufEnter,BufFilePost * call MySetTmuxWindowTitle(ShortenFilename('%', 15))
 augroup END
 
 fun! MyGetPrettyFileDir()
@@ -1042,9 +1047,9 @@ imap <C-F> <C-R>=expand("%")<CR>
 " toggle settings, mnemonic "set paste", "set wrap", ..
 " NOTE: see also unimpaired
 set pastetoggle=<leader>sp
-nmap    <leader>sc :ColorToggle<cr>
-nmap    <leader>sq :QuickfixsignsToggle<cr>
-nmap    <leader>si :IndentGuidesToggle<cr>
+nmap <leader>sc :ColorToggle<cr>
+nmap <leader>sq :QuickfixsignsToggle<cr>
+nmap <leader>si :IndentGuidesToggle<cr>
 
 " let g:colorizer_fgcontrast=-1
 let g:colorizer_startup = 0
@@ -1073,7 +1078,7 @@ endif
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set nonumber
 let &showbreak = '↪ '
-function! ToggleLineNr()
+function! CycleLineNr()
   " states: [start] => norelative/number => relative/number => relative/nonumber => nonumber/norelative
   if exists('+relativenumber')
     if &relativenumber
@@ -1111,7 +1116,24 @@ function! SetNumberWidth()
     set numberwidth=2
   endif
 endfun
-nmap <leader>sa :call ToggleLineNr()<CR>
+nmap <leader>sa :call CycleLineNr()<CR>
+
+" Toggle numbers, but with relativenumber turned on
+fun! ToggleLineNr()
+  if &number
+    if exists('+relativenumber')
+      set norelativenumber
+    endif
+    set nonumber
+  else
+    if exists('+relativenumber')
+      set relativenumber
+    endif
+    set number
+  endif
+endfun
+" map according to unimpaired, mnemonic "a on the left, like numbers".
+nmap coa :call ToggleLineNr()<cr>
 "}}}
 
 " Tab completion options
@@ -1149,20 +1171,19 @@ endif
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet
 
-set hidden
+" Maps for jk and kj to act as Esc (kj is idempotent in normal mode)
+ino jk <esc>
+cno jk <c-c>
+ino kj <esc>
+cno kj <c-c>
 
-" consider existing windows (but not tabs) when opening files, e.g. from quickfix
-" set switchbuf=useopen,usetab
-set switchbuf=useopen
-
-" Maps for jj and kj to act as Esc (kj is idempotent in normal mode)
-" ino jk <esc>
-" cno jk <c-c>
-" ino kj <esc>
-" cno kj <c-c>
 
 " close tags (useful for html)
-imap <Leader>/ </<C-X><C-O>
+" NOTE: not required/used; avoid imap for leader.
+" imap <Leader>/ </<C-X><C-O>
+
+nnoremap <Leader>a :Ag<space>
+nnoremap <Leader><Leader>a :Ack!<space>
 
 " Toggle folds
 nnoremap <space> za
@@ -1170,8 +1191,8 @@ vnoremap <space> zf
 
 
 " paste shortcut (source: http://userobsessed.net/tips-and-tricks/2011/05/10/copy-and-paste-in-vim/)
-imap <Leader>v  <C-O>:set paste<CR><C-r>*<C-O>:set nopaste<CR>
-imap <Leader><Leader>v  <C-O>:set paste<CR><C-r>+<C-O>:set nopaste<CR>
+" imap <Leader>v  <C-O>:set paste<CR><C-r>*<C-O>:set nopaste<CR>
+" imap <Leader><Leader>v  <C-O>:set paste<CR><C-r>+<C-O>:set nopaste<CR>
 
 
 " swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
@@ -1233,7 +1254,7 @@ command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
 noremap <leader>st :Untrail<CR>
 
 function! MyChangeToRepoRootOfCurrentFile()
-  exe 'RepoRoot '.expand('%')
+  exe 'RepoRootLocal '.expand('%')
 endfunction
 command! RR call MyChangeToRepoRootOfCurrentFile()
 
@@ -1284,7 +1305,7 @@ fun! GrepCurrentBuffer(q)
     let &errorformat = save_errorformat
   endtry
 endfunction
-noremap <leader>. :GrepCurrentBuffer <C-r><C-w><cr>
+noremap <leader><space> :GrepCurrentBuffer <C-r><C-w><cr>
 
 
 " Commands to disable (and re-enable) all other tests in the current file. {{{2
@@ -1412,7 +1433,7 @@ if has("autocmd") && exists(":CommandTFlush") && has("ruby")
 endif
 if (has("gui_running"))
   " use Alt-T in GUI mode
-  map <M-t> :CommandT<CR>
+  map <A-t> :CommandT<CR>
 endif
 map <leader>tt :CommandT<CR>
 map <leader>t. :execute "CommandT ".expand("%:p:h")<cr>
@@ -1438,10 +1459,14 @@ let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
 let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
 let g:EclimLargeFileEnabled = 0
+let g:EclimCompletionMethod = 'omnifunc' " setup &omnifunc instead of &completefunc; this way YCM picks it up
 " let g:EclimLogLevel = 6
 " if exists(":EclimEnable")
 "   au VimEnter * EclimEnable
 " endif
+let g:EclimShowCurrentError = 0 " can be really slow, when used with PHP omnicompletion. I am using Syntastic anyway.
+let g:EclimSignLevel = 0
+let g:EclimLocateFileNonProjectScope = 'ag'
 
 " Prepend <leader> to visualctrlg mappings.
 let g:visualctrg_no_default_keymappings = 1
@@ -1465,7 +1490,32 @@ augroup QFixToggle
   au!
   au BufWinEnter quickfix let g:qfix_buf = bufnr("%")
 augroup END
+" 2}}}
 
+" Adjust height of quickfix window {{{2
+" Based on http://vim.wikia.com/wiki/Automatically_fitting_a_quickfix_window_height
+au FileType qf call AdjustWindowHeight(1, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+  exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
+endfunction
+" function! AdjustWindowHeight(minheight, maxheight)
+"   let totallines = line('$')
+"   if totallines >= a:maxheight
+"     n_lines = a:maxheight
+"   else
+"     let l = 1
+"     let n_lines = 0
+"     let w_width = winwidth(0)
+"     while l <= totallines && n_lines < a:maxheight
+"       " number to float for division
+"       let l_len = strlen(getline(l)) + 0.0
+"       let line_width = l_len/w_width
+"       let n_lines += float2nr(ceil(line_width))
+"       let l += 1
+"     endw
+"   endif
+"   exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
+" endfunction
 " 2}}}
 endif " 1}}} eval guard
 
@@ -1508,6 +1558,7 @@ noremap <F5> :GundoToggle<cr>
 " noremap <F11> :YRShow<cr>
 if has('gui_running')
   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
+  imap <silent> <F11> <Esc><F11>a
 endif
 
 " Mappings for german keyboard layout {{{
@@ -1805,23 +1856,40 @@ endfun
 let g:session_autoload = 'no'
 let g:session_autosave = 'no'
 
+" xmledit: do not enable for HTML (default)
+" interferes too much, see issue https://github.com/sukima/xmledit/issues/27
+" let g:xmledit_enable_html = 1
+
+" indent these tags for ft=html
+let g:html_indent_inctags = "body,html,head,p,tbody"
+" do not indent these
+let g:html_indent_autotags = "br"
 
 
-" autoclose
-" Overwrite defaults with sane value, see
-" https://github.com/Townk/vim-autoclose/pull/40 (<ESC> instead of <C-e>)
-let g:AutoClosePumvisible = {"ENTER": "\<C-Y>", "ESC": "\<ESC>"}
+" Setup late autocommands {{{
+if has('autocmd')"
+  augroup vimrc_late
+    au!
+    au FileType mail let b:no_detect_indent=1
+    au BufReadPost * if exists(':DetectIndent') | if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) | exec 'DetectIndent' | endif | endif
 
-
-" Local config (if any)
-if filereadable(expand("~/.vimrc.local"))
-  source ~/.vimrc.local
-endif
-
-nmap <C-D> :q<CR>
+    au BufReadPost * if &bt == "quickfix" | set nowrap | endif
 
     " Check if the new file (with git-diff prefix removed) is readable and
     " edit that instead (copy'n'paste from shell)
     au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^[abiw]/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
+    " Display a warning when editing foo.css, but foo.{scss,sass} exists
+    au BufRead *.css if glob(expand('<afile>:r').'.s[ca]ss', 1) != "" | echoerr "WARN: editing .css, but .scss/.sass exists!" | endif
+  augroup END
+endif " }}}
+
+
+" Local config (if any). {{{1
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif
+
+
+" Local file settings. {{{1
 " vim: fdm=marker

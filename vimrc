@@ -1170,6 +1170,11 @@ set switchbuf=useopen
 " close tags (useful for html)
 imap <Leader>/ </<C-X><C-O>
 
+" Toggle folds
+nnoremap <space> za
+vnoremap <space> zf
+
+
 " paste shortcut (source: http://userobsessed.net/tips-and-tricks/2011/05/10/copy-and-paste-in-vim/)
 imap <Leader>v  <C-O>:set paste<CR><C-r>*<C-O>:set nopaste<CR>
 imap <Leader><Leader>v  <C-O>:set paste<CR><C-r>+<C-O>:set nopaste<CR>
@@ -1252,6 +1257,8 @@ endfunction
 noremap <Leader>; :call MyToggleLastChar(';')<cr>
 noremap <Leader>: :call MyToggleLastChar(':')<cr>
 noremap <Leader>, :call MyToggleLastChar(',')<cr>
+noremap <Leader>. :call MyToggleLastChar('.')<cr>
+noremap <Leader>qa :call MyToggleLastChar('  # noqa')<cr>
 
 " use 'en_us' also to work around matchit considering 'en' as 'endif'
 set spl=de,en_us
@@ -1267,8 +1274,6 @@ fun! MyToggleSpellLang()
   echo "Set spl to ".&spl
 endfun
 noremap <Leader>sts :call MyToggleSpellLang()<cr>
-
-noremap ö :
 
 " Grep in the current (potential unsaved) buffer {{{2
 command! -nargs=1 GrepCurrentBuffer call GrepCurrentBuffer('<args>')
@@ -1511,12 +1516,22 @@ if has('gui_running')
   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
 endif
 
-" map ö/ä to brackets used by unimpaired (more accessible on a German keyboard layout)
-nmap ö [
-nmap ä ]
-" for one hand:
-nmap äj :cnext<cr>
-nmap äk :cprev<cr>
+" Mappings for german keyboard layout {{{
+" Map ö/ä to brackets used by unimpaired (more accessible on a German keyboard layout)
+map ö [
+map ä ]
+" For single hand mode:
+nmap äj :exec (getloclist(0) ? ':lnext' : ':cnext')."<CR>"
+nmap äk :exec (getloclist(0) ? ':lprev' : ':cprev')."<CR>"
+
+" Quit with ää / exit with ÄÄ
+nnoremap ÄÄ :confirm qall<cr>
+nnoremap ää :confirm q<cr>
+
+" Fast navigation.
+map ü {
+map + }
+" }}}
 
 " tagbar plugin
 nnoremap <silent> <F8> :TagbarToggle<CR>
@@ -1552,29 +1567,51 @@ nmap <C-S-Del> dWa
 
 " Map delete to 'delete to black hole register' (experimental, might use
 " `d` instead)
-map  <Del> "_x
-imap <Del> <C-O>"_x
-vmap <Del> "_x
+" Join lines, if on last column, delete otherwise (used in insert mode)
+" NOTE: de-activated: misbehaves with '""' at end of line (autoclose),
+"       and deleting across lines works anyway. The registers also do not
+"       get polluted.. do not remember why I came up with it...
+" function! MyDelAcrossEOL()
+"   echomsg col(".") col("$")
+"   if col(".") == col("$")
+"     " XXX: found no way to use '_' register
+"     call feedkeys("\<Down>\<Home>\<Backspace>")
+"   else
+"     normal! "_x
+"   endif
+"   return ''
+" endfunction
+" noremap  <Del> "_<Del>
+" inoremap <Del> <C-R>=MyDelAcrossEOL()<cr>
+" vnoremap <Del> "_<Del>
 
 map _  <Plug>(operator-replace)
 
+
 function! TabIsEmpty()
-  return winnr('$') == 1 && len(expand('%')) == 0 && line2byte(line('$') + 1) <= 2
+  return winnr('$') == 1 && WindowIsEmpty()
 endfunction
 
+" Is the current window considered to be empty?
 function! WindowIsEmpty()
+  if &ft == 'startify'
+    return 1
+  endif
   return len(expand('%')) == 0 && line2byte(line('$') + 1) <= 2
 endfunction
 
-function! MyEditConfig(path)
-  exec (WindowIsEmpty() ? 'e' : 'sp') a:path
+function! MyEditConfig(path, ...)
+  let cmd = a:0 ? a:1 : 'split'
+  exec (WindowIsEmpty() ? 'e' : cmd) a:path
 endfunction
 
 " edit vimrc shortcut
 " nnoremap <leader>ev <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
 nnoremap <leader>ev :call MyEditConfig(resolve($MYVIMRC))<cr>
+nnoremap <leader>Ev :call MyEditConfig(resolve($MYVIMRC), 'vsplit')<cr>
 " edit zshrc shortcut
 nnoremap <leader>ez :call MyEditConfig(resolve("~/.zshrc"))<cr>
+" edit tmux shortcut
 nnoremap <leader>et :call MyEditConfig(resolve("~/.tmux.common.conf"))<cr>
 " edit .lvimrc shortcut (in repository root)
 nnoremap <leader>elv :call MyEditConfig(GetRepoRoot(expand('%')).'/.lvimrc')<cr>
@@ -1585,7 +1622,6 @@ nnoremap <leader>elv :call MyEditConfig(GetRepoRoot(expand('%')).'/.lvimrc')<cr>
 "   execute 'cabbrev ' . a:abbreviation . ' <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "' . a:expansion . '" : "' . a:abbreviation . '"<CR>'
 " endfunction
 
-
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
@@ -1593,13 +1629,6 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 " Remap CTRL-W_ using maximize.vim (smarter and toggles).
 " NOTE: using `Ctrl-W o` currently mainly (via ZoomWin).
 map <c-w>_ :MaximizeWindow<cr>
-
-" Exit with ÄÄ (German keyboard layout)
-nnoremap ÄÄ :confirm qall<cr>
-" inoremap ÄÄ <C-O>:confirm qall<cr>
-" cnoremap ÄÄ <C-C>:confirm qall<cr>
-" onoremap ÄÄ <C-C>:confirm qall<cr>
-nnoremap ää :confirm q<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
 nnoremap <Leader>gd :Gdiff<cr>
@@ -1710,17 +1739,22 @@ endif
 "{{{2 Abbreviations
 " <C-g>u adds break to undo chain, see i_CTRL-G_u
 iabbr cdata <![CDATA[]]><Left><Left><Left>
+iabbr sg  Sehr geehrte Damen und Herren,<cr>
+iabbr sgh Sehr geehrter Herr<space>
+iabbr sgf Sehr geehrte Frau<space>
 iabbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
-iabbr sg Sehr geehrte Damen und Herren,<cr>
-iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 iabbr LG Liebe Grüße,<cr>Daniel.
 iabbr VG Viele Grüße,<cr>Daniel.
 " ellipsis
 iabbr ... …
 " sign "checkmark"
 iabbr scm ✓
-iabbr sgh Sehr geehrter Herr<space>
-iabbr sgf Sehr geehrte Frau<space>
+iabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
+iabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
+" German/styled quotes.
+iabbr <silent> _" „“<Left>
+iabbr <silent> _' ‚‘<Left>
+iabbr <silent> _- –<space>
 "}}}
 
 " ignore certain files for completion (used also by Command-T)
@@ -1728,6 +1762,8 @@ iabbr sgf Sehr geehrte Frau<space>
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
 set wildignore+=*.sw?
+set wildignore+=*.pyc
+set wildignore+=__pycache__
 if has('wildignorecase') " not on MacOS
   set wildignorecase
 endif
@@ -1742,11 +1778,13 @@ let g:CommandTWildIgnore=&wildignore . ",**/bower_components/*"
 let g:vdebug_keymap = {
 \    "run" : "<S-F5>",
 \}
+command! VdebugStart python debugger.run()
 
 " LocalVimRC {{{
 let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
 let g:localvimrc_debug = 0
+let g:localvimrc_persistence_file = g:vimsharedir . '/localvimrc_persistent'
 
 " Helper method for .lvimrc files to finish
 fun! MyLocalVimrcAlreadySourced(...)

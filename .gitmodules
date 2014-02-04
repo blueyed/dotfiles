@@ -503,4 +503,4 @@
 	url = git://github.com/inkarkat/runVimTests.git
 [submodule "vim/bundle/VimTAP"]
 	path = vim/bundle/VimTAP
-	url = git://github.com/vim-scripts/VimTAP.git
+	url = git://github.com/inkarkat/VimTAP.git

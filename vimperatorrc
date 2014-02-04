@@ -201,7 +201,7 @@ nmap <Leader>p :emenu View.Sidebar.Pocket<cr>
 silent qmark 0 hahler.de
 silent qmark c http://www.google.com/calendar
 silent qmark f facebook.com
-silent qmark g https://www.google.com/reader/view
+silent qmark g https://groups.google.com/forum/#!myforums
 silent qmark h heise.de
 silent qmark m https://mail.google.com/mail
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
@@ -228,7 +228,7 @@ autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.rep
 " pass through all keys with gmail and Google+
 javascript <<EOF
 function myPassAllKeys(buffer) {
-	if( /(mail|plus)\.google\.[a-z]+\//.test(buffer.URL) ) {
+	if( /(groups|mail|plus)\.google\.[a-z]+\//.test(buffer.URL) ) {
 		return true;
 	}
 	return false;
@@ -271,9 +271,30 @@ au PageLoad .* -js function area(w) w.innerWidth * w.innerHeight; buffer.allFram
 
 nnoremap <leader>c :js buffer.openContextMenu()<cr>
 
+" Yank document.title.
+nnoremap <leader>yt :js util.copyToClipboard(content.document.title, true)<cr>
+
+" Yank 'Issue #X: title (URL)' from Github issue page.
+javascript <<EOF
+function myCopyGithubIssueTitle(buffer) {
+	// return buffer.title.replace(/foo/, '$1');
+	let pat = /^(.*) · (Issue #\d+) · \w+\/\w+$/;
+	if( ! pat.test(buffer.title) ) {
+		liberator.echoerr("buffer title does not match.");
+		return;
+	}
+	let s = buffer.title.replace(pat, '$2: $1') + ' ('+buffer.URL+')';
+	util.copyToClipboard(s, true);
+}
+EOF
+nnoremap <leader>yl :js myCopyGithubIssueTitle(buffer)<cr>
+
 " remap for smooth scrolling
 map j <Down>
 map k <Up>
+
+" Edit ~/.vimperatorrc in global gvim server instance.
+map <leader>ep :!gv ~/.dotfiles/vimperatorrc<cr>
 
 source! ~/.pentadactylrc.local
 

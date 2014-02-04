@@ -140,7 +140,7 @@
 	ignore = untracked
 [submodule "vim/bundle/detectindent"]
 	path = vim/bundle/detectindent
-	url = git://github.com/ciaranm/detectindent.git
+	url = git://github.com/raymond-w-ko/detectindent.git
 	ignore = untracked
 [submodule "vim/bundle/shymenu"]
 	path = vim/bundle/shymenu

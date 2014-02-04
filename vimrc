@@ -642,7 +642,7 @@ if has("autocmd") " Autocommands {{{1
   "   au FocusLost * stopinsert
   " endif
 
-  au BufRead * if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) |
+  au BufReadPost * if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) |
         \ if exists(':DetectIndent') | DetectIndent | endif |
       \ endif
 
@@ -1401,6 +1401,8 @@ let g:easytags_suppress_ctags_warning = 1
 let g:easytags_resolve_links = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
+let g:detectindent_min_indent = 2  " via https://github.com/raymond-w-ko/detectindent
+let g:detectindent_max_indent = 4  " via https://github.com/raymond-w-ko/detectindent
 
 " command-t plugin {{{
 let g:CommandTMaxFiles=50000

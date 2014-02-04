@@ -18,8 +18,7 @@ set encoding=utf8
 set fileformats=unix,dos
 
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
+set backspace=indent,eol,start " allow backspacing over everything in insert mode
 set confirm " ask for confirmation by default (instead of silently failing)
 set splitright splitbelow
 set history=1000
@@ -27,13 +26,9 @@ set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
 
-set backup " enable backup (default off)
-set writebackup " keep a backup while writing the file (default on)
+set backup          " enable backup (default off)
+set writebackup     " keep a backup while writing the file (default on)
 set backupcopy=yes  " important to keep the file descriptor (inotify)
-
-" This is an alternative that also works in block mode, but the deleted
-" text is lost and it only works for putting the current register.
-"vnoremap p "_dp
 
 set nowrap
 
@@ -44,11 +39,9 @@ set shiftwidth=2
 set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
 set expandtab
 set iskeyword+=-
-" remove '=' from filename characters; for completion of FOO=/path/to/file
-set isfname-==
+set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file
 
 set laststatus=2  " Always display the statusline
-
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
 
 " use short timeout after Escape sequence in terminal mode (for keycodes)
@@ -80,10 +73,8 @@ set selection=inclusive
 " do not mess with X selection by default
 set clipboard=
 
-" Enable mouse
-set mouse=a
-" Make mouse work with Vim in tmux
-set ttymouse=xterm2
+set mouse=a " Enable mouse
+set ttymouse=xterm2  " Make mouse work with Vim in tmux
 
 set showmatch  " show matching pairs
 set matchtime=3
@@ -115,7 +106,6 @@ cnoremap <Left> <Space><BS><Left>
 cnoremap <Right> <Space><BS><Right>
 
 " consider existing windows (but not tabs) when opening files, e.g. from quickfix
-" set switchbuf=useopen,usetab
 set switchbuf=useopen
 
 " Display extra whitespace
@@ -1039,6 +1029,10 @@ vmap D y'>p
 " Press Shift+P while in visual mode to replace the selection without
 " overwriting the default register
 vmap P p :call setreg('"', getreg('0')) <CR>
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+"vnoremap p "_dp
 
 " Press ^F from insert mode to insert the current file name
 imap <C-F> <C-R>=expand("%")<CR>

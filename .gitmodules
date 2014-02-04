@@ -504,3 +504,6 @@
 [submodule "vim/bundle/VimTAP"]
 	path = vim/bundle/VimTAP
 	url = git://github.com/inkarkat/VimTAP.git
+[submodule "vim/bundle/notes"]
+	path = vim/bundle/notes
+	url = git://github.com/xolox/vim-notes.git

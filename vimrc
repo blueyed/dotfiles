@@ -2,13 +2,6 @@
 " exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
 " profile! file **
 
-" Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-let s:has_ycm = filereadable(expand('~/.vim/bundle/YouCompleteMe/python/ycm_core.*', 1, 1)[0])
-let s:use_ycm = s:has_ycm
-" let s:use_ycm = 0
-let s:use_neocomplcache = ! s:use_ycm
-" }}}
-
 " Settings {{{1
 set nocompatible " This must be first, because it changes other options as a side effect.
 set hidden
@@ -73,7 +66,9 @@ set selection=inclusive
 " do not mess with X selection by default
 set clipboard=
 
-set mouse=a " Enable mouse
+if has('mouse')
+  set mouse=a " Enable mouse
+endif
 set ttymouse=xterm2  " Make mouse work with Vim in tmux
 
 set showmatch  " show matching pairs
@@ -116,10 +111,12 @@ set fillchars=vert:\ ,fold:\ ,stl:\ ,stlnc:\ ,diff:⣿
 
 " Do not display "Pattern not found" messages during YouCompleteMe completion.
 " Patch: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
-try
-  set shortmess+=c
-catch /E539: Illegal character/
-endtry
+if 1 && exists(':try')
+  try
+    set shortmess+=c
+  catch /E539: Illegal character/
+  endtry
+endif
 
 set nolist
 set listchars=tab:»·,trail:·,eol:¬,nbsp:_,extends:»,precedes:«
@@ -155,6 +152,13 @@ if has('gui_running')
 endif
 
 if 1 " has('eval') / `let` may not be available.
+  " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
+  let s:has_ycm = filereadable(expand('~/.vim/bundle/YouCompleteMe/python/ycm_core.*', 1, 1)[0])
+  let s:use_ycm = s:has_ycm
+  " let s:use_ycm = 0
+  let s:use_neocomplcache = ! s:use_ycm
+  " }}}
+
   let mapleader = ","
   let g:my_full_name = "Daniel Hahler"
 

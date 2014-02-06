@@ -1262,15 +1262,15 @@ function! MyChangeToRepoRootOfCurrentFile()
 endfunction
 command! RR call MyChangeToRepoRootOfCurrentFile()
 
-" Toggle semicolon at end of line {{{2
-function! MyToggleLastChar(char)
-  let ss = @/ | let save_cursor = getpos(".")
+" Toggle pattern (typically a char) at the end of line {{{2
+function! MyToggleLastChar(pat)
+  let view = winsaveview()
   try
-    exe 's/\([^'.escape(a:char,'/').']\)$/\1'.escape(a:char,'/').'/'
+    keepjumps keeppatterns exe 's/\([^'.escape(a:pat,'/').']\)$\|^$/\1'.escape(a:pat,'/').'/'
   catch /^Vim\%((\a\+)\)\=:E486: Pattern not found/
-    exe 's/'.escape(a:char, '/').'$//'
+    keepjumps keeppatterns exe 's/'.escape(a:pat, '/').'$//'
   finally
-    let @/ = ss | call setpos('.', save_cursor)
+    call winrestview(view)
   endtry
 endfunction
 noremap <Leader>; :call MyToggleLastChar(';')<cr>

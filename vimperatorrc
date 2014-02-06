@@ -209,6 +209,14 @@ silent qmark p https://www.producteev.com/dashboard.php
 silent qmark r reddit.com
 silent qmark t twitter.com
 
+" Use buffer.URL for yanking (encoded spaces).
+js <<EOM
+mappings.addUserMap([modes.NORMAL], ["y"], "Yank current location to the clipboard",
+	function(){
+		util.copyToClipboard(buffer.URL, true);
+	});
+EOM
+
 " Setup `editor` option dynamically. {{{1
 " OBSOLETE: setup editor via LocationChange autocmd. {{{2
 " " group! editor

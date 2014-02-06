@@ -209,17 +209,64 @@ silent qmark p https://www.producteev.com/dashboard.php
 silent qmark r reddit.com
 silent qmark t twitter.com
 
-" group! editor
-" js my_editor=(config.OS.isMacOSX ? 'mvim' : 'gvim') + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
-" NOTE: no support for "<column>" and "<line"> with Vimperator: http://code.google.com/p/vimperator-labs/issues/detail?id=875
-" js my_editor='gvim' + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
-js my_editor='gvim' + ' -f -c "set ft={0}"'
-autocmd -js LocationChange .*           options.editor=my_editor.replace('{0}', 'html spell')
-autocmd -js LocationChange (www\.reddit\.com|github\.com|stackoverflow\.com)/ options.editor=my_editor.replace('{0}', 'markdown spell')
-autocmd -js LocationChange ^https?://mail\\..*   options.editor=my_editor.replace('{0}', 'mail spell')
-autocmd -js LocationChange ^https?://[^/]+/phpmyadmin/ options.editor=my_editor.replace('{0}', 'html')
-autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.replace('{0}', 'tracwiki')
-" group default
+" Setup `editor` option dynamically. {{{1
+" OBSOLETE: setup editor via LocationChange autocmd. {{{2
+" " group! editor
+" " js my_editor=(config.OS.isMacOSX ? 'mvim' : 'gvim') + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
+" " NOTE: no support for "<column>" and "<line"> with Vimperator: http://code.google.com/p/vimperator-labs/issues/detail?id=875
+" " js my_editor='gvim' + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
+" js my_editor='gvim' + ' -f -c "set ft={0}"'
+" autocmd -js LocationChange .*           options.editor=my_editor.replace('{0}', 'html spell')
+" autocmd -js LocationChange (www\.reddit\.com|github\.com|stackoverflow\.com)/ options.editor=my_editor.replace('{0}', 'markdown spell')
+" autocmd -js LocationChange ^https?://mail\\..*   options.editor=my_editor.replace('{0}', 'mail spell')
+" autocmd -js LocationChange ^https?://[^/]+/phpmyadmin/ options.editor=my_editor.replace('{0}', 'html')
+" autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.replace('{0}', 'tracwiki')
+" " group default
+" }}}2
+
+" Initially done via autocmd (see above), then rewritten based on [1] and adopted for Vimperator.
+" 1: http://ingo-karkat.de/blog/2012/05/22/Pentadactyl%20set%20filetype%20in%20external%20Vim%20editor%20based%20on%20URL.html
+set editor='gvim -f'
+javascript <<EOF
+// Get options for `editor`.
+// These get used with `set ` prepended and passed to `editor` via `-c`.
+function editExternallyGetOptions() {
+	// return 'spell | echom "foo"';
+	// These differ between Pentadactyl and Vimperator.
+	var host = location.host;
+	var path = location.pathname;
+	switch(host.replace(/^www\./, "")) {
+		case "github.com":
+			if (! path.match("/wiki/"))
+				return "ft=markdown spell";
+			// TODO: handle /wiki
+		case "reddit.com":
+		case "stackoverflow.com":
+			return "ft=markdown spell";
+	}
+	if (host.match(/^mail\./))
+		return 'ft=mail spell';
+	if (host.match(/.*\.wikia\.com$/) || host.match(/.*\.wikipedia\.org$/))
+		return "ft=mediawiki spell";
+	if (path.match(/\/phpmyadmin\//))
+		return 'ft=html spell';
+	if (buffer.URL.match(/^https?:\/\/.*trac.*\/wiki\//))
+		return 'ft=tracwiki';
+	return 'spell';
+}
+function editExternallyWithOptions() {
+    var edopts = editExternallyGetOptions();
+	var save_editor = options["editor"];
+	options["editor"] = options["editor"] + ' -c "set ' + edopts.replace(/"/g, '\\"') + '"';
+	// alert(options['editor']);
+    editor.editFieldExternally();
+	options["editor"] = save_editor;
+}
+// Overwrite Ctrl-I input mapping.
+mappings.addUserMap([modes.INSERT], ["<c-i>"], "Launch the external editor.", editExternallyWithOptions);
+EOF
+" }}}1
+
 
 " for pentadactyl:
 " passthrough certain keys, see "h key-sequence" for a list

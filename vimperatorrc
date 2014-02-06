@@ -168,7 +168,7 @@ EOF
 
 " reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
 " open current page with reddit toolbar (allows submitting)
-nmap e :js liberator.open("http://reddit.com/s/" + buffer.URL)<cr>
+nmap e :js liberator.open("http://reddit.com/submit?url=" + buffer.URL)<cr>
 " add bookmark for subreddits (":o r")
 "bma -k=r http://reddit.com/r/%s/
 
@@ -197,7 +197,7 @@ map <Leader>n :noscript popup<cr>
 " Toggle pocket sidebar
 nmap <Leader>p :emenu View.Sidebar.Pocket<cr>
 
-" Quickmarks
+" Quickmarks (for `go` and `gn`)
 silent qmark 0 hahler.de
 silent qmark c http://www.google.com/calendar
 silent qmark f facebook.com
@@ -275,7 +275,6 @@ mappings.addUserMap([modes.INSERT], ["<c-i>"], "Launch the external editor.", ed
 EOF
 " }}}1
 
-
 " for pentadactyl:
 " passthrough certain keys, see "h key-sequence" for a list
 " set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
@@ -349,8 +348,8 @@ map j <Down>
 map k <Up>
 
 " Edit ~/.vimperatorrc in global gvim server instance.
-map <leader>ep :!gv ~/.dotfiles/vimperatorrc<cr>
+map <leader>ec :silent !gv ~/.dotfiles/vimperatorrc<cr>
 
 source! ~/.pentadactylrc.local
 
-" vim: set ft=pentadactyl.vim:
+" vim: set ft=pentadactyl.vim fdm=marker:

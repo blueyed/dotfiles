@@ -510,3 +510,6 @@
 [submodule "vim/bundle/quicktask"]
 	path = vim/bundle/quicktask
 	url = git://github.com/aaronbieber/vim-quicktask.git
+[submodule "vim/bundle/google/maktaba"]
+	path = vim/bundle/google/maktaba
+	url = git://github.com/google/maktaba.git

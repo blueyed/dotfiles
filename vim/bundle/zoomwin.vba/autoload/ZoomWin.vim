@@ -1,8 +1,8 @@
 " ZoomWin:	Brief-like ability to zoom into/out-of a window
 " Author:	Charles Campbell
 "			original version by Ron Aaron
-" Date:		Mar 13, 2013 
-" Version:	25g	ASTRO-ONLY
+" Date:		Nov 09, 2013 
+" Version:	25j	ASTRO-ONLY
 " History: see :help zoomwin-history {{{1
 " GetLatestVimScripts: 508 1 :AutoInstall: ZoomWin.vim
 
@@ -18,9 +18,9 @@ if v:version < 702
  finish
 endif
 let s:keepcpo        = &cpo
-let g:loaded_ZoomWin = "v25g"
+let g:loaded_ZoomWin = "v25j"
 if !exists("g:zoomwin_localoptlist")
- let s:localoptlist   = ["ai","ar","bh","bin","bl","bomb","bt","cfu","ci","cin","cink","cino","cinw","cms","com","cpt","diff","efm","eol","ep","et","fenc","fex","ff","flp","fo","ft","gp","imi","ims","inde","inex","indk","inf","isk","key","kmp","lisp","mps","ml","ma","mod","nf","ofu","oft","pi","qe","ro","sw","sn","si","sts","spc","spf","spl","sua","swf","smc","syn","ts","tx","tw","udf","wm"]
+ let s:localoptlist   = ["ai","ar","bh","bin","bl","bomb","bt","cfu","ci","cin","cink","cino","cinw","cms","com","cpt","diff","efm","eol","ep","et","fenc","fex","ff","flp","fo","ft","gp","imi","ims","inde","inex","indk","inf","isk","key","kmp","lisp","mps","ml","ma","mod","nf","ofu","oft","pi","qe","ro","sw","sn","si","sts","spc","spf","spl","sua","swf","smc","syn","ts","tx","tw","udf","wfh","wfw","wm"]
 else
  let s:localoptlist   = g:zoomwin_localoptlist
 endif
@@ -193,19 +193,32 @@ fun! ZoomWin#ZoomWin()
 	let keepy9= @9
     set lz ei=all bh=
 	if v:version >= 700
+	 let curwin = winnr()
+
 	 try
 	  exe "keepalt keepmarks new! ".fnameescape(s:sessionfile)
 	 catch /^Vim\%((\a\+)\)\=:E/
-	  echoerr "Too many windows"
-      sil! call delete(s:sessionfile)
-      unlet s:sessionfile
-      let &lz= lzkeep
-"      call Dret("ZoomWin#ZoomWin : too many windows")
-      return
+	  let seswin = -1
+	  windo if winheight(winnr()) > 1 | let seswin= winnr() | endif
+	  if seswin < 0
+	   echoerr "Too many windows (not enough room)"
+       sil! call delete(s:sessionfile)
+       unlet s:sessionfile
+       let &lz= lzkeep
+"       call Dret("ZoomWin#ZoomWin : too many windows")
+       return
+	  endif
+	  exe seswin."wincmd w"
+	  exe "keepalt keepmarks new! ".fnameescape(s:sessionfile)
 	 endtry
+	 " modify the session (so that it merely restores window layout)
      sil! keepjumps keepmarks v/wincmd\|split\|resize/d
+	 " save modified session
+	 " wipe out session window and buffer
+	 " restore cursor to the window that was current before editing the session file
      keepalt w!
      keepalt bw!
+	 exe curwin."wincmd w"
 	else
 	 exe "new! ".fnameescape(s:sessionfile)
      v/wincmd\|split\|resize/d

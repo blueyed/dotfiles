@@ -511,7 +511,7 @@
 	path = vim/bundle/quicktask
 	url = git://github.com/aaronbieber/vim-quicktask.git
 [submodule "vim/bundle/google/maktaba"]
-	path = vim/bundle/google/maktaba
+	path = vim/bundle/maktaba
 	url = git://github.com/google/maktaba.git
 [submodule "vim/bundle/diminactive"]
 	path = vim/bundle/diminactive

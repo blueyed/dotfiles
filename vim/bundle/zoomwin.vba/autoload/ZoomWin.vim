@@ -264,7 +264,7 @@ fun! ZoomWin#ZoomWin()
    if type(g:ZoomWin_funcref) == 2
 	call g:ZoomWin_funcref(zoomwinstate)
    elseif type(g:ZoomWin_funcref) == 3
-    for Fncref in g:ZoomWin_funcref
+    for FncRef in g:ZoomWin_funcref
      if type(FncRef) == 2
 	  call FncRef(zoomwinstate)
      endif

@@ -513,3 +513,6 @@
 [submodule "vim/bundle/google/maktaba"]
 	path = vim/bundle/google/maktaba
 	url = git://github.com/google/maktaba.git
+[submodule "vim/bundle/diminactive"]
+	path = vim/bundle/diminactive
+	url = git://github.com/blueyed/vim-diminactive.git

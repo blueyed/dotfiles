@@ -608,6 +608,39 @@ if has("autocmd") " Autocommands {{{1
   " For all text files set 'textwidth' to 78 characters.
   " au FileType text setlocal textwidth=78
 
+  " Follow symlinks when opening a file {{{
+  " NOTE: this happens with directory symlinks anyway (due to Vim's chdir/getcwd
+  "       magic when getting filenames).
+  " Sources:
+  "  - https://github.com/tpope/vim-fugitive/issues/147#issuecomment-7572351
+  "  - http://www.reddit.com/r/vim/comments/yhsn6/is_it_possible_to_work_around_the_symlink_bug/c5w91qw
+  " Echoing a warning does not appear to work:
+  "   echohl WarningMsg | echo "Resolving symlink." | echohl None |
+  function! MyFollowSymlink(...)
+    if exists('w:no_resolve_symlink') && w:no_resolve_symlink
+      return
+    endif
+    let fname = a:0 ? a:1 : expand('%')
+    if fname =~ '^\w\+:/'
+      " do not mess with 'fugitive://' etc
+      return
+    endif
+    let fname = simplify(fname)
+
+    let resolvedfile = resolve(fname)
+    if resolvedfile == fname
+      return
+    endif
+    let resolvedfile = fnameescape(resolvedfile)
+    echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+    " exec 'noautocmd file ' . resolvedfile
+    " XXX: problems with AutojumpLastPosition: line("'\"") is 1 always.
+    exec 'file ' . resolvedfile
+  endfunction
+  command! FollowSymlink call MyFollowSymlink()
+  command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
+  au BufReadPost * call MyFollowSymlink(expand('<afile>'))
+
   " Jump to last known cursor position on BufReadPost {{{
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).

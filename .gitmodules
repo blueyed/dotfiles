@@ -519,3 +519,6 @@
 [submodule "vim/bundle/sneak"]
 	path = vim/bundle/sneak
 	url = git://github.com/justinmk/vim-sneak.git
+[submodule "vim/bundle/space"]
+	path = vim/bundle/space
+	url = git://github.com/zhaocai/vim-space.git

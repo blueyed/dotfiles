@@ -241,8 +241,9 @@ javascript <<EOF
 function editExternallyGetOptions() {
 	// return 'spell | echom "foo"';
 	// These differ between Pentadactyl and Vimperator.
-	var host = location.host;
-	var path = location.pathname;
+	var host = content.location.host;
+	var path = content.location.pathname;
+	// alert(host, path);
 	switch(host.replace(/^www\./, "")) {
 		case "github.com":
 			if (! path.match("/wiki/"))

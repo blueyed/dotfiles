@@ -516,3 +516,6 @@
 [submodule "vim/bundle/diminactive"]
 	path = vim/bundle/diminactive
 	url = git://github.com/blueyed/vim-diminactive.git
+[submodule "vim/bundle/sneak"]
+	path = vim/bundle/sneak
+	url = git://github.com/justinmk/vim-sneak.git

@@ -168,7 +168,7 @@ EOF
 
 " reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
 " open current page with reddit toolbar (allows submitting)
-nmap e :js liberator.open("http://reddit.com/submit?url=" + buffer.URL)<cr>
+nmap e :js liberator.open("http://reddit.com/submit?url=" + encodeURIComponent(buffer.URL))<cr>
 " add bookmark for subreddits (":o r")
 "bma -k=r http://reddit.com/r/%s/
 

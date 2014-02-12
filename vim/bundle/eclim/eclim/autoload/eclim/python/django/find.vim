@@ -112,47 +112,22 @@ endfunction " }}}
 " FindTemplate(project_dir, template) {{{
 " Finds and opens the supplied template definition.
 function! eclim#python#django#find#FindTemplate(project_dir, template)
-  let file = ''
-  " Use Django's template module to lookup the template
-  " This requires Django 1.7
-  " (patch at https://code.djangoproject.com/ticket/16096)
-  " TODO: abstract/refactor it, use it for GetSetting
-  python << EOF
-try:
-  import vim
-  from django.template import loader as django_template_loader
-  template = vim.eval('a:template')
-  # from django.conf import settings  # might throw django.core.exceptions.ImproperlyConfigured
-  t = django_template_loader.get_template(template)
-  # print(t.__dict__)
-  file = django_template_loader.get_template(template).origin.name
-  vim.command("let file = '%s'" % file)  # TODO: properly quote it
-except:
-  raise
-  pass
-EOF
-
-  if file == ''
-    let dirs = eclim#python#django#util#GetTemplateDirs(a:project_dir)
-    for dir in dirs
-      let template_dir = dir
-      if template_dir !~ '^' . a:project_dir
-        if fnamemodify(a:project_dir, ':t') == split(dir, '/')[0]
-          let template_dir = fnamemodify(a:project_dir, ':h') . '/' . dir
-        else
-          let template_dir = a:project_dir . '/' . dir
-        endif
+  let dirs = eclim#python#django#util#GetTemplateDirs(a:project_dir)
+  for dir in dirs
+    let template_dir = dir
+    if template_dir !~ '^' . a:project_dir
+      if fnamemodify(a:project_dir, ':t') == split(dir, '/')[0]
+        let template_dir = fnamemodify(a:project_dir, ':h') . '/' . dir
+      else
+        let template_dir = a:project_dir . '/' . dir
       endif
-      let file = findfile(a:template, template_dir)
-      if file != ''
-        break
-      endif
-    endfor
-  endif
-  if len(file)
-    call eclim#util#GoToBufferWindowOrOpen(file, g:EclimDjangoFindAction)
-    return 1
-  endif
+    endif
+    let file = findfile(a:template, template_dir)
+    if file != ''
+      call eclim#util#GoToBufferWindowOrOpen(file, g:EclimDjangoFindAction)
+      return 1
+    endif
+  endfor
   call eclim#util#EchoError('Could not find the template "' . a:template . '"')
 endfunction " }}}
 

@@ -533,3 +533,6 @@
 [submodule "vim/bundle/vimfiler"]
 	path = vim/bundle/vimfiler
 	url = git://github.com/Shougo/vimfiler.vim.git
+[submodule "vim/bundle/ref"]
+	path = vim/bundle/ref
+	url = git://github.com/thinca/vim-ref.git

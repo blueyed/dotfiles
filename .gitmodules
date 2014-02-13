@@ -524,3 +524,6 @@
 [submodule "vim/bundle/unite-outline"]
 	path = vim/bundle/unite-outline
 	url = git://github.com/Shougo/unite-outline.git
+[submodule "vim/bundle/targets"]
+	path = vim/bundle/targets
+	url = git://github.com/wellle/targets.vim.git

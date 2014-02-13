@@ -7,6 +7,7 @@ autocmd!
 map , <Leader>
 set urlseparator='\|'
 set guioptions+=N
+set guioptions+=T
 
 set! browser.dom.window.dump.enabled=true
 set! devtools.errorconsole.enabled=true
@@ -24,6 +25,9 @@ vmap s :gg<Space>
 " bypass ctrl-tab (ref: http://code.google.com/p/dactyl/issues/detail?id=171)
 nmap <C-Tab> <Pass>
 nmap <C-S-Tab> <Pass>
+
+" New tab. C-t is "Execute the next [count] mappings in a new tab.".
+nmap <C-t><C-t> :tabnew<cr>
 
 " command to clear history
 " command! clearhist sanitize commandline
@@ -49,9 +53,6 @@ au LocationChange www.heise.de set previouspattern='^Neuere$',^<<$ nextpattern='
 " forum.xda-developers.com
 au LocationChange ://[^]+/showthread\.php\? set previouspattern='^<$'
 au LocationChange ://[^]+/showthread\.php\? set nextpattern='^>$'
-
-" XXX: something likge that (google for it)
-" autocmd LocationChange .* js modes.passAllKeys = /google\.com/.test(buffer.URL)
 group default
 
 set popups=tab,resized
@@ -74,6 +75,7 @@ function shortenURLBitLy (url) {
 		req.send(null);
 	}
 EOF
+" mnemonic: Go and yank.
 map -silent gy -js shortenURLBitLy(buffer.URL)
 
 
@@ -88,22 +90,24 @@ function toggleDevLiveHost() {
 	let customtoggle = {
 		'www.betterplace.org': 'www.bp42.com',
 	}
+	let curhost = buffer.URL.host;
+	let cururl = buffer.URL;
 	for( var i in customtoggle ) {
-		if( buffer.uri.host === i ) {
-			return String.replace(buffer.URL, i, customtoggle[i]);
+		if( curhost === i ) {
+			return String.replace(cururl, i, customtoggle[i]);
 		}
-		if( buffer.uri.host === customtoggle[i] ) {
-			return String.replace(buffer.URL, customtoggle[i], i);
+		if( curhost === customtoggle[i] ) {
+			return String.replace(cururl, customtoggle[i], i);
 		}
 	}
 
 	// then prepend/remove suffix
 	let suffix = '.localdomain';
-	if( buffer.uri.host.indexOf(suffix, buffer.uri.host.length - suffix.length) !== -1 ) {
-		return String.replace(buffer.URL, suffix, '');
+	if( curhost.indexOf(suffix, curhost.length - suffix.length) !== -1 ) {
+		return String.replace(cururl, suffix, '');
 	}
 	// append suffix
-	return String.replace(buffer.URL, /(\.\w{2,4})([\/:])/, "$1"+suffix+"$2");
+	return String.replace(cururl, /(\.\w{2,4})([\/:])/, "$1"+suffix+"$2");
 }
 EOF
 map gz -js dactyl.open(toggleDevLiveHost());
@@ -161,7 +165,7 @@ EOF
 
 " reddit tips (via http://www.reddit.com/r/vim/comments/crs9u/some_vimperator_tips_for_redditors/)
 " open current page with reddit toolbar (allows submitting)
-nmap e -js dactyl.open("http://reddit.com/s/" + encodeURIComponent(buffer.uri.spec))
+nmap e -js dactyl.open("http://reddit.com/submit?url=" + encodeURIComponent(buffer.URL))
 " add bookmark for subreddits (":o r")
 "bma -k=r http://reddit.com/r/%s/
 
@@ -190,11 +194,11 @@ map <Leader>n -ex noscript popup
 " Toggle pocket sidebar
 nmap <Leader>p -ex emenu View.Sidebar.Pocket
 
-" Quickmarks
+" Quickmarks (for `go` and `gn`)
 silent qmark 0 hahler.de
 silent qmark c http://www.google.com/calendar
 silent qmark f facebook.com
-silent qmark g https://www.google.com/reader/view
+silent qmark g https://groups.google.com/forum/#!myforums
 silent qmark h heise.de
 silent qmark m https://mail.google.com/mail
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
@@ -202,17 +206,56 @@ silent qmark p https://www.producteev.com/dashboard.php
 silent qmark r reddit.com
 silent qmark t twitter.com
 
-group! editor
-js my_editor=(config.OS.isMacOSX ? 'mvim' : 'gvim') + ' -f -c "set ft={0} | call cursor(<line>, <column>)"'
-autocmd -js LocationChange .*           options.editor=my_editor.replace('{0}', 'html spell')
-autocmd -js LocationChange www.reddit.com,github.com,stackoverflow.com options.editor=my_editor.replace('{0}', 'markdown spell')
-autocmd -js LocationChange ^https?://mail\\..*   options.editor=my_editor.replace('{0}', 'mail spell')
-autocmd -js LocationChange ^https?://[^/]+/phpmyadmin/ options.editor=my_editor.replace('{0}', 'html')
-autocmd -js LocationChange ^https?://.*trac.*/wiki/ options.editor=my_editor.replace('{0}', 'tracwiki')
-group default
 
-" passthrough certain keys, see "h key-sequence" for a list
-set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
+" Initially done via autocmd (see above), then rewritten based on [1] and adopted for Vimperator.
+" 1: http://ingo-karkat.de/blog/2012/05/22/Pentadactyl%20set%20filetype%20in%20external%20Vim%20editor%20based%20on%20URL.html
+set editor='gvim -f'
+javascript <<EOF
+// Get options for `editor`.
+// These get used with `set ` prepended and passed to `editor` via `-c`.
+function editExternallyGetOptions() {
+	// return 'spell | echom "foo"';
+	// These differ between Pentadactyl and Vimperator.
+	var host = buffer.URL.host;
+	var path = buffer.URL.path;
+	// alert(host, path);
+	switch(host.replace(/^www\./, "")) {
+		case "github.com":
+			if (! path.match("/wiki/"))
+				return "ft=markdown spell";
+			// TODO: handle /wiki
+		case "reddit.com":
+		case "stackoverflow.com":
+			return "ft=markdown spell";
+	}
+	if (host.match(/^mail\./))
+		return 'ft=mail spell';
+	if (host.match(/.*\.wikia\.com$/) || host.match(/.*\.wikipedia\.org$/))
+		return "ft=mediawiki spell";
+	if (path.match(/\/phpmyadmin\//))
+		return 'ft=html spell';
+	if (buffer.URL.match(/^https?:\/\/.*trac.*\/wiki\//))
+		return 'ft=tracwiki';
+	return 'spell';
+}
+function editExternallyWithOptions() {
+    var edopts = editExternallyGetOptions();
+	var save_editor = options["editor"];
+	options["editor"] = options["editor"] + ' -c "set ' + edopts.replace(/"/g, '\\"') + '"';
+	alert(options['editor']);
+    editor.editFieldExternally();
+	options["editor"] = save_editor;
+}
+EOF
+" Overwrite Ctrl-I input mapping.
+imap <C-i> -js editExternallyWithOptions();
+" }}}1
+
+" Bypassing keys. {{{1
+autocmd LocationChange '^https?://(groups|mail|plus|www)\.google\.com/' :normal! <C-z>
+" Passthrough certain keys only, see "h key-sequence" for a list.
+" set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
+" }}}1
 
 " use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
 set hintkeys=asdfgöälkjh
@@ -243,6 +286,33 @@ nmap -builtin -silent zc :removeselect<CR>
 " Focus largest frame. This replaces the auto-focus-frame.js plugin. Props @John-Galt!
 au PageLoad .* -js function area(w) w.innerWidth * w.innerHeight; buffer.allFrames(doc.defaultView.top).reduce(function (w, acc) area(w) > area(acc) ? w : acc).focus()
 
+nnoremap <leader>c :js buffer.openContextMenu()<cr>
+
+" Yank document.title.
+nnoremap <leader>yt :js dactyl.clipboardWrite(content.document.title, true)<cr>
+
+" Yank 'Issue #X: title (URL)' from Github issue page.
+javascript <<EOF
+function myCopyGithubIssueTitle(buffer) {
+	// return buffer.title.replace(/foo/, '$1');
+	let pat = /^(.*) · (Issue #\d+) · \w+\/\w+$/;
+	if( ! pat.test(buffer.title) ) {
+		dactyl.echoerr("buffer title does not match.");
+		return;
+	}
+	let s = buffer.title.replace(pat, '$2: $1') + ' ('+buffer.URL+')';
+	dactyl.clipboardWrite(s, true);
+}
+EOF
+nnoremap <leader>yl :js myCopyGithubIssueTitle(buffer)<cr>
+
+" remap for smooth scrolling
+map j <Down>
+map k <Up>
+
+" Edit ~/.vimperatorrc in global gvim server instance.
+map <leader>ec :silent !gv ~/.dotfiles/pentadactylrc<cr>
+
 source! ~/.pentadactylrc.local
 
-" vim: set ft=pentadactyl.vim:
+" vim: set ft=pentadactyl.vim fdm=marker:

@@ -78,6 +78,7 @@ function shortenURLBitLy (url) {
 		req.send(null);
 	}
 EOF
+" mnemonic: Go and yank.
 map <silent> gy :js shortenURLBitLy(buffer.URL)<cr>
 
 
@@ -210,6 +211,7 @@ silent qmark r reddit.com
 silent qmark t twitter.com
 
 " Use buffer.URL for yanking (encoded spaces).
+" (not required for Pentadactyl, see http://code.google.com/p/vimperator-labs/issues/detail?id=797).
 js <<EOM
 mappings.addUserMap([modes.NORMAL], ["y"], "Yank current location to the clipboard",
 	function(){
@@ -276,11 +278,7 @@ mappings.addUserMap([modes.INSERT], ["<c-i>"], "Launch the external editor.", ed
 EOF
 " }}}1
 
-" for pentadactyl:
-" passthrough certain keys, see "h key-sequence" for a list
-" set passkeys+='https://mail\.':<Left><Right><Up><Down><Del>
-
-" pass through all keys with gmail and Google+
+" Bypassing keys. {{{1
 javascript <<EOF
 function myPassAllKeys(buffer) {
 	if( /(groups|mail|plus)\.google\.[a-z]+\//.test(buffer.URL) ) {
@@ -289,8 +287,9 @@ function myPassAllKeys(buffer) {
 	return false;
 }
 EOF
-
 autocmd LocationChange .* js modes.passAllKeys = myPassAllKeys(buffer)
+" }}}1
+
 " use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
 set hintchars=asdfgöälkjh
 

@@ -536,3 +536,6 @@
 [submodule "vim/bundle/ref"]
 	path = vim/bundle/ref
 	url = git://github.com/thinca/vim-ref.git
+[submodule "vim/bundle/github-issues"]
+	path = vim/bundle/github-issues
+	url = git://github.com/jaxbot/github-issues.vim.git

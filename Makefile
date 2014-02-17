@@ -149,3 +149,4 @@ upgrade:
 
 tags:
 	ctags -R --exclude=YouCompleteMe .
+.PHONY: tags

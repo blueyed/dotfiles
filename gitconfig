@@ -4,7 +4,7 @@
 [alias]
 	a = add
 	ae = add -e
-	amend = commit --amend
+	amend = commit --amend -v
 	# use "aliases" instead of "alias", which is used by hub; ref: https://github.com/defunkt/hub/issues/303
 	aliases = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'
 	c = commit -v
@@ -44,6 +44,10 @@
 	sync = !legit sync \"$@\"
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
+	# Diff stash with working tree.
+	# This is used to decide, if a stash can be savely dropped.
+	stash-diff = !zsh -c 'bcompare =(git stash show -p --no-prefix) =(git diff --no-prefix)'
+	cfg = !$EDITOR $(readlink -f ~/.gitconfig)
 [browser "open-in-running-browser"]
 	cmd = open-in-running-browser
 [web]

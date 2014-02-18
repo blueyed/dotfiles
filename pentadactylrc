@@ -29,6 +29,9 @@ nmap <C-S-Tab> <Pass>
 " New tab. C-t is "Execute the next [count] mappings in a new tab.".
 nmap <C-t><C-t> :tabnew<cr>
 
+" <C-l>: Redraw and select location bar.
+map -builtin <c-l> :redraw<cr><C-v><c-l>
+
 " command to clear history
 " command! clearhist sanitize commandline
 
@@ -185,9 +188,6 @@ map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 " String.replace is a workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=633830
 map gp -js dactyl.open( String.replace(buffer.URL, /(\.\w{2,4})\//, "$1.nyud.net/") )
 
-" Clear mapping for Ubiquity
-map <C-k> <Nop>
-
 " NoScript popup
 map <Leader>n -ex noscript popup
 
@@ -242,7 +242,7 @@ function editExternallyWithOptions() {
     var edopts = editExternallyGetOptions();
 	var save_editor = options["editor"];
 	options["editor"] = options["editor"] + ' -c "set ' + edopts.replace(/"/g, '\\"') + '"';
-	alert(options['editor']);
+	// alert(options['editor']);
     editor.editFieldExternally();
 	options["editor"] = save_editor;
 }
@@ -261,7 +261,8 @@ autocmd LocationChange '^https?://(groups|mail|plus|www)\.google\.com/' :normal!
 set hintkeys=asdfgöälkjh
 
 " add suggestion,history to completion list
-set complete=search,location,file,suggestion
+" default: search,location,file
+set complete=location,suggestion,search,file
 
 " center_select plugin: https://code.google.com/p/vimperator-labs/issues/detail?id=221
 nmap -builtin -silent zz :centerselect<CR>
@@ -286,10 +287,10 @@ nmap -builtin -silent zc :removeselect<CR>
 " Focus largest frame. This replaces the auto-focus-frame.js plugin. Props @John-Galt!
 au PageLoad .* -js function area(w) w.innerWidth * w.innerHeight; buffer.allFrames(doc.defaultView.top).reduce(function (w, acc) area(w) > area(acc) ? w : acc).focus()
 
-nnoremap <leader>c :js buffer.openContextMenu()<cr>
+map -builtin -js <leader>c buffer.openContextMenu()
 
 " Yank document.title.
-nnoremap <leader>yt :js dactyl.clipboardWrite(content.document.title, true)<cr>
+map -builtin -js <leader>yt dactyl.clipboardWrite(content.document.title, true)
 
 " Yank 'Issue #X: title (URL)' from Github issue page.
 javascript <<EOF
@@ -304,11 +305,10 @@ function myCopyGithubIssueTitle(buffer) {
 	dactyl.clipboardWrite(s, true);
 }
 EOF
-nnoremap <leader>yl :js myCopyGithubIssueTitle(buffer)<cr>
+map -builtin -js <leader>yl myCopyGithubIssueTitle(buffer)
 
-" remap for smooth scrolling
-map j <Down>
-map k <Up>
+map -builtin j 5j
+map -builtin k 5k
 
 " Edit ~/.vimperatorrc in global gvim server instance.
 map <leader>ec :silent !gv ~/.dotfiles/pentadactylrc<cr>

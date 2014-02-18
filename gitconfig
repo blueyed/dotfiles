@@ -65,6 +65,12 @@
 	# whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol,blank-at-eol
 	; buggy(?) with Git 1.7.1 on CentOS 6.0 for submodules, see commit message.
 	; autocrlf = input
+	# do not use $PAGER/vimpager for now (https://github.com/rkitover/vimpager/issues/11)
+	# -F: --quit-if-one-screen: Quit if entire file fits on first screen.
+	# -X: --no-init: Don't use termcap init/deinit strings.
+	pager = less --no-init --quit-if-one-screen
+	# -+F/-+X to override LESS selectively?! (http://stackoverflow.com/a/18781512/15690)
+	# pager = less -+F -+X
 [diff]
 	tool = bc3
 	mnemonicprefix = true
@@ -108,3 +114,5 @@
 
 ; [pager]
 ; 	status = true
+
+# vim: ft=gitconfig

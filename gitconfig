@@ -85,6 +85,7 @@
 [merge]
 	tool = bc3
 	stat = true
+	ff = no
 [mergetool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
 	trustExitCode = true
@@ -100,7 +101,7 @@
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
 [push]
-	default = matching
+	default = simple
 [interactive]
 	singlekey = true
 

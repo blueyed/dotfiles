@@ -11,7 +11,9 @@ path="$1"
 
 hash_file=$HOME/.cache/hashd
 
-if ! [ -f $hash_file ]; then
+# Regenerate hash cache file, if zshrc/zshrc.local (which contain hash commands) are newer.
+# if ! [ -f $hash_file ] || [ $(( $(date +%s) - $(stat -c %Y $hash_file) )) -gt 86400 ]; then
+if ! [ -f $hash_file ] || [ ~/.zshrc -nt $hash_file ] || [ ~/.zshrc.local -nt $hash_file ]; then
   zsh -i -c 'hash -d' > $hash_file
 fi
 

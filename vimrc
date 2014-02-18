@@ -969,7 +969,7 @@ endfun
 
 " titlestring handling, with tmux support {{{
 " Change tmux window name (used in window list) {{{
-if len($TMUX_PANE)
+if 0 && len($TMUX_PANE)
   if len($_tmux_title_is_auto_set)
     " Use exported state from Zsh (if any)
     let g:tmux_auto_rename_window = $_tmux_title_is_auto_set
@@ -1014,10 +1014,13 @@ endfun
 let g:_last_tmux_win_title = ''
 
 set title
-set titlestring=vim:\ %t%M%R%(\ %<%{MyGetPrettyFileDir()}%)
+" set titlestring=✐\ %t%M%R%(\ %<%{MyGetPrettyFileDir()}%)
+set titlestring=✐%(\ %<%{ShortenFilename('%',\ 15)}%)%M%R
 
-" Append $TERM_USERATHOST_SUFFIX to title (set via zsh, used for SSH)
-let &titlestring .= $TERM_USERATHOST_SUFFIX
+" Append $_TERM_TITLE_SUFFIX to title (set via zsh, used with SSH).
+if len($_TERM_TITLE_SUFFIX)
+  let &titlestring .= $_TERM_TITLE_SUFFIX
+endif
 "}}}
 
 

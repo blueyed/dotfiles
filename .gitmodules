@@ -539,3 +539,6 @@
 [submodule "vim/bundle/github-issues"]
 	path = vim/bundle/github-issues
 	url = git://github.com/jaxbot/github-issues.vim.git
+[submodule "vim/bundle/neomru"]
+	path = vim/bundle/neomru
+	url = git://github.com/Shougo/neomru.vim.git

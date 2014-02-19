@@ -10,10 +10,10 @@ set encoding=utf8
 " set fileformat=unix
 set fileformats=unix,dos
 
-
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
 set confirm " ask for confirmation by default (instead of silently failing)
 set splitright splitbelow
+set diffopt+=vertical
 set history=1000
 set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
@@ -45,15 +45,20 @@ set formatoptions+=r " Insert comment leader after hitting <Enter>
 set formatoptions+=o " Insert comment leader after hitting o or O in normal mode
 set formatoptions+=t " Auto-wrap text using textwidth
 set formatoptions+=c " Autowrap comments using textwidth
-set formatoptions+=b " Do not wrap if you modify a line after textwidth
+" set formatoptions+=b " Do not wrap if you modify a line after textwidth; handled by 'l' already?!
 set formatoptions+=l " do not wrap lines that have been longer when starting insert mode already
-set formatoptions+=q " Allow formatting of comments with "gq".
 set formatoptions+=q " Allow formatting of comments with "gq".
 set formatoptions+=t " Auto-wrap text using textwidth
 set formatoptions+=n " Recognize numbered lists
+if v:version > 703 || v:version == 703 && has("patch541")
+" Delete comment character when joining commented lines
+  set formatoptions+=j
+endif
 " }}}
 
-" set guioptions-=m
+set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
+
+set guioptions-=m  " no menu with gvim
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 set viminfo+=! " keep global uppercase variables. Used by localvimrc.
@@ -94,6 +99,8 @@ set suffixes+=.pyc
 " case only matters with mixed case expressions
 set ignorecase smartcase
 set smarttab
+
+set lazyredraw  " No redraws in macros.
 
 set wildmenu
 " move cursor instead of selecting entries (wildmenu)
@@ -150,6 +157,7 @@ if has('gui_running')
   endif
   set guifont=Ubuntu\ Mono\ For\ Powerline\ 12,DejaVu\ Sans\ Mono\ 10
 endif
+" }}}1
 
 if 1 " has('eval') / `let` may not be available.
   " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{

@@ -622,8 +622,6 @@ if has("autocmd") " Autocommands {{{1
   " Sources:
   "  - https://github.com/tpope/vim-fugitive/issues/147#issuecomment-7572351
   "  - http://www.reddit.com/r/vim/comments/yhsn6/is_it_possible_to_work_around_the_symlink_bug/c5w91qw
-  " Echoing a warning does not appear to work:
-  "   echohl WarningMsg | echo "Resolving symlink." | echohl None |
   function! MyFollowSymlink(...)
     if exists('w:no_resolve_symlink') && w:no_resolve_symlink
       return
@@ -640,10 +638,16 @@ if has("autocmd") " Autocommands {{{1
       return
     endif
     let resolvedfile = fnameescape(resolvedfile)
-    echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+    if &modifiable
+      " Only display a warning when editing a file, especially not for `:help`.
+      echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+    endif
     " exec 'noautocmd file ' . resolvedfile
     " XXX: problems with AutojumpLastPosition: line("'\"") is 1 always.
-    exec 'file ' . resolvedfile
+    let sshm = &shm
+    set shortmess+=A  " silence ATTENTION message about swap file (would get displayed twice)
+    exec 'silent file ' . resolvedfile
+    let &shm=sshm
   endfunction
   command! FollowSymlink call MyFollowSymlink()
   command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink

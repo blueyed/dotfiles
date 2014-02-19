@@ -211,7 +211,9 @@ if 1 " has('eval') / `let` may not be available.
   " let g:sparkupExecuteMapping = '<Leader>e'
   " let g:sparkupNextMapping = '<Leader>ee'
   "
-  let g:EasyMotion_leader_key = '<Leader>m'
+  " obsolete: using vim-sneak instead.
+  " let g:EasyMotion_leader_key = '<Leader>m'
+  " let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
   " autocomplpop: do not complete from dictionary; -= "k"
   " (manually trigger it by C-X C-K instead).
@@ -468,6 +470,7 @@ if has("user_commands")
   " TO BE REMOVED"
   let g:pathogen_disabled += [ "powerline-vim" ]
   let g:pathogen_disabled += [ "shymenu" ]
+  let g:pathogen_disabled += [ "easymotion" ]
   call pathogen#infect()
 
   " Themes
@@ -804,7 +807,9 @@ function! ShortenFilename(...)  " {{{
   endif
 
   " maxlen from a:2 (used for cache key)
-  let maxlen = a:0>1 ? a:2 : winwidth(0)-50
+  let maxlen = a:0>1 ? a:2 : max([10, winwidth(0)-50])
+  " echom maxlen a:0
+  " if a:0>1 | echom a:2 | endif
 
   " Check for cache:
   let cache_key = escape(bufname.'::'.getcwd().'::'.maxlen, "'")
@@ -1401,7 +1406,8 @@ augroup MyAutoChecktime
 augroup END
 command! NoAutoChecktime let b:autochecktime=0
 
-" setup b:VCSCommandVCSType
+" vcscommand: only used as lib for detection (e.g. with airline). {{{1
+" Setup b:VCSCommandVCSType.
 function! SetupVCSType()
   try
     call VCSCommandGetVCSType(bufnr('%'))
@@ -1414,6 +1420,8 @@ endfunction
 if exists("*VCSCommandVCSType")
 "au BufRead * call SetupVCSType()
 endif
+let g:VCSCommandDisableMappings = 1
+" }}}1
 
 " Open Windows explorer and select current file
 if executable('explorer.exe')
@@ -1476,7 +1484,6 @@ let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is n
 " openssl enc -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd > 1
 " openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
 let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
-let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
 let g:EclimLargeFileEnabled = 0
 let g:EclimCompletionMethod = 'omnifunc' " setup &omnifunc instead of &completefunc; this way YCM picks it up

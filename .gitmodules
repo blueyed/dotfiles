@@ -545,3 +545,6 @@
 [submodule "vim/bundle/projectroot"]
 	path = vim/bundle/projectroot
 	url = git://github.com/dbakker/vim-projectroot.git
+[submodule "vim/bundle/tinykeymap"]
+	path = vim/bundle/tinykeymap
+	url = git://github.com/tomtom/tinykeymap_vim.git

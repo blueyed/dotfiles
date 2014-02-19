@@ -542,3 +542,6 @@
 [submodule "vim/bundle/neomru"]
 	path = vim/bundle/neomru
 	url = git://github.com/Shougo/neomru.vim.git
+[submodule "vim/bundle/projectroot"]
+	path = vim/bundle/projectroot
+	url = git://github.com/dbakker/vim-projectroot.git

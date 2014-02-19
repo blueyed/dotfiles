@@ -101,7 +101,8 @@
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
 [push]
-	default = simple
+	# "simple" not available with Git 1.7.10 (Debian stable)
+	# default = simple
 [interactive]
 	singlekey = true
 

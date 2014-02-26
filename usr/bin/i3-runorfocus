@@ -2,6 +2,7 @@
 import json
 import subprocess
 import sys
+import argparse
 
 def get_output(cmd):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -13,8 +14,8 @@ def get_tree():
     cmd = ["i3-msg", "-t", "get_tree"]
     return json.loads(get_output(cmd))
 
-def get_matching_class():
-    cmd = ["xdotool", "search", "--class", sys.argv[1]]
+def get_matching_ids(xdotool_args):
+    cmd = ["xdotool", "search"] + xdotool_args
     return get_output(cmd).split('\n')
 
 windows = []
@@ -26,19 +27,42 @@ def walk_tree(tree):
         for node in tree['nodes']:
             walk_tree(node)
 
-def get_matches():
+def get_matches(xdotool_args):
     matches = []
     tree = get_tree()
-    check = get_matching_class()
+    matching_ids = get_matching_ids(xdotool_args)
     walk_tree(tree)
     for window in windows:
-        for winid in check:
+        for winid in matching_ids:
             if window['window'] == winid:
                 matches.append(window)
     return matches
 
 def main():
-    matches = get_matches()
+    parser = argparse.ArgumentParser(
+        description='Focus a window or run a command (for i3wm).',
+        epilog='If none of --name, --classname, or --class are specified, the defaults are: --name --classname --class'
+    )
+    parser.add_argument(
+        'regexp_pattern', type=str,
+        help='the filter for searching')
+    parser.add_argument(
+        'command', type=str,
+        help='the command to execute, if focusing failed')
+    # Add filter arguments, which get passed to `xdotool search`:
+    for k, v in (
+        ('--class',     'check regexp_pattern agains the window class'),
+        ('--classname', 'check regexp_pattern agains the window classname'),
+        ('--name',      'check regexp_pattern agains the window name'),
+    ):
+        parser.add_argument(
+            k, help=v,
+            dest='xdotool_args', action='append_const', const=k)
+
+    args = parser.parse_args()
+    xdotool_args = (args.xdotool_args or []) + [args.regexp_pattern]
+
+    matches = get_matches(xdotool_args)
     # Sort the list by window IDs
     matches = [(match['window'], match) for match in matches]
     matches.sort()

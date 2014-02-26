@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import json
 import subprocess
-import sys
 import argparse
 
 def get_output(cmd):
@@ -10,33 +9,39 @@ def get_output(cmd):
     process.stdout.close()
     return out
 
+
 def get_tree():
     cmd = ["i3-msg", "-t", "get_tree"]
     return json.loads(get_output(cmd))
+
 
 def get_matching_ids(xdotool_args):
     cmd = ["xdotool", "search"] + xdotool_args
     return get_output(cmd).split('\n')
 
-windows = []
+
 def walk_tree(tree):
+    windows = []
     if tree['window']:
         windows.append({'window': str(tree['window']),
                         'focused': tree['focused']})
     if len(tree['nodes']) > 0:
         for node in tree['nodes']:
             walk_tree(node)
+    return windows
+
 
 def get_matches(xdotool_args):
     matches = []
     tree = get_tree()
     matching_ids = get_matching_ids(xdotool_args)
-    walk_tree(tree)
+    windows = walk_tree(tree)
     for window in windows:
         for winid in matching_ids:
             if window['window'] == winid:
                 matches.append(window)
     return matches
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -70,8 +75,8 @@ def main():
     # Iterate over the matches to find the first focused one, then focus the
     # next one.
     for ind, match in enumerate(matches):
-        if match['focused'] == True:
-            subprocess.call(["i3-msg", "[id=%s] focus" % matches[(ind+1)%len(matches)]['window']])
+        if match['focused']:
+            subprocess.call(["i3-msg", "[id=%s] focus" % matches[(ind + 1) % len(matches)]['window']])
             return
     # No focused match was found, so focus the first one
     if len(matches) > 0:

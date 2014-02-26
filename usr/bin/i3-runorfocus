@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import json
 import subprocess
 import argparse
+import sys
+
 
 def get_output(cmd):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -63,6 +66,9 @@ def main():
         parser.add_argument(
             k, help=v,
             dest='xdotool_args', action='append_const', const=k)
+    parser.add_argument(
+        '-v', '--verbose', action='store_const', const=True,
+        help='verbose output to stderr')
 
     args = parser.parse_args()
     xdotool_args = (args.xdotool_args or []) + [args.regexp_pattern]
@@ -74,6 +80,8 @@ def main():
     matches = [match for (key, match) in matches]
     # Iterate over the matches to find the first focused one, then focus the
     # next one.
+    if args.verbose:
+        print('Matches: %s' % matches, file=sys.stderr)
     for ind, match in enumerate(matches):
         if match['focused']:
             subprocess.call(["i3-msg", "[id=%s] focus" % matches[(ind + 1) % len(matches)]['window']])
@@ -83,6 +91,8 @@ def main():
             subprocess.call(["i3-msg", "[id=%s] focus" % matches[0]['window']])
             return
     # No matches found, launch program
+    if args.verbose:
+        print('No matches found, executing %s.' % args.command, file=sys.stderr)
     subprocess.call(["i3-msg", "exec --no-startup-id", args.command])
 
 if __name__ == '__main__':

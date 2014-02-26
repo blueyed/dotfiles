@@ -27,7 +27,7 @@ def walk_tree(tree):
                         'focused': tree['focused']})
     if len(tree['nodes']) > 0:
         for node in tree['nodes']:
-            walk_tree(node)
+            windows += walk_tree(node)
     return windows
 
 

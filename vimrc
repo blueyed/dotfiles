@@ -161,7 +161,7 @@ endif
 
 if 1 " has('eval') / `let` may not be available.
   " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-  let s:has_ycm = filereadable(expand('~/.vim/bundle/YouCompleteMe/python/ycm_core.*', 1, 1)[0])
+  let s:has_ycm = len(glob('~/.vim/bundle/YouCompleteMe/python/ycm_core.*'))
   let s:use_ycm = s:has_ycm
   " let s:use_ycm = 0
   let s:use_neocomplcache = ! s:use_ycm

@@ -5,7 +5,7 @@ import sys
 
 def get_output(cmd):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    out = process.communicate()[0].decode()
+    out = process.communicate()[0]
     process.stdout.close()
     return out
 

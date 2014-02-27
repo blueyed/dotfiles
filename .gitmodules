@@ -551,3 +551,6 @@
 [submodule "vim/bundle/syntax-tmux"]
 	path = vim/bundle/syntax-tmux
 	url = git://github.com/zaiste/tmux.vim.git
+[submodule "lib/awesome/awesome-revelation"]
+	path = lib/awesome/awesome-revelation
+	url = git://github.com/guotsuan/awesome-revelation.git

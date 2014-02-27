@@ -554,3 +554,6 @@
 [submodule "lib/awesome/awesome-revelation"]
 	path = config/awesome/revelation
 	url = git://github.com/guotsuan/awesome-revelation.git
+[submodule "config/awesome/hints"]
+	path = config/awesome/hints
+	url = git://github.com/zackpete/hints.git

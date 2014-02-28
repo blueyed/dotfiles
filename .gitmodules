@@ -557,3 +557,6 @@
 [submodule "config/awesome/hints"]
 	path = config/awesome/hints
 	url = git://github.com/zackpete/hints.git
+[submodule "vim/bundle/GoldenView"]
+	path = vim/bundle/GoldenView
+	url = git://github.com/zhaocai/GoldenView.Vim.git

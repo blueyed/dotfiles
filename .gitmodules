@@ -560,3 +560,6 @@
 [submodule "vim/bundle/GoldenView"]
 	path = vim/bundle/GoldenView
 	url = git://github.com/zhaocai/GoldenView.Vim.git
+[submodule "config/awesome/redshift"]
+	path = config/awesome/redshift
+	url = git://github.com/YoRyan/awesome-redshift.git

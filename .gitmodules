@@ -563,3 +563,6 @@
 [submodule "config/awesome/redshift"]
 	path = config/awesome/redshift
 	url = git://github.com/YoRyan/awesome-redshift.git
+[submodule "config/awesome/awpomodoro"]
+	path = config/awesome/awpomodoro
+	url = git://github.com/pefimo/awpomodoro.git

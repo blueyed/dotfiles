@@ -566,3 +566,6 @@
 [submodule "config/awesome/awpomodoro"]
 	path = config/awesome/awpomodoro
 	url = git://github.com/pefimo/awpomodoro.git
+[submodule "vim/bundle/lua-ftplugin"]
+	path = vim/bundle/lua-ftplugin
+	url = git://github.com/xolox/vim-lua-ftplugin.git

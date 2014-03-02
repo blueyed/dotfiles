@@ -1703,7 +1703,6 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 map <c-w>_ :MaximizeWindow<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
-nnoremap <Leader>gd :Gdiff<cr>
 " Close any corresponding fugitive diff buffer.
 function! MyCloseDiff()
   if (&diff == 0 || getbufvar('#', '&diff') == 0)
@@ -1727,7 +1726,15 @@ function! MyCloseDiff()
     bd #
   endif
 endfunction
+" nnoremap <Leader>gd :Gdiff<cr>
+
+" Maps related to version control (Git). {{{1
+" Toggle `:Gdiff`.
+nnoremap <Leader>gd :if !&diff \| Gdiff \| else \| call MyCloseDiff() \| endif <cr>
 nnoremap <Leader>gD :call MyCloseDiff()<cr>
+nnoremap <Leader>gc :Gcommit -v
+" }}}1
+
 
 " Toggle highlighting of too long lines {{{2
 function! ToggleTooLongHL()

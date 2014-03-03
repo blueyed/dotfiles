@@ -575,3 +575,6 @@
 [submodule "vim/bundle/luarefvim"]
 	path = vim/bundle/luarefvim
 	url = git://github.com/vim-scripts/luarefvim.git
+[submodule "config/awesome/vicious"]
+	path = config/awesome/vicious
+	url = http://git.sysphere.org/vicious

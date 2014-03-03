@@ -572,3 +572,6 @@
 [submodule "config/awesome/pomodoro"]
 	path = config/awesome/pomodoro
 	url = git://github.com/nikolavp/awesome-pomodoro.git
+[submodule "vim/bundle/luarefvim"]
+	path = vim/bundle/luarefvim
+	url = git://github.com/vim-scripts/luarefvim.git

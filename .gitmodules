@@ -383,9 +383,9 @@
 [submodule "vim/bundle/tbone"]
 	path = vim/bundle/tbone
 	url = git://github.com/tpope/vim-tbone.git
-# [submodule "vim/bundle/snippets"]
-# 	path = vim/bundle/snippets
-# 	url = git://github.com/honza/vim-snippets.git
+[submodule "vim/bundle/snippets"]
+	path = vim/bundle/snippets
+	url = git://github.com/honza/vim-snippets.git
 [submodule "vim/bundle/vim-misc"]
 	path = vim/bundle/vim-misc
 	url = git://github.com/xolox/vim-misc.git

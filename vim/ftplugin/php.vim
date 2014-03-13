@@ -65,3 +65,6 @@ function! SetupPhpHelp()
   endif
 endfunction
 call SetupPhpHelp()
+
+" EXPERIMENTAL
+setlocal iskeyword+=$

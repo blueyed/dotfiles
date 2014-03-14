@@ -370,7 +370,7 @@
 	url = git://github.com/blueyed/powerline.git
 [submodule "vim/bundle/YouCompleteMe"]
 	path = vim/bundle/YouCompleteMe
-	url = git://github.com/Valloric/YouCompleteMe.git
+	url = git://github.com/blueyed/YouCompleteMe.git
 [submodule "vim/bundle/scriptease"]
 	path = vim/bundle/scriptease
 	url = git://github.com/tpope/vim-scriptease.git

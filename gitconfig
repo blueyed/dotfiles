@@ -21,8 +21,15 @@
 	dc = diff --cached
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
-	ll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
+	# lll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
 	l = log --abbrev-commit --graph --decorate --submodule=log
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	l1 = !git ll -1
+	m = merge
+	ma = merge --abort
+	# preview/temp merge
+	mp = merge --no-commit
 	rb = rebase -i @{u}
 	rba = rebase --abort
 	rbc = rebase --continue
@@ -30,12 +37,14 @@
 	rbs = rebase --skip
 	s = status
 	sm = submodule
-	st = status
+	sta = stash
+	sts = stash show -p
+	stp = stash pop
 	g = log -p
 	p = push
 	tree = log --graph --decorate --pretty=oneline --abbrev-commit
 	up = !git fetch && git rebase
-	showtrackedignored = !\ncd \"${GIT_PREFIX}\" &&\nuntracked_list=$(git rev-parse --git-dir)/ignored-untracked.txt &&\ngit ls-files -o -i --exclude-standard >\"${untracked_list}\" &&\nGIT_INDEX_FILE=\"\" git ls-files -o -i --exclude-standard | grep -Fvxf \"${untracked_list}\" &&\nrm -rf \"${untracked_list}\"
+	showtrackedignored = ! cd \"${GIT_PREFIX}\" && untracked_list=$(git rev-parse --git-dir)/ignored-untracked.txt && git ls-files -o -i --exclude-standard >\"${untracked_list}\" && GIT_INDEX_FILE=\"\" git ls-files -o -i --exclude-standard | grep -Fvxf \"${untracked_list}\" && rm -rf \"${untracked_list}\"
 	switch = !legit switch \"$@\"
 	branches = !legit branches
 	sprout = !legit sprout \"$@\"
@@ -101,8 +110,9 @@
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
 [push]
-	# "simple" not available with Git 1.7.10 (Debian stable)
+	# "simple" not available with Git 1.7.10 (Debian stable), "current" is similar.
 	# default = simple
+	default = current
 [interactive]
 	singlekey = true
 

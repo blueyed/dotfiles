@@ -575,3 +575,6 @@
 [submodule "config/awesome/vicious"]
 	path = config/awesome/vicious
 	url = http://git.sysphere.org/vicious
+[submodule "vim/bundle/gist"]
+	path = vim/bundle/gist
+	url = git://github.com/mattn/gist-vim.git

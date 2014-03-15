@@ -578,3 +578,6 @@
 [submodule "vim/bundle/gist"]
 	path = vim/bundle/gist
 	url = git://github.com/mattn/gist-vim.git
+[submodule "vim/bundle/webapi"]
+	path = vim/bundle/webapi
+	url = git://github.com/mattn/webapi-vim.git

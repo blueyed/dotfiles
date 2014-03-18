@@ -114,10 +114,6 @@
 	path = vim/bundle/surround
 	url = git://github.com/tpope/vim-surround.git
 	ignore = untracked
-[submodule "vim/bundle/reporoot"]
-	path = vim/bundle/reporoot
-	url = git://github.com/blueyed/vim-reporoot.git
-	ignore = untracked
 [submodule "vim/bundle/visualctrlg"]
 	path = vim/bundle/visualctrlg
 	url = git://github.com/tyru/visualctrlg.vim.git

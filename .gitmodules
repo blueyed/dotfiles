@@ -574,3 +574,6 @@
 [submodule "vim/bundle/webapi"]
 	path = vim/bundle/webapi
 	url = git://github.com/mattn/webapi-vim.git
+[submodule "vim/bundle/wildfire"]
+	path = vim/bundle/wildfire
+	url = git://github.com/gcmt/wildfire.vim.git

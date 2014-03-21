@@ -9,6 +9,13 @@ Xml / Dtd / Xsd
 Xml
 ===
 
+Note: If you have xml files that do not have a .xml extension then
+  eclipse may not recognize it as an xml file resulting in validation,
+  completion, etc not working. Although the vim side may have the
+  correct file type set, you may still need to add the file's
+  extension to the list of xml content types in the eclipse
+  gui:Preferences ‣ General ‣ Content Types ‣ Text ‣ XML
+
 
 Code Completion
 ---------------

@@ -3,7 +3,7 @@
 Python Search
 *************
 
-*:PythonFindDefinition*
+*:PythonSearch*
 
 
 Element Search
@@ -12,19 +12,31 @@ Element Search
 Element searching allows you to place the cursor over just about any
 element in a source file (method call, class name, constant) and
 perform a search for that element by issuing the command
-:PythonFindDefinition.
+:PythonSearch. By default this command will search for declarations,
+but you can specify that you want to search for references using:
+
+>
+
+   :PythonSearch -x references
+
+<
+
 
 If only one result is found and that result is in the current source
-file, the cursor will be moved to the element found.  Otherwise, on
+file, the cursor will be moved to the element found. Otherwise, on
 single result matches, the value of |g:EclimPythonSearchSingleResult|
-will be consulted for the action to take.  If there are multiple
+will be consulted for the action to take. If there are multiple
 results, the location list will be opened with the list of results.
+
+Note: :PythonSearch does not currently support searching for
+  patterns. Attempting to supply a pattern to search for will result
+  in an error.
 
 *:PythonSearchContext*
 
 As a convenience eclim also provides the command :PythonSearchContext.
 This command accepts no arguments and will perform the appropriate
-search depending on the context of the element.
+search depending on the context of the element:
 
 - If the cursor is on the declaration of a class, function, or
   method then it will search for all occurrences.

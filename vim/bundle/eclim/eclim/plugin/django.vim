@@ -5,7 +5,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2009  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 " Command Declarations {{{
 if !exists(":DjangoManage")
-  command -nargs=+  -complete=customlist,eclim#python#django#manage#CommandCompleteManage
+  command -nargs=+ -complete=customlist,eclim#python#django#manage#CommandCompleteManage
     \ DjangoManage :call eclim#python#django#manage#Manage('<args>')
 endif
 " }}}

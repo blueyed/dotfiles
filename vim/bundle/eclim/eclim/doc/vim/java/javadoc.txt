@@ -21,10 +21,10 @@ Viewing
 While editing java code, if you'd like to view the javadoc of the
 element under the cursor, you can run the :JavaDocPreview command
 which will open vim's preview window with the element's javadoc
-content. In the preview window links classes, methods, etc. in the
-javadoc will be highlighted and you can view that content by hitting
-<cr> on the link. You can also use <c-o> to back to the previous
-javadoc preview and <c-i> to navigate forward.
+content. In the preview window any links to classes, methods, etc. in
+the javadoc will be highlighted and you can view follow those links by
+hitting <cr> on the link. You can also use <c-o> to navigate back to
+the previous javadoc preview and <c-i> to navigate forward.
 
 *:JavaDocSearch*
 
@@ -57,6 +57,14 @@ file, etc).
 
 <
 
+
+If you would like to set the javadoc url for your project's source
+files, you will instead need to set the
+org.eclipse.jdt.ui.project_javadoc_location option via
+|:ProjectSettings|. Also note that the javadocs for your source files
+are not generated automatically, so if you would like to use
+:JavaDocSearch to open your project's javadocs, you will first need to
+generate those javadocs as described in the next section.
 
 *:Javadoc*
 
@@ -109,5 +117,7 @@ Eclim Settings (|vim-settings|)
   relative source directories which you want javadoc to be executed
   against.  When unset, all your configured source directories will be
   used.
+- org.eclipse.jdt.ui.project_javadoc_location - URL where your
+  project's javadocs can be found.
 
 vim:ft=eclimhelp

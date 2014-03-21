@@ -28,10 +28,23 @@ Configuration
 
 Vim Settings (|vim-settings|)
 
-*g:EclimJavaSrcValidate*
+*g:EclimJavaValidate*
 
 - g:EclimJavaValidate (Default: 1) - If set to 0, disables source
   code validation.
+  Note: When enabled, syntastic
+    (https://github.com/scrooloose/syntastic) is disabled so that
+    eclim and syntastic don't step on each other. If you'd like to use
+    syntastic over eclim for validation, then simply disable eclim's
+    validation.If you'd like to disable eclim's source code validation
+    for all languages, eclim provides a global variable for that as
+    well:>
+
+       let g:EclimFileTypeValidate = 0
+
+    <
+
+
 - g:EclimValidateSortResults (Default: 'occurrence') - If set to
   'severity', the validation results will be sorted by severity
   (errors > warnings > info > etc.)

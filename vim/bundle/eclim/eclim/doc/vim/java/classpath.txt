@@ -250,13 +250,15 @@ Note: For additional information on the Eclipse plugin from maven,
   the .classpath for your project every time you save your pom.xml
   file.  Any entries found in the pom.xml that are not in the
   .classpath will be added, any entries that differ in version will be
-  updated, and any stale entries deleted. This behavior can be
-  disabled by adding the following setting to your vimrc:
+  updated, and any stale entries deleted.
 
-  >
-     let g:EclimMavenPomClasspathUpdate = 0
+  Note: This behavior can be disabled by adding the following
+    setting to your vimrc:>
 
-  <
+       let g:EclimMavenPomClasspathUpdate = 0
+
+    <
+
 
   Note: This feature simply updates the entries in your project's
     .classpath file, it does not download any newly added jars. When
@@ -319,11 +321,19 @@ updated, and any stale entries deleted.
   .classpath file is as easy as saving your ivy.xml file (:w) and
   letting eclim do the rest.
 
-  Note: This will update your project's .classpath file accordingly,
-    but it will not download any newly added jars. For that you'll
-    need to have a target in your ant build file which you can run
-    that will force ivy to download dependencies. Something like the
-    example from the ivy docs:>
+  Note: This behavior can be disabled by adding the following
+    setting to your vimrc:>
+
+       let g:EclimIvyClasspathUpdate = 0
+
+    <
+
+
+  Note: This feature will update your project's .classpath file
+    accordingly, but it will not download any newly added jars. For
+    that you'll need to have a target in your ant build file that will
+    force ivy to download dependencies. Something like the example
+    from the ivy docs:>
 
        <target name="resolve" description="--> retrieve dependencies with ivy">
          <ivy:retrieve/>

@@ -296,11 +296,6 @@ eclim's installer dependencies
 (https://github.com/ervandew/eclim/blob/master/org.eclim.installer/build/resources/dependencies.xml)
 file).
 
-On exception to this is eclim's python plugin which currently does not
-rely on any eclipse features, so to enable the installation of that
-plugin, just add -DfeatureList.python=true to the install command
-above.
-
 Required Properties:
 
 - eclipse.home - The absolute path to your eclipse installation.
@@ -381,7 +376,7 @@ will be skipped:
    [echo] Plugins:
    [echo]   org.eclim.cdt
    [echo]   org.eclim.jdt
-   [echo]   org.eclim.python
+   [echo]   org.eclim.pydev
    [echo]   org.eclim.sdt
    [echo]   org.eclim.wst
 
@@ -419,6 +414,19 @@ your properties in there:
 
 <
 
+
+Note: The eclim vim help files, used by the :EclimHelp
+  (|vim-core-eclim#:EclimHelp|) command, are not built by default. To
+  build these you first need to install sphinx
+  (http://sphinx-doc.org), then run the following command:>
+
+     $ ant vimdocs
+
+  <
+
+
+  This target also supports the vim.files property if you want the
+  docs deployed to a directory other than the default location.
 
 *install-headless*
 

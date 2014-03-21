@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   see http://eclim.org/vim/python/django.html
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2010  Eric Van Dewoestine
+" Copyright (C) 2005 - 2014  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -23,45 +20,14 @@
 " }}}
 
 " Global Variables {{{
-if !exists('g:EclimPythonInterpreter')
-  let g:EclimPythonInterpreter = 'python'
-endif
 if !exists('g:EclimDjangoAdmin')
   let g:EclimDjangoAdmin = 'django-admin.py'
 endif
 " }}}
 
 " Script Variables {{{
-" reset and runfcgi removed?
-" test requires django > 0.95
-let s:manage_actions = [
-    \ 'adminindex',
-    \ 'createcachetable',
-    \ 'dbshell',
-    \ 'diffsettings',
-    \ 'inspectdb',
-    \ 'install',
-    \ 'reset',
-    \ 'runfcgi',
-    \ 'runserver',
-    \ 'shell',
-    \ 'sql',
-    \ 'sqlall',
-    \ 'sqlclear',
-    \ 'sqlindexes',
-    \ 'sqlinitialdata',
-    \ 'sqlreset',
-    \ 'sqlsequencereset',
-    \ 'startapp',
-    \ 'startproject',
-    \ 'syncdb',
-    \ 'test',
-    \ 'validate',
-  \ ]
-
-let s:app_actions = [
-    \ 'adminindex',
-    \ 'install',
+let s:manage_commands = []
+let s:app_commands = [
     \ 'reset',
     \ 'sql',
     \ 'sqlall',
@@ -72,8 +38,7 @@ let s:app_actions = [
     \ 'sqlsequencereset'
   \ ]
 
-let s:output_actions = [
-    \ 'adminindex',
+let s:output_commands = [
     \ 'diffsettings',
     \ 'inspectdb',
     \ 'sql',
@@ -86,113 +51,181 @@ let s:output_actions = [
   \ ]
 
 let s:sql_dialects = {
-    \ 'ado_mysql': 'mysql.vim',
     \ 'mysql': 'mysql.vim',
-    \ 'mysql_old': 'mysql.vim',
     \ 'postgresql': 'plsql.vim',
-    \ 'postgresql_psycopg2': 'plsql.vim',
     \ 'sqlite3': 'sql.vim',
   \ }
 
 " }}}
 
-" DjangoManage(args) {{{
-function! eclim#python#django#manage#Manage(args)
-  let cwd = getcwd()
-  if a:args =~ '^startproject\s'
-    if !executable(g:EclimDjangoAdmin)
-      call eclim#util#EchoError(
-        \ g:EclimDjangoAdmin . ' is either not executable or not in your path.')
+function! eclim#python#django#manage#Manage(args) " {{{
+  if a:args =~ '^startproject\>'
+    if executable(g:EclimDjangoAdmin)
+      let result = eclim#util#System(g:EclimDjangoAdmin . ' ' . a:args)
+      if v:shell_error
+        call eclim#util#EchoError(result)
+      elseif result != ''
+        call eclim#util#Echo(result)
+      endif
       return
     endif
-    let command = g:EclimDjangoAdmin
-  else
-    if !executable(g:EclimPythonInterpreter)
-      call eclim#util#EchoError(
-        \ g:EclimPythonInterpreter . ' is either not executable or not in your path.')
-      return
-    endif
-    let command = g:EclimPythonInterpreter . ' manage.py'
 
-    " change to project directory before executing manage script.
-    let path = eclim#python#django#util#GetProjectPath()
-    if path == ''
-      call eclim#util#EchoError('Current file not in a django project.')
-      return
+    " on windows the django-admin.py script probably won't be on the path, so
+    " attempt to find it
+    if has('win32') || has('win64')
+      let interpreter = eclim#python#project#GetInterpreter()
+      if interpreter !~# '^python\d*'
+        let path = fnamemodify(interpreter, ':p:h')
+        if filereadable(path . '/' . g:EclimDjangoAdmin)
+          let command = interpreter . ' ' . path . '/' . g:EclimDjangoAdmin
+          let result = eclim#util#System(command . ' ' . a:args)
+          if v:shell_error
+            call eclim#util#EchoError(result)
+          elseif result != ''
+            call eclim#util#Echo(result)
+          endif
+          return
+        endif
+      endif
     endif
-    exec 'cd ' . escape(path, ' ')
+
+    call eclim#util#EchoError(
+      \ g:EclimDjangoAdmin . ' is either not executable or not in your path.')
+    return
   endif
 
-  try
-    let action = substitute(a:args, '^\(.\{-}\)\(\s.*\|$\)', '\1', '')
-    if eclim#util#ListContains(s:output_actions, action)
-      let result = eclim#util#System(command . ' ' . a:args)
-      if v:shell_error
-        if result =~ '^Error:'
-          let error = substitute(result, '^\(.\{-}\)\n.*', '\1', '')
-        else
-          let error = 'Error: ' .
-            \ substitute(result, '.*\n\s*\(' . action . '\s.\{-}\)\n.*', '\1', '')
-        endif
-        call eclim#util#EchoError(error)
-      else
-        let engine = eclim#python#django#util#GetSqlEngine(path)
-        let dialect = has_key(s:sql_dialects, engine) ? s:sql_dialects[engine] : 'plsql'
+  let interpreter = eclim#python#project#GetInterpreter()
+  if interpreter == ''
+    call eclim#util#EchoError(
+      \ 'Unable to determine the python interpreter to use for your project.')
+    return
+  endif
 
-        let filename = expand('%')
-        let name = '__' . action . '__'
-        call eclim#util#TempWindow(name, split(result, '\n'))
-        if action =~ '^sql'
-          set filetype=sql
-          if exists('b:current_syntax') && dialect !~ b:current_syntax
-            exec 'SQLSetType ' . dialect
-          endif
-        elseif action == 'adminindex'
-          set filetype=html
-        elseif action =~ '\(diffsettings\|inspectdb\)'
-        endif
-        setlocal nomodified
-        " Store filename so that plugins can use it if necessary.
-        let b:filename = filename
+  let manage_path = eclim#python#django#manage#GetManagePath()
+  if manage_path == ''
+    call eclim#util#EchoError('Current file not in a django project.')
+    return
+  endif
+  let command = interpreter . ' ' . manage_path
 
-        augroup temp_window
-          autocmd! BufWinLeave <buffer>
-          call eclim#util#GoToBufferWindowRegister(filename)
-        augroup END
-      endif
+  let action = substitute(a:args, '^\(.\{-}\)\(\s.*\|$\)', '\1', '')
+  if eclim#util#ListContains(s:output_commands, action)
+    let result = eclim#util#System(command . ' ' . a:args)
+    if v:shell_error
+      call eclim#util#EchoError(result)
     else
-      exec '!' . command . ' ' . a:args
+      let path = eclim#python#django#util#GetProjectPath()
+      let engine = eclim#python#django#util#GetSqlEngine(path)
+      let dialect = has_key(s:sql_dialects, engine) ? s:sql_dialects[engine] : 'plsql'
+
+      let filename = expand('%')
+      let name = '__' . action . '__'
+      call eclim#util#TempWindow(name, split(result, '\n'))
+      if action =~ '^sql'
+        set filetype=sql
+        if exists('b:current_syntax') && dialect !~ b:current_syntax
+          exec 'SQLSetType ' . dialect
+        endif
+      elseif action =~ '\(diffsettings\|inspectdb\)'
+      endif
+      setlocal nomodified
+      " Store filename so that plugins can use it if necessary.
+      let b:filename = filename
+
+      augroup temp_window
+        autocmd! BufWinLeave <buffer>
+        call eclim#util#GoToBufferWindowRegister(filename)
+      augroup END
     endif
-  finally
-    " change back to original directory if necessary.
-    exec 'cd ' . escape(cwd, ' ')
-  endtry
+  else
+    exec '!' . command . ' ' . a:args
+  endif
 endfunction " }}}
 
-" CommandCompleteManage(argLead, cmdLine, cursorPos) {{{
-function! eclim#python#django#manage#CommandCompleteManage(argLead, cmdLine, cursorPos)
+function! eclim#python#django#manage#GetManagePath() " {{{
+  let project_path = eclim#python#django#util#GetProjectPath()
+  if project_path == ''
+    return ''
+  endif
+
+  let path = project_path . '/manage.py'
+  if filereadable(path)
+    return path
+  endif
+
+  let path = fnamemodify(project_path, ':h') . '/manage.py'
+  if filereadable(path)
+    return path
+  endif
+
+  return ''
+endfunction " }}}
+
+function! eclim#python#django#manage#CommandCompleteManage(argLead, cmdLine, cursorPos) " {{{
   let cmdLine = strpart(a:cmdLine, 0, a:cursorPos)
   let args = eclim#util#ParseCmdLine(cmdLine)
   let argLead = cmdLine =~ '\s$' ? '' : args[len(args) - 1]
 
   if cmdLine =~ '^' . args[0] . '\s*' . escape(argLead, '~.\') . '$'
-    let actions = copy(s:manage_actions)
-    if cmdLine !~ '\s$'
-      call filter(actions, 'v:val =~ "^' . argLead . '"')
+    call s:LoadManageCommands()
+    if len(s:manage_commands)
+      let commands = copy(s:manage_commands)
+    else
+      let commands = ['startproject']
     endif
-    return actions
+    if cmdLine !~ '\s$'
+      call filter(commands, 'v:val =~ "^' . argLead . '"')
+    endif
+    return commands
   endif
 
   " complete app names if action support one
   let action = args[1]
-  if eclim#util#ListContains(s:app_actions, action)
-    let apps = eclim#python#django#util#GetProjectApps(
+  if eclim#util#ListContains(s:app_commands, action)
+    let apps = eclim#python#django#util#GetProjectAppNames(
       \ eclim#python#django#util#GetProjectPath())
     if cmdLine !~ '\s$'
       call filter(apps, 'v:val =~ "^' . argLead . '"')
     endif
     return apps
   endif
+endfunction " }}}
+
+function! s:LoadManageCommands() " {{{
+  if len(s:manage_commands)
+    return
+  endif
+
+  let interpreter = eclim#python#project#GetInterpreter()
+  if interpreter == ''
+    return
+  endif
+
+  let manage_path = eclim#python#django#manage#GetManagePath()
+  if manage_path == ''
+    return
+  endif
+
+  let command = interpreter . ' ' . manage_path
+  let result = eclim#util#System(command . ' help')
+  if v:shell_error
+    return
+  endif
+  let incommands = 0
+  for line in split(result, '\n')
+    if line =~ '^\[\S\+\]$'
+      let incommands = 1
+      continue
+    endif
+
+    if incommands
+      let command = substitute(line, '^\s*\(.*\)\s*$', '\1', '')
+      if command != ''
+        call add(s:manage_commands, command)
+      endif
+    endif
+  endfor
+  call sort(s:manage_commands)
 endfunction " }}}
 
 " vim:ft=vim:fdm=marker

@@ -28,6 +28,19 @@ Vim Settings (|vim-settings|)
 
 - g:EclimPhpValidate (Default: 1) - If set to 0, disables source
   code validation.
+  Note: When enabled, syntastic
+    (https://github.com/scrooloose/syntastic) is disabled so that
+    eclim and syntastic don't step on each other. If you'd like to use
+    syntastic over eclim for validation, then simply disable eclim's
+    validation.If you'd like to disable eclim's source code validation
+    for all languages, eclim provides a global variable for that as
+    well:>
+
+       let g:EclimFileTypeValidate = 0
+
+    <
+
+
 - g:EclimPhpHtmlValidate (Default: 0) - If set to a non 0 value,
   enables validating html markup in the php file. Enabling of html
   validation can also be enabled on a per buffer basis using a buffer

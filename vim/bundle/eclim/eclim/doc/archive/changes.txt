@@ -560,7 +560,7 @@ Python:
    - Added support for code completion (|vim-python-complete|).
    - Added support for finding an element definition
      (|vim-python-search|).
-   - Improved |:PyLint| support.
+   - Improved :PyLint support.
 Git Log (1.4.3)
 (https://github.com/ervandew/eclim/compare/1.4.2...1.4.3)
 
@@ -748,7 +748,7 @@ Python:
      pyflakes (http://www.divmod.org/trac/wiki/DivmodPyflakes) and the
      python compiler.
    - Added support for pylint (http://www.logilab.org/857) using new
-     |:PyLint| command.
+     :PyLint command.
 Vcs:
    - Added :VcsInfo, :ViewvcAnnotate, :ViewvcChangeSet, and
      :ViewvcDiff.

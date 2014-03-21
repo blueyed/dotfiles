@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"  Syntax file for maven's project.xml files.
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2009  Eric Van Dewoestine
+" Copyright (C) 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -21,7 +18,8 @@
 " along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "
 " }}}
-
-runtime! syntax/xml.vim
+"
+autocmd BufRead .pydevproject
+  \ call EclimSetXmlFileType({'pydev_project': 'pydevproject'})
 
 " vim:ft=vim:fdm=marker

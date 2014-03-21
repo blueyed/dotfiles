@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   see http://eclim.org/vim/python/django.html
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2011  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -22,66 +19,67 @@
 "
 " }}}
 
-" Script Variables {{{
-let s:starttag = '{%\s*\(end\)\@!\(\w\+\)\s*\([^}]\+\)\?\s*%}'
-let s:endtag = '{%\s*end\w\+\s*%}'
-
-let s:body_tags = {}
-function! s:InitBodyTags()
-  for elements in g:HtmlDjangoBodyElements
-    let s:body_tags[elements[0]] = elements[-1]
-  endfor
-endfunction
-call s:InitBodyTags()
-" }}}
-
-" CompleteEndTag() {{{
-" Function to complete a django template end tag.
-" Ex. imap <silent> % <c-r>=eclim#python#django#template#CompleteEndTag()<cr>
-function eclim#python#django#template#CompleteEndTag()
+function eclim#python#django#template#CompleteTag(tag_prefix, tag_suffix, body_elements) " {{{
   let line = getline('.')
-  let match_start = '.*{%\s*\%' . col('.') . 'c'
-  if line =~ match_start . '\(\s\|\s*%}\|$\)'
-    let tag = s:GetStartTag(line('.'))
-    if tag != '' && tag != 'endif'
-      let ops = ''
-      " account for case where the closing %} already exists (delete it)
-      if line =~ match_start . '\s*%}'
-        let chars = substitute(line, match_start . '\(\s*%}\).*', '\1', '')
-        let ops = substitute(chars, '.', "\<del>", "g")
+  let match_start = '.*' . a:tag_prefix . '\%' . col('.') . 'c'
+  if line =~ match_start . '\(\s\|' . a:tag_suffix . '\|$\)'
+    let [start_line, start_col, tags] = s:GetTagComplete(
+      \ line('.'), a:tag_prefix, a:tag_suffix, a:body_elements)
+
+    let prefix = substitute(line, '.*\(' . match_start . '\).*', '\1', '')
+    let start = searchpos('{%', 'bn')[1]
+    let indent = indent('.') - indent(start_line)
+    if !&expandtab
+      let indent = indent / shiftwidth()
+    endif
+    let start -= indent
+
+    if len(tags) == 1
+      call eclim#util#Complete(start, [prefix . 'e', prefix . tags[0] . ' %}'])
+      return ''
+    elseif len(tags)
+      if line !~ match_start . a:tag_suffix
+        call map(tags, 'prefix . (v:val != "elif" ? v:val . " %}" : v:val . " ")')
+      elseif line !~ match_start . '\s'
+        call map(tags, 'v:val . " "')
       endif
-      return tag . ops . ' %}'
+      call eclim#util#Complete(start, [prefix . 'e'] + reverse(tags))
+      return ''
     endif
   endif
   return 'e'
 endfunction " }}}
 
-" s:GetStartTag(line) {{{
-function s:GetStartTag(line)
-  let pairpos = searchpairpos(s:starttag, '', '{%', 'bnW')
+function s:GetTagComplete(line, tag_prefix, tag_suffix, body_elements) " {{{
+  let start_tag = a:tag_prefix . '\(end\)\@!\(\w\+\)\s*\([^}]\+\)\?' . a:tag_suffix
+  let pairpos = searchpairpos(start_tag, '', '{%', 'bnW')
   if pairpos[0]
     let line = getline(pairpos[0])
     let pos = getpos('.')
     call cursor(pairpos[0], pairpos[1])
     try
-      let tags = s:ExtractTags(line)
+      let tags = s:ExtractTags(line, a:tag_prefix, a:tag_suffix, a:body_elements)
       " place the cursor at the end of the line
       call cursor(line('.'), col('$'))
       for tag in reverse(tags)
         " find first tag searching backwards
-        call search('{%\s*' . tag[0] . '\s*\([^}]\+\)\?\s*%}', 'b', line('.'))
+        call search(
+          \ a:tag_prefix . tag[0] . '\s*\([^}]\+\)\?' . a:tag_suffix,
+          \ 'b', line('.'))
 
         " see if the tag has a matching close tag
         let pairpos = searchpairpos(
-          \ '{%\s*' . tag[0] . '\s*\([^}]\+\)\?\s*%}', '',
-          \ '{%\s*' . tag[1], 'nW')
-          "\ '{%\s*' . tag[1] . '\s*%}', 'nW')
-        if !pairpos[0] || pairpos[0] > a:line
-          return tag[1]
+          \ a:tag_prefix . tag[0] . '\s*\([^}]\+\)\?' . a:tag_suffix, '',
+          \ a:tag_prefix . tag[1][-1], 'nW')
+          "\ a:tag_prefix . tag[1] . a:tag_suffix, 'nW')
+        if !pairpos[0] || indent(pairpos[0]) < indent(a:line)
+          return [line('.'), col('.'), tag[1]]
+        elseif pairpos[0] > a:line && len(tag[1]) > 1
+          return [line('.'), col('.'), tag[1][:-2]]
         endif
       endfor
       call cursor(line('.'), 1)
-      return s:GetStartTag(a:line)
+      return s:GetTagComplete(a:line, a:tag_prefix, a:tag_suffix, a:body_elements)
     finally
       call setpos('.', pos)
     endtry
@@ -89,17 +87,24 @@ function s:GetStartTag(line)
   return ''
 endfunction " }}}
 
-" s:ExtractTags() {{{
-" Extracts a list of open tag names from the current line.
-function s:ExtractTags(line)
+function s:ExtractTags(line, tag_prefix, tag_suffix, body_elements) " {{{
+  " Extracts a list of open tag names from the current line.
   let line = a:line
   let tags = []
-  while line =~ s:starttag
-    let tag = substitute(line, '.\{-}' . s:starttag . '.*', '\2', '')
-    if line !~ '{%\s*end' . tag . '\s*%}' && has_key(s:body_tags, tag)
-      call add(tags, [tag, s:body_tags[tag]])
+  let tags_dict = {}
+  for elements in a:body_elements
+    let tags_dict[elements[0]] = elements[1:]
+  endfor
+  let start_tag = a:tag_prefix . '\(end\)\@!\(\w\+\)\s*\([^}]\+\)\?' . a:tag_suffix
+  while line =~ start_tag
+    let tag = substitute(line, '.\{-}' . start_tag . '.*', '\2', '')
+    if line !~ a:tag_prefix . 'end' . tag . a:tag_suffix && has_key(tags_dict, tag)
+      call add(tags, [tag, tags_dict[tag]])
     endif
-    let line = substitute(line, '.\{-}{%\s*' . tag . '\>.\{-}%}', '\1', '')
+    let line = substitute(
+      \ line,
+      \ '.\{-}' . a:tag_prefix . tag . '\>.\{-}' . a:tag_suffix,
+      \ '\1', '')
   endwhile
   return tags
 endfunction " }}}

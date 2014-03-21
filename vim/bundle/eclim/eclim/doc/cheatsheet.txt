@@ -251,13 +251,11 @@ Php Commands
 Python Commands
 ===============
 
-- |:PythonFindDefinition| - Find the element under the cursor.
-- |:PythonSearchContext| - Find the element under the cursor based
-  on its context.
-- :Validate (|:Validate_python|) - Validates the current file using
-  pyflakes (http://www.divmod.org/trac/wiki/DivmodPyflakes).
-- |:PyLint| - Runs pylint (http://www.logilab.org/857) on the
-  current file.
+- |:PythonSearch| - Find the element under the cursor or, if
+  requested, all references to that element.
+- |:PythonSearchContext| - Find the element under the cursor or its
+  references based on the current context in the file.
+- :Validate (|:Validate_python|) - Validates the current file.
 - |:DjangoManage| - Invokes django's manage.py from any file in the
   same directory as your manage.py or in any of the child directories.
 - |:DjangoFind| - Available when editing a django html template

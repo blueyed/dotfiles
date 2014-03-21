@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   see http://eclim.org/vim/python/index.html
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2013  Eric Van Dewoestine
+" Copyright (C) 2012 - 2014  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -28,46 +25,40 @@ if !exists("g:EclimPythonValidate")
   let g:EclimPythonValidate = 1
 endif
 
+if !exists("g:EclimPythonSyntasticEnabled")
+  let g:EclimPythonSyntasticEnabled = 0
+endif
+
 " }}}
 
 " Options {{{
 
 exec 'setlocal ' . g:EclimCompletionMethod . '=eclim#python#complete#CodeComplete'
 
+call eclim#lang#DisableSyntasticIfValidationIsEnabled('python')
+
 " }}}
 
 " Autocmds {{{
 
-if g:EclimPythonValidate
-  augroup eclim_python_validate
-    autocmd! BufWritePost <buffer>
-    autocmd BufWritePost <buffer> call eclim#python#validate#Validate(1)
-  augroup END
-endif
+augroup eclim_python
+  autocmd! BufWritePost <buffer>
+  autocmd BufWritePost <buffer> call eclim#lang#UpdateSrcFile('python')
+augroup END
 
 " }}}
 
 " Command Declarations {{{
 
-if !exists(":PythonFindDefinition")
-  command -buffer PythonFindDefinition :call eclim#python#search#Find('definition')
-endif
-if !exists(":PythonSearchContext")
-  command -buffer PythonSearchContext :call eclim#python#search#SearchContext()
-endif
-
-if !exists(':PythonImportClean')
-  command -buffer PythonImportClean :call eclim#python#import#CleanImports()
-endif
-if !exists(':PythonImportSort')
-  command -buffer PythonImportSort :call eclim#python#import#SortImports()
-endif
-
 if !exists(":Validate")
-  command -nargs=0 -buffer Validate :call eclim#python#validate#Validate(0)
+  command! -nargs=0 -buffer Validate :call eclim#lang#UpdateSrcFile('python', 1)
 endif
-if !exists(":PyLint")
-  command -nargs=0 -buffer PyLint :call eclim#python#validate#PyLint()
+
+if !exists(":PythonSearch")
+  command -buffer -nargs=*
+    \ -complete=customlist,eclim#python#search#CommandCompletePythonSearch
+    \ PythonSearch :call eclim#python#search#Search('<args>')
+  command -buffer PythonSearchContext :call eclim#python#search#SearchContext()
 endif
 
 if !exists(':DjangoTemplateOpen')

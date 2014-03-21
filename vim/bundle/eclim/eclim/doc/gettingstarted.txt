@@ -42,14 +42,11 @@ simply changing the nature accordingly:
    :ProjectCreate /path/to/my_cpp_project -n c++
    :ProjectCreate /path/to/my_java_project -n java
    :ProjectCreate /path/to/my_php_project -n php
-   :ProjectCreate /path/to/my_python_project -n none
+   :ProjectCreate /path/to/my_python_project -n python
    :ProjectCreate /path/to/my_ruby_project -n ruby
 
 <
 
-
-The only odd ball in the bunch is the creation of the python project
-which currently uses the 'none' nature.
 
 The path supplied to the |:ProjectCreate| command will be the path to
 the root of your project.  This path may or may not exist.  If it does
@@ -64,7 +61,7 @@ file:
 - java, android - .classpath file (|vim-java-classpath|)
 - php, ruby - .buildpath file (|vim-dltk-buildpath|)
 - c, c++ - .cproject, managed via the |:CProjectConfigs| command
-- python - .ropeproject (see the rope docs (|python-rope|))
+- python - .pydevproject file (|vim-python-path|)
 Once you've created your project you can use the :ProjectList command
 to list the available projects and you should see your newly created
 one in the list.
@@ -98,7 +95,7 @@ language for more details:
 - java and android (|vim-java-classpath|)
 - php and ruby (|vim-dltk-buildpath|)
 - c and c++ (|:CProjectConfigs|)
-- python (|python-rope|)
+- python (|vim-python-path|)
 For the purpose of this example we will assume that you will store
 your source files at:
 

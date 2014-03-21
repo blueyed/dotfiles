@@ -4,7 +4,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2005 - 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -35,15 +35,20 @@ if !exists('g:HtmlDjangoUserBodyElements')
 endif
 
 let g:HtmlDjangoBodyElements = [
+    \ ['autoescape', 'endautoescape'],
     \ ['block', 'endblock'],
+    \ ['blocktrans', 'plural', 'endblocktrans'],
     \ ['comment', 'endcomment'],
     \ ['filter', 'endfilter'],
-    \ ['for', 'endfor'],
-    \ ['if', 'else', 'endif'],
+    \ ['for', 'empty', 'endfor'],
+    \ ['if', 'elif', 'else', 'endif'],
     \ ['ifchanged', 'else', 'endifchanged'],
     \ ['ifequal', 'else', 'endifequal'],
     \ ['ifnotequal', 'else', 'endifnotequal'],
-    \ ['spaceless', 'else', 'endspaceless']
+    \ ['language', 'endlanguage'],
+    \ ['spaceless', 'endspaceless'],
+    \ ['verbatim', 'endverbatim'],
+    \ ['with', 'endwith']
   \ ] + g:HtmlDjangoUserBodyElements
 
 " add matchit.vim support for django tags
@@ -66,7 +71,9 @@ endif
 " Mappings {{{
 
 if g:HtmlDjangoCompleteEndTag
-  imap <buffer> <silent> e <c-r>=eclim#python#django#template#CompleteEndTag()<cr>
+  imap <buffer> <silent> e
+    \ <c-r>=eclim#python#django#template#CompleteTag(
+      \ '{%\s*', '\s*%}', g:HtmlDjangoBodyElements)<cr>
 endif
 
 " }}}

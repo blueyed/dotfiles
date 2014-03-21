@@ -86,7 +86,7 @@ JavaScript
 Php
 ===
 
-- Code completion.
+- Context sensitive code completion.
 - Searching.
 - Source code validation.
 
@@ -94,12 +94,10 @@ Python
 ======
 
 - Context sensitive code completion.
-- Find element definition support.
+- Find element definition/references support.
+- Source code validation.
 - Regular expression testing.
 - Django functionality.
-- Validation via python compiler, pyflakes
-  (http://www.divmod.org/trac/wiki/DivmodPyflakes), and pylint
-  (http://www.logilab.org/857).
 
 Ruby
 ====

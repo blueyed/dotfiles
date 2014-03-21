@@ -77,7 +77,7 @@ will be skipped:
    [echo] Plugins:
    [echo]   org.eclim.cdt
    [echo]   org.eclim.jdt
-   [echo]   org.eclim.python
+   [echo]   org.eclim.pydev
    [echo]   org.eclim.sdt
    [echo]   org.eclim.wst
 
@@ -115,6 +115,19 @@ your properties in there:
 
 <
 
+
+Note: The eclim vim help files, used by the :EclimHelp
+  (|vim-core-eclim#:EclimHelp|) command, are not built by default. To
+  build these you first need to install sphinx
+  (http://sphinx-doc.org), then run the following command:>
+
+     $ ant vimdocs
+
+  <
+
+
+  This target also supports the vim.files property if you want the
+  docs deployed to a directory other than the default location.
 
 *coding-style*
 
@@ -178,8 +191,8 @@ doing so.
 To build the installer you first need a couple external tools
 installed:
 
-- sphinx (http://sphinx.pocoo.org): Sphinx is used to build the
-  eclim documentation which is included in the installer.
+- sphinx (http://sphinx-doc.org): Sphinx is used to build the eclim
+  documentation which is included in the installer.
   Eclim also uses a custom sphinx theme which is included in eclim as
   a git submodule. So before you can build the installer you will need
   to initialize the submodule:

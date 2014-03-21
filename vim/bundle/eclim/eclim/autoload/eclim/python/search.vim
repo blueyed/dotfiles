@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   see http://eclim.org/vim/python/find.html
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2012  Eric Van Dewoestine
+" Copyright (C) 2013  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -29,72 +26,50 @@
   endif
 " }}}
 
-" Find(context) {{{
-function! eclim#python#search#Find(context)
-  if !eclim#project#util#IsCurrentFileInProject() || !filereadable(expand('%'))
-    return
-  endif
+" Script Varables {{{
+  let s:search = '-command python_search'
+  let s:options = ['-x']
+  let s:contexts = ['declarations', 'references']
+" }}}
 
-  " update the file
-  call eclim#util#ExecWithoutAutocmds('silent update')
-
-  let offset = eclim#python#rope#GetOffset()
-  let encoding = eclim#util#GetEncoding()
-  let project = eclim#project#util#GetCurrentProjectRoot()
-  let file = eclim#project#util#GetProjectRelativeFilePath()
-
-  let results =
-    \ eclim#python#rope#Find(project, file, offset, encoding, a:context)
-  if type(results) == g:NUMBER_TYPE && results == 0
-    call eclim#util#SetLocationList([])
-    return
-  endif
-
-  if !empty(results)
-    call eclim#util#SetLocationList(eclim#util#ParseLocationEntries(results))
-    let locs = getloclist(0)
-    " if only one result and it's for the current file, just jump to it.
-    " note: on windows the expand result must be escaped
-    if len(results) == 1 && locs[0].bufnr == bufnr('%')
-      if results[0] !~ '|1 col 1|'
-        lfirst
-      endif
-
-    " single result in another file.
-    elseif len(results) == 1 && g:EclimPythonSearchSingleResult != "lopen"
-      let entry = getloclist(0)[0]
-      call eclim#util#GoToBufferWindowOrOpen(
-        \ bufname(entry.bufnr), g:EclimPythonSearchSingleResult)
-      call eclim#util#SetLocationList(eclim#util#ParseLocationEntries(results))
-      call eclim#display#signs#Update()
-
-      call cursor(entry.lnum, entry.col)
-    else
-      exec 'lopen ' . g:EclimLocationListHeight
-    endif
-  elseif has('python')
-    call eclim#util#EchoInfo("Element not found.")
-  endif
+function! eclim#python#search#Search(argline) " {{{
+  return eclim#lang#Search(
+    \ s:search, g:EclimPythonSearchSingleResult, a:argline)
 endfunction " }}}
 
-" SearchContext() {{{
-" Executes a contextual search.
-function! eclim#python#search#SearchContext()
-  if getline('.')[col('.') - 1] == '$'
-    call cursor(line('.'), col('.') + 1)
-    let cnum = eclim#util#GetCurrentElementColumn()
-    call cursor(line('.'), col('.') - 1)
-  else
-    let cnum = eclim#util#GetCurrentElementColumn()
+function! eclim#python#search#SearchContext() " {{{
+  let line = getline('.')
+  let col = col('.')
+  let args = ''
+  if line =~ '\<\(def\|class\)\>\s\+\w*\%' . col . 'c'
+    let args = '-x references'
+  elseif line =~ '\%' . col . 'c\w*\_s*=[^=]'
+    let args = '-x references'
   endif
+  call eclim#python#search#Search(args)
+endfunction " }}}
 
-  if getline('.') =~ '\<\(class\|def\)\s\+\%' . cnum . 'c'
-    call eclim#python#search#Find('occurrences')
-    return
+function! eclim#python#search#CommandCompletePythonSearch(argLead, cmdLine, cursorPos) " {{{
+  let cmdLine = strpart(a:cmdLine, 0, a:cursorPos)
+  let cmdTail = strpart(a:cmdLine, a:cursorPos)
+  let argLead = substitute(a:argLead, cmdTail . '$', '', '')
+  if cmdLine =~ '-x\s\+[a-z]*$'
+    let contexts = deepcopy(s:contexts)
+    call filter(contexts, 'v:val =~ "^' . argLead . '"')
+    return contexts
+  elseif cmdLine =~ '\s\+[-]\?$'
+    let options = deepcopy(s:options)
+    let index = 0
+    for option in options
+      if a:cmdLine =~ option
+        call remove(options, index)
+      else
+        let index += 1
+      endif
+    endfor
+    return options
   endif
-
-  call eclim#python#search#Find('definition')
-
+  return []
 endfunction " }}}
 
 " vim:ft=vim:fdm=marker

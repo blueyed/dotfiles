@@ -9,7 +9,7 @@
 "
 " License:
 "
-" Copyright (C) 2005 - 2013  Eric Van Dewoestine
+" Copyright (C) 2005 - 2014  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
   let s:command_settings = '-command settings'
   let s:command_settings_update = '-command settings_update -s "<settings>"'
   let s:command_shutdown = "-command shutdown"
+  let s:command_jobs = '-command jobs'
   let s:connect= '^connect: .*$'
 " }}}
 
@@ -205,14 +206,18 @@ endfunction " }}}
 function! eclim#ParseSettingErrors(errors) " {{{
   let errors = []
   for error in a:errors
-    let setting = substitute(error, '^\(.\{-}\): .*', '\1', '')
-    let message = substitute(error, '^.\{-}: \(.*\)', '\1', '')
-    let line = search('^\s*' . setting . '\s*=', 'cnw')
+    let message = error.message
+    let setting = substitute(message, '^\(.\{-}\): .*', '\1', '')
+    let message = substitute(message, '^.\{-}: \(.*\)', '\1', '')
+    if error.line == 1 && setting != error.message
+      let line = search('^\s*' . setting . '\s*=', 'cnw')
+      let error.line = line > 0 ? line : 1
+    endif
     call add(errors, {
         \ 'bufnr': bufnr('%'),
-        \ 'lnum': line > 0 ? line : 1,
+        \ 'lnum': error.line,
         \ 'text': message,
-        \ 'type': 'e'
+        \ 'type': error.warning == 1 ? 'w' : 'e',
       \ })
   endfor
   return errors
@@ -262,7 +267,8 @@ function! eclim#SaveSettings(command, project) " {{{
     if type(result) == g:LIST_TYPE
       call eclim#util#EchoError
         \ ("Operation contained errors.  See location list for details.")
-      call eclim#util#SetLocationList(eclim#ParseSettingErrors(result))
+      let errors = eclim#ParseSettingErrors(result)
+      call eclim#util#SetLocationList(errors)
     else
       call eclim#util#ClearLocationList()
       call eclim#util#Echo(result)
@@ -329,6 +335,31 @@ function! eclim#UserHome() " {{{
     let home = expand('$USERPROFILE')
   endif
   return substitute(home, '\', '/', 'g')
+endfunction " }}}
+
+function! eclim#WaitOnRunningJobs(timeout) " {{{
+  " Args:
+  "   timeout: max time to wait in milliseconds
+  let running = 1
+  let waited = 0
+  while running && waited < a:timeout
+    let jobs = eclim#Execute(s:command_jobs)
+    if type(jobs) == g:LIST_TYPE
+      let running = 0
+      for job in jobs
+        if job.status == 'running'
+          call eclim#util#EchoDebug('Wait on job: ' . job.job)
+          let running = 1
+          let waited += 300
+          sleep 300m
+          break
+        endif
+      endfor
+    endif
+  endwhile
+  if running
+    call eclim#util#EchoDebug('Timeout exceeded waiting on jobs')
+  endif
 endfunction " }}}
 
 " vim:ft=vim:fdm=marker

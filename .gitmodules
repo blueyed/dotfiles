@@ -509,7 +509,7 @@
 	path = vim/bundle/sneak
 	url = git://github.com/justinmk/vim-sneak.git
 [submodule "vim/bundle/jedi-vim"]
-	path = vim/bundle/jedi-vim
+	path = vim/bundle/jedi
 	url = git://github.com/davidhalter/jedi-vim.git
 [submodule "vim/bundle/unite-outline"]
 	path = vim/bundle/unite-outline

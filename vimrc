@@ -356,31 +356,6 @@ if 1 " has('eval') / `let` may not be available.
   let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
   let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 
-  " jedi-vim (besides YCM with jedi library) {{{1
-  " let g:jedi#force_py_version = 3
-  let g:jedi#auto_vim_configuration = 0
-  let g:jedi#goto_assignments_command = 'gd'
-  let g:jedi#goto_definitions_command = 'gD'
-  let g:jedi#rename_command = 'cR'
-  let g:jedi#usages_command = 'gr'
-  let g:jedi#completions_enabled = 0
-
-  " Unite/ref and pydoc are more useful.
-  let g:jedi#documentation_command = '<Leader>_K'
-  let g:jedi#show_call_signatures = 1
-  augroup JediVimEnter
-    au!
-    au VimEnter * call jedi#configure_call_signatures()
-  augroup END
-
-  let g:jedi#completions_enabled = 0
-
-  let g:jedi#auto_close_doc = 1
-    " if g:jedi#auto_close_doc
-    "     " close preview if its still open after insert
-    "     autocmd InsertLeave <buffer> if pumvisible() == 0|pclose|endif
-    " end
-  " }}}1
   " syntax mode setup
   let python_highlight_all = 1
   let php_sql_query = 1
@@ -523,6 +498,34 @@ if has("user_commands")
   call airline#parts#define_function('file', 'Airline_filename')
 
   filetype plugin indent on
+
+  " jedi-vim (besides YCM with jedi library) {{{1
+  " let g:jedi#force_py_version = 3
+  let g:jedi#auto_vim_configuration = 0
+  let g:jedi#goto_assignments_command = 'gd'
+  let g:jedi#goto_definitions_command = 'gD'
+  let g:jedi#rename_command = 'cR'
+  let g:jedi#usages_command = 'gr'
+  let g:jedi#completions_enabled = 0
+
+  " Unite/ref and pydoc are more useful.
+  let g:jedi#documentation_command = '<Leader>_K'
+  let g:jedi#show_call_signatures = 1
+  if index(g:pathogen_disabled, 'jedi') != -1
+    augroup JediVimEnter
+      au!
+      au VimEnter * call jedi#configure_call_signatures()
+    augroup END
+  endif
+
+  let g:jedi#completions_enabled = 0
+
+  let g:jedi#auto_close_doc = 1
+    " if g:jedi#auto_close_doc
+    "     " close preview if its still open after insert
+    "     autocmd InsertLeave <buffer> if pumvisible() == 0|pclose|endif
+    " end
+  " }}}1
 endif
 
 " Enable syntax {{{1

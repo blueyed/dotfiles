@@ -598,7 +598,7 @@ if has("user_commands")
   " Unite/ref and pydoc are more useful.
   let g:jedi#documentation_command = '<Leader>_K'
   let g:jedi#show_call_signatures = 1
-  if index(g:pathogen_disabled, 'jedi') != -1
+  if index(g:pathogen_disabled, 'jedi') == -1
     augroup JediVimEnter
       au!
       au VimEnter * call jedi#configure_call_signatures()

@@ -2446,6 +2446,7 @@ endfun
 " Do not autoload/autosave 'default' session
 " let g:session_autoload = 'no'
 " let g:session_autosave = 'no'
+let g:session_default_name = ''
 let g:session_command_aliases = 1
 let g:session_persist_globals = [
       \ 'g:tmru_file',

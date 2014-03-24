@@ -2713,6 +2713,17 @@ nmap <Esc>[5;8~ <S-M-C-PageUp>
 nmap <Esc>[6;8~ <S-M-C-PageDown>
 "map! <Esc>[6;8~ <S-M-C-PageDown>
 " }}}
+fun! MyGetNonDefaultServername()
+  " Not for gvim in general (uses v:servername by default), and the global
+  " server ("G").
+  let sname = v:servername
+  if len(sname) && sname =~# '\v^GVIM.*' && sname =~# '\v^G\d*$'
+    return sname
+  endif
+  return ''
+endfun
+
+
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

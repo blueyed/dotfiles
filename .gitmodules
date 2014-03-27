@@ -577,3 +577,6 @@
 [submodule "vim/bundle/wildfire"]
 	path = vim/bundle/wildfire
 	url = git://github.com/gcmt/wildfire.vim.git
+[submodule "vim/bundle/phpcomplete"]
+	path = vim/bundle/phpcomplete
+	url = git://github.com/shawncplus/phpcomplete.vim.git

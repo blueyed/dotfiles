@@ -1,3 +1,8 @@
+" -- adopted from indent/php.vim:
+" Needs to override the default html.vim.
+" Set the comment setting to something correct for PHP
+setlocal comments=s1:/*,mb:*,ex:*/,://,:#
+
 " TODO: move to snippets
 inoremap <Leader>pd pre_dump();hi
 inoremap <Leader>pdd pre_dump(); die();8hi
@@ -68,3 +73,4 @@ call SetupPhpHelp()
 
 " EXPERIMENTAL
 setlocal iskeyword+=$
+

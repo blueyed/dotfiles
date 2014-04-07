@@ -187,6 +187,9 @@ if 1 " has('eval') / `let` may not be available.
   nnoremap <Leader>ss s
   xnoremap <Leader>ss s
 
+  " Close preview and quickfix windows.
+  nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
+
   let g:my_full_name = "Daniel Hahler"
 
   let g:snips_author = g:my_full_name
@@ -1685,10 +1688,10 @@ command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
 command! -range=% UntrailSpecial keepjumps call StripWhitespace(<line1>,<line2>,'[\\]\@<!\s\+│\?$')
 noremap <leader>st :Untrail<CR>
 
-" Execute current line/selection.
-" Merge escaped newlines.
+" Execute current line/selection, merging escaped newlines.
 command! -range ExecThis <line1>,<line2>yank t | let @t=substitute(@t, '\v\n\s*\\', ' ', 'g') | @t
 map <Leader>< :ExecThis<cr>
+vnoremap <Leader>< "ty:let @t=substitute(@t, '\v\n\s*\\', ' ', 'g')<cr>:@t<cr>
 
 command! RR ProjectRootLCD
 command! RRR ProjectRootCD
@@ -2020,12 +2023,14 @@ noremap <F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache 
 noremap <S-F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 " XXX: mapping does not work (autoclose?!)
 " noremap <F3> :CtrlPMRUFiles
-fun! MyRefresh()
+fun! MyF5()
   if &diff
     diffupdate
+  else
+    GundoToggle
   endif
 endfun
-noremap <F5> :call MyRefresh()<cr>
+noremap <F5> :call MyF5()<cr>
 noremap <Leader>u :GundoToggle<cr>
 " if has('gui_running')
 "   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
@@ -2317,8 +2322,8 @@ if has("folding")
   " let vimsyn_folding='af'       " Vim script
   " let xml_syntax_folding=1      " XML
 
-  set foldlevel=1
-  set foldlevelstart=1
+  set foldlevel=2
+  set foldlevelstart=2
 
   " set foldmethod=indent
   " set foldnestmax=2
@@ -2373,19 +2378,20 @@ endif
 
 "{{{2 Abbreviations
 " <C-g>u adds break to undo chain, see i_CTRL-G_u
-iabbr cdata <![CDATA[]]><Left><Left><Left>
-iabbr sg  Sehr geehrte Damen und Herren,<cr>
-iabbr sgh Sehr geehrter Herr<space>
-iabbr sgf Sehr geehrte Frau<space>
-iabbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
-iabbr LG Liebe Grüße,<cr>Daniel.
-iabbr VG Viele Grüße,<cr>Daniel.
+inoreabbr cdata <![CDATA[]]><Left><Left><Left>
+inoreabbr sg  Sehr geehrte Damen und Herren,<cr>
+inoreabbr sgh Sehr geehrter Herr<space>
+inoreabbr sgf Sehr geehrte Frau<space>
+inoreabbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
+inoreabbr LG Liebe Grüße,<cr>Daniel.
+inoreabbr VG Viele Grüße,<cr>Daniel.
+" iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 " ellipsis
-abbr ... …
+noreabbr ... …
 " sign "checkmark"
-iabbr scm ✓
-iabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
-iabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
+inoreabbr scm ✓
+inoreabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
+inoreabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
 " German/styled quotes.
 iabbr <silent> _" „“<Left>
 iabbr <silent> _' ‚‘<Left>
@@ -2476,7 +2482,7 @@ let g:session_persist_globals = [
 " indent these tags for ft=html
 let g:html_indent_inctags = "body,html,head,p,tbody"
 " do not indent these
-let g:html_indent_autotags = "br,input"
+let g:html_indent_autotags = "br,input,img"
 
 
 " better-whitespace: disable by default.

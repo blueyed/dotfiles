@@ -89,11 +89,13 @@ set matchtime=3
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
 set scrolloff=3 " scroll offset/margin (cursor at 4th line)
-augroup set_scrollof
-  au!
-  " Especially with quickfix (mouse jumping, narrow)
-  au BufEnter * if &buftype != "" | set scrolloff=0 | end
-augroup END
+if has('autocmd')"
+  augroup set_scrollof
+    au!
+    " Especially with quickfix (mouse jumping, narrow)
+    au BufEnter * if &buftype != "" | set scrolloff=0 | end
+  augroup END
+endif
 set sidescroll=1
 set sidescrolloff=10
 set commentstring=#\ %s

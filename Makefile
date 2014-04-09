@@ -67,8 +67,9 @@ ALL_FILES := $(INSTALL_FILES) $(INSTALL_FILES_AFTER_SM)
 install_files_before_sm: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
+# install_files handler: test for (existing) symlinks, skipping existing files/dirs.
 ~/.% ~/.local/share/%: %
-	@test -h $@ \
+	@{ test -h $@ && test -e $@; } \
 		|| { test -f $@ && echo "Skipping existing target (file): $@"; } \
 		|| { test -d $@ && echo "Skipping existing target (dir): $@"; } \
 		|| { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ ; }

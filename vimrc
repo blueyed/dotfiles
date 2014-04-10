@@ -431,18 +431,28 @@ if 1 " has('eval') / `let` may not be available.
   let g:cursorcross_no_map_BS = 1
   let g:delimitMate_expand_cr = 0
   let g:SuperTabCrMapping = 0  " Skip SuperTab CR map setup (skipped anyway for expr mapping)
-  let g:cursorcross_mappings = 0
 
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
     " "<CR>" via delimitMateCR
-    return "\<Plug>delimitMateCR\<Plug>CursorCrossCR\<Plug>DiscretionaryEnd"
+    let r = "\<Plug>delimitMateCR"
+    if maparg('<Plug>CursorCrossCR', 'i')
+      " requires vim 704
+      let r .= "\<Plug>CursorCrossCR"
+    endif
+    let r .= "\<Plug>DiscretionaryEnd"
+    return r
   endfun
   imap <expr> <CR> My_CR_map()
 
   fun! My_BS_map()
     " "<BS>" via delimitMateBS
-    return "\<Plug>delimitMateBS\<Plug>CursorCrossCR"
+    let r = "\<Plug>delimitMateBS"
+    if maparg('<Plug>CursorCrossBS', 'i')
+      " requires vim 704
+      let r .= "\<Plug>CursorCrossBS"
+    endif
+    return r
   endfun
   imap <expr> <BS> My_BS_map()
 

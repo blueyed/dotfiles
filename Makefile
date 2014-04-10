@@ -34,7 +34,7 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 	done
 	touch $@
 .stamps/submodules_rm.16:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips"; \
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox"; \
 	for i in $$rm_bundles; do \
 		[ ! -d "$$i" ] || [ ! -e "$$i/.git" ] && continue ; \
 		( cd $$i && gst=$$(git status --short --untracked-files=normal 2>&1) && [ "$$gst" = "" ] || { echo "Repo not clean ($$i): $$gst" ; false ; } ; ) \

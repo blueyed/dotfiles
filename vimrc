@@ -1,6 +1,11 @@
-" PROFILE
-" exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
-" profile! file **
+" Profiling. {{{
+fun! ProfileStart()
+  exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
+  profile! file **
+  profile  func *
+endfun
+" call ProfileStart()
+" }}}
 
 " Settings {{{1
 set nocompatible " This must be first, because it changes other options as a side effect.
@@ -14,6 +19,7 @@ set backspace=indent,eol,start " allow backspacing over everything in insert mod
 set confirm " ask for confirmation by default (instead of silently failing)
 set nosplitright splitbelow
 set diffopt+=vertical
+set diffopt+=context:1000000  " don't fold
 set history=1000
 set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
@@ -60,6 +66,7 @@ endif
 
 set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
+set guioptions-=e  " Same tabline as with terminal (allows for setting colors).
 set guioptions-=m  " no menu with gvim
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
@@ -246,7 +253,7 @@ if 1 " has('eval') / `let` may not be available.
 
   " Syntastic {{{
   let g:syntastic_enable_signs=1
-  let g:syntastic_auto_jump=2
+  " let g:syntastic_auto_jump=2
   let g:syntastic_check_on_wq=1  " Only for active filetypes.
   let g:syntastic_auto_loc_list=1
   " let g:syntastic_always_populate_loc_list=1  " Default: 0
@@ -457,7 +464,7 @@ if 1 " has('eval') / `let` may not be available.
   " let php_alt_comparisons = 0
   " let php_alt_assignByReference = 0
   " let PHP_outdentphpescape = 1
-  let g:PHP_autoformatcomment = 0 " do not set formatoptions/comments automatically
+  let g:PHP_autoformatcomment = 0 " do not set formatoptions/comments automatically (php-indent bundle / vim runtime)
   let g:php_noShortTags = 1
 
   " always use Smarty comments in smarty files
@@ -557,7 +564,10 @@ if has("user_commands")
   "   call add(g:pathogen_disabled, 'supertab')
   " endif
 
-  "
+  let g:pathogen_disabled += [ "space" ]
+  " nmap <unique> <Space> <Plug>SmartspaceNext
+  " nmap <unique> <S-Space> <Plug>SmartspacePrev
+
   " TO BE REMOVED"
   let g:pathogen_disabled += [ "shymenu" ]
   let g:pathogen_disabled += [ "easymotion" ]
@@ -1906,9 +1916,14 @@ map <leader>tb :CommandTBuffer<CR>
     " defaults to something else).
     " imap <nul> <c-r>=SuperTabAlternateCompletion("\<lt>c-p>")<cr>
 
-    au FileType python
-      \ if &completefunc != '' |
-      \   call SuperTabChain(&completefunc, "<c-p>") |
+    " au FileType python
+    "   \ if &completefunc != '' |
+    "   \   call SuperTabChain(&completefunc, "<c-p>") |
+    "   \ endif
+    autocmd FileType *
+      \ if &omnifunc != '' |
+      \   call SuperTabChain(&omnifunc, "<c-p>") |
+      \   call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
       \ endif
   endif
 " }}}
@@ -1937,6 +1952,9 @@ let g:EclimFileTypeValidate = 0
 
 " lua {{{
 let g:lua_check_syntax = 0  " done via syntastic
+let g:lua_define_omnifunc = 0  " must be enabled also (g:lua_complete_omni=1, but crashes Vim!)
+let g:lua_complete_library = 0  " interferes with YouCompleteMe
+let g:lua_complete_dynamic = 0  " interferes with YouCompleteMe
 " }}}
 
 " Prepend <leader> to visualctrlg mappings.

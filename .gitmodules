@@ -387,25 +387,25 @@
 	url = git://github.com/xolox/vim-misc.git
 [submodule "vim/bundle/delimitMate"]
 	path = vim/bundle/delimitMate
-	url = git@github.com:Raimondi/delimitMate.git
+	url = git://github.com/Raimondi/delimitMate.git
 [submodule "vim/bundle/visual-star-search"]
 	path = vim/bundle/visual-star-search
-	url = git@github.com:nelstrom/vim-visual-star-search.git
+	url = git://github.com/nelstrom/vim-visual-star-search.git
 [submodule "vim/bundle/abolish"]
 	path = vim/bundle/abolish
-	url = git@github.com:tpope/vim-abolish.git
+	url = git://github.com/tpope/vim-abolish.git
 [submodule "vim/bundle/colorscheme-detailed"]
 	path = vim/bundle/colorscheme-detailed
-	url = git@github.com:rking/vim-detailed.git
+	url = git://github.com/rking/vim-detailed.git
 [submodule "vim/bundle/less"]
 	path = vim/bundle/less
-	url = git@github.com:groenewege/vim-less.git
+	url = git://github.com/groenewege/vim-less.git
 [submodule "vim/bundle/textobj-indent"]
 	path = vim/bundle/textobj-indent
-	url = git@github.com:kana/vim-textobj-indent.git
+	url = git://github.com/kana/vim-textobj-indent.git
 [submodule "vim/bundle/xpath"]
 	path = vim/bundle/xpath
-	url = git@github.com:actionshrimp/vim-xpath.git
+	url = git://github.com/actionshrimp/vim-xpath.git
 [submodule "vim/bundle/django-pony"]
 	path = vim/bundle/django-pony
 	url = git://github.com/jmcomets/vim-pony.git
@@ -417,7 +417,7 @@
 	url = https://github.com/mkomitee/vim-gf-python.git
 [submodule "lib/mc-solarized"]
 	path = lib/mc-solarized
-	url = git@github.com:peel/mc.git
+	url = git://github.com/peel/mc.git
 [submodule "vim/bundle/tmux-navigator"]
 	path = vim/bundle/tmux-navigator
 	url = git://github.com/christoomey/vim-tmux-navigator.git

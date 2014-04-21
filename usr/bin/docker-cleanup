@@ -1,0 +1,32 @@
+#!/bin/sh
+# Cleanup docker files: untagged containers and images.
+#
+# Use `docker-cleanup -n` for a dry run to see what would be deleted.
+
+untagged_containers() {
+	# Print containers using untagged images: $1 is used with awk's print: 0=line, 1=column 1.
+	docker ps -a | awk '$2 ~ "[0-9a-f]{12}" {print $'$1'}'
+}
+
+untagged_images() {
+	# Print untagged images: $1 is used with awk's print: 0=line, 3=column 3.
+	docker images | awk '$2 == "<none>" {print $'$1'}'
+}
+
+# Dry-run.
+if [ "$1" = "-n" ]; then
+	echo "=== Untagged containers: ==="
+	untagged_containers 0
+	echo
+
+	echo "=== Untagged images: ==="
+	untagged_images 0
+
+	exit
+fi
+
+# Remove containers with untagged images.
+untagged_containers 1 | xargs --no-run-if-empty docker rm
+
+# Remove untagged images
+untagged_images 3 | xargs --no-run-if-empty docker rmi

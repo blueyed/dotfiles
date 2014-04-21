@@ -574,3 +574,6 @@
 [submodule "vim/bundle/phpcomplete"]
 	path = vim/bundle/phpcomplete
 	url = git://github.com/shawncplus/phpcomplete.vim.git
+[submodule "lib/docker-zsh-completion"]
+	path = lib/docker-zsh-completion
+	url = git://github.com/felixr/docker-zsh-completion.git

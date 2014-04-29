@@ -273,7 +273,7 @@
 	url = git://github.com/rkitover/vimpager.git
 [submodule "vim/bundle/file-line"]
 	path = vim/bundle/file-line
-	url = git://github.com/bogado/file-line.git
+	url = git://github.com/blueyed/file-line.git
 [submodule "vim/bundle/viewoutput"]
 	path = vim/bundle/viewoutput
 	url = git://github.com/vim-scripts/ViewOutput.git

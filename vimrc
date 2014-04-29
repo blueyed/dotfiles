@@ -138,7 +138,8 @@ set fillchars=vert:\ ,fold:\ ,stl:\ ,stlnc:\ ,diff:⣿
 if 1 && exists(':try')
   try
     set shortmess+=c
-  catch /E539: Illegal character/
+  " Catch "Illegal character" (and its translations).
+  catch /E539: /
   endtry
 endif
 

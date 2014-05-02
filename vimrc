@@ -309,6 +309,12 @@ if 1 " has('eval') / `let` may not be available.
   let g:tinykeymap#break_key = 113
   " }}}
 
+  " fontzoom {{{
+  let g:fontzoom_no_default_key_mappings = 1
+  nmap <A-+> <Plug>(fontzoom-larger)
+  nmap <A--> <Plug>(fontzoom-smaller)
+  " }}}
+
   " Call bcompare with current and alternate file.
   command! BC call system('bcompare '.shellescape(expand('%')).' '.shellescape(expand('#')).'&')
 
@@ -369,16 +375,16 @@ if 1 " has('eval') / `let` may not be available.
     let g:neocomplcache_force_overwrite_completefunc = 1
     " XXX: exists() does not work with autoload function
     augroup neocomplcachefiletype
-    au!
-    " au FileType * let f='eclim#'.&filetype.'#complete#CodeComplete' | if exists('*'.f) | exec('setlocal omnifunc='.f) | endif
+      au!
+      " au FileType * let f='eclim#'.&filetype.'#complete#CodeComplete' | if exists('*'.f) | exec('setlocal omnifunc='.f) | endif
 
-    " Enable omni completion.
-    au FileType css setlocal omnifunc=csscomplete#CompleteCSS
-    au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    au FileType python setlocal omnifunc=pythoncomplete#Complete
-    au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-    "au FileType ruby setlocal omnifunc=rubycomplete#Complete
+      " Enable base completion.
+      au FileType css setlocal omnifunc=csscomplete#CompleteCSS
+      au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+      au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+      au FileType python setlocal omnifunc=pythoncomplete#Complete
+      au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+      "au FileType ruby setlocal omnifunc=rubycomplete#Complete
     augroup END
 
     " Enable heavy omni completion.
@@ -406,8 +412,8 @@ if 1 " has('eval') / `let` may not be available.
   " EXPERIMENTAL: auto-popups and experimenting with SuperTab
   " NOTE: this skips the following map setup (also for C-n):
   "       ' pumvisible() ? "\<C-p>" : "\' . key .'"'
-  " let g:ycm_key_list_select_completion = []
-  " let g:ycm_key_list_previous_completion = []
+  let g:ycm_key_list_select_completion = []
+  let g:ycm_key_list_previous_completion = []
 
   " " disable trigger for 'php' (slow; trigger it manually)
   " let g:ycm_semantic_triggers =  {
@@ -480,11 +486,7 @@ if 1 " has('eval') / `let` may not be available.
 
   " always use Smarty comments in smarty files
   " NOTE: for {php} it's useful
-  " let g:tcommentGuessFileType_smarty = 0
-
-  " -- adopted from indent/php.vim:
-  " Set the comment setting to something correct for PHP
-  au FileType php setlocal comments=s1:/*,mb:*,ex:*/,://,:#
+  let g:tcommentGuessFileType_smarty = 0
 endif
 
 if &t_Co == 8
@@ -1394,6 +1396,22 @@ omap T <Plug>Sneak_T
 " omap F <Plug>Sneak_S
 " }}}1
 
+" GoldenView {{{1
+let g:goldenview__enable_default_mapping = 0
+let g:goldenview__enable_at_startup = 0
+
+" 1. split to tiled windows
+nmap <silent> g<C-L>  <Plug>GoldenViewSplit
+
+" " 2. quickly switch current window with the main pane
+" " and toggle back
+nmap <silent> <F9>   <Plug>GoldenViewSwitchMain
+nmap <silent> <S-F9> <Plug>GoldenViewSwitchToggle
+
+" " 3. jump to next and previous window
+nmap <silent> <C-N>  <Plug>GoldenViewNext
+nmap <silent> <C-P>  <Plug>GoldenViewPrevious
+" }}}
 
 " Duplicate a selection in visual mode
 vmap D y'>p
@@ -1517,10 +1535,10 @@ set wildmode=list:longest,list:full
 if has("autocmd") && exists("+omnifunc")
   augroup filetype_omnifunc
   au!
-  au Filetype *
-    \   if &omnifunc == "" |
-    \     setlocal omnifunc=syntaxcomplete#Complete |
-    \   endif
+  " au Filetype *
+  "   \   if &omnifunc == "" |
+  "   \     setlocal omnifunc=syntaxcomplete#Complete |
+  "   \   endif
   " use eclim for PHP omnicompletion (does not pollute quickfix window and is better in general)
   "  au Filetype php setlocal omnifunc=eclim#php#complete#CodeComplete
   " ref: https://github.com/Valloric/YouCompleteMe/issues/103#issuecomment-14149318
@@ -1549,6 +1567,9 @@ ino jk <esc>l
 ino kj <esc>
 " cno kj <c-c>
 
+" Improve the Esc key: good for `i`, does not work for `a`.
+" Source: http://vim.wikia.com/wiki/Avoid_the_escape_key#Improving_the_Esc_key
+" inoremap <Esc> <Esc>`^
 
 " close tags (useful for html)
 " NOTE: not required/used; avoid imap for leader.
@@ -1677,6 +1698,10 @@ vnoremap <C-X> <Esc>`.``gvP``P
 " Make `<leader>gp` select the last pasted text
 " (http://vim.wikia.com/wiki/Selecting_your_pasted_text).
 nnoremap <expr> <leader>gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+" select last inserted text
+" nnoremap gV `[v`]
+nmap gV <leader>gp
+
 
 " Syntax Checking entire file (Python)
 " Usage: :make (check file)
@@ -1964,8 +1989,12 @@ let g:EclimFileTypeValidate = 0
 " lua {{{
 let g:lua_check_syntax = 0  " done via syntastic
 let g:lua_define_omnifunc = 0  " must be enabled also (g:lua_complete_omni=1, but crashes Vim!)
+let g:lua_complete_keywords = 0 " interferes with YouCompleteMe
+let g:lua_complete_globals = 0  " interferes with YouCompleteMe?
 let g:lua_complete_library = 0  " interferes with YouCompleteMe
 let g:lua_complete_dynamic = 0  " interferes with YouCompleteMe
+let g:lua_complete_omni = 0     " Disabled by default. Likely to crash Vim!
+let g:lua_define_completion_mappings = 0
 " }}}
 
 " Prepend <leader> to visualctrlg mappings.
@@ -2034,6 +2063,10 @@ inoremap <C-s> <Esc>:up<CR>
 " swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U)
 nnoremap <C-z> <C-y>
 nnoremap <C-y> <C-z>
+" map! <C-Z> <C-O>:stop<C-M>
+
+" zi: insert one char
+" map zi i$<ESC>r
 
 " defined in php-doc.vim
 " nnoremap <Leader>d :call PhpDocSingle()<CR>
@@ -2063,6 +2096,9 @@ fun! MyF5()
 endfun
 noremap <F5> :call MyF5()<cr>
 noremap <Leader>u :GundoToggle<cr>
+noremap <F6> gT
+noremap <F7> gt
+" noremap <F11> :YRShow<cr>
 " if has('gui_running')
 "   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
 "   imap <silent> <F11> <Esc><F11>a
@@ -2329,11 +2365,13 @@ xnoremap Y "+y
 cnoremap <c-j> <up>
 cnoremap <c-k> <down>
 
-" Idea: change the xterm cursor color for insert mode {{{2
-if &term =~? '^xterm' && exists('&t_SI') && &t_Co > 1
-  " let &t_SI="\<Esc>]12;purple\x7"
-  " let &t_EI="\<Esc>]12;green\x7"
-endif
+" Move without arrow keys. {{{2
+inoremap <m-h> <left>
+inoremap <m-l> <right>
+inoremap <m-j> <down>
+inoremap <m-k> <up>
+cnoremap <m-h> <left>
+cnoremap <m-l> <right>
 
 " Folding {{{2
 if has("folding")
@@ -2424,9 +2462,9 @@ inoreabbr scm ✓
 inoreabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
 inoreabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
 " German/styled quotes.
-iabbr <silent> _" „“<Left>
-iabbr <silent> _' ‚‘<Left>
-iabbr <silent> _- –<space>
+inoreabbr <silent> _" „“<Left>
+inoreabbr <silent> _' ‚‘<Left>
+inoreabbr <silent> _- –<space>
 "}}}
 
 " ignore certain files for completion (used also by Command-T)
@@ -2760,6 +2798,34 @@ fun! MyGetNonDefaultServername()
   endif
   return ''
 endfun
+
+" Delete all but the current buffer. {{{
+" Source: http://vim.1045645.n5.nabble.com/Close-all-buffers-except-the-one-you-re-in-tp1183357p1183361.html
+com! -bar -bang BdOnly call s:BdOnly(<q-bang>)
+
+func! s:BdOnly(bang)
+    let bdcmd = "bdelete". a:bang
+    let bnr = bufnr("")
+    if bnr > 1
+        call s:ExecCheckBdErrs("1,".(bnr-1). bdcmd)
+    endif
+    if bnr < bufnr("$")
+        call s:ExecCheckBdErrs((bnr+1).",".bufnr("$"). bdcmd)
+    endif
+endfunc
+
+func! s:ExecCheckBdErrs(bdrangecmd)
+    try
+        exec a:bdrangecmd
+    catch /:E51[567]:/
+        " no buffers unloaded/deleted/wiped out: ignore
+    catch
+        echohl ErrorMsg
+        echomsg matchstr(v:exception, ':\zsE.*')
+        echohl none
+    endtry
+endfunc
+" }}}
 
 
 " Local config (if any). {{{1

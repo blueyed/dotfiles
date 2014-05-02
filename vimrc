@@ -1,10 +1,12 @@
 " Profiling. {{{
+if 1
 fun! ProfileStart()
   exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
   profile! file **
   profile  func *
 endfun
 " call ProfileStart()
+endif
 " }}}
 
 " Settings {{{1
@@ -625,11 +627,12 @@ if has("user_commands")
 
   " Unite/ref and pydoc are more useful.
   let g:jedi#documentation_command = '<Leader>_K'
+  " Manually setup jedi's call signatures.
   let g:jedi#show_call_signatures = 1
   if index(g:pathogen_disabled, 'jedi') == -1
-    augroup JediVimEnter
+    augroup JediSetup
       au!
-      au VimEnter * call jedi#configure_call_signatures()
+      au FileType python call jedi#configure_call_signatures()
     augroup END
   endif
 

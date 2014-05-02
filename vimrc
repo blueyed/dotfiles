@@ -1,7 +1,9 @@
 " Profiling. {{{
 if 1
 fun! ProfileStart()
-  exec 'profile start /tmp/vim.'.getpid().'.profile.txt'
+  let profile_file = '/tmp/vim.'.getpid().'.profile.txt'
+  echom "Profiling into" profile_file
+  exec 'profile start '.profile_file
   profile! file **
   profile  func *
 endfun
@@ -582,6 +584,10 @@ if has("user_commands")
   let g:pathogen_disabled += [ "space" ]
   " nmap <unique> <Space> <Plug>SmartspaceNext
   " nmap <unique> <S-Space> <Plug>SmartspacePrev
+
+  " Expensive on startup, not used much
+  " (autoload issue: https://github.com/actionshrimp/vim-xpath/issues/7).
+  let g:pathogen_disabled += [ "xpath" ]
 
   " TO BE REMOVED"
   let g:pathogen_disabled += [ "shymenu" ]

@@ -10,23 +10,29 @@ untagged_containers() {
 
 untagged_images() {
 	# Print untagged images: $1 is used with awk's print: 0=line, 3=column 3.
-	docker images | awk '$2 == "<none>" {print $'$1'}'
+	# NOTE: intermediate images (via -a) seem to only cause
+	# "Error: Conflict, foobarid wasn't deleted" messages.
+	# Might be useful sometimes when Docker messed things up?!
+	# docker images -a | awk '$1 == "<none>" {print $'$1'}'
+	docker images | awk '$1 == "<none>" {print $'$1'}'
 }
 
 # Dry-run.
 if [ "$1" = "-n" ]; then
-	echo "=== Untagged containers: ==="
+	echo "=== Containers with uncommitted images: ==="
 	untagged_containers 0
 	echo
 
-	echo "=== Untagged images: ==="
+	echo "=== Uncommitted images: ==="
 	untagged_images 0
 
 	exit
 fi
 
 # Remove containers with untagged images.
-untagged_containers 1 | xargs --no-run-if-empty docker rm
+echo "Removing containers:" >&2
+untagged_containers 1 | xargs --no-run-if-empty docker rm --volumes=true
 
 # Remove untagged images
+echo "Removing images:" >&2
 untagged_images 3 | xargs --no-run-if-empty docker rmi

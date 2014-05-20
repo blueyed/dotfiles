@@ -1,11 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   see http://eclim.org/vim/php/search.html
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2013  Eric Van Dewoestine
+" Copyright (C) 2005 - 2014  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -22,36 +19,24 @@
 "
 " }}}
 
-" Global Varables {{{
-  if !exists("g:EclimPhpSearchSingleResult")
-    " possible values ('split', 'edit', 'lopen')
-    let g:EclimPhpSearchSingleResult = g:EclimDefaultFileOpenAction
-  endif
-" }}}
-
 " Script Varables {{{
   let s:search = '-command php_search'
   let s:buildpaths = '-command dltk_buildpaths -p "<project>"'
-  let s:options = ['-p', '-t', '-s', '-x', '-i']
-  let s:scopes = ['all', 'project']
-  let s:types = [
-      \ 'class',
-      \ 'function',
-      \ 'constant'
-    \ ]
-  let s:contexts = [
-      \ 'all',
-      \ 'declarations',
-      \ 'references'
-    \ ]
+  let s:options_map = {
+      \ '-a': ['split', 'vsplit', 'edit', 'tabnew', 'lopen'],
+      \ '-s': ['all', 'project'],
+      \ '-i': [],
+      \ '-p': [],
+      \ '-t': ['class', 'function', 'constant'],
+      \ '-x': ['all', 'declarations', 'references'],
+    \ }
 " }}}
 
 function! eclim#php#search#Search(argline) " {{{
-  return eclim#lang#Search(
-    \ s:search, g:EclimPhpSearchSingleResult, a:argline)
+  return eclim#lang#Search(s:search, g:EclimPhpSearchSingleResult, a:argline)
 endfunction " }}}
 
-function eclim#php#search#FindInclude() " {{{
+function! eclim#php#search#FindInclude(argline) " {{{
   if !eclim#project#util#IsCurrentFileInProject(1)
     return
   endif
@@ -72,12 +57,33 @@ function eclim#php#search#FindInclude() " {{{
   if !empty(results)
     call eclim#util#SetLocationList(eclim#util#ParseLocationEntries(results))
 
+    let [action_args, argline] = eclim#util#ExtractCmdArgs(a:argline, '-a:')
+    let action = len(action_args) == 2 ? action_args[1] : g:EclimPhpSearchSingleResult
+
     " single result in another file.
-    if len(results) == 1 && g:EclimPhpSearchSingleResult != "lopen"
+    if len(results) == 1 && action != "lopen"
       let entry = getloclist(0)[0]
-      call eclim#util#GoToBufferWindowOrOpen
-        \ (bufname(entry.bufnr), g:EclimPhpSearchSingleResult)
+      call eclim#util#GoToBufferWindowOrOpen(bufname(entry.bufnr), action)
       call eclim#display#signs#Update()
+
+    " multiple results and user specified an action other than lopen
+    elseif len(results) && len(action_args) && action != 'lopen'
+      let locs = getloclist(0)
+      let files = map(copy(locs),  'printf(' .
+        \ '"%s|%s col %s| %s", ' .
+        \ 'bufname(v:val.bufnr), v:val.lnum, v:val.col, v:val.text)')
+      let response = eclim#util#PromptList(
+        \ 'Please choose the file to ' . action,
+        \ files, g:EclimHighlightInfo)
+      if response == -1
+        return
+      endif
+      let entry = locs[response]
+      let name = substitute(bufname(entry.bufnr), '\', '/', 'g')
+      call eclim#util#GoToBufferWindowOrOpen(name, action)
+      call eclim#display#signs#Update()
+      call cursor(entry.lnum, entry.col)
+
     else
       exec 'lopen ' . g:EclimLocationListHeight
     endif
@@ -86,7 +92,7 @@ function eclim#php#search#FindInclude() " {{{
   endif
 endfunction " }}}
 
-function! eclim#php#search#SearchContext() " {{{
+function! eclim#php#search#SearchContext(argline) " {{{
   if getline('.')[col('.') - 1] == '$'
     call cursor(line('.'), col('.') + 1)
     let cnum = eclim#util#GetCurrentElementColumn()
@@ -96,7 +102,7 @@ function! eclim#php#search#SearchContext() " {{{
   endif
 
   if getline('.') =~ "\\<\\(require\\|include\\)\\(_once\\)\\?\\s*[(]\\?['\"][^'\"]*\\%" . cnum . "c"
-    call eclim#php#search#FindInclude()
+    call eclim#php#search#FindInclude(a:argline)
     return
   elseif getline('.') =~ '\<\(class\|function\)\s\+\%' . cnum . 'c'
     call eclim#php#search#Search('-x references')
@@ -109,38 +115,18 @@ function! eclim#php#search#SearchContext() " {{{
   "  return
   endif
 
-  call eclim#php#search#Search('-x declarations')
+  call eclim#php#search#Search(a:argline . ' -x declarations')
 endfunction " }}}
 
-function! eclim#php#search#CommandCompletePhpSearch(argLead, cmdLine, cursorPos) " {{{
-  let cmdLine = strpart(a:cmdLine, 0, a:cursorPos)
-  let cmdTail = strpart(a:cmdLine, a:cursorPos)
-  let argLead = substitute(a:argLead, cmdTail . '$', '', '')
-  if cmdLine =~ '-s\s\+[a-z]*$'
-    let scopes = deepcopy(s:scopes)
-    call filter(scopes, 'v:val =~ "^' . argLead . '"')
-    return scopes
-  elseif cmdLine =~ '-t\s\+[a-z]*$'
-    let types = deepcopy(s:types)
-    call filter(types, 'v:val =~ "^' . argLead . '"')
-    return types
-  elseif cmdLine =~ '-x\s\+[a-z]*$'
-    let contexts = deepcopy(s:contexts)
-    call filter(contexts, 'v:val =~ "^' . argLead . '"')
-    return contexts
-  elseif cmdLine =~ '\s\+[-]\?$'
-    let options = deepcopy(s:options)
-    let index = 0
-    for option in options
-      if a:cmdLine =~ option
-        call remove(options, index)
-      else
-        let index += 1
-      endif
-    endfor
-    return options
-  endif
-  return []
+function! eclim#php#search#CommandCompleteSearch(argLead, cmdLine, cursorPos) " {{{
+  return eclim#util#CommandCompleteOptions(
+    \ a:argLead, a:cmdLine, a:cursorPos, s:options_map)
+endfunction " }}}
+
+function! eclim#php#search#CommandCompleteSearchContext(argLead, cmdLine, cursorPos) " {{{
+  let options_map = {'-a': s:options_map['-a']}
+  return eclim#util#CommandCompleteOptions(
+    \ a:argLead, a:cmdLine, a:cursorPos, options_map)
 endfunction " }}}
 
 " vim:ft=vim:fdm=marker

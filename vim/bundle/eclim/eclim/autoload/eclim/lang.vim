@@ -1,10 +1,6 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
-"   Common language functionality (validation, completion, etc.) abstracted
-"   into re-usable functions.
-"
-" License:
+" License: {{{
 "
 " Copyright (C) 2005 - 2014  Eric Van Dewoestine
 "
@@ -21,20 +17,6 @@
 " You should have received a copy of the GNU General Public License
 " along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "
-" }}}
-
-" Global Varables {{{
-  if !exists('g:EclimTempFilesEnable')
-    let g:EclimTempFilesEnable = 1
-  endif
-
-  if !exists('g:EclimFileTypeValidate')
-    let g:EclimFileTypeValidate = 1
-  endif
-
-  if !exists('g:EclimRefactorDiffOrientation')
-    let g:EclimRefactorDiffOrientation = 'vertical'
-  endif
 " }}}
 
 " Script Variables {{{
@@ -135,14 +117,16 @@ function! eclim#lang#CodeComplete(command, findstart, base, ...) " {{{
   endif
 endfunction " }}}
 
-" Search(command, singleResultAction, argline) {{{
-" Executes a search.
-function! eclim#lang#Search(command, singleResultAction, argline)
+function! eclim#lang#Search(command, singleResultAction, argline) " {{{
   let argline = a:argline
   "if argline == ''
   "  call eclim#util#EchoError('You must supply a search pattern.')
   "  return
   "endif
+
+  " check for user supplied open action
+  let [action_args, argline] = eclim#util#ExtractCmdArgs(argline, '-a:')
+  let action = len(action_args) == 2 ? action_args[1] : a:singleResultAction
 
   " check if pattern supplied without -p.
   if argline !~ '^\s*-[a-z]' && argline !~ '^\s*$'
@@ -202,14 +186,32 @@ function! eclim#lang#Search(command, singleResultAction, argline)
       endif
 
     " single result in another file.
-    elseif len(results) == 1 && a:singleResultAction != "lopen"
+    elseif len(results) == 1 && action != "lopen"
       let entry = getloclist(0)[0]
-      call eclim#util#GoToBufferWindowOrOpen
-        \ (bufname(entry.bufnr), a:singleResultAction)
+      let name = substitute(bufname(entry.bufnr), '\', '/', 'g')
+      call eclim#util#GoToBufferWindowOrOpen(name, action)
       call eclim#util#SetLocationList(eclim#util#ParseLocationEntries(results))
       call eclim#display#signs#Update()
-
       call cursor(entry.lnum, entry.col)
+
+    " multiple results and user specified an action other than lopen
+    elseif len(results) && len(action_args) && action != 'lopen'
+      let locs = getloclist(0)
+      let files = map(copy(locs),  'printf(' .
+        \ '"%s|%s col %s| %s", ' .
+        \ 'bufname(v:val.bufnr), v:val.lnum, v:val.col, v:val.text)')
+      let response = eclim#util#PromptList(
+        \ 'Please choose the file to ' . action,
+        \ files, g:EclimHighlightInfo)
+      if response == -1
+        return
+      endif
+      let entry = locs[response]
+      let name = substitute(bufname(entry.bufnr), '\', '/', 'g')
+      call eclim#util#GoToBufferWindowOrOpen(name, action)
+      call eclim#display#signs#Update()
+      call cursor(entry.lnum, entry.col)
+
     else
       exec 'lopen ' . g:EclimLocationListHeight
     endif
@@ -222,7 +224,6 @@ function! eclim#lang#Search(command, singleResultAction, argline)
       call eclim#util#EchoInfo("Pattern '" . searchedFor . "' not found.")
     endif
   endif
-
 endfunction " }}}
 
 function! eclim#lang#IsFiletypeValidationEnabled(lang) " {{{
@@ -349,8 +350,8 @@ function! eclim#lang#SilentUpdate(...) " {{{
     try
       if a:0 && a:1 && g:EclimTempFilesEnable
         " don't create temp files if no server is available to clean them up.
-        let project = eclim#project#util#GetCurrentProjectName()
-        let workspace = eclim#project#util#GetProjectWorkspace(project)
+        let project = eclim#project#util#GetProject(expand('%:p'))
+        let workspace = len(project) > 0 ? project.workspace : ''
         if workspace != '' && eclim#PingEclim(0, workspace)
           let prefix = '__eclim_temp_'
           let file = fnamemodify(file, ':h') . '/' . prefix . fnamemodify(file, ':t')
@@ -358,7 +359,7 @@ function! eclim#lang#SilentUpdate(...) " {{{
           if a:0 < 2 || a:2
             let savepatchmode = &patchmode
             set patchmode=
-            exec 'silent noautocmd keepalt write! ' . escape(tempfile, ' ')
+            exec 'silent noautocmd keepalt write! ' . escape(tempfile, ' %')
             let &patchmode = savepatchmode
           endif
         endif
@@ -595,7 +596,7 @@ endfunction " }}}
 " RefactorPrompt(prompt) {{{
 " Issues the standard prompt for language refactorings.
 function! eclim#lang#RefactorPrompt(prompt)
-  exec "echohl " . g:EclimInfoHighlight
+  exec "echohl " . g:EclimHighlightInfo
   try
     " clear any previous messages
     redraw

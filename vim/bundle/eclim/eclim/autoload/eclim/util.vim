@@ -32,6 +32,15 @@
   let s:show_current_error_displaying = 0
 
   let s:command_setting = '-command setting -s <setting>'
+
+  let s:log_levels = {
+      \ 'trace': 5,
+      \ 'debug': 4,
+      \ 'info': 3,
+      \ 'warning': 2,
+      \ 'error': 1,
+      \ 'off': 0,
+    \ }
 " }}}
 
 " Balloon(message) {{{
@@ -83,50 +92,42 @@ function! eclim#util#DelayedCommand(command, ...)
   exec 'augroup END'
 endfunction " }}}
 
-" EchoTrace(message, [time_elapsed]) {{{
-function! eclim#util#EchoTrace(message, ...)
+function! eclim#util#EchoTrace(message, ...) " {{{
+  " Optional args:
+  "   time_elapsed
+  let message = a:message
   if a:0 > 0
-    call s:EchoLevel('(' . a:1 . 's) ' . a:message, 6, g:EclimTraceHighlight)
-  else
-    call s:EchoLevel(a:message, 6, g:EclimTraceHighlight)
+    let message = '(' . a:1 . 's) ' . message
   endif
+  call s:EchoLevel(message, 'trace', g:EclimHighlightTrace)
 endfunction " }}}
 
-" EchoDebug(message) {{{
-function! eclim#util#EchoDebug(message)
-  call s:EchoLevel(a:message, 5, g:EclimDebugHighlight)
+function! eclim#util#EchoDebug(message) " {{{
+  call s:EchoLevel(a:message, 'debug', g:EclimHighlightDebug)
 endfunction " }}}
 
-" EchoInfo(message) {{{
-function! eclim#util#EchoInfo(message)
-  call s:EchoLevel(a:message, 4, g:EclimInfoHighlight)
+function! eclim#util#EchoInfo(message) " {{{
+  call s:EchoLevel(a:message, 'info', g:EclimHighlightInfo)
 endfunction " }}}
 
-" EchoWarning(message) {{{
-function! eclim#util#EchoWarning(message)
-  call s:EchoLevel(a:message, 3, g:EclimWarningHighlight)
+function! eclim#util#EchoWarning(message) " {{{
+  call s:EchoLevel(a:message, 'warning', g:EclimHighlightWarning)
 endfunction " }}}
 
-" EchoError(message) {{{
-function! eclim#util#EchoError(message)
-  call s:EchoLevel(a:message, 2, g:EclimErrorHighlight)
+function! eclim#util#EchoError(message) " {{{
+  call s:EchoLevel(a:message, 'error', g:EclimHighlightError)
 endfunction " }}}
 
-" EchoFatal(message) {{{
-function! eclim#util#EchoFatal(message)
-  call s:EchoLevel(a:message, 1, g:EclimFatalHighlight)
-endfunction " }}}
+function! s:EchoLevel(message, level, highlight) " {{{
+  " Echos the supplied message at the supplied level with the specified
+  " highlight.
 
-" s:EchoLevel(message) {{{
-" Echos the supplied message at the supplied level with the specified
-" highlight.
-function! s:EchoLevel(message, level, highlight)
   " don't echo if the message is 0, which signals an eclim#Execute failure.
   if type(a:message) == g:NUMBER_TYPE && a:message == 0
     return
   endif
 
-  if g:EclimLogLevel < a:level
+  if s:log_levels[g:EclimLogLevel] < s:log_levels[a:level]
     return
   endif
 
@@ -138,7 +139,7 @@ function! s:EchoLevel(message, level, highlight)
 
   exec "echohl " . a:highlight
   redraw
-  if mode() == 'n' || mode() == 'c'
+  if mode() == 'n' || mode() == 'c' || s:log_levels[a:level] > s:log_levels['info']
     " Note: in command mode, the message won't display, but the user can view
     " it using :messages
     for line in messages
@@ -147,17 +148,17 @@ function! s:EchoLevel(message, level, highlight)
   else
     " if we aren't in normal mode then use regular 'echo' since echom
     " messages won't be displayed while the current mode is displayed in
-    " vim's command line.
+    " vim's command line (but still use echom above for debug/verbose messages
+    " so the user can get at them with :messages).
     echo join(messages, "\n") . "\n"
   endif
   echohl None
 endfunction " }}}
 
-" Echo(message) {{{
-" Echos a message using the info highlight regardless of what log level is set.
-function! eclim#util#Echo(message)
-  if a:message != "0" && g:EclimLogLevel > 0
-    exec "echohl " . g:EclimInfoHighlight
+function! eclim#util#Echo(message) " {{{
+  " Echos a message using the info highlight regardless of what log level is set.
+  if a:message != "0"
+    exec "echohl " . g:EclimHighlightInfo
     redraw
     for line in split(a:message, '\n')
       echom line
@@ -606,6 +607,14 @@ function! eclim#util#ListContains(list, element)
   return 0
 endfunction " }}}
 
+function! eclim#util#ListDedupe(list) " {{{
+  " assumes the list is presorted.
+  if exists('*uniq')
+    return uniq(copy(a:list))
+  endif
+  return filter(copy(a:list), 'index(a:list, v:val, v:key + 1) == -1')
+endfunction " }}}
+
 function! eclim#util#Make(bang, args) " {{{
   " Executes make using the supplied arguments.
 
@@ -662,7 +671,7 @@ function! eclim#util#MakeWithCompiler(compiler, bang, args, ...)
     exec 'compiler ' . a:compiler
     let make_cmd = substitute(&makeprg, '\$\*', a:args, '')
 
-    if g:EclimMakeLCD
+    if g:EclimMakeLCD && eclim#EclimAvailable(0)
       let w:quickfix_dir = getcwd()
       let dir = eclim#project#util#GetCurrentProjectRoot()
       if dir != ''
@@ -858,7 +867,9 @@ function! s:ParseLocationEntry(entry)
     let col = entry.column
     let message = entry.message
     let type = ''
-    if has_key(entry, 'warning')
+    if has_key(entry, 'type')
+      let type = entry.type[0]
+    elseif has_key(entry, 'warning')
       let type = entry.warning ? 'w' : 'e'
     endif
 
@@ -905,7 +916,7 @@ function! eclim#util#Prompt(prompt, ...)
     return remove(g:EclimTestPromptQueue, 0)
   endif
 
-  let highlight = g:EclimInfoHighlight
+  let highlight = g:EclimHighlightInfo
   if a:0 > 0
     if type(a:1) == g:FUNCREF_TYPE
       let Validator = a:1
@@ -984,7 +995,7 @@ function! eclim#util#PromptList(prompt, list, ...)
     let index = index + 1
   endfor
 
-  exec "echohl " . (a:0 ? a:1 : g:EclimInfoHighlight)
+  exec "echohl " . (a:0 ? a:1 : g:EclimHighlightInfo)
   try
     " clear any previous messages
     redraw
@@ -1024,7 +1035,7 @@ function! eclim#util#PromptConfirm(prompt, ...)
     return choice =~ '\c\s*\(y\(es\)\?\)\s*'
   endif
 
-  exec "echohl " . (a:0 ? a:1 : g:EclimInfoHighlight)
+  exec "echohl " . (a:0 ? a:1 : g:EclimHighlightInfo)
   try
     " clear any previous messages
     redraw
@@ -1427,10 +1438,9 @@ function! eclim#util#System(cmd, ...)
   return result
 endfunction " }}}
 
-" TempWindow(name, lines, [options]) {{{
-" Opens a temp window w/ the given name and contents which is readonly unless
-" specified otherwise.
-function! eclim#util#TempWindow(name, lines, ...)
+function! eclim#util#TempWindow(name, lines, ...) " {{{
+  " Opens a temp window w/ the given name and contents which is readonly unless
+  " specified otherwise.
   let options = a:0 > 0 ? a:1 : {}
   let filename = expand('%:p')
   let winnr = winnr()
@@ -1446,13 +1456,13 @@ function! eclim#util#TempWindow(name, lines, ...)
 
   if bufwinnr(bufname) == -1
     let height = get(options, 'height', 10)
-    silent! noautocmd exec "botright " . height . "sview " . name
+    silent! noautocmd exec "keepalt botright " . height . "sview " . name
     setlocal nowrap
     setlocal winfixheight
     setlocal noswapfile
     setlocal nobuflisted
     setlocal buftype=nofile
-    setlocal bufhidden=delete
+    setlocal bufhidden=wipe
     silent doautocmd WinEnter
   else
     let temp_winnr = bufwinnr(bufname)
@@ -1501,9 +1511,8 @@ function! eclim#util#TempWindow(name, lines, ...)
   endif
 endfunction " }}}
 
-" TempWindowClear(name) {{{
-" Clears the contents of the temp window with the given name.
-function! eclim#util#TempWindowClear(name)
+function! eclim#util#TempWindowClear(name) " {{{
+  " Clears the contents of the temp window with the given name.
   let name = eclim#util#EscapeBufferName(a:name)
   if bufwinnr(name) != -1
     let curwinnr = winnr()
@@ -1553,9 +1562,7 @@ function! eclim#util#WillWrittenBufferClose()
   return histget("cmd") =~ s:buffer_write_closing_commands
 endfunction " }}}
 
-" CommandCompleteFile(argLead, cmdLine, cursorPos) {{{
-" Custom command completion for files.
-function! eclim#util#CommandCompleteFile(argLead, cmdLine, cursorPos)
+function! eclim#util#CommandCompleteFile(argLead, cmdLine, cursorPos) " {{{
   let cmdTail = strpart(a:cmdLine, a:cursorPos)
   let argLead = substitute(a:argLead, cmdTail . '$', '', '')
   let results = split(eclim#util#Glob(argLead . '*', 1), '\n')
@@ -1566,9 +1573,7 @@ function! eclim#util#CommandCompleteFile(argLead, cmdLine, cursorPos)
   return eclim#util#ParseCommandCompletionResults(argLead, results)
 endfunction " }}}
 
-" CommandCompleteDir(argLead, cmdLine, cursorPos) {{{
-" Custom command completion for directories.
-function! eclim#util#CommandCompleteDir(argLead, cmdLine, cursorPos)
+function! eclim#util#CommandCompleteDir(argLead, cmdLine, cursorPos) " {{{
   let cmdLine = strpart(a:cmdLine, 0, a:cursorPos)
   let args = eclim#util#ParseCmdLine(cmdLine)
   let argLead = cmdLine =~ '\s$' ? '' : args[len(args) - 1]
@@ -1588,19 +1593,40 @@ function! eclim#util#CommandCompleteDir(argLead, cmdLine, cursorPos)
   return eclim#util#ParseCommandCompletionResults(argLead, results)
 endfunction " }}}
 
-" ParseCmdLine(args) {{{
-" Parses the supplied argument line into a list of args.
-function! eclim#util#ParseCmdLine(args)
+function! eclim#util#CommandCompleteOptions(argLead, cmdLine, cursorPos, options_map) " {{{
+  let cmdLine = strpart(a:cmdLine, 0, a:cursorPos)
+  let cmdTail = strpart(a:cmdLine, a:cursorPos)
+  let argLead = substitute(a:argLead, cmdTail . '$', '', '')
+  for [key, values] in items(a:options_map)
+    if cmdLine =~ key . '\s\+[a-z]*$'
+      return filter(copy(values), 'v:val =~ "^' . argLead . '"')
+    endif
+  endfor
+  if cmdLine =~ '\s\+[-]\?$'
+    let options = keys(a:options_map)
+    let index = 0
+    for option in options
+      if a:cmdLine =~ option
+        call remove(options, index)
+      else
+        let index += 1
+      endif
+    endfor
+    return options
+  endif
+  return []
+endfunction " }}}
+
+function! eclim#util#ParseCmdLine(args) " {{{
+  " Parses the supplied argument line into a list of args.
   let args = split(a:args, '[^\\]\s\zs')
   call map(args, 'substitute(v:val, "\\([^\\\\]\\)\\s\\+$", "\\1", "")')
-
   return args
 endfunction " }}}
 
-" ParseCommandCompletionResults(args) {{{
-" Bit of a hack for vim's lack of support for escaped spaces in custom
-" completion.
-function! eclim#util#ParseCommandCompletionResults(argLead, results)
+function! eclim#util#ParseCommandCompletionResults(argLead, results) " {{{
+  " Bit of a hack for vim's lack of support for escaped spaces in custom
+  " completion.
   let results = a:results
   if stridx(a:argLead, ' ') != -1
     let removePrefix = escape(substitute(a:argLead, '\(.*\s\).*', '\1', ''), '\')
@@ -1608,5 +1634,42 @@ function! eclim#util#ParseCommandCompletionResults(argLead, results)
   endif
   return results
 endfunction " }}}
+
+function! eclim#util#ExtractCmdArgs(argline, extract) " {{{
+  " Extracts one or more args from the given argline.
+  " The 'extract' arg here is a list of args in the form '-x' where the -x arg
+  " would be extracted. You can also use the getopts like syntax of '-x:'
+  " (trailing colon) to indicate that you want the arg to the -x option to be
+  " extracted as well.
+  "
+  " Returns a tuple with a list of the extracted args and the updated argline.
+  let extract = type(a:extract) == g:LIST_TYPE ? a:extract : [a:extract]
+  let args = eclim#util#ParseCmdLine(a:argline)
+  let extracted_args = []
+  let remaining_args = []
+  let extract_next = 0
+  for arg in args
+    if extract_next
+      call add(extracted_args, arg)
+      let extract_next = 0
+      continue
+    endif
+    for e in extract
+      let has_value = 0
+      if e =~ ':$'
+        let e = e[:-2]
+        let has_value = 1
+      endif
+      if arg == e
+        call add(extracted_args, arg)
+        let extract_next = has_value
+      else
+        call add(remaining_args, arg)
+      endif
+    endfor
+  endfor
+
+  return [extracted_args, join(remaining_args)]
+endfunction "}}}
 
 " vim:ft=vim:fdm=marker

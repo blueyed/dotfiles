@@ -1,10 +1,8 @@
 " Author:  Eric Van Dewoestine
 "
-" Description: {{{
+" License: {{{
 "
-" License:
-"
-" Copyright (C) 2005 - 2013  Eric Van Dewoestine
+" Copyright (C) 2005 - 2014  Eric Van Dewoestine
 "
 " This program is free software: you can redistribute it and/or modify
 " it under the terms of the GNU General Public License as published by
@@ -29,9 +27,6 @@
         \ {'pattern': '.*', 'name': 'Tab', 'action': 'tablast | tabnew'},
         \ {'pattern': '.*', 'name': 'Edit', 'action': 'edit'},
       \ ]
-  endif
-  if !exists('g:EclimProjectTreePathEcho')
-    let g:EclimProjectTreePathEcho = 1
   endif
 " }}}
 
@@ -124,8 +119,9 @@ function! eclim#project#tree#ProjectTreeToggle() " {{{
 endfunction " }}}
 
 function! eclim#project#tree#ProjectTreeOpen(display, names, dirs) " {{{
+  let expand = len(a:dirs) == 1
   let expandDir = ''
-  if g:EclimProjectTreeExpandPathOnOpen
+  if expand && g:EclimProjectTreeExpandPathOnOpen
     let expandDir = substitute(expand('%:p:h'), '\', '/', 'g')
   endif
 
@@ -142,6 +138,11 @@ function! eclim#project#tree#ProjectTreeOpen(display, names, dirs) " {{{
         exec 'let t:project_tree_id = ' .
           \ substitute(bufname(shared), g:EclimProjectTreeTitle . '\(\d\+\)', '\1', '')
       endif
+
+      if expand && expandDir != ''
+        call eclim#tree#ExpandPath(s:GetTreeTitle(), expandDir)
+      endif
+
       return
     endif
   endif
@@ -161,8 +162,6 @@ function! eclim#project#tree#ProjectTreeOpen(display, names, dirs) " {{{
       let g:EclimProjectTreeContentWincmd = 'winc l'
     endif
   endif
-
-  let expand = len(a:dirs) == 1
 
   if exists('g:TreeSettingsFunction')
     let s:TreeSettingsFunction = g:TreeSettingsFunction

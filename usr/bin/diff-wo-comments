@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+if [ $# != 2 ]; then
+  echo "Compare two files, with any comments removed (e.g. compiled PIP requirements)."
+  echo "Usage: ${0##*/} file1 file2"
+  exit 1
+fi
+
+if [ -n "$commands[bcompare]" ]; then
+  diff_tool=bcompare
+else
+  diff_tool=vimdiff
+fi
+subst='s/\s*#.*//'
+$diff_tool =(sed $subst $1) =(sed $subst $2)

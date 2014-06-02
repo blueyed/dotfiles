@@ -577,3 +577,6 @@
 [submodule "lib/docker-zsh-completion"]
 	path = lib/docker-zsh-completion
 	url = git://github.com/felixr/docker-zsh-completion.git
+[submodule "vim/bundle/dispatch"]
+	path = vim/bundle/dispatch
+	url = git://github.com/tpope/vim-dispatch.git

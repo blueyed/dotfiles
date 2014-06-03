@@ -775,6 +775,7 @@ if has("autocmd") " Autocommands {{{1
         \ | echom "vimrc: handling large file."
         \ | syntax clear
         \ | let &ft = &ft.".ycmblacklisted"
+        \ | endif
 
   " Enable soft-wrapping for text files
   au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist

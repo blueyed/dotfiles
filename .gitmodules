@@ -580,3 +580,6 @@
 [submodule "vim/bundle/dispatch"]
 	path = vim/bundle/dispatch
 	url = git://github.com/tpope/vim-dispatch.git
+[submodule "vim/bundle/projectionist"]
+	path = vim/bundle/projectionist
+	url = git://github.com/tpope/vim-projectionist.git

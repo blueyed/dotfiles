@@ -583,3 +583,6 @@
 [submodule "vim/bundle/projectionist"]
 	path = vim/bundle/projectionist
 	url = git://github.com/tpope/vim-projectionist.git
+[submodule "vim/bundle/LargeFile"]
+	path = vim/bundle/LargeFile
+	url = git://github.com/vim-scripts/LargeFile.git

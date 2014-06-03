@@ -586,3 +586,6 @@
 [submodule "vim/bundle/LargeFile"]
 	path = vim/bundle/LargeFile
 	url = git://github.com/vim-scripts/LargeFile.git
+[submodule "vim/bundle/isort"]
+	path = vim/bundle/isort
+	url = git://github.com/fisadev/vim-isort.git

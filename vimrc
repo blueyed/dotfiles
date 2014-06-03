@@ -769,6 +769,12 @@ if has("autocmd") " Autocommands {{{1
   " Put these in an autocmd group, so that we can delete them easily.
   augroup vimrcEx
   au!
+  " Handle large files, based on LargeFile plugin.
+  let g:LargeFile = 5  " 5mb
+  autocmd BufWinEnter * if get(b:, 'LargeFile_mode') || line2byte(line("$") + 1) > 1000000
+        \ | echom "vimrc: handling large file."
+        \ | syntax clear
+        \ | let &ft = &ft.".ycmblacklisted"
 
   " Enable soft-wrapping for text files
   au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist

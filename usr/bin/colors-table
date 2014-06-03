@@ -8,17 +8,19 @@ local -a bgs
 if [[ $1 != "" ]]; then
 	bgs=($1)
 else
-	bgs=(${(k)bg})
+	# bgs=(${(k)bg})
+	bgs=("-" 0 1 2 3 4 5 6 7)
 fi
+
 
 for b in $bgs; do
 	if (( $#bgs > 1 )); then
 		echo "bg: $b"
 	fi
-	for c in ${(k)fg}; do
-		print -nP %{${bg_no_bold[$b]}%}
-		print -nP %{${fg_no_bold[$c]}%} ${(l.$((COLUMNS/2-1)).)c}
-		print -nP %{${fg_bold[$c]}%}    ${(r.$((COLUMNS/2-1)).)c}
+	for c in {0..7}; do
+		[[ $b != "-" ]] && print -n "\x1b[$((b+40))m"
+		print -n "\x1b[$((c+30))m"   ${(l.$((COLUMNS/2-1)).)${color[$((c+30))]}}
+		print -n "\x1b[$((c+30));1m" ${(r.$((COLUMNS/2-1)).)${color[$((c+30))]}}
 		print -P %{${reset_color}%}
 	done
 done

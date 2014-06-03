@@ -14,7 +14,7 @@ untagged_images() {
 	# "Error: Conflict, foobarid wasn't deleted" messages.
 	# Might be useful sometimes when Docker messed things up?!
 	# docker images -a | awk '$1 == "<none>" {print $'$1'}'
-	docker images | awk '$1 == "<none>" {print $'$1'}'
+	docker images | tail -n +2 | awk '$1 == "<none>" {print $'$1'}'
 }
 
 # Dry-run.

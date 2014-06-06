@@ -592,3 +592,6 @@
 [submodule "vim/bundle/tracwiki"]
 	path = vim/bundle/tracwiki
 	url = git://github.com/vim-scripts/tracwiki.git
+[submodule "vim/bundle/sleuth"]
+	path = vim/bundle/sleuth
+	url = git://github.com/tpope/vim-sleuth.git

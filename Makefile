@@ -19,7 +19,7 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.17
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.18
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -33,8 +33,8 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@
-.stamps/submodules_rm.17:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox config/awesome/awpomodoro"; \
+.stamps/submodules_rm.18:
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox config/awesome/awpomodoro vim/bundle/isort"; \
 	for i in $$rm_bundles; do \
 		[ ! -d "$$i" ] || [ ! -e "$$i/.git" ] && continue ; \
 		( cd $$i && gst=$$(git status --short --untracked-files=normal 2>&1) && [ "$$gst" = "" ] || { echo "Repo not clean ($$i): $$gst" ; false ; } ; ) \

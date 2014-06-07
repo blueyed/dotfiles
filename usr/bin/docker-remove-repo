@@ -1,0 +1,35 @@
+#!/bin/sh
+# Remove all tagged images from a repo.
+#
+# Use `docker-remove-repo` for a list and `-n` for a dry run to see what would be deleted.
+
+# Parse options.
+for a do
+	case "$a" in
+		-n|-l) dry_run=1 ;;
+	  -*) echo "Unknown option: $a"; exit 1 ;;
+		 *) repo="$a" ;;
+	esac
+done
+
+repo_images() {
+	# Print images from $1 (regexp): $2 is used as awk command.
+	docker images | tail -n +2 | awk "\$1 !~ \"<none>\" && \$1 ~ \"$1\" { $2 }"
+}
+
+if [ "$repo" = "" ]; then
+	echo "Which repo to remove?"
+	repo_images "." 'print $1' | uniq
+	exit 1
+fi
+
+if [ "$dry_run" = "1" ]; then
+	echo "=== Images from repo $repo: ==="
+	repo_images "$repo" 'print $0'
+	exit
+fi
+
+for i in $(repo_images "$repo" 'print $1":"$2'); do
+	echo "Removing image: $i"
+	docker rmi "$i"
+done

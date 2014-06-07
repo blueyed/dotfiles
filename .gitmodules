@@ -592,3 +592,6 @@
 [submodule "vim/bundle/sleuth"]
 	path = vim/bundle/sleuth
 	url = git://github.com/tpope/vim-sleuth.git
+[submodule "vim/bundle/tplugin"]
+	path = vim/bundle/tplugin
+	url = git://github.com/tomtom/tplugin_vim.git

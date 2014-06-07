@@ -10,3 +10,4 @@ echo $image | grep -q '^[0-9a-f]{12}$' && {
 
 cmd="docker commit $container $image"
 echo $cmd
+$cmd

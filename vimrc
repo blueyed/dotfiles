@@ -7,7 +7,9 @@ fun! ProfileStart()
   profile! file **
   profile  func *
 endfun
-" call ProfileStart()
+if get(g:, 'profile')
+  call ProfileStart()
+endif
 endif
 " }}}
 
@@ -99,14 +101,37 @@ set matchtime=3
 
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
-set scrolloff=3 " scroll offset/margin (cursor at 4th line)
+
+" scrolloff: number of lines visible above/below the cursor.
+" Special handling for &bt!="" and &diff.
+set scrolloff=3
+fun! MyAutoScrollOff() " {{{
+  if exists('g:no_auto_scrolloff')
+    return
+  endif
+  if ! exists('g:scrolloff_default')
+    let g:scrolloff_default = &scrolloff
+  endif
+  if &buftype != ""
+    " Especially with quickfix (mouse jumping, more narrow).
+    let scrolloff = 0
+  elseif &diff
+    let scrolloff = 10
+  else
+    let scrolloff = g:scrolloff_default
+  endif
+  if &scrolloff != scrolloff
+    " echom "Setting scrolloff:" scrolloff
+    let &scrolloff = scrolloff
+  endif
+endfun
 if has('autocmd')"
   augroup set_scrollof
     au!
-    " Especially with quickfix (mouse jumping, narrow)
-    au BufEnter * if &buftype != "" | set scrolloff=0 | end
+    au BufEnter,WinEnter * call MyAutoScrollOff()
   augroup END
-endif
+endif " }}}
+
 set sidescroll=1
 set sidescrolloff=10
 set commentstring=#\ %s
@@ -184,9 +209,8 @@ endif
 
 if 1 " has('eval') / `let` may not be available.
   " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-  let s:has_ycm = len(glob('~/.vim/bundle/YouCompleteMe/python/ycm_core.*'))
+  let s:has_ycm = len(glob('~/.vim/bundle/YouCompleteMe/third_party/ycmd/ycm_core.*'))
   let s:use_ycm = s:has_ycm
-  " let s:use_ycm = 0
   let s:use_neocomplcache = ! s:use_ycm
   " }}}
 
@@ -245,8 +269,10 @@ if 1 " has('eval') / `let` may not be available.
     let &runtimepath = substitute(&runtimepath, '\('.escape($HOME, '\').'\)vimfiles\>', '\1.vim', 'g')
   endif
 
-  " let g:sparkupExecuteMapping = '<Leader>e'
-  " let g:sparkupNextMapping = '<Leader>ee'
+  " Sparkup (insert mode) maps. Default: <c-e>/<c-n>, both used by Vim.
+  let g:sparkupExecuteMapping = '<Leader>e'
+  " '<c-n>' by default!
+  let g:sparkupNextMapping = '<Leader>ee'
   "
   " obsolete: using vim-sneak instead.
   " let g:EasyMotion_leader_key = '<Leader>m'
@@ -597,9 +623,11 @@ if has("user_commands")
 
   " Themes
   " Airline:
+  let g:airline#extensions#disable_rtp_load = 1
   let g:airline_powerline_fonts = 1
   " to test
   let g:airline#extensions#branch#use_vcscommand = 1
+  let g:airline#extensions#branch#displayed_head_limit = 7
 
   let g:airline#extensions#tabline#enabled = 1
   let g:airline#extensions#tabline#show_buffers = 0
@@ -773,7 +801,7 @@ if has("autocmd") " Autocommands {{{1
   let g:LargeFile = 5  " 5mb
   autocmd BufWinEnter * if get(b:, 'LargeFile_mode') || line2byte(line("$") + 1) > 1000000
         \ | echom "vimrc: handling large file."
-        \ | syntax clear
+        \ | set syntax=off
         \ | let &ft = &ft.".ycmblacklisted"
         \ | endif
 
@@ -812,7 +840,8 @@ if has("autocmd") " Autocommands {{{1
     let resolvedfile = fnameescape(resolvedfile)
     if &modifiable
       " Only display a warning when editing a file, especially not for `:help`.
-      echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+      " echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+      echomsg 'Resolving symlink' fname '=>' resolvedfile
     endif
     " exec 'noautocmd file ' . resolvedfile
     " XXX: problems with AutojumpLastPosition: line("'\"") is 1 always.
@@ -877,7 +906,7 @@ if has("autocmd") " Autocommands {{{1
     en
   endf
   au FileType c call Select_c_style()
-  au FileType makefile setlocal noexpandtab
+  au FileType make setlocal noexpandtab
 
   augroup END
 
@@ -1246,7 +1275,7 @@ endfun
 nmap gh :call MyGotoMRUTab()<CR>
 " nmap <tab><tab> :call MyGotoMRUTab()<CR>
 " nmap °  :call MyGotoMRUTab()<CR>
-nmap <C-^>  :call MyGotoMRUTab()<CR>
+" nmap <C-^>  :call MyGotoMRUTab()<CR>
 augroup MyTL
   au!
   au TabLeave * let g:mrutab = tabpagenr()
@@ -1362,7 +1391,7 @@ endfun
 nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
 
 " yankstack, to be replaced by unite's history/yank {{{1
-if index(g:pathogen_disabled, 'yankring') == -1
+if index(g:pathogen_disabled, 'yankstack') == -1
   " Define own map for yankstack, Alt-p/esc-p does not work correctly in term.
   let g:yankstack_map_keys = 0
   " Setup yankstack to make yank/paste related mappings work.
@@ -1621,12 +1650,15 @@ vnoremap <Leader><space> zf
 
 " Easily switch between different fold methods {{{
 " Source: https://github.com/pydave/daveconfig/blob/master/multi/vim/.vim/bundle/foldtoggle/plugin/foldtoggle.vim
-nnoremap <Leader>ff :call ToggleFold()<CR>
+nnoremap <Leader>sf :call ToggleFold()<CR>
 function! ToggleFold()
         if !exists("b:fold_toggle_options")
                 " By default, use the main three. I rarely use custom expressions or
                 " manual and diff is just for diffing.
                 let b:fold_toggle_options = ["syntax", "indent", "marker"]
+                if len(&foldexpr)
+                  let b:fold_toggle_options += ["expr"]
+                endif
         endif
 
         " Find the current setting in the list
@@ -1634,9 +1666,10 @@ function! ToggleFold()
 
         " Advance to the next setting
         let i = (i + 1) % len(b:fold_toggle_options)
+        let old_method = &l:foldmethod
         let &l:foldmethod = b:fold_toggle_options[i]
 
-        echo 'foldmethod is now ' . &l:foldmethod
+        echom 'foldmethod: ' . old_method . " => " . &l:foldmethod
 endfunction
 
 function! FoldParagraphs()
@@ -1930,8 +1963,9 @@ let g:easytags_suppress_ctags_warning = 1
 let g:easytags_resolve_links = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
-let g:detectindent_min_indent = 2  " via https://github.com/raymond-w-ko/detectindent
-let g:detectindent_max_indent = 4  " via https://github.com/raymond-w-ko/detectindent
+let g:detectindent_min_indent = 2
+let g:detectindent_max_indent = 4
+let g:detectindent_max_lines_to_analyse = 50
 
 " command-t plugin {{{
 let g:CommandTMaxFiles=50000
@@ -2039,7 +2073,10 @@ augroup END
 
 " Adjust height of quickfix window {{{2
 " Based on http://vim.wikia.com/wiki/Automatically_fitting_a_quickfix_window_height
-au FileType qf call AdjustWindowHeight(1, 10)
+augroup AdjustWindowHeight
+  au!
+  au FileType qf call AdjustWindowHeight(1, 10)
+augroup END
 function! AdjustWindowHeight(minheight, maxheight)
   exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
 endfunction
@@ -2169,8 +2206,10 @@ map <C-Right> <C-W>l
 " inoremap <Down> <C-O>:normal gj<CR>
 "
 " j,k move by screen line instead of file line.
-nnoremap j gj
-nnoremap k gk
+" nnoremap j gj
+" nnoremap k gk
+nnoremap <Down> gj
+nnoremap <Up> gk
 " inoremap <Down> <C-o>gj
 " inoremap <Up> <C-o>gk
 " XXX: does not keep virtual column! Also adds undo points!
@@ -2316,6 +2355,10 @@ nnoremap <Leader>gD :call MyCloseDiff()<cr>
 nnoremap <Leader>gc :Gcommit -v
 " }}}1
 
+" Diff this window with the previous one.
+command! DiffThese diffthis | wincmd p | diffthis | wincmd p
+command! DiffOff   Windo diffoff
+
 
 " Toggle highlighting of too long lines {{{2
 function! ToggleTooLongHL()
@@ -2423,28 +2466,28 @@ if has('eval')
   " Windo/Bufdo/Tabdo which do not change window, buffer or tab. {{{1
   " Source: http://vim.wikia.com/wiki/Run_a_command_in_multiple_buffers#Restoring_position
   " Like windo but restore the current window.
-  function! WinDo(command)
+  function! Windo(command)
     let currwin=winnr()
     execute 'windo ' . a:command
     execute currwin . 'wincmd w'
   endfunction
-  com! -nargs=+ -complete=command Windo call WinDo(<q-args>)
+  com! -nargs=+ -complete=command Windo call Windo(<q-args>)
 
   " Like bufdo but restore the current buffer.
-  function! BufDo(command)
+  function! Bufdo(command)
     let currBuff=bufnr("%")
     execute 'bufdo ' . a:command
     execute 'buffer ' . currBuff
   endfunction
-  com! -nargs=+ -complete=command Bufdo call BufDo(<q-args>)
+  com! -nargs=+ -complete=command Bufdo call Bufdo(<q-args>)
 
   " Like tabdo but restore the current tab.
-  function! TabDo(command)
+  function! Tabdo(command)
     let currTab=tabpagenr()
     execute 'tabdo ' . a:command
     execute 'tabn ' . currTab
   endfunction
-  com! -nargs=+ -complete=command Tabdo call TabDo(<q-args>)
+  com! -nargs=+ -complete=command Tabdo call Tabdo(<q-args>)
   " }}}1
 
   " Maps for fold commands across windows.
@@ -2495,11 +2538,14 @@ if has('wildignorecase') " not on MacOS
 endif
 
 " allow for tab-completion in vim, but ignore them with command-t
-let g:CommandTWildIgnore=&wildignore . ",**/bower_components/*"
+let g:CommandTWildIgnore=&wildignore
       \ .',htdocs/asset/**'
       \ .',htdocs/media/**'
-      \ .',static/_build/**'
+      \ .',**/static/_build/**'
       \ .',**/node_modules/**'
+      \ .',**/cache/**'
+      \ .',**/build/**'
+      " \ .',**/bower_components/*'
 
 let g:vdebug_keymap = {
 \    "run" : "<S-F5>",
@@ -2591,8 +2637,8 @@ if has('autocmd')"
     au BufReadPost * if &bt == "quickfix" | set nowrap | endif
 
     " Check if the new file (with git-diff prefix removed) is readable and
-    " edit that instead (copy'n'paste from shell)
-    au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^[abiw]/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
+    " (for git diff: `[abiw]`).
+    au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^\S\{-}/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
     " Display a warning when editing foo.css, but foo.{scss,sass} exists
     au BufRead *.css if glob(expand('<afile>:r').'.s[ca]ss', 1) != "" | echoerr "WARN: editing .css, but .scss/.sass exists!" | endif
@@ -2611,7 +2657,8 @@ endif " }}}
 " (pre-)Override S-Tab mapping
 " Orig: silent! imap <unique> <buffer> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "<Plug>delimitMateS-Tab"
 " Ref: https://github.com/Raimondi/delimitMate/pull/148#issuecomment-29428335
-imap <buffer> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "<Plug>delimitMateS-Tab"
+" NOTE: mapped by SuperTab now.
+" imap <buffer> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "<Plug>delimitMateS-Tab"
 
 
 " Fix xterm keys {{{

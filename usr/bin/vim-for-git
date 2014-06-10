@@ -12,7 +12,10 @@ FILE=$1
 # if [ -z $EDITOR ]; EDITOR=vim ; fi
 
 if [ "$(basename "$FILE")" = "COMMIT_EDITMSG" ]; then
-  $EDITOR -c "/Changes" -c "normal zt" -c "set nohlsearch nospell sw=2 scrolloff=0" -c "sp" -c "normal gg" -c "resize 5" -c "set spell spl=en,de" -c "command! Q qa" "$@"
+  $EDITOR \
+    -c "exe max([5, min([10, (winheight(0) / 3)])]).'split'" \
+    -c "normal gg" \
+    -c "command! Q qa" "$@"
 else
   $EDITOR "$@"  
 fi

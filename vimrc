@@ -2631,6 +2631,27 @@ augroup END
 if has('autocmd')"
   augroup vimrc_late
     au!
+    " See also ~/.dotfiles/usr/bin/vim-for-git, which uses this setup and
+    " additionally splits the window.
+    fun! MySetupGitCommitMsg()
+      set foldmethod=syntax foldlevel=1
+      set nohlsearch nospell sw=2 scrolloff=0
+      silent g/^# \(Changes not staged\|Untracked files\)/norm zc
+      normal zt
+      set spell spl=en,de
+
+      " Prefill NeoComplCache (obsolete).
+      if exists(':NeoComplCacheEnable')
+        NeoComplCacheEnable
+
+        let l:staged_files = split(system('git diff --name-only --cached'), "\n")
+        for l:filename in l:staged_files
+          exec 'NeoComplCacheCachingBuffer '.l:filename
+        endfor
+      endif
+    endfun
+    au FileType gitcommit call MySetupGitCommitMsg()
+
     au FileType mail let b:no_detect_indent=1
     au BufReadPost * if exists(':DetectIndent') | if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) | exec 'DetectIndent' | endif | endif
 

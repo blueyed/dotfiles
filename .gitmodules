@@ -592,3 +592,6 @@
 [submodule "vim/bundle/tplugin"]
 	path = vim/bundle/tplugin
 	url = git://github.com/tomtom/tplugin_vim.git
+[submodule "vim/bundle/vipy"]
+	path = vim/bundle/vipy
+	url = git://github.com/johndgiese/vipy.git

@@ -595,3 +595,6 @@
 [submodule "vim/bundle/vipy"]
 	path = vim/bundle/vipy
 	url = git://github.com/johndgiese/vipy.git
+[submodule "vim/bundle/css"]
+	path = vim/bundle/css
+	url = git://github.com/JulesWang/css.vim.git

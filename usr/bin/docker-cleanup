@@ -7,7 +7,7 @@ untagged_containers() {
 	# Print containers using untagged images: $1 is used with awk's print: 0=line, 1=column 1.
 	# NOTE: "[0-9a-f]{12}" does not work with GNU Awk 3.1.7 (RHEL6).
 	#       Ref: https://github.com/blueyed/dotfiles/commit/a14f0b4b#commitcomment-6736470
-	docker ps -a | awk '$2 ~ "^[0-9a-f]$" {print $'$1'}'
+	docker ps -a | tail -n +2 | awk '$2 ~ "^[0-9a-f]+$" {print $'$1'}'
 }
 
 untagged_images() {

@@ -30,6 +30,12 @@ if [ "$1" = "-n" ]; then
 
 	exit
 fi
+if [ -n "$1" ]; then
+	echo "Cleanup docker files: remove untagged containers and images."
+	echo "Usage: ${0##*/} [-n]"
+	echo "   -n: dry run: display what would get removed."
+	exit 1
+fi
 
 # Remove containers with untagged images.
 echo "Removing containers:" >&2

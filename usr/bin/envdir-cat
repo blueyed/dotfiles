@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ "$1" = "" ]; then
+  echo "Usage: ${0##*/} dir..."
+  echo
+  echo "Prints envdir like files in given directories."
+  exit 1
+fi
+
+is_first=1
+for dir in "$@"; do
+  # Separator after first block.
+  [ $is_first = 0 ] && echo || is_first=0
+
+  echo $dir:
+  for i in "$dir"/*; do
+    printf ${i##*/}=\"$(cat $i)\"\\n
+    # cat -A $i
+    # cat $i
+  done
+done

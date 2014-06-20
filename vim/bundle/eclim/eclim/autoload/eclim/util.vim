@@ -618,16 +618,6 @@ endfunction " }}}
 function! eclim#util#Make(bang, args) " {{{
   " Executes make using the supplied arguments.
 
-  " tpope/vim-rake/plugin/rake.vim will execute :Make if it exists, so mimic
-  " Rake's behavior here if that's the case.
-  if b:current_compiler == 'rake'
-    " See tpope/vim-rage/plugin/rake.vim s:Rake(bang,arg)
-    exec 'make! ' . a:args
-    if a:bang !=# '!'
-      exec 'cwindow'
-    endif
-    return
-  endif
   let makefile = findfile('makefile', '.;')
   let makefile2 = findfile('Makefile', '.;')
   if len(makefile2) > len(makefile)
@@ -679,8 +669,18 @@ function! eclim#util#MakeWithCompiler(compiler, bang, args, ...)
       endif
     endif
 
+    " use dispatch if available
+    if exists(':Dispatch') == 2
+      call eclim#util#EchoTrace('dispatch: ' . make_cmd)
+      " since dispatch is intended to run the make cmd in the background, make
+      " sure the errorformat doesn't suppress all the non-error output so the
+      " user can see the full build output in the quickfix window.
+      let &l:errorformat=substitute(&errorformat, '\M,%-G%.%#$', '', '')
+      exec 'Dispatch' . a:bang . ' _ ' . a:args
+
     " windows machines where 'tee' is available
-    if (has('win32') || has('win64')) && (executable('tee') || executable('wtee'))
+    elseif (has('win32') || has('win64')) &&
+         \ (executable('tee') || executable('wtee'))
       doautocmd QuickFixCmdPre make
       let resultfile = eclim#util#Exec(make_cmd, 2)
       if filereadable(resultfile)
@@ -1055,13 +1055,26 @@ function! eclim#util#PromptConfirm(prompt, ...)
   return response =~ '\c\s*\(y\(es\)\?\)\s*'
 endfunction " }}}
 
+" Complete(start, completions) {{{
+" Returns 1 if completion has been setup/triggered, 0 if not (because it is
+" active already) and any input trigger would need to be inserted by the
+" caller.
 function! eclim#util#Complete(start, completions) " {{{
   if !exists('##CompleteDone')
-    return complete(a:start, a:completions)
+    call complete(a:start, a:completions)
+    return 1
   endif
 
   let b:eclim_complete_temp_start = a:start
   let b:eclim_complete_temp_completions = a:completions
+
+  " If the temporary completion is active already, stop here and indicate
+  " that the trigger needs to be inserted manually by returning 0.
+  " (e.g. '{% e<BS>e' in a Django template)
+  if &completefunc == 'eclim#util#CompleteTemp'
+    return 0
+  endif
+
   let b:eclim_complete_temp_func = &completefunc
   let b:eclim_complete_temp_opt = &completeopt
   augroup eclim_complete_temp
@@ -1071,6 +1084,7 @@ function! eclim#util#Complete(start, completions) " {{{
   setlocal completefunc=eclim#util#CompleteTemp
   setlocal completeopt=menuone,longest
   call feedkeys("\<c-x>\<c-u>", "n")
+  return 1
 endfunction " }}}
 
 function! eclim#util#CompleteTemp(findstart, base) " {{{

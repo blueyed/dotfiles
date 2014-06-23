@@ -14,11 +14,14 @@ endif
 " }}}
 
 
-let use_pathogen = 0
 let use_neobundle = 1
+let use_pathogen = !use_neobundle
 if use_neobundle
   set rtp+=~/.vim/bundle/neobundle
-  call neobundle#begin(expand('~/.vim/neobundle'))
+
+  let s:neobundles_path = expand('~/.vim/neobundles')
+  call neobundle#begin(s:neobundles_path)
+  filetype off
 
   if neobundle#has_cache()
     NeoBundleLoadCache
@@ -81,8 +84,9 @@ if use_neobundle
     NeoBundle 'jmcantrell/vim-fatrat.git', { 'directory': 'fatrat' }
     NeoBundle 'blueyed/file-line.git', { 'directory': 'file-line' }
     NeoBundle 'thinca/vim-fontzoom.git', { 'directory': 'fontzoom' }
-    " NeoBundle 'tpope/vim-fugitive.git', { 'directory': 'fugitive' }
-    NeoBundle 'blueyed/vim-fugitive.git', { 'directory': 'fugitive' }
+    NeoBundle 'tpope/vim-fugitive.git', {
+          \ 'directory': 'fugitive',
+          \ 'augroup': 'fugitive' }
     NeoBundle 'mkomitee/vim-gf-python.git', { 'directory': 'gf-python' }
     NeoBundle 'mattn/gist-vim.git', { 'directory': 'gist' }
     NeoBundle 'jaxbot/github-issues.vim.git', { 'directory': 'github-issues' }
@@ -107,9 +111,10 @@ if use_neobundle
     NeoBundle 'tpope/vim-markdown.git', { 'directory': 'markdown' }
     NeoBundle 'nelstrom/vim-markdown-folding.git', { 'directory': 'markdown-folding' }
     NeoBundle 'vim-scripts/matchit.zip.git', { 'directory': 'matchit' }
-    NeoBundle 'Shougo/neobundle.vim.git', { 'directory': 'neobundle' }
     NeoBundle 'Shougo/neomru.vim.git', { 'directory': 'neomru' }
-    NeoBundle 'blueyed/nerdtree.git', { 'directory': 'nerdtree' }
+    NeoBundle 'blueyed/nerdtree.git', {
+          \ 'directory': 'nerdtree',
+          \ 'augroup' : 'NERDTreeHijackNetrw' }
     NeoBundle 'blueyed/nginx.vim.git', { 'directory': 'nginx' }
     NeoBundle 'tyru/open-browser.vim.git', { 'directory': 'open-browser' }
     NeoBundle 'kana/vim-operator-replace.git', { 'directory': 'operator-replace' }
@@ -128,7 +133,7 @@ if use_neobundle
     NeoBundle '5long/pytest-vim-compiler.git', { 'directory': 'pytest-vim-compiler' }
     NeoBundle 'hynek/vim-python-pep8-indent.git', { 'directory': 'python-pep8-indent' }
     NeoBundle 'tomtom/quickfixsigns_vim.git', { 'directory': 'quickfixsigns' }
-    NeoBundle 'blueyed/vim-quickhl.git', { 'directory': 'quickhl' }
+    NeoBundle 't9md/vim-quickhl.git', { 'directory': 'quickhl' }
     NeoBundle 'aaronbieber/vim-quicktask.git', { 'directory': 'quicktask' }
     NeoBundle 'tpope/vim-ragtag.git', { 'directory': 'ragtag' }
     NeoBundle 'tpope/vim-rails.git', { 'directory': 'rails' }
@@ -137,10 +142,13 @@ if use_neobundle
     NeoBundle 'tpope/vim-repeat.git', { 'directory': 'repeat' }
     NeoBundle 'inkarkat/runVimTests.git', { 'directory': 'runVimTests' }
     NeoBundle 'tpope/vim-scriptease.git', { 'directory': 'scriptease' }
-    NeoBundle 'xolox/vim-session.git', { 'directory': 'session' }
+    NeoBundle 'xolox/vim-session.git', {
+          \ 'directory': 'session',
+          \ 'augroup': 'PluginSession' }
     NeoBundle 'blueyed/smarty.vim.git', { 'directory': 'smarty' }
     NeoBundle 'justinmk/vim-sneak.git', { 'directory': 'sneak' }
-    NeoBundle 'honza/vim-snippets.git', { 'directory': 'snippets' }
+    " NeoBundle 'honza/vim-snippets.git', { 'directory': 'snippets' }
+    NeoBundle 'blueyed/vim-snippets.git', { 'directory': 'snippets' }
     NeoBundle 'rstacruz/sparkup.git', { 'directory': 'sparkup' }
     NeoBundle 'tpope/vim-speeddating.git', { 'directory': 'speeddating' }
     NeoBundle 'AndrewRadev/splitjoin.vim.git', { 'directory': 'splitjoin' }
@@ -165,7 +173,7 @@ if use_neobundle
     NeoBundleLazy 'tomtom/tmru_vim.git', {
           \ 'directory': 'tmru',
           \ 'autoload': { 'commands': 'TRecentlyUsedFiles' }}
-    NeoBundle 'christoomey/vim-tmux-navigator.git', { 'directory': 'tmux-navigator' }
+    NeoBundle 'blueyed/vim-tmux-navigator.git', { 'directory': 'tmux-navigator' }
     NeoBundle 'tomtom/tplugin_vim.git', { 'directory': 'tplugin' }
     NeoBundle 'vim-scripts/tracwiki.git', { 'directory': 'tracwiki' }
     NeoBundle 'tomtom/ttagecho_vim.git', { 'directory': 'ttagecho' }
@@ -217,7 +225,6 @@ if use_neobundle
     " NeoBundle 'blueyed/vim-diminactive.git', { 'directory': 'diminactive' }
     " NeoBundle 'tpope/vim-sleuth.git', { 'directory': 'sleuth' }
     " NeoBundle 'xolox/vim-notes.git', { 'directory': 'notes' }
-    " NeoBundle 'Shougo/neocomplcache.git', { 'directory': 'neocomplcache' }
     " NeoBundle 'tomtom/shymenu_vim.git', { 'directory': 'shymenu' }
     " NeoBundle 'kergoth/vim-hilinks'
 
@@ -247,15 +254,18 @@ if use_neobundle
           \ { 'manual': { 'base': '~/.vim/bundle', 'type': 'nosync' }}
     NeoBundle 'eclim', '', 'manual'
     NeoBundle 'zoomwin.vba', '', 'manual'
+    NeoBundleFetch "Shougo/neobundle.vim", {
+          \ 'default': 'manual',
+          \ 'directory': 'neobundle', }
 
     NeoBundleSaveCache
   endif
   call neobundle#end()
 
-  filetype plugin indent on
-
   " Installation check.
   NeoBundleCheck
+
+  filetype plugin indent on
 
   if !has('vim_starting')
     " Call on_source hook when reloading .vimrc.
@@ -460,7 +470,7 @@ endif
 
 if 1 " has('eval') / `let` may not be available.
   " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-  let s:has_ycm = len(glob('~/.vim/neobundle/YouCompleteMe/third_party/ycmd/ycm_core.*'))
+  let s:has_ycm = len(glob(s:neobundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
   let s:use_ycm = s:has_ycm
   let s:use_neocomplcache = ! s:use_ycm
   " }}}
@@ -601,6 +611,9 @@ if 1 " has('eval') / `let` may not be available.
 
   if s:use_neocomplcache
   " neocomplcache {{{
+    if s:use_neobundle
+      NeoBundle 'Shougo/neocomplcache.git', { 'directory': 'neocomplcache' }
+    endif
     let g:neocomplcache_cursor_hold_i_time = 300 " default
     let g:neocomplcache_enable_at_startup = 1
     let g:neocomplcache_enable_camel_case_completion = 1

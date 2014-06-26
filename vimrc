@@ -99,6 +99,7 @@ if use_neobundle
     NeoBundle 'tpope/vim-haml.git', { 'directory': 'haml' }
     NeoBundle 'nathanaelkane/vim-indent-guides.git', { 'directory': 'indent-guides' }
     NeoBundle 'ivanov/vim-ipython.git', { 'directory': 'ipython' }
+    " NeoBundle 'johndgiese/vipy.git', { 'directory': 'vipy' }
     NeoBundle 'davidhalter/jedi-vim.git', { 'directory': 'jedi' }
     NeoBundle 'vim-scripts/keepcase.vim.git', { 'directory': 'keepcase' }
     NeoBundle 'vim-scripts/LargeFile.git', { 'directory': 'LargeFile' }
@@ -203,7 +204,6 @@ if use_neobundle
 
     NeoBundle 'inkarkat/VimTAP.git', { 'directory': 'VimTAP' }
     NeoBundle 'tpope/vim-vinegar.git', { 'directory': 'vinegar' }
-    NeoBundle 'johndgiese/vipy.git', { 'directory': 'vipy' }
     NeoBundle 'jmcantrell/vim-virtualenv', { 'directory': 'virtualenv' }
     NeoBundle 'tyru/visualctrlg.vim.git', { 'directory': 'visualctrlg' }
     NeoBundle 'nelstrom/vim-visual-star-search.git', { 'directory': 'visual-star-search' }

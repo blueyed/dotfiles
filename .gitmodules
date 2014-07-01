@@ -66,3 +66,6 @@
 [submodule "vim/bundle/neobundle"]
 	path = vim/bundle/neobundle
 	url = git://github.com/Shougo/neobundle.vim.git
+[submodule "lib/zsh-autoenv"]
+	path = lib/zsh-autoenv
+	url = git://github.com/blueyed/autoenv.git

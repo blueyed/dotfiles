@@ -300,7 +300,8 @@ set nowrap
 
 set autoindent    " always set autoindenting on (fallback after 'indentexpr')
 
-" set colorcolumn=78
+set colorcolumn=78
+set numberwidth=1  " Initial default, gets adjusted dynamically.
 
 set tabstop=2
 set shiftwidth=2
@@ -330,6 +331,11 @@ if v:version > 703 || v:version == 703 && has("patch541")
   set formatoptions+=j
 endif
 " }}}
+
+if exists('+breakindent')
+  set breakindent
+  " set breakindentopt=min:20,shift:2,sbr
+endif
 
 set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
@@ -493,7 +499,7 @@ if 1 " has('eval') / `let` may not be available.
 
   let g:snips_author = g:my_full_name
 
-  " TAB is used by YouCompleteMe/SuperTab
+  " TAB is used by YouCompleteMe/SuperTab.
   let g:UltiSnipsExpandTrigger="<c-j>"
   let g:UltiSnipsJumpForwardTrigger="<c-j>"
   let g:UltiSnipsJumpBackwardTrigger="<c-k>"
@@ -531,9 +537,9 @@ if 1 " has('eval') / `let` may not be available.
   endif
 
   " Sparkup (insert mode) maps. Default: <c-e>/<c-n>, both used by Vim.
-  let g:sparkupExecuteMapping = '<Leader>e'
+  let g:sparkupExecuteMapping = '<Leader><c-e>'
   " '<c-n>' by default!
-  let g:sparkupNextMapping = '<Leader>ee'
+  let g:sparkupNextMapping = '<Leader><c-n>'
   "
   " obsolete: using vim-sneak instead.
   " let g:EasyMotion_leader_key = '<Leader>m'
@@ -552,15 +558,14 @@ if 1 " has('eval') / `let` may not be available.
   " let g:syntastic_echo_current_error=0 " TEST: faster?!
   let g:syntastic_mode_map = {
         \'mode': 'passive',
-        \ 'active_filetypes': ['ruby', 'php', 'lua'],
+        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python', 'javascript'],
         \ 'passive_filetypes': ['puppet'] }
   let g:syntastic_error_symbol='✗'
   let g:syntastic_warning_symbol='⚠'
   let g:syntastic_aggregate_errors = 0
   " let g:syntastic_python_python_exe = 'python3'
   " let g:syntastic_python_checkers = ['pyflakes', 'flake8', 'pep8', 'pylint', 'python']
-  " let g:syntastic_python_checkers = ['python', 'pep8']
-  let g:syntastic_python_checkers = ['python', 'flake8']
+  let g:syntastic_python_checkers = ['python', 'frosted', 'flake8']
   " let g:syntastic_php_checkers = ['php']
   let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
 
@@ -598,6 +603,13 @@ if 1 " has('eval') / `let` may not be available.
   let g:tinykeymap#conflict = 1
   " Exit also with 'q'.
   let g:tinykeymap#break_key = 113
+  " Default "*"; exluded "para_move" from tlib.
+  " List: :echo globpath(&rtp, 'autoload/tinykeymap/map/*.vim')
+  let g:tinykeymaps_default = [
+        \ 'buffers', 'diff', 'filter', 'lines', 'loc', 'qfl', 'tabs', 'undo',
+        \ 'windows', 'quickfixsigns',
+        \ ]
+        " \ 'para_move',
   " }}}
 
   " fontzoom {{{
@@ -691,6 +703,7 @@ if 1 " has('eval') / `let` may not be available.
     let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
   endif " }}}
 
+
   " YouCompleteMe {{{
   let g:ycm_filetype_blacklist = {
     \ 'ycmblacklisted': 1
@@ -732,6 +745,9 @@ if 1 " has('eval') / `let` may not be available.
   let g:cursorcross_no_map_BS = 1
   let g:delimitMate_expand_cr = 0
   let g:SuperTabCrMapping = 0  " Skip SuperTab CR map setup (skipped anyway for expr mapping)
+
+  let g:cursorcross_mappings = 0  " No generic mappings for cursorcross.
+
 
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
@@ -839,7 +855,7 @@ if 1
   let g:tmru_file = s:new_tmru_files
 end
 
-let s:check_create_dirs = [vimcachedir, g:tlib_cache, g:neocomplcache_temporary_dir, g:Powerline_cache_dir, vimconfigdir, g:session_directory, vimsharedir]
+let s:check_create_dirs = [vimcachedir, g:tlib_cache, g:neocomplcache_temporary_dir, g:Powerline_cache_dir, vimconfigdir, g:session_directory, vimsharedir, &directory]
 
 if has('persistent_undo')
   let &undodir = vimsharedir . '/undo'
@@ -865,13 +881,12 @@ if has("user_commands")
 
   if ! s:use_ycm
     call add(g:pathogen_disabled, 'YouCompleteMe')
+  else
+    " call add(g:pathogen_disabled, 'supertab')
   endif
   if ! s:use_neocomplcache
     call add(g:pathogen_disabled, 'neocomplcache')
   endif
-  " if s:use_ycm || s:use_neocomplcache
-  "   call add(g:pathogen_disabled, 'supertab')
-  " endif
 
   let g:pathogen_disabled += [ "space" ]
   " nmap <unique> <Space> <Plug>SmartspaceNext
@@ -904,6 +919,7 @@ if has("user_commands")
   let g:airline#extensions#tmuxline#enabled = 1
   let g:airline#extensions#whitespace#enabled = 0
 
+  let g:airline#extensions#tagbar#enabled = 0
   let g:airline#extensions#tagbar#flags = 'f'  " full hierarchy of tag (with scope), see tagbar-statusline
   " see airline-predefined-parts
   "   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
@@ -914,7 +930,9 @@ if has("user_commands")
   " endfunction
   " au VimEnter * call AirlineInit()
 
-  call airline#parts#define_function('file', 'ShortenFilenameWithSuffix')
+  if &rtp =~ '\<airline\>'
+    call airline#parts#define_function('file', 'ShortenFilenameWithSuffix')
+  endif
 
   filetype plugin indent on
 
@@ -958,7 +976,7 @@ if (&t_Co > 2 || has("gui_running"))
 
   " Inject "TODO highlighting" via @Spell cluster (e.g. into cssComment)
   function! MyHighlightTodo()
-    syn keyword MyTodo	  FIXME NOTE TODO OPTIMIZE XXX TODO: XXX:
+    syn keyword MyTodo  FIXME NOTE TODO OPTIMIZE XXX TODO: XXX:
     " XXX: using "Spell" (without "@") will disable spell checking with e.g. ft=mail!
     syn cluster @Spell add=MyTodo
   endfunction
@@ -1505,6 +1523,9 @@ nmap <C-@> :tabnew<cr>
 map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
 map <a-o> <C-W>o
+" Avoid this to be done accidentally (when zooming is meant). ":on" is more
+" explicit.
+map <C-W><C-o> <Nop>
 
 " does not work, even with lilyterm.. :/
 " TODO: <C-1>..<C-0> for tabs; not possible; only certain C-sequences get
@@ -1640,7 +1661,8 @@ fun! MySetupTitleString()
   endif
 endfun
 if has('vim_starting')
-  au! VimEnter,SessionLoadPost * call MySetupTitleString()
+  au! VimEnter call MySetupTitleString()
+  au! SessionLoadPost * if ! exists('g:loaded_title') | let g:loaded_title=1 | call MySetupTitleString() | endif
 else
   call MySetupTitleString()
 endif
@@ -1774,7 +1796,7 @@ endif
 
 " Automatic line numbers {{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
-set nonumber
+set number relativenumber
 let &showbreak = '↪ '
 function! CycleLineNr()
   " states: [start] => norelative/number => relative/number => relative/nonumber => nonumber/norelative
@@ -1947,6 +1969,9 @@ endfunction
 command! FoldParagraphs call FoldParagraphs()
 " }}}
 
+" Sort Python imports.
+command! -range=% Isort :<line1>,<line2>! isort -
+
 " Paste register `reg`, while remembering current state of &paste
 function! MyPasteRegister(reg, mode)
   let at_end_of_line = (col(".") >= col("$")-1)
@@ -2031,6 +2056,8 @@ nmap gV <leader>gp
 if 1 " has('eval') {{{1
 " Strip trailing whitespace {{{2
 function! StripWhitespace(line1, line2, ...)
+  let s_report = &report
+  let &report=0
   let pattern = a:0 ? a:1 : '[\\]\@<!\s\+$'
   if exists('*winsaveview')
     let oldview = winsaveview()
@@ -2041,12 +2068,16 @@ function! StripWhitespace(line1, line2, ...)
   " let old_linenum = line('.')
   exe 'keepjumps keeppatterns '.a:line1.','.a:line2.'substitute/'.pattern.'//e'
   if exists('oldview')
+    if oldview != winsaveview()
+      echohl WarningMsg | echomsg 'Trimmed whitespace.' | echohl None
+    endif
     call winrestview(oldview)
   else
     call setpos('.', save_cursor)
   endif
   " call setreg('/', old_query)
   " keepjumps exe "normal " . old_linenum . "G"
+  let &report = s_report
 endfunction
 command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
 " Untrail, for pastes from tmux (containing border).
@@ -2231,9 +2262,10 @@ let g:easytags_suppress_ctags_warning = 1
 let g:easytags_resolve_links = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
+let g:detectindent_preferred_expandtab = 1
 let g:detectindent_min_indent = 2
 let g:detectindent_max_indent = 4
-let g:detectindent_max_lines_to_analyse = 50
+let g:detectindent_max_lines_to_analyse = 100
 
 " command-t plugin {{{
 let g:CommandTMaxFiles=50000
@@ -2575,6 +2607,7 @@ nnoremap <leader>ez :call MyEditConfig(resolve("~/.zshrc"))<cr>
 nnoremap <leader>et :call MyEditConfig(resolve("~/.tmux.common.conf"))<cr>
 " edit .lvimrc shortcut (in repository root)
 nnoremap <leader>elv :call MyEditConfig(ProjectRootGuess().'/.lvimrc')<cr>
+nnoremap <leader>em :call MyEditConfig(ProjectRootGuess().'/Makefile')<cr>
 
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc
@@ -2588,7 +2621,7 @@ vmap <leader>gw <Plug>(openbrowser-smart-search)
 
 " Remap CTRL-W_ using maximize.vim (smarter and toggles).
 " NOTE: using `Ctrl-W o` currently mainly (via ZoomWin).
-map <c-w>_ :MaximizeWindow<cr>
+" map <c-w>_ :MaximizeWindow<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
 " Close any corresponding fugitive diff buffer.
@@ -2620,7 +2653,11 @@ endfunction
 " Toggle `:Gdiff`.
 nnoremap <Leader>gd :if !&diff \| Gdiff \| else \| call MyCloseDiff() \| endif <cr>
 nnoremap <Leader>gD :call MyCloseDiff()<cr>
+" nnoremap <Leader>gD :Git difftool %
+
+" Shortcuts for committing.
 nnoremap <Leader>gc :Gcommit -v
+command! -nargs=1 Gcm Gcommit -m "<args>"
 " }}}1
 
 " Diff this window with the previous one.
@@ -2655,7 +2692,7 @@ function! RedirCommand(cmd, newcmd)
   exec a:newcmd
   silent put=message
   " NOTE: 'ycmblacklisted' filetype used with YCM blacklist.
-  "	      Needs patch: https://github.com/Valloric/YouCompleteMe/pull/830
+  "       Needs patch: https://github.com/Valloric/YouCompleteMe/pull/830
   set nomodified ft=vim.ycmblacklisted
 endfunction
 command! -nargs=* -complete=command Redir call RedirCommand(<q-args>, 'tabnew')
@@ -2903,7 +2940,7 @@ if has('autocmd')"
     " additionally splits the window.
     fun! MySetupGitCommitMsg()
       set foldmethod=syntax foldlevel=1
-      set nohlsearch nospell sw=2 scrolloff=0
+      set nohlsearch nospell sw=4 scrolloff=0
       silent g/^# \(Changes not staged\|Untracked files\)/norm zc
       normal zt
       set spell spl=en,de
@@ -2920,12 +2957,16 @@ if has('autocmd')"
     endfun
     au FileType gitcommit call MySetupGitCommitMsg()
 
-    au FileType mail let b:no_detect_indent=1
-    au BufReadPost * if exists(':DetectIndent') | if ! exists('b:no_detect_indent') || empty(b:no_detect_indent) | exec 'DetectIndent' | endif | endif
+    au FileType mail,make,python let b:no_detect_indent=1
+    au BufReadPost * if exists(':DetectIndent') |
+          \ if !exists('b:no_detect_indent') || empty(b:no_detect_indent) | 
+          \   exec 'DetectIndent' |
+          \ endif | endif
 
     au BufReadPost * if &bt == "quickfix" | set nowrap | endif
 
     " Check if the new file (with git-diff prefix removed) is readable and
+    " edit that instead (copy'n'paste from shell).
     " (for git diff: `[abiw]`).
     au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^\S\{-}/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
@@ -3153,7 +3194,7 @@ endfun
 
 " Delete all but the current buffer. {{{
 " Source: http://vim.1045645.n5.nabble.com/Close-all-buffers-except-the-one-you-re-in-tp1183357p1183361.html
-com! -bar -bang BdOnly call s:BdOnly(<q-bang>)
+com! -bar -bang BDOnly call s:BdOnly(<q-bang>)
 
 func! s:BdOnly(bang)
     let bdcmd = "bdelete". a:bang
@@ -3178,6 +3219,15 @@ func! s:ExecCheckBdErrs(bdrangecmd)
     endtry
 endfunc
 " }}}
+
+
+" Keep cursor centered (mode and for readonly files).
+" Source: http://www.reddit.com/r/vim/comments/27nnsz/top_shortcuts_commands_configuration_for_vim/ci2os92
+nnoremap <Leader>z :let &scrolloff=999-&scrolloff<CR>
+augroup CenteringReadOnly
+    autocmd!
+    autocmd BufEnter * if !&modifiable || &ft=='help' | setl scrolloff=999 | endif
+augroup END
 
 
 " Local config (if any). {{{1

@@ -14,13 +14,22 @@ endif
 " }}}
 
 
-let use_neobundle = 1
-let use_pathogen = !use_neobundle
-if use_neobundle
+" Try to init neobundle.
+try
   set rtp+=~/.vim/bundle/neobundle
-
-  let s:neobundles_path = expand('~/.vim/neobundles')
-  call neobundle#begin(s:neobundles_path)
+  let s:bundles_path = expand('~/.vim/neobundles')
+  call neobundle#begin(s:bundles_path)
+  let s:use_neobundle = 1
+catch
+  echomsg "NeoBundle not found, falling back to Pathogen!"
+  let s:use_neobundle = 0
+  let s:bundles_path = expand('~/.vim/bundles')
+endtry
+if s:use_neobundle
+else
+endif
+let s:use_pathogen = !s:use_neobundle
+if s:use_neobundle
   filetype off
 
   if neobundle#has_cache()
@@ -98,9 +107,9 @@ if use_neobundle
     NeoBundle 'sjl/gundo.vim.git', { 'directory': 'gundo' }
     NeoBundle 'tpope/vim-haml.git', { 'directory': 'haml' }
     NeoBundle 'nathanaelkane/vim-indent-guides.git', { 'directory': 'indent-guides' }
-    NeoBundle 'ivanov/vim-ipython.git', { 'directory': 'ipython' }
+    " NeoBundle 'ivanov/vim-ipython.git', { 'directory': 'ipython' }
     " NeoBundle 'johndgiese/vipy.git', { 'directory': 'vipy' }
-    NeoBundle 'davidhalter/jedi-vim.git', { 'directory': 'jedi' }
+    " NeoBundle 'davidhalter/jedi-vim.git', { 'directory': 'jedi' }
     NeoBundle 'vim-scripts/keepcase.vim.git', { 'directory': 'keepcase' }
     NeoBundle 'vim-scripts/LargeFile.git', { 'directory': 'LargeFile' }
     NeoBundle 'groenewege/vim-less.git', { 'directory': 'less' }
@@ -476,7 +485,7 @@ endif
 
 if 1 " has('eval') / `let` may not be available.
   " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-  let s:has_ycm = len(glob(s:neobundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
+  let s:has_ycm = len(glob(s:bundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
   let s:use_ycm = s:has_ycm
   let s:use_neocomplcache = ! s:use_ycm
   " }}}
@@ -872,7 +881,7 @@ endfor
 
 if has("user_commands")
   " enable pathogen, which allows for bundles in vim/bundle
-  if use_pathogen
+  if s:use_pathogen
     set rtp+=~/.vim/bundle/pathogen
     filetype off
   endif
@@ -900,7 +909,9 @@ if has("user_commands")
   let g:pathogen_disabled += [ "shymenu" ]
   let g:pathogen_disabled += [ "easymotion" ]
   let g:pathogen_disabled += [ "yankstack" ]
-  if use_pathogen
+  let g:pathogen_disabled += [ 'xpath' ]
+  let g:pathogen_disabled += [ 'notes' ]  " XXX: needs writable path, not used currently
+  if s:use_pathogen
     call pathogen#infect()
   endif
 

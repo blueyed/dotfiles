@@ -25,22 +25,33 @@ catch
   let s:use_neobundle = 0
   let s:bundles_path = expand('~/.vim/bundles')
 endtry
-if s:use_neobundle
-else
-endif
 let s:use_pathogen = !s:use_neobundle
+
+" Check if YouCompleteMe has been compiled.
+if 1 " has('eval') / `let` may not be available.
+  " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
+  let s:has_ycm = len(glob(s:bundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
+  let s:use_ycm = s:has_ycm
+  let s:use_neocomplcache = ! s:use_ycm
+  " }}}
+endif
+
 if s:use_neobundle
   filetype off
 
   if neobundle#has_cache()
     NeoBundleLoadCache
   else
-    NeoBundle 'blueyed/YouCompleteMe.git' , {
-          \ 'build': {
-          \   'unix': './install.sh --clang-completer --system-libclang'
-          \           .' || ./install.sh --clang-completer',
-          \ 'directory': 'YouCompleteMe',
-          \ }}
+    if s:use_ycm
+      NeoBundle 'blueyed/YouCompleteMe.git' , {
+            \ 'build': {
+            \   'unix': './install.sh --clang-completer --system-libclang'
+            \           .' || ./install.sh --clang-completer',
+            \ 'directory': 'YouCompleteMe',
+            \ }}
+    else
+      NeoBundle 'Shougo/neocomplcache.git', { 'directory': 'neocomplcache' }
+    endif
 
     NeoBundle 'wincent/command-t', {
           \ 'build': {
@@ -219,7 +230,7 @@ if s:use_neobundle
     NeoBundle 'mattn/webapi-vim.git', { 'directory': 'webapi' }
     NeoBundle 'gcmt/wildfire.vim.git', { 'directory': 'wildfire' }
     NeoBundle 'sukima/xmledit.git', { 'directory': 'xmledit' }
-    NeoBundle 'actionshrimp/vim-xpath.git', {
+    NeoBundleLazy 'actionshrimp/vim-xpath.git', {
           \ 'directory': 'xpath',
           \ 'autoload': {'commands': ['XPathSearchPrompt']}}
     NeoBundle 'guns/xterm-color-table.vim.git', { 'directory': 'xterm-color-table' }
@@ -484,12 +495,6 @@ endif
 " }}}1
 
 if 1 " has('eval') / `let` may not be available.
-  " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
-  let s:has_ycm = len(glob(s:bundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
-  let s:use_ycm = s:has_ycm
-  let s:use_neocomplcache = ! s:use_ycm
-  " }}}
-
   " Use both , and Space as leader.
   let mapleader = ","
   " Not for imap!
@@ -632,9 +637,6 @@ if 1 " has('eval') / `let` may not be available.
 
   if s:use_neocomplcache
   " neocomplcache {{{
-    if s:use_neobundle
-      NeoBundle 'Shougo/neocomplcache.git', { 'directory': 'neocomplcache' }
-    endif
     let g:neocomplcache_cursor_hold_i_time = 300 " default
     let g:neocomplcache_enable_at_startup = 1
     let g:neocomplcache_enable_camel_case_completion = 1

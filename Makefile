@@ -20,6 +20,7 @@ install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
 migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.19
+migrate: .stamps/neobundle.1
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -41,6 +42,13 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 			&& $(RM) -r $$i \
 			|| { echo "Skipping removal of submodule $$i" ; } ; \
 	done
+	touch $@
+.stamps/neobundle.1:
+	@echo '== Migrating to neobundles =='
+	@echo Use the following to inspect any changes to vim/pathogen submodules:
+	@echo 'cd vim/bundle; for i in $$(git ls-files -o ); do echo $$i; ( cd $$i && git diff --exit-code; ) || break; done'
+	@echo To delete all untracked bundles:
+	@echo 'rm $$(git ls-files -o vim/bundle) -r'
 	touch $@
 
 # Target to install a copy of .dotfiles, where Git is not available

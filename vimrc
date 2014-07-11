@@ -371,7 +371,7 @@ set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 " set clipboard=unnamed
 " do not mess with X selection by default
-set clipboard=
+" set clipboard=
 
 if has('mouse')
   set mouse=a " Enable mouse

@@ -1000,9 +1000,23 @@ endif
 if 1 " has('eval')
   " Color scheme (after 'syntax on') {{{1
 
-  set bg=dark
+  " Use light/dark background based on day/night period (according to
+  " get-daytime-period (uses redshift))
+  fun! SetBgAccordingToShell()
+    if len($ZSH_THEME_VARIANT)
+      exec 'set bg='.$ZSH_THEME_VARIANT
+    else
+      set bg=light
+    endif
+  endfun
+  command! AutoBg call SetBgAccordingToShell()
+  AutoBg
 
-  set rtp+=~/.vim/bundle/solarized
+  " always light, because of airline theme issue
+  " set bg=light
+  " set fillchars+=stlnc:=
+
+  " set rtp+=~/.vim/neobundles/solarized
 
   " Set g:solarized_termcolors based on if terminal colors are setup for the 16 colors palette.
   if $TERM != 'linux' && $TERM != "fbterm" && ( $TERM != 'screen' || len($TMUX) || $HAS_SOLARIZED_COLORS == 1 )  " || $COLORTERM == 'gnome-terminal'

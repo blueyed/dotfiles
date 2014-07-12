@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Get/print the daytime period ("Night", "Day), possibly from redshift
+# ("Night" / "Day" / "Transition").
+#
+# This defaults to the geoclue provider and falls back to lat/lon (via config
+# file). The result is cached for 10 minutes.
+
+cachefile=~/.cache/redshift-period
+latlonfile=~/.config/redshift-latlon-default
+
+# If `redshift` is not available, just look at the current hour.
+if ! command -v redshift > /dev/null; then
+  hour=$(date +%H)
+  if [ "$hour" -gt 8 ] || [ "$hour" -lt 21 ]; then
+    echo -n "Daytime"
+  else
+    echo -n "Night"
+  fi
+  exit
+fi
+
+if [ -e $cachefile ]; then
+  if [ `stat --format=%Y $cachefile` -gt $(( `date +%s` - 600 )) ]; then
+    cat $cachefile
+    exit 0
+  fi
+fi
+
+# Try geoclue
+if ! period=$(redshift -l geoclue -p 2>/dev/null | grep "^Period"); then
+  if [ ! -e $latlonfile ]; then
+    echo "ERROR: geoclue failed and fallback ($latlonfile) does not exist."
+    exit 1
+  fi
+  period=$(redshift -l $(cat $latlonfile) | grep "^Period")
+fi
+
+if [ -n "$period" ]; then
+  period=$(echo $period | cut -d\  -f2)
+fi
+echo -n $period > $cachefile
+echo -n $period

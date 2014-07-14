@@ -62,9 +62,9 @@ update_submodules: sync_submodules
 	git submodule update --init --quiet
 	@# Simulate `--recursive`, but not for vim/bundle/command-t:
 	@# (https://github.com/wincent/Command-T/pull/23)
-	cd vim/bundle/operator-replace && git submodule update --init --quiet
-	cd vim/bundle/operator-user && git submodule update --init --quiet
-	cd vim/bundle/YouCompleteMe && git submodule update --init --quiet
+#	cd vim/bundle/operator-replace && git submodule update --init --quiet
+#	cd vim/bundle/operator-user && git submodule update --init --quiet
+#	cd vim/bundle/YouCompleteMe && git submodule update --init --quiet
 sync_submodules:
 	git submodule sync --quiet
 

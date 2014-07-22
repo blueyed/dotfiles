@@ -1,4 +1,25 @@
 /**
+ * Copyright (c) 2008 - 2011 by Eric Van Dewoestine
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ *
  * Integration plugin for noscript extension
  *
  * Usage:
@@ -20,11 +41,7 @@
  *
  * Tested against NoScript 1.8.6
  *
- * @author Eric Van Dewoestine (ervandew@gmail.com)
  * @version 0.4
- *
- * First two versions written by Martin Stubenschrott, but now maintained by
- * Eric.  Please direct all correspondence regarding this plugin to Eric.
  */
 
 /**
@@ -40,9 +57,9 @@
  */
 function NoscriptVimperator() {
   var popup = (
-    window.noscriptOverlay.stickyUI &&
-    window.noscriptOverlay.ns.getPref("stickyUI.onKeyboard") &&
-    (popup = window.noscriptOverlay.stickyUI)
+    noscriptOverlay.stickyUI &&
+    noscriptOverlay.ns.getPref("stickyUI.onKeyboard") &&
+    (popup = noscriptOverlay.stickyUI)
   ) || document.getElementById("noscript-status-popup");
   popup.addEventListener('popupshown', popupshown, true);
   popup.addEventListener('popuphidden', popuphidden, true);
@@ -94,21 +111,21 @@ function NoscriptVimperator() {
 
   return {
     info: function(){
-      liberator.echo(util.objectToString(window.noscriptOverlay.getSites(), true));
+      liberator.echo(util.objectToString(noscriptOverlay.getSites(), true));
     },
 
     popup: function(){
-      window.noscriptOverlay.showUI();
+      noscriptOverlay.showUI();
     },
 
     toggletemp: function(){
-      window.noscriptOverlay.toggleCurrentPage(3);
+      noscriptOverlay.toggleCurrentPage(3);
     },
 
     toggleperm: function(){
-      const ns = window.noscriptOverlay.ns;
+      const ns = noscriptOverlay.ns;
       const url = ns.getQuickSite(content.document.documentURI, /*level*/ 3);
-      window.noscriptOverlay.safeAllow(url, !ns.isJSEnabled(url), false);
+      noscriptOverlay.safeAllow(url, !ns.isJSEnabled(url), false);
     },
 
     _execute: function(args){
@@ -133,10 +150,12 @@ function NoscriptVimperator() {
   };
 }
 
-var nsv = NoscriptVimperator();
+if (typeof(noscriptOverlay) != 'undefined'){
+  var nsv = NoscriptVimperator();
 
-group.commands.add(["nosc[ript]"],
-  "Execute noscript commands",
-  function(args) { nsv._execute(args); },
-  { argCount: '1', completer: nsv._completer }
-);
+  commands.addUserCommand(["nosc[ript]"],
+    "Execute noscript commands",
+    function(args) { nsv._execute(args); },
+    { argCount: '1', completer: nsv._completer }
+  );
+}

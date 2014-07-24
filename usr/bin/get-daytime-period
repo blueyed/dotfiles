@@ -33,7 +33,7 @@ if ! period=$(redshift -l geoclue -p 2>/dev/null | grep "^Period"); then
     echo "ERROR: geoclue failed and fallback ($latlonfile) does not exist."
     exit 1
   fi
-  period=$(redshift -l $(cat $latlonfile) | grep "^Period")
+  period=$(redshift -l $(cat $latlonfile) -p | grep "^Period")
 fi
 
 if [ -n "$period" ]; then

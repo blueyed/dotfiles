@@ -128,6 +128,9 @@
 	binary = true
 	textconv = odt2txt
 
+[url "ssh://git@github.com/"]
+	pushInsteadOf = git://github.com/
+
 ; [pager]
 ; 	status = true
 

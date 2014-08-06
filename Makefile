@@ -158,5 +158,7 @@ upgrade:
 	rake upgrade
 
 tags:
-	ctags -R --exclude=YouCompleteMe .
+	# ctags -R --exclude=YouCompleteMe .
+	# ag --ignore YouCompleteMe -g . | ctags --links=no -L-
+	ag -g . | ctags --links=no -L-
 .PHONY: tags

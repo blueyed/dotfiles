@@ -10,7 +10,7 @@ cachefile=~/.cache/redshift-period
 latlonfile=~/.config/redshift-latlon-default
 
 # If `redshift` is not available, just look at the current hour.
-if ! command -v redshift > /dev/null; then
+if ! hash redshift 2> /dev/null; then
   hour=$(date +%H)
   if [ "$hour" -gt 8 ] || [ "$hour" -lt 21 ]; then
     echo -n "Daytime"

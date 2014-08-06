@@ -10,3 +10,6 @@ _build/
 *.gif
 *.jpg
 *.png
+
+# IPython notebooks
+*.ipynb

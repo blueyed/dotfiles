@@ -9,3 +9,5 @@ tags-??
 .~lock.*#
 *.pyc
 .sass-cache
+
+*.ipynb

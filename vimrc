@@ -21,7 +21,7 @@ try
   call neobundle#begin(s:bundles_path)
   let s:use_neobundle = 1
 catch
-  echomsg "NeoBundle not found, falling back to Pathogen!"
+  echom "NeoBundle not found, falling back to Pathogen:" v:exception
   let s:use_neobundle = 0
   let s:bundles_path = expand('~/.vim/bundles')
 endtry
@@ -230,6 +230,8 @@ if s:use_neobundle
     NeoBundle 'mattn/webapi-vim.git', { 'directory': 'webapi' }
     NeoBundle 'gcmt/wildfire.vim.git', { 'directory': 'wildfire' }
     NeoBundle 'sukima/xmledit.git', { 'directory': 'xmledit' }
+    " Expensive on startup, not used much
+    " (autoload issue: https://github.com/actionshrimp/vim-xpath/issues/7).
     NeoBundleLazy 'actionshrimp/vim-xpath.git', {
           \ 'directory': 'xpath',
           \ 'autoload': {'commands': ['XPathSearchPrompt']}}
@@ -763,19 +765,29 @@ if 1 " has('eval') / `let` may not be available.
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
     " "<CR>" via delimitMateCR
-    let r = "\<Plug>delimitMateCR"
+    if maparg('<Plug>delimitMateCR', 'i')
+      let r = "\<Plug>delimitMateCR"
+    else
+      let r = "\<CR>"
+    endif
     if maparg('<Plug>CursorCrossCR', 'i')
       " requires vim 704
       let r .= "\<Plug>CursorCrossCR"
     endif
-    let r .= "\<Plug>DiscretionaryEnd"
+    if maparg('<Plug>DiscretionaryEnd', 'i')
+      let r .= "\<Plug>DiscretionaryEnd"
+    endif
     return r
   endfun
   imap <expr> <CR> My_CR_map()
 
   fun! My_BS_map()
     " "<BS>" via delimitMateBS
-    let r = "\<Plug>delimitMateBS"
+    if maparg('<Plug>delimitMateBS', 'i')
+      let r = "\<Plug>delimitMateBS"
+    else
+      let r = "\<BS>"
+    endif
     if maparg('<Plug>CursorCrossBS', 'i')
       " requires vim 704
       let r .= "\<Plug>CursorCrossBS"
@@ -1028,7 +1040,11 @@ if 1 " has('eval')
   " let g:solarized_italic=0
   " NOTE: using better-whitespace instead
   let g:solarized_hitrail=0
-  colorscheme solarized
+  try
+    colorscheme solarized
+  catch
+    echom "Failed to load colorscheme:" v:exception
+  endtry
 
   " set rtp+=~/.vim/bundle/xoria256 " colorscheme
   " silent! colorscheme xoria256
@@ -2950,13 +2966,15 @@ let g:html_indent_autotags = "br,input,img"
 
 " better-whitespace: disable by default.
 " TODO: DisableWhitespace is buggy across buffers?!
-let g:better_whitespace_enabled = 0
-nmap <Leader>sw :ToggleWhitespace<cr>
-augroup MyBetterWhitespace
-  au!
-  au FileType * if &buftype == 'nofile' | exec 'DisableWhitespace' | endif
-  au FileType diff,gitcommit DisableWhitespace
-augroup END
+if &rtp =~ '\<better-whitespace\>'
+  let g:better_whitespace_enabled = 0
+  nmap <Leader>sw :ToggleWhitespace<cr>
+  augroup MyBetterWhitespace
+    au!
+    au FileType * if &buftype == 'nofile' | exec 'DisableWhitespace' | endif
+    au FileType diff,gitcommit DisableWhitespace
+  augroup END
+endif
 
 
 " Setup late autocommands {{{

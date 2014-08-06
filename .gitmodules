@@ -26,7 +26,7 @@
 	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "lib/legit"]
 	path = lib/legit
-	url = git://github.com/kennethreitz/legit.git
+	url = git://github.com/blueyed/legit.git
 [submodule "lib/powerline"]
 	path = lib/powerline
 	url = git://github.com/blueyed/powerline.git

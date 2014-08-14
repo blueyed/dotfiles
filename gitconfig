@@ -138,6 +138,7 @@
 
 [url "ssh://git@github.com/"]
 	pushInsteadOf = git://github.com/
+	pushInsteadOf = https://github.com/
 
 ; [pager]
 ; 	status = true

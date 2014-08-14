@@ -60,6 +60,11 @@
 	# This is used to decide, if a stash can be savely dropped.
 	stash-diff = !zsh -c 'bcompare =(git stash show -p --no-prefix) =(git diff --no-prefix)'
 	cfg = !$EDITOR $(readlink -f ~/.gitconfig)
+	# Based on http://haacked.com/archive/2014/07/28/github-flow-aliases/.
+	# wipe: reset --hard with savepoint.
+	wipe = "!f() { rev=$(git rev-parse ${1-HEAD}); \
+		git add -A && git commit --allow-empty -qm 'WIPE SAVEPOINT' \
+		&& git reset $rev --hard; }; f"
 [browser "open-in-running-browser"]
 	cmd = open-in-running-browser
 [web]

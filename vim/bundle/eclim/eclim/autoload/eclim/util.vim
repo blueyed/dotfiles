@@ -618,6 +618,18 @@ endfunction " }}}
 function! eclim#util#Make(bang, args) " {{{
   " Executes make using the supplied arguments.
 
+  " if vim-dispatch is installed, just delegate to that.
+  if exists(':Dispatch') == 2
+    " vim-dispatch has a :Make command which doesn't really have anything to do
+    " with the build tool 'make', but is instead an upper cased async version of
+    " vim's 'make' command. Several of tpope's plugins depend on that :Make
+    " command (instead of the underlying function, or the less ambiguous
+    " :Dispatch command), so anyone else that defines such a command is shit out
+    " of luck.
+    exec 'Dispatch' . a:bang . ' _ ' . a:args
+    return
+  endif
+
   let makefile = findfile('makefile', '.;')
   let makefile2 = findfile('Makefile', '.;')
   if len(makefile2) > len(makefile)
@@ -669,8 +681,8 @@ function! eclim#util#MakeWithCompiler(compiler, bang, args, ...)
       endif
     endif
 
-    " use dispatch if available
-    if exists(':Dispatch') == 2
+    " use dispatch if available and not disabled
+    if exists(':Dispatch') == 2 && g:EclimMakeDispatchEnabled
       call eclim#util#EchoTrace('dispatch: ' . make_cmd)
       " since dispatch is intended to run the make cmd in the background, make
       " sure the errorformat doesn't suppress all the non-error output so the
@@ -983,17 +995,18 @@ function! eclim#util#PromptList(prompt, list, ...)
     return -1
   endif
 
-  " only one elment, no need to choose.
+  " only one element, no need to choose.
   if len(a:list) == 1
     return 0
   endif
 
   let prompt = ""
-  let index = 0
+  let index = g:EclimPromptListStartIndex
   for item in a:list
     let prompt = prompt . index . ") " . item . "\n"
     let index = index + 1
   endfor
+  let maxindex = index - 1
 
   exec "echohl " . (a:0 ? a:1 : g:EclimHighlightInfo)
   try
@@ -1008,10 +1021,11 @@ function! eclim#util#PromptList(prompt, list, ...)
       let response = input(a:prompt . ": ")
     endtry
     while response !~ '\(^$\|^[0-9]\+$\)' ||
-        \ response < 0 ||
-        \ response > (len(a:list) - 1)
+        \ response < g:EclimPromptListStartIndex ||
+        \ response > maxindex
       let response = input("You must choose a value between " .
-        \ 0 . " and " . (len(a:list) - 1) . ". (Ctrl-C to cancel): ")
+        \ g:EclimPromptListStartIndex . " and " . maxindex .
+        \ ". (Ctrl-C to cancel): ")
     endwhile
   finally
     echohl None
@@ -1022,7 +1036,7 @@ function! eclim#util#PromptList(prompt, list, ...)
     return -1
   endif
 
-  return response
+  return response - g:EclimPromptListStartIndex
 endfunction " }}}
 
 " PromptConfirm(prompt, [highlight]) {{{

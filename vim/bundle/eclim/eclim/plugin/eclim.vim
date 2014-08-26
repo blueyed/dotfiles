@@ -79,7 +79,7 @@ call eclim#AddVimSetting(
   \ 'Sets how validation results from the various language validators will be sorted',
   \ '\(occurrence\|severity\)')
 call eclim#AddVimSetting(
-  \ 'Core', 'g:EclimTempFilesEnable', 1,
+  \ 'Core', 'g:EclimTempFilesEnable', 0,
   \ 'Should eclim ever use temp files for code completion, etc.',
   \ '\(0\|1\)')
 call eclim#AddVimSetting(
@@ -115,10 +115,21 @@ call eclim#AddVimSetting(
   \ '\d\+')
 
 call eclim#AddVimSetting(
+  \ 'Core', 'g:EclimPromptListStartIndex', 0,
+  \ 'The starting index to use for list based prompts.',
+  \ '\(0\|1\)')
+
+call eclim#AddVimSetting(
   \ 'Core', 'g:EclimMakeLCD', 1,
   \ "When set to a non-0 value, all eclim based make commands\n" .
   \ "(:Ant, :Maven, :Mvn, etc) will change to the current file's\n" .
   \ "project root before executing.",
+  \ '\(0\|1\)')
+call eclim#AddVimSetting(
+  \ 'Core', 'g:EclimMakeDispatchEnabled', 1,
+  \ "When tpope/vim-dispatch is installed and this option is set\n" .
+  \ "to a non-0 value, then eclim will run its make based commands\n" .
+  \ "(:Ant, :Maven, :Mvn, etc) via dispatch.",
   \ '\(0\|1\)')
 
 call eclim#AddVimSetting(
@@ -247,11 +258,12 @@ endif
 let g:EclimQuote = "['\"]"
 
 if !exists("g:EclimTempDir")
-  let g:EclimTempDir = expand('$TMP')
-  if g:EclimTempDir == '$TMP'
-    let g:EclimTempDir = expand('$TEMP')
-  endif
-  if g:EclimTempDir == '$TEMP' && has('unix')
+  " NOTE: `expand("$FOO")` might spawn a new shell.
+  if len($TMP)
+    let g:EclimTempDir = $TMP
+  elseif len($TEMP)
+    let g:EclimTempDir = $TEMP
+  elseif has('unix')
     let g:EclimTempDir = '/tmp'
   endif
 

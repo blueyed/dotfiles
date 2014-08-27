@@ -39,7 +39,8 @@ endif
 if s:use_neobundle
   filetype off
 
-  if neobundle#has_cache()
+  " if neobundle#has_cache()
+  if neobundle#has_fresh_cache()
     NeoBundleLoadCache
   else
     if s:use_ycm
@@ -104,8 +105,7 @@ if s:use_neobundle
     NeoBundle 'jmcantrell/vim-fatrat.git', { 'directory': 'fatrat' }
     NeoBundle 'blueyed/file-line.git', { 'directory': 'file-line' }
     NeoBundle 'thinca/vim-fontzoom.git', { 'directory': 'fontzoom' }
-    NeoBundle 'tpope/vim-fugitive.git', {
-          \ 'directory': 'fugitive',
+    NeoBundle 'tpope/vim-fugitive.git', { 'directory': 'fugitive',
           \ 'augroup': 'fugitive' }
     NeoBundle 'mkomitee/vim-gf-python.git', { 'directory': 'gf-python' }
     NeoBundle 'mattn/gist-vim.git', { 'directory': 'gist' }
@@ -188,12 +188,11 @@ if s:use_neobundle
     NeoBundle 'kana/vim-textobj-function.git', { 'directory': 'textobj-function' }
     NeoBundle 'kana/vim-textobj-indent.git', { 'directory': 'textobj-indent' }
     NeoBundle 'kana/vim-textobj-user.git', { 'directory': 'textobj-user' }
+    NeoBundle 'mattn/vim-textobj-url', { 'directory': 'textobj-url' }
     NeoBundle 'tomtom/tinykeymap_vim.git', { 'directory': 'tinykeymap' }
-    NeoBundle 'tomtom/tlib_vim.git', { 'directory': 'tlib' }
     NeoBundle 'tomtom/tmarks_vim.git', { 'directory': 'tmarks' }
-    NeoBundleLazy 'tomtom/tmru_vim.git', {
-          \ 'directory': 'tmru',
-          \ 'autoload': { 'commands': 'TRecentlyUsedFiles' }}
+    NeoBundle 'tomtom/tmru_vim.git', { 'directory': 'tmru', 'depends':
+          \ [['tomtom/tlib_vim.git', { 'directory': 'tlib' }]]}
     NeoBundle 'blueyed/vim-tmux-navigator.git', { 'directory': 'tmux-navigator' }
     NeoBundle 'tomtom/tplugin_vim.git', { 'directory': 'tplugin' }
     NeoBundle 'vim-scripts/tracwiki.git', { 'directory': 'tracwiki' }
@@ -314,9 +313,13 @@ set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set incsearch   " do incremental searching
 
+set nowrapscan  " do not wrap around when searching.
+
 set backup          " enable backup (default off)
 set writebackup     " keep a backup while writing the file (default on)
 set backupcopy=yes  " important to keep the file descriptor (inotify)
+
+set directory=~/tmp/vim/swapfiles
 
 set nowrap
 
@@ -330,6 +333,13 @@ set shiftwidth=2
 set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
 set expandtab
 set iskeyword+=-
+augroup vimrc_iskeyword
+  au!
+  " Remove '-' and ':' from keyword characters (to highlight e.g. 'width:…' and 'font-size:foo' correctly)
+  " XXX: should get fixed in syntax/css.vim probably!
+  au FileType css setlocal iskeyword-=-:
+augroup END
+
 set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file
 
 set laststatus=2  " Always display the statusline
@@ -363,6 +373,8 @@ set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
 set guioptions-=e  " Same tabline as with terminal (allows for setting colors).
 set guioptions-=m  " no menu with gvim
+set guioptions-=a  " do not mess with X selection when visual selecting text.
+set guioptions+=A  " make modeless selections available in the X clipboard.
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 set viminfo+=! " keep global uppercase variables. Used by localvimrc.
@@ -372,8 +384,10 @@ set mousemodel=popup " extend/popup/pupup_setpos
 set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 " set clipboard=unnamed
-" do not mess with X selection by default
-" set clipboard=
+" Do not mess with X selection by default (only in modeless mode).
+set clipboard-=autoselect
+set clipboard+=autoselectml
+
 
 if has('mouse')
   set mouse=a " Enable mouse
@@ -574,8 +588,8 @@ if 1 " has('eval') / `let` may not be available.
   " let g:syntastic_echo_current_error=0 " TEST: faster?!
   let g:syntastic_mode_map = {
         \'mode': 'passive',
-        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python', 'javascript'],
-        \ 'passive_filetypes': ['puppet'] }
+        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python'],
+        \ 'passive_filetypes': [] }
   let g:syntastic_error_symbol='✗'
   let g:syntastic_warning_symbol='⚠'
   let g:syntastic_aggregate_errors = 0
@@ -692,19 +706,6 @@ if 1 " has('eval') / `let` may not be available.
 
     " Force overwriting completefunc set by eclim
     let g:neocomplcache_force_overwrite_completefunc = 1
-    " XXX: exists() does not work with autoload function
-    augroup neocomplcachefiletype
-      au!
-      " au FileType * let f='eclim#'.&filetype.'#complete#CodeComplete' | if exists('*'.f) | exec('setlocal omnifunc='.f) | endif
-
-      " Enable base completion.
-      au FileType css setlocal omnifunc=csscomplete#CompleteCSS
-      au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-      au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-      au FileType python setlocal omnifunc=pythoncomplete#Complete
-      au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-      "au FileType ruby setlocal omnifunc=rubycomplete#Complete
-    augroup END
 
     " Enable heavy omni completion.
     if !exists('g:neocomplcache_omni_patterns')
@@ -735,18 +736,19 @@ if 1 " has('eval') / `let` may not be available.
   let g:ycm_key_list_select_completion = []
   let g:ycm_key_list_previous_completion = []
 
-  " " disable trigger for 'php' (slow; trigger it manually)
-  " let g:ycm_semantic_triggers =  {
-  "   \   'c' : ['->', '.'],
-  "   \   'objc' : ['->', '.'],
-  "   \   'cpp,objcpp' : ['->', '.', '::'],
-  "   \   'perl' : ['->'],
-  "   \   'php' : [],
-  "   \   'cs,java,javascript,d,vim,ruby,python,perl6,scala,vb,elixir' : ['.'],
-  "   \   'lua' : ['.', ':'],
-  "   \   'erlang' : [':'],
-  "   \ }
-  " }}}
+  let g:ycm_semantic_triggers =  {
+    \   'c' : ['->', '.'],
+    \   'objc' : ['->', '.'],
+    \   'ocaml' : ['.', '#'],
+    \   'cpp,objcpp' : ['->', '.', '::'],
+    \   'perl' : ['->'],
+    \   'php' : ['->', '::'],
+    \   'cs,java,javascript,d,vim,python,perl6,scala,vb,elixir,go' : ['.'],
+    \   'ruby' : ['.', '::'],
+    \   'lua' : ['.', ':'],
+    \   'erlang' : [':'],
+    \ }
+
 
   " Tags (configure this before easytags, except when using easytags_dynamic_files)
   " Look for tags file in parent directories, upto "/"
@@ -974,7 +976,7 @@ if has("user_commands")
   let g:jedi#documentation_command = '<Leader>_K'
   " Manually setup jedi's call signatures.
   let g:jedi#show_call_signatures = 1
-  if index(g:pathogen_disabled, 'jedi') == -1
+  if &rtp =~ '\<jedi\>'
     augroup JediSetup
       au!
       au FileType python call jedi#configure_call_signatures()
@@ -1030,18 +1032,20 @@ if 1 " has('eval')
 
   " set rtp+=~/.vim/neobundles/solarized
 
+  " Colorscheme: use solarized with 16 colors (special palette),
+  " or xterm16 as fallback (typically for tmux in a linux $TERM).
   " Set g:solarized_termcolors based on if terminal colors are setup for the 16 colors palette.
-  if $TERM != 'linux' && $TERM != "fbterm" && ( $TERM != 'screen' || len($TMUX) || $HAS_SOLARIZED_COLORS == 1 )  " || $COLORTERM == 'gnome-terminal'
-    " term with solarized color palette
-    let g:solarized_termcolors=16
+  if $HAS_SOLARIZED_COLORS != 1
+        \ && index(["linux", "fbterm", "screen"], $TERM) != -1
+    let s:use_colorscheme = "xterm16"
   else
-    let g:solarized_termcolors=256
+    let s:use_colorscheme = "solarized"
+    let g:solarized_termcolors=16
+    " NOTE: using better-whitespace instead
+    let g:solarized_hitrail=0
   endif
-  " let g:solarized_italic=0
-  " NOTE: using better-whitespace instead
-  let g:solarized_hitrail=0
   try
-    colorscheme solarized
+    exec 'colorscheme' s:use_colorscheme
   catch
     echom "Failed to load colorscheme:" v:exception
   endtry
@@ -1698,13 +1702,28 @@ fun! MySetupTitleString()
   " easier to type/find than the unicode symbol prefix.
   let &titlestring .= ' - vim'
 
-  " Append $_TERM_TITLE_SUFFIX to title (set via zsh, used with SSH).
+  " Append $_TERM_TITLE_SUFFIX (e.g. user@host) to title (set via zsh, used
+  " with SSH).
   if len($_TERM_TITLE_SUFFIX)
     let &titlestring .= $_TERM_TITLE_SUFFIX
   endif
+
+  " Setup tmux window name, see ~/.dotfiles/oh-my-zsh/lib/termsupport.zsh.
+  if len($TMUX)
+        \ && (!len($_tmux_name_reset) || $_tmux_name_reset != $TMUX . '_' . $TMUX_PANE)
+    let tmux_auto_rename=systemlist('tmux show-window-options -t '.$TMUX_PANE.' -v automatic-rename 2>/dev/null')
+    " || $(tmux show-window-options -t $TMUX_PANE | grep '^automatic-rename' | cut -f2 -d\ )
+    " echom string(tmux_auto_rename)
+    if !len(tmux_auto_rename) || tmux_auto_rename[0] != "off"
+      " echom "Resetting tmux name to 0."
+      call system('tmux set-window-option -t '.$TMUX_PANE.' -q automatic-rename off')
+      call system('tmux rename-window -t '.$TMUX_PANE.' 0')
+    endif
+    " _tmux_name_reset=${TMUX}_${TMUX_PANE}
+  endif
 endfun
 if has('vim_starting')
-  au! VimEnter call MySetupTitleString()
+  au! VimEnter * call MySetupTitleString()
   au! SessionLoadPost * if ! exists('g:loaded_title') | let g:loaded_title=1 | call MySetupTitleString() | endif
 else
   call MySetupTitleString()
@@ -1724,7 +1743,7 @@ endfun
 nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
 
 " yankstack, to be replaced by unite's history/yank {{{1
-if index(g:pathogen_disabled, 'yankstack') == -1
+if &rtp =~ '\<yankstack\>'
   " Define own map for yankstack, Alt-p/esc-p does not work correctly in term.
   let g:yankstack_map_keys = 0
   " Setup yankstack to make yank/paste related mappings work.
@@ -1746,12 +1765,14 @@ nmap s <Plug>Sneak_s
 nmap S <Plug>Sneak_S
 xmap s <Plug>Sneak_s
 xmap S <Plug>Sneak_S
+omap s <Plug>Sneak_s
+omap S <Plug>Sneak_S
 
 let g:sneak#streak=1
 " g:sneak#target_labels = "asdfghjkl;qwertyuiopzxcvbnm/ASDFGHJKL:QWERTYUIOPZXCVBNM?"
 let g:sneak#target_labels = "asdfghjklöä"
 
-" " Replace 'f' with inclusive 1-char Sneak.
+" Replace 'f' with inclusive 1-char Sneak.
 nmap f <Plug>Sneak_f
 nmap F <Plug>Sneak_F
 xmap f <Plug>Sneak_f
@@ -2013,7 +2034,7 @@ command! FoldParagraphs call FoldParagraphs()
 " }}}
 
 " Sort Python imports.
-command! -range=% Isort :<line1>,<line2>! isort -
+command! -range=% Isort :<line1>,<line2>! isort --lines 79 -
 
 " Paste register `reg`, while remembering current state of &paste
 function! MyPasteRegister(reg, mode)
@@ -2303,6 +2324,7 @@ let g:easytags_cmd = 'ctags'
 let g:easytags_suppress_ctags_warning = 1
 " let g:easytags_dynamic_files = 1
 let g:easytags_resolve_links = 1
+let g:easytags_async = 1
 
 let g:detectindent_preferred_indent = 2 " used for sw and ts if only tabs
 let g:detectindent_preferred_expandtab = 1
@@ -2313,7 +2335,8 @@ let g:detectindent_max_lines_to_analyse = 100
 " command-t plugin {{{
 let g:CommandTMaxFiles=50000
 let g:CommandTMaxHeight=20
-let g:CommandTFileScanner='find'
+" NOTE: find finder does not skip g:CommandTWildIgnore for scanning!
+" let g:CommandTFileScanner='find'
 if has("autocmd") && exists(":CommandTFlush") && has("ruby")
   " this is required for Command-T to pickup the setting(s)
   au VimEnter * CommandTFlush
@@ -2328,33 +2351,108 @@ map <leader>t  :CommandT<space>
 map <leader>tb :CommandTBuffer<CR>
 " }}}
 
+" Setup completefunc / base completion. {{{
+" (used by neocomplcache and as fallback (manual)).
+" au FileType python set completefunc=eclim#python#complete#CodeComplete
+if has("autocmd") && exists("+omnifunc")
+  if &rtp =~ '\<eclim\>'
+    au FileType * if index(
+          \ ["php", "javascript", "css", "python", "xml", "java", "html"], &ft) != -1 |
+          \ let cf="eclim#".&ft."#complete#CodeComplete" |
+          \ exec 'setlocal omnifunc='.cf |
+          \ endif
+    " function! eclim#php#complete#CodeComplete(findstart, base)
+    " function! eclim#javascript#complete#CodeComplete(findstart, base)
+    " function! eclim#css#complete#CodeComplete(findstart, base)
+    " function! eclim#python#complete#CodeComplete(findstart, base) " {{{
+    " function! eclim#xml#complete#CodeComplete(findstart, base)
+    " function! eclim#java#complete#CodeComplete(findstart, base) " {{{
+    " function! eclim#java#ant#complete#CodeComplete(findstart, base)
+    " function! eclim#html#complete#CodeComplete(findstart, base)
+  else
+    au FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    au FileType python setlocal omnifunc=pythoncomplete#Complete
+    au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+    "au FileType ruby setlocal omnifunc=rubycomplete#Complete
+  endif
+
+  " Use syntaxcomplete, if there is no better omnifunc.
+  autocmd Filetype *
+        \ if &omnifunc == "" |
+        \   setlocal omnifunc=syntaxcomplete#Complete |
+        \ endif
+endif
+" }}}
+
+
 " supertab.vim {{{
-  if &rtp =~ '\<supertab\>'
-    let g:SuperTabDefaultCompletionType = 'context'
-    let g:SuperTabContextTextFileTypeExclusions =
-      \ ['htmldjango', 'htmljinja', 'javascript', 'sql']
+if &rtp =~ '\<supertab\>'
+  " "context" appears to trigger path/file lookup?!
+  " let g:SuperTabDefaultCompletionType = 'context'
+  " let g:SuperTabContextDefaultCompletionType = "<c-p>"
+  " let g:SuperTabContextTextFileTypeExclusions =
+  "   \ ['htmldjango', 'htmljinja', 'javascript', 'sql']
 
-    " auto select the first result when using 'longest'
-    "let g:SuperTabLongestHighlight = 1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
+  " auto select the first result when using 'longest'
+  "let g:SuperTabLongestHighlight = 1 " triggers bug with single match (https://github.com/ervandew/supertab/commit/e026bebf1b7113319fc7831bc72d0fb6e49bd087#commitcomment-297471)
 
-    " let g:SuperTabLongestEnhanced = 1  " involves mappings; requires
-    " completeopt =~ longest
-    let g:SuperTabClosePreviewOnPopupClose = 1
+  " let g:SuperTabLongestEnhanced = 1  " involves mappings; requires
+  " completeopt =~ longest
+  let g:SuperTabClosePreviewOnPopupClose = 1
+  let g:SuperTabNoCompleteAfter = ['^\s*']
 
-    " map <c-space> to <c-p> completion (useful when supertab 'context'
-    " defaults to something else).
-    " imap <nul> <c-r>=SuperTabAlternateCompletion("\<lt>c-p>")<cr>
+  " map <c-space> to <c-p> completion (useful when supertab 'context'
+  " defaults to something else).
+  " imap <nul> <c-r>=SuperTabAlternateCompletion("\<lt>c-p>")<cr>
 
-    " au FileType python
-    "   \ if &completefunc != '' |
-    "   \   call SuperTabChain(&completefunc, "<c-p>") |
-    "   \ endif
+  " Setup completion with SuperTab: default to omnifunc (YouCompleteMe),
+  " then completefunc.
+  if s:use_ycm
+    " Call YouCompleteMe always (semantic).
+    " Let &completefunc untouched (eclim).
+    " Use autocommand to override any other automatic setting from filetypes.
+    " Use SuperTab chaining to fallback to "<C-p>".
+    " autocmd FileType *
+    "       \ let g:ycm_set_omnifunc = 0 |
+    "       \ set omnifunc=youcompleteme#OmniComplete
+    " let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+    fun! CompleteViaSuperTab(findstart, base)
+      let old = g:ycm_min_num_of_chars_for_completion
+      " 0 would trigger/force semantic completion (results in everything after
+      " a dot also).
+      let g:ycm_min_num_of_chars_for_completion = 1
+      let r = youcompleteme#Complete(a:findstart, a:base)
+      let g:ycm_min_num_of_chars_for_completion = old
+      return r
+    endfun
+    " completefunc is used by SuperTab's chaining.
+    " let ycm_set_completefunc = 0
+    autocmd FileType *
+          \ call SuperTabChain("CompleteViaSuperTab", "<c-p>") |
+          \ call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
+    " Let SuperTab trigger YCM always.
+
+    " call SuperTabChain('youcompleteme#OmniComplete', "<c-p>") |
+    " let g:SuperTabChain = ['youcompleteme#Complete', "<c-p>"]
+    " set completefunc=SuperTabCodeComplete
+    " let g:SuperTabDefaultCompletionType = "<c-x><c-u>"
+    " autocmd FileType *
+    "   \ call SuperTabChain('youcompleteme#Complete', "<c-p>") |
+    "   \ call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
+  else
+    let g:SuperTabDefaultCompletionType = "<c-p>"
     autocmd FileType *
       \ if &omnifunc != '' |
       \   call SuperTabChain(&omnifunc, "<c-p>") |
       \   call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
+      \ elseif &completefunc != '' |
+      \   call SuperTabChain(&completefunc, "<c-p>") |
+      \   call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
       \ endif
   endif
+endif
 " }}}
 
 let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
@@ -2378,6 +2476,10 @@ let g:EclimLocateFileNonProjectScope = 'ag'
 " does not work as expected, ref: https://github.com/ervandew/eclim/issues/199
 let g:EclimFileTypeValidate = 0
 
+" Disable HTML indenting via eclim, ref: https://github.com/ervandew/eclim/issues/332.
+let g:EclimHtmlIndentDisabled = 1
+let g:EclimHtmldjangoIndentDisabled = 1
+
 
 " lua {{{
 let g:lua_check_syntax = 0  " done via syntastic
@@ -2398,16 +2500,17 @@ silent! vmap <unique> <Leader>g<C-g> <Plug>(visualctrlg-verbosely)
 " Toggle quickfix window, using <Leader>qq. {{{2
 " Based on: http://vim.wikia.com/wiki/Toggle_to_open_or_close_the_quickfix_window
 nnoremap <Leader>qq :QFix<CR>
+nnoremap <Leader>cc :QFix<CR>
 command! -bang -nargs=? QFix call QFixToggle(<bang>0)
 function! QFixToggle(forced)
   if exists("t:qfix_buf") && bufwinnr(t:qfix_buf) != -1 && a:forced == 0
     cclose
   else
-    cwindow 10 " 10 is height
+    copen
     let t:qfix_buf = bufnr("%")
   endif
 endfunction
-" used to track manual opening of the quickfix, e.g. via `:copen`
+" Used to track manual opening of the quickfix, e.g. via `:copen`.
 augroup QFixToggle
   au!
   au BufWinEnter quickfix let g:qfix_buf = bufnr("%")
@@ -2474,7 +2577,7 @@ noremap <Leader>nn :NERDTreeToggle<cr>
 noremap <Leader>no :NERDTreeToggle<space>
 noremap <Leader>nf :NERDTreeFind<cr>
 noremap <Leader>nc :NERDTreeClose<cr>
-noremap <F1> :tab<Space>:help<Space>
+noremap <S-F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
 noremap <F2> g<C-]>
 " expand abbr (insert mode and command line)
@@ -2743,15 +2846,15 @@ command! -nargs=* -complete=command Redir call RedirCommand(<q-args>, 'tabnew')
 command! -nargs=* -complete=command Redirbuf call RedirCommand(<q-args>, 'new')
 command! Maps Redir map
 
-fun! Cabbrev(key, value)
-  exe printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',
-    \ a:key, 1+len(a:key), string(a:value), string(a:key))
-endfun
-" IDEA: requires expansion of abbr.
-call Cabbrev('/',   '/\v')
-call Cabbrev('?',   '?\v')
-call Cabbrev('s/',  's/\v')
-call Cabbrev('%s/', '%s/\v')
+" fun! Cabbrev(key, value)
+"   exe printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',
+"     \ a:key, 1+len(a:key), string(a:value), string(a:key))
+" endfun
+" " IDEA: requires expansion of abbr.
+" call Cabbrev('/',   '/\v')
+" call Cabbrev('?',   '?\v')
+" call Cabbrev('s/',  's/\v')
+" call Cabbrev('%s/', '%s/\v')
 
 " Swap ' and ` keys (` is more useful, but requires shift on a German keyboard) {{{2
 noremap ' `
@@ -2863,10 +2966,13 @@ inoreabbr LG Liebe Grüße,<cr>Daniel.
 inoreabbr VG Viele Grüße,<cr>Daniel.
 " iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
 " ellipsis
-noreabbr ... …
+inoreabbr ... …
 " sign "checkmark"
 inoreabbr scm ✓
+" date timestamp.
 inoreabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
+inoreabbr <expr> ds strftime('%a, %d %b %Y')
+" date timestamp with fold markers.
 inoreabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
 " German/styled quotes.
 inoreabbr <silent> _" „“<Left>
@@ -2938,6 +3044,7 @@ let g:session_persist_globals = [
       \ 'g:session_autosave',
       \ 'g:MySessionName']
 " call add(g:session_persist_globals, 'g:session_autoload')
+let g:session_persist_colors = 0
 
 " fun! MyOnVimEnter()
 "   let sname = v:servername
@@ -3004,7 +3111,7 @@ if has('autocmd')"
 
     au FileType mail,make,python let b:no_detect_indent=1
     au BufReadPost * if exists(':DetectIndent') |
-          \ if !exists('b:no_detect_indent') || empty(b:no_detect_indent) | 
+          \ if !exists('b:no_detect_indent') || empty(b:no_detect_indent) |
           \   exec 'DetectIndent' |
           \ endif | endif
 
@@ -3035,6 +3142,28 @@ endif " }}}
 " NOTE: mapped by SuperTab now.
 " imap <buffer> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "<Plug>delimitMateS-Tab"
 
+
+if has('vim_starting') " only do this on startup, not when reloading .vimrc
+  " neocomplcache
+  if s:use_neocomplcache
+    " Define keyword.
+    call neocomplcache#disable_default_dictionary('g:neocomplcache_keyword_patterns')
+    let g:neocomplcache_keyword_patterns = {
+      \ 'default': '\k\+'
+      \ }
+    " let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+    " let g:neocomplcache_keyword_patterns['default'] = '\k\+' " default
+    " let g:neocomplcache_keyword_patterns['vim'] = '\k\+' " default
+    " let g:neocomplcache_keyword_patterns['vim'] = '\k\+' " default
+
+    " ref: https://github.com/Shougo/neocomplcache/issues/269
+    call neocomplcache#disable_default_dictionary('g:neocomplcache_same_filetype_lists')
+    let g:neocomplcache_same_filetype_lists = { '_': '_' }
+  endif
+
+  " Don't move when you use *
+  " nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
+endif
 
 " Fix xterm keys {{{
 " Map alt sequences for terminal via Esc.

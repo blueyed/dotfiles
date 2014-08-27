@@ -3122,8 +3122,12 @@ if has('autocmd')"
     " (for git diff: `[abiw]`).
     au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^\S\{-}/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
-    " Display a warning when editing foo.css, but foo.{scss,sass} exists
-    au BufRead *.css if glob(expand('<afile>:r').'.s[ca]ss', 1) != "" | echoerr "WARN: editing .css, but .scss/.sass exists!" | endif
+    " Display a warning when editing foo.css, but foo.{scss,sass} exists.
+    au BufRead *.css if glob(expand('<afile>:r').'.s[ca]ss', 1) != ""
+          \ || glob(substitute(expand('<afile>'), 'css', 's[ac]ss', 'g')) != ""
+          \ |   echoerr "WARN: editing .css, but .scss/.sass exists!"
+          \ |   set readonly
+          \ | endif
 
     " Make Vim help files modifiable by default.
     au FileType help setl modifiable

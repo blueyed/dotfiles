@@ -21,7 +21,9 @@ try
   call neobundle#begin(s:bundles_path)
   let s:use_neobundle = 1
 catch
-  echom "NeoBundle not found, falling back to Pathogen:" v:exception
+  echom "NeoBundle not found, falling back to Pathogen!"
+  echom "Error:" v:exception
+  set rtp+=~/.vim/bundle/pathogen
   let s:use_neobundle = 0
   let s:bundles_path = expand('~/.vim/bundles')
 endtry

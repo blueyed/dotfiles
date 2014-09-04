@@ -919,9 +919,13 @@ if has("user_commands")
   " nmap <unique> <Space> <Plug>SmartspaceNext
   " nmap <unique> <S-Space> <Plug>SmartspacePrev
 
-  " Expensive on startup, not used much
-  " (autoload issue: https://github.com/actionshrimp/vim-xpath/issues/7).
-  let g:pathogen_disabled += [ "xpath" ]
+  " Requires python
+  if ! has('python') && ! has('python3')
+    let g:pathogen_disabled += [ "jedi" ]
+    let g:pathogen_disabled += [ "github-issues" ]
+    let g:pathogen_disabled += [ "ultisnips" ]
+    let g:pathogen_disabled += [ "xpath" ]
+  endif
 
   " TO BE REMOVED"
   let g:pathogen_disabled += [ "shymenu" ]

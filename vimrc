@@ -294,7 +294,47 @@ if s:use_neobundle
     " Call on_source hook when reloading .vimrc.
     call neobundle#call_hook('on_source')
   endif
+
+elseif s:use_pathogen
+  set rtp+=~/.vim/bundle/pathogen
+  filetype off
+
+  let g:pathogen_disabled = [ 'golden-ratio', 'yankring' ]
+
+  if ! s:use_ycm
+    call add(g:pathogen_disabled, 'YouCompleteMe')
+  else
+    " call add(g:pathogen_disabled, 'supertab')
+  endif
+  if ! s:use_neocomplcache
+    call add(g:pathogen_disabled, 'neocomplcache')
+  endif
+
+  let g:pathogen_disabled += [ "space" ]
+  " nmap <unique> <Space> <Plug>SmartspaceNext
+  " nmap <unique> <S-Space> <Plug>SmartspacePrev
+
+  " Requires python
+  if ! has('python') && ! has('python3')
+    let g:pathogen_disabled += [ "jedi" ]
+    let g:pathogen_disabled += [ "github-issues" ]
+    let g:pathogen_disabled += [ "ultisnips" ]
+    let g:pathogen_disabled += [ "xpath" ]
+  endif
+
+  " TO BE REMOVED"
+  let g:pathogen_disabled += [ "shymenu" ]
+  let g:pathogen_disabled += [ "easymotion" ]
+  let g:pathogen_disabled += [ "yankstack" ]
+  let g:pathogen_disabled += [ 'xpath' ]
+  let g:pathogen_disabled += [ 'notes' ]  " XXX: needs writable path, not used currently
+
+  call pathogen#infect()
 endif
+
+" Use neocomplcache only, if it could be loaded/exists.
+let s:use_neocomplcache = s:use_neocomplcache
+      \ && &rtp =~ '\<neocomplcache\>'
 
 
 " Settings {{{1
@@ -898,45 +938,6 @@ endfor
 " }}}
 
 if has("user_commands")
-  " enable pathogen, which allows for bundles in vim/bundle
-  if s:use_pathogen
-    set rtp+=~/.vim/bundle/pathogen
-    filetype off
-  endif
-
-  let g:pathogen_disabled = [ 'golden-ratio', 'yankring' ]
-
-  if ! s:use_ycm
-    call add(g:pathogen_disabled, 'YouCompleteMe')
-  else
-    " call add(g:pathogen_disabled, 'supertab')
-  endif
-  if ! s:use_neocomplcache
-    call add(g:pathogen_disabled, 'neocomplcache')
-  endif
-
-  let g:pathogen_disabled += [ "space" ]
-  " nmap <unique> <Space> <Plug>SmartspaceNext
-  " nmap <unique> <S-Space> <Plug>SmartspacePrev
-
-  " Requires python
-  if ! has('python') && ! has('python3')
-    let g:pathogen_disabled += [ "jedi" ]
-    let g:pathogen_disabled += [ "github-issues" ]
-    let g:pathogen_disabled += [ "ultisnips" ]
-    let g:pathogen_disabled += [ "xpath" ]
-  endif
-
-  " TO BE REMOVED"
-  let g:pathogen_disabled += [ "shymenu" ]
-  let g:pathogen_disabled += [ "easymotion" ]
-  let g:pathogen_disabled += [ "yankstack" ]
-  let g:pathogen_disabled += [ 'xpath' ]
-  let g:pathogen_disabled += [ 'notes' ]  " XXX: needs writable path, not used currently
-  if s:use_pathogen
-    call pathogen#infect()
-  endif
-
   " Themes
   " Airline:
   let g:airline#extensions#disable_rtp_load = 1

@@ -809,16 +809,16 @@ if 1 " has('eval') / `let` may not be available.
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
     " "<CR>" via delimitMateCR
-    if maparg('<Plug>delimitMateCR', 'i')
+    if len(maparg('<Plug>delimitMateCR', 'i'))
       let r = "\<Plug>delimitMateCR"
     else
       let r = "\<CR>"
     endif
-    if maparg('<Plug>CursorCrossCR', 'i')
+    if len(maparg('<Plug>CursorCrossCR', 'i'))
       " requires vim 704
       let r .= "\<Plug>CursorCrossCR"
     endif
-    if maparg('<Plug>DiscretionaryEnd', 'i')
+    if len(maparg('<Plug>DiscretionaryEnd', 'i'))
       let r .= "\<Plug>DiscretionaryEnd"
     endif
     return r
@@ -827,12 +827,12 @@ if 1 " has('eval') / `let` may not be available.
 
   fun! My_BS_map()
     " "<BS>" via delimitMateBS
-    if maparg('<Plug>delimitMateBS', 'i')
+    if len(maparg('<Plug>delimitMateBS', 'i'))
       let r = "\<Plug>delimitMateBS"
     else
       let r = "\<BS>"
     endif
-    if maparg('<Plug>CursorCrossBS', 'i')
+    if len(maparg('<Plug>CursorCrossBS', 'i'))
       " requires vim 704
       let r .= "\<Plug>CursorCrossBS"
     endif

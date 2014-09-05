@@ -212,6 +212,7 @@ task :upgrade => [:update_submodules] do
         puts output if $my_verbose and $my_verbose > 1
       end
       if not $?.success?
+        submodules.delete(path)
         raise "Merging FETCH_HEAD failed: " + output
       end
     end

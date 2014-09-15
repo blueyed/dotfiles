@@ -1,3 +1,5 @@
+set nocompatible " This must be first, because it changes other options as a side effect.
+
 " Profiling. {{{
 if 1
 fun! ProfileStart()
@@ -338,7 +340,6 @@ let s:use_neocomplcache = s:use_neocomplcache
 
 
 " Settings {{{1
-set nocompatible " This must be first, because it changes other options as a side effect.
 set hidden
 set encoding=utf8
 " Prefer unix fileformat
@@ -559,16 +560,10 @@ if 1 " has('eval') / `let` may not be available.
   nmap <space> <Leader>
   vmap <space> <Leader>
 
-  " Map `s` (occupied by vim-sneak).
-  " TODO: this needs improvement
-  nnoremap <Leader>ss s
-  xnoremap <Leader>ss s
-
   " Close preview and quickfix windows.
   nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 
   let g:my_full_name = "Daniel Hahler"
-
   let g:snips_author = g:my_full_name
 
   " TAB is used by YouCompleteMe/SuperTab.
@@ -612,10 +607,6 @@ if 1 " has('eval') / `let` may not be available.
   let g:sparkupExecuteMapping = '<Leader><c-e>'
   " '<c-n>' by default!
   let g:sparkupNextMapping = '<Leader><c-n>'
-  "
-  " obsolete: using vim-sneak instead.
-  " let g:EasyMotion_leader_key = '<Leader>m'
-  " let g:EasyMotion_keys = 'asdfghjklöä' " home row
 
   " autocomplpop: do not complete from dictionary; -= "k"
   " (manually trigger it by C-X C-K instead).
@@ -1982,16 +1973,16 @@ ino kj <esc>
 " imap <Leader>/ </<C-X><C-O>
 
 nnoremap <Leader>a :Ag<space>
-nnoremap <Leader><Leader>a :Ack!<space>
+nnoremap <Leader><Space>a :Ack!<space>
 
 " Make those behave like ci' , ci"
 nnoremap ci( f(ci(
 nnoremap ci{ f{ci{
 nnoremap ci[ f[ci[
-
-vnoremap ci( f(ci(
-vnoremap ci{ f{ci{
-vnoremap ci[ f[ci[
+" NOTE: occupies `c`.
+" vnoremap ci( f(ci(
+" vnoremap ci{ f{ci{
+" vnoremap ci[ f[ci[
 
 " 'goto buffer'; NOTE: overwritten with Unite currently.
 nnoremap gb :ls<CR>:b

@@ -1,1 +1,8 @@
 xrdb -merge $HOME/.Xresources
+
+# Make Caps-Lock behave as Escape on its own.
+# Source: http://www.reddit.com/r/vim/comments/27nnsz/top_shortcuts_commands_configuration_for_vim/ci30edy
+
+# xcape -e 'Caps_Lock=Escape'
+# xcape -e 'Shift_L=Escape;Control_L=Control_L|O'
+xcape -e 'Caps_Lock=Escape;Control_L=Control_L|O'

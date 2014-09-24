@@ -29,7 +29,7 @@
 	url = git://github.com/blueyed/legit.git
 [submodule "lib/powerline"]
 	path = lib/powerline
-	url = git://github.com/blueyed/powerline.git
+	url = git://github.com/Lokaltog/powerline.git
 [submodule "lib/mc-solarized"]
 	path = lib/mc-solarized
 	url = git://github.com/peel/mc.git

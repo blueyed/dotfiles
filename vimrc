@@ -63,6 +63,7 @@ if 1 " has('eval') / `let` may not be available.
             \ }
 
       NeoBundleLazy 'davidhalter/jedi-vim.git', '', {
+            \ 'directory': 'jedi',
             \ 'autoload': { 'filetypes': ['python'] }}
 
       " Generate NeoBundle statements from .gitmodules.
@@ -122,7 +123,6 @@ if 1 " has('eval') / `let` may not be available.
       NeoBundle 'nathanaelkane/vim-indent-guides.git', { 'directory': 'indent-guides' }
       " NeoBundle 'ivanov/vim-ipython.git', { 'directory': 'ipython' }
       " NeoBundle 'johndgiese/vipy.git', { 'directory': 'vipy' }
-      " NeoBundle 'davidhalter/jedi-vim.git', { 'directory': 'jedi' }
       NeoBundle 'vim-scripts/keepcase.vim.git', { 'directory': 'keepcase' }
       NeoBundle 'vim-scripts/LargeFile.git', { 'directory': 'LargeFile' }
       NeoBundle 'groenewege/vim-less.git', { 'directory': 'less' }
@@ -797,6 +797,9 @@ if 1 " has('eval') / `let` may not be available.
 
   let g:cursorcross_mappings = 0  " No generic mappings for cursorcross.
 
+  " github-issues
+  " Trigger API request(s) only when completion is used/invoked.
+  let g:gissues_lazy_load = 1
 
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
@@ -1173,6 +1176,8 @@ if has("autocmd") " Autocommands {{{1
     if &modifiable
       " Only display a warning when editing a file, especially not for `:help`.
       " echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
+      " Redraw now, to avoid hit-enter with the following notice.
+      redraw
       echomsg 'Resolving symlink' fname '=>' resolvedfile
     endif
     " exec 'noautocmd file ' . resolvedfile
@@ -1860,6 +1865,13 @@ endif
 " Automatic line numbers {{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set number relativenumber
+" No relative numbers with quickfix and other special windows like __TMRU__.
+augroup vimrc_number_qf
+  au!
+  au FileType qf set number norelativenumber
+  au FileType * if bufname("%") =~ '^__' | set nonumber norelativenumber | endif
+  au CmdwinEnter * set number norelativenumber
+augroup END
 let &showbreak = '↪ '
 function! CycleLineNr()
   " states: [start] => norelative/number => relative/number => relative/nonumber => nonumber/norelative
@@ -1974,7 +1986,7 @@ ino kj <esc>
 " imap <Leader>/ </<C-X><C-O>
 
 nnoremap <Leader>a :Ag<space>
-nnoremap <Leader><Space>a :Ack!<space>
+nnoremap <Leader>A :Ag!<space>
 
 " Make those behave like ci' , ci"
 nnoremap ci( f(ci(
@@ -2005,24 +2017,24 @@ vnoremap <Leader><space> zf
 " Source: https://github.com/pydave/daveconfig/blob/master/multi/vim/.vim/bundle/foldtoggle/plugin/foldtoggle.vim
 nnoremap <Leader>sf :call ToggleFold()<CR>
 function! ToggleFold()
-        if !exists("b:fold_toggle_options")
-                " By default, use the main three. I rarely use custom expressions or
-                " manual and diff is just for diffing.
-                let b:fold_toggle_options = ["syntax", "indent", "marker"]
-                if len(&foldexpr)
-                  let b:fold_toggle_options += ["expr"]
-                endif
-        endif
+  if !exists("b:fold_toggle_options")
+    " By default, use the main three. I rarely use custom expressions or
+    " manual and diff is just for diffing.
+    let b:fold_toggle_options = ["syntax", "indent", "marker"]
+    if len(&foldexpr)
+      let b:fold_toggle_options += ["expr"]
+    endif
+  endif
 
-        " Find the current setting in the list
-        let i = match(b:fold_toggle_options, &foldmethod)
+  " Find the current setting in the list
+  let i = match(b:fold_toggle_options, &foldmethod)
 
-        " Advance to the next setting
-        let i = (i + 1) % len(b:fold_toggle_options)
-        let old_method = &l:foldmethod
-        let &l:foldmethod = b:fold_toggle_options[i]
+  " Advance to the next setting
+  let i = (i + 1) % len(b:fold_toggle_options)
+  let old_method = &l:foldmethod
+  let &l:foldmethod = b:fold_toggle_options[i]
 
-        echom 'foldmethod: ' . old_method . " => " . &l:foldmethod
+  echom 'foldmethod: ' . old_method . " => " . &l:foldmethod
 endfunction
 
 function! FoldParagraphs()
@@ -2229,8 +2241,7 @@ fun! EnableAllTests()
   endtry
 endfun
 
-
-" Twiddle case of chars / visual selection {{{2
+" Twiddle case of chars / visual selection. {{{2
 " source http://vim.wikia.com/wiki/Switching_case_of_characters
 function! TwiddleCase(str)
   if a:str ==# toupper(a:str)
@@ -2243,27 +2254,29 @@ function! TwiddleCase(str)
   return result
 endfunction
 vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
+" }}}2
 
-
-" Close the last window on entering if its buffer is a controlling
-" buffer (NERDTree, quickfix). {{{2
+" Exit if the last window is a controlling one (NERDTree, qf). {{{2
 function! s:CloseIfOnlyControlWinLeft()
   if winnr("$") != 1
     return
   endif
-  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
-        \ || getbufvar(winbufnr(1), '&buftype') == 'quickfix'
+  " Alt Source: https://github.com/scrooloose/nerdtree/issues/21#issuecomment-3348390
+  " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+  if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
+        \ || &buftype == 'quickfix'
     " NOTE: problematic with Unite's directory, when opening a file:
-    " :Unite from startify, then quitting Unite quits Vim.
+    " :Unite from startify, then quitting Unite quits Vim; also with TMRU from
+    " startify.
         " \ || &ft == 'startify'
     q
   endif
 endfunction
 augroup CloseIfOnlyControlWinLeft
   au!
-  au WinEnter * call s:CloseIfOnlyControlWinLeft()
+  au BufEnter * call s:CloseIfOnlyControlWinLeft()
 augroup END
-
+" }}}2
 
 " Check for file modifications automatically
 " (current buffer only)
@@ -3093,7 +3106,7 @@ if has('autocmd')"
       set foldmethod=syntax foldlevel=1
       set nohlsearch nospell sw=4 scrolloff=0
       silent g/^# \(Changes not staged\|Untracked files\)/norm zc
-      normal zt
+      normal! zt
       set spell spl=en,de
 
       " Prefill NeoComplCache (obsolete).
@@ -3122,10 +3135,11 @@ if has('autocmd')"
     au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^\S\{-}/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
 
     " Display a warning when editing foo.css, but foo.{scss,sass} exists.
-    au BufRead *.css if glob(expand('<afile>:r').'.s[ca]ss', 1) != ""
-          \ || glob(substitute(expand('<afile>'), 'css', 's[ac]ss', 'g')) != ""
+    au BufRead *.css if &modifiable
+          \ && (glob(expand('<afile>:r').'.s[ca]ss', 1) != ""
+          \ || glob(substitute(expand('<afile>'), 'css', 's[ac]ss', 'g')) != "")
           \ |   echoerr "WARN: editing .css, but .scss/.sass exists!"
-          \ |   set readonly
+          \ |   set nomodifiable readonly
           \ | endif
 
     " Make Vim help files modifiable by default.

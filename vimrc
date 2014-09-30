@@ -797,10 +797,6 @@ if 1 " has('eval') / `let` may not be available.
 
   let g:cursorcross_mappings = 0  " No generic mappings for cursorcross.
 
-  " github-issues
-  " Trigger API request(s) only when completion is used/invoked.
-  let g:gissues_lazy_load = 1
-
   " Force delimitMate mapping (gets skipped if mapped already).
   fun! My_CR_map()
     " "<CR>" via delimitMateCR
@@ -838,6 +834,10 @@ if 1 " has('eval') / `let` may not be available.
   " For endwise.
   imap <C-X><CR> <CR><Plug>AlwaysEnd
   " }}}
+
+  " github-issues
+  " Trigger API request(s) only when completion is used/invoked.
+  let g:gissues_lazy_load = 1
 
   " inoremap <expr> <tab>  pumvisible() ? "\<C-n>" : "\<tab>"
 

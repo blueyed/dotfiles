@@ -69,3 +69,6 @@
 [submodule "lib/zsh-autoenv"]
 	path = lib/zsh-autoenv
 	url = git://github.com/blueyed/autoenv.git
+[submodule "urxvt/ext/urxvt-font-size"]
+	path = urxvt/ext/urxvt-font-size
+	url = git://github.com/majutsushi/urxvt-font-size.git

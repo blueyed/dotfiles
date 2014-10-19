@@ -72,3 +72,6 @@
 [submodule "urxvt/ext/urxvt-font-size"]
 	path = urxvt/ext/urxvt-font-size
 	url = git://github.com/majutsushi/urxvt-font-size.git
+[submodule "lib/solarized-xresources"]
+	path = lib/solarized-xresources
+	url = git://github.com/solarized/xresources.git

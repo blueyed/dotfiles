@@ -1323,8 +1323,13 @@ function! ShortenFilename(...)  " {{{
     let bufname = bufname("%")
     if !len(bufname)
       if len(&ft)
-        " use &ft for name (e.g. with 'startify'
-        return '['.&ft.']'
+        " Use &ft for name (e.g. with 'startify' and quickfix windows).
+        let alt_name = expand('#')
+        if len(alt_name)
+          return '['.&ft.'] '.ShortenFilename(expand('#'))
+        else
+          return '['.&ft.']'
+        endif
       else
         " TODO: get Vim's original "[No Name]" somehow
         return '[No Name]'

@@ -3388,6 +3388,44 @@ fun! MyGetNonDefaultServername()
   return ''
 endfun
 
+" Change cursor shape for terminal mode. {{{1
+if exists('&t_SI')
+  " 'start insert' and 'exit insert'.
+  let &t_SI = ''
+  let &t_EI = ''
+  if $COLORTERM =~ "rxvt"
+    " Reference: {{{
+    " P s = 0 → blinking block.
+    " P s = 1 → blinking block (default).
+    " P s = 2 → steady block.
+    " P s = 3 → blinking underline.
+    " P s = 4 → steady underline.
+    " P s = 5 → blinking bar (xterm).
+    " P s = 6 → steady bar (xterm).
+    " source: http://vim.wikia.com/wiki/Configuring_the_cursor
+    " }}}
+    let &t_SI .= "\<Esc>[3 q"
+    let &t_EI .= "\<Esc>[1 q"
+
+    " let &t_SI = "\<Esc>]12;purple\x7"
+    " let &t_EI = "\<Esc>]12;blue\x7"
+
+    " mac / iTerm?!
+    " let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+    " let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+  elseif &t_Co > 1
+    " Fallback (e.g. for gnome-terminal): change only the color of the cursor.
+    let &t_SI .= "\<Esc>]12;#0087ff\x7"
+    let &t_EI .= "\<Esc>]12;#5f8700\x7"
+  endif
+endif
+" Wrap escape codes for tmux.
+if len($TMUX)
+  let &t_SI = "\<Esc>Ptmux;\<Esc>".&t_SI."\<Esc>\\"
+  let &t_EI = "\<Esc>Ptmux;\<Esc>".&t_EI."\<Esc>\\"
+endif
+" }}}
+
 " Delete all but the current buffer. {{{
 " Source: http://vim.1045645.n5.nabble.com/Close-all-buffers-except-the-one-you-re-in-tp1183357p1183361.html
 com! -bar -bang BDOnly call s:BdOnly(<q-bang>)

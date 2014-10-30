@@ -2418,7 +2418,7 @@ if &rtp =~ '\<supertab\>'
   " let g:SuperTabLongestEnhanced = 1  " involves mappings; requires
   " completeopt =~ longest
   let g:SuperTabClosePreviewOnPopupClose = 1
-  let g:SuperTabNoCompleteAfter = ['^\s*']
+  let g:SuperTabNoCompleteAfter = ['^', '\s']
 
   " map <c-space> to <c-p> completion (useful when supertab 'context'
   " defaults to something else).
@@ -2480,7 +2480,7 @@ let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is n
 let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
 
 let g:EclimLargeFileEnabled = 0
-let g:EclimCompletionMethod = 'omnifunc' " setup &omnifunc instead of &completefunc; this way YCM picks it up
+let g:EclimCompletionMethod = 'completefunc' " Default, picked up via SuperTab.
 " let g:EclimLogLevel = 6
 " if exists(":EclimEnable")
 "   au VimEnter * EclimEnable

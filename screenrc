@@ -5,5 +5,5 @@ caption always "%?%F%{-b gk}%? %L=%-Lw%45>%{-b kg}%n%f* %t%{-}%+Lw%-0<"
 
 # Hardstatus (update xterm title)
 # do not overwrite byobu's
-hardstatus string "SCREEN @ %H: %-n - %t"
+hardstatus string "[screen: %-n] %t (@%H)"
 

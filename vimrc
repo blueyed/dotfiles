@@ -1631,34 +1631,6 @@ for i in range(9)
   exec 'nmap <M-' .(i+1).'> :call MyGotoNextTabOrBuffer('.(i+1).')<cr>'
 endfor
 
-" titlestring handling, with tmux support {{{
-" Change tmux window name (used in window list) {{{
-if 0 && len($TMUX_PANE)
-  if len($_tmux_title_is_auto_set)
-    " Use exported state from Zsh (if any)
-    let g:tmux_auto_rename_window = $_tmux_title_is_auto_set
-  else
-    " look at tmux' automatic-rename option
-    let s:tmux_auto_set = system('tmux show-window-options -t $TMUX_PANE -v automatic-rename 2>/dev/null')
-    if v:shell_error
-      let s:tmux_auto_set = system('tmux show-window-options -t $TMUX_PANE | grep "^automatic-rename" | cut -f2 -d\ ')
-    endif
-    " TODO: look for marker (﻿) at end of current title
-    let g:tmux_auto_rename_window = s:tmux_auto_set =~ '^off' ? 0 : 1
-  endif
-  augroup tmuxtitle
-    au!
-    " au BufReadPost,FileReadPost,BufNewFile * call MySetTmuxWindowTitle('vi: '.expand('%:t'))
-    " au BufWinEnter,WinEnter * call MySetTmuxWindowTitle('vi: '.expand('%:t'))"{{{"}}}
-    " BufReadPost,FileReadPost,BufNewFile from http://stackoverflow.com/a/15124717/15690
-    " FocusGained: not working with tmux, but should (when coming back from
-    " another pane)
-    " XXX: not called after returning/quitting :Gdiff; https://github.com/tpope/vim-fugitive/issues/421
-    " au FocusGained,BufWinEnter,WinEnter * call MySetTmuxWindowTitle(ShortenFilename('%', 15))
-    " au BufEnter,BufWinEnter,WinEnter * echomsg "BufEnter"
-    au BufEnter,BufFilePost * call MySetTmuxWindowTitle(ShortenFilename('%', 15))
-  augroup END
-endif " }}}
 
 fun! MyGetPrettyFileDir()
   " TODO: use shorten_path / abstract it
@@ -1668,21 +1640,6 @@ fun! MyGetPrettyFileDir()
   endif
   return ''
 endfun
-
-fun! MySetTmuxWindowTitle(title)
-  " echom "MySetTmuxWindowTitle" a:title
-  " return early, if unchanged
-  if a:title == g:_last_tmux_win_title | return | endif
-
-  " call tmux according to g:tmux_auto_rename_window setting
-  if exists('g:tmux_auto_rename_window') && g:tmux_auto_rename_window
-    " tmux title: prefix and marker for "auto-renamed"
-    let s:tmux_title = '✐ '.a:title.'﻿'
-    call system('tmux rename-window -t $TMUX_PANE '.shellescape(s:tmux_title))
-    let g:_last_tmux_win_title = a:title
-  endif
-endfun
-let g:_last_tmux_win_title = ''
 
 " Set titlestring, used to set terminal title (pane title in tmux). {{{2
 set title
@@ -1728,11 +1685,22 @@ fun! MySetupTitleString()
       call system('tmux set-window-option -t '.$TMUX_PANE.' -q automatic-rename off')
       call system('tmux rename-window -t '.$TMUX_PANE.' 0')
     endif
-    " _tmux_name_reset=${TMUX}_${TMUX_PANE}
+  endif
+
+  " Make Vim set the window title according to &titlestring.
+  if !has('gui_running') && empty(&t_ts)
+    if len($TMUX)
+      let &t_ts = "\e]2;"
+      let &t_fs = "\007"
+    elseif &term =~ "^screen.*"
+      let &t_ts="\ek"
+      let &t_fs="\e\\"
+    endif
   endif
 endfun
+
 if has('vim_starting')
-  au! VimEnter * call MySetupTitleString()
+  au! VimEnter * call MySetupTitleString() | redraw
   au! SessionLoadPost * if ! exists('g:loaded_title') | let g:loaded_title=1 | call MySetupTitleString() | endif
 else
   call MySetupTitleString()
@@ -3194,7 +3162,6 @@ endif
 " NOTE: drawback (with imap) - triggers timeout for Esc: use jk/kj,
 "       or press it twice.
 " NOTE: Alt-<NR> mapped in tmux. TODO: change this?!
-" NOTE: äd
 if ! has('gui_running')
   fun! MySetupAltMapping(c)
     " exec "set <A-".a:c.">=\e".a:c
@@ -3420,10 +3387,11 @@ if exists('&t_SI')
   endif
 endif
 " Wrap escape codes for tmux.
-if len($TMUX)
-  let &t_SI = "\<Esc>Ptmux;\<Esc>".&t_SI."\<Esc>\\"
-  let &t_EI = "\<Esc>Ptmux;\<Esc>".&t_EI."\<Esc>\\"
-endif
+" NOTE: wrapping it acts on the term, not just on the pane!
+" if len($TMUX)
+"   let &t_SI = "\<Esc>Ptmux;\<Esc>".&t_SI."\<Esc>\\"
+"   let &t_EI = "\<Esc>Ptmux;\<Esc>".&t_EI."\<Esc>\\"
+" endif
 " }}}
 
 " Delete all but the current buffer. {{{

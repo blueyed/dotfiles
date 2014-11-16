@@ -46,7 +46,7 @@ migrate: .stamps/neobundle.1
 .stamps/neobundle.1:
 	@echo '== Migrating to neobundles =='
 	@echo Use the following to inspect any changes to vim/pathogen submodules:
-	@echo 'cd vim/bundle; for i in $$(git ls-files -o ); do echo $$i; ( cd $$i && git diff --exit-code; ) || break; done'
+	@echo 'cd vim/bundle; for i in $$(git ls-files -o ); do echo $$i; ( test -f $$i && (git diff --exit-code;) || ( cd $$i && git diff --exit-code; ) ) || break; done'
 	@echo To delete all untracked bundles:
 	@echo 'rm $$(git ls-files -o vim/bundle) -r'
 	touch $@

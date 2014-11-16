@@ -75,3 +75,6 @@
 [submodule "urxvt/ext/urxvt-perls"]
 	path = urxvt/ext/urxvt-perls
 	url = git://github.com/muennich/urxvt-perls.git
+[submodule "lib/zsh-autoenv"]
+	path = lib/zsh-autoenv
+	url = git://github.com/Tarrasch/zsh-autoenv.git

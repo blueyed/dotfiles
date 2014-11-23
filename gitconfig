@@ -38,6 +38,7 @@
 	rbc = rebase --continue
 	rbi = rebase --interactive
 	rbs = rebase --skip
+	rl = reflog --pretty=reflog
 	s = status
 	sm = submodule
 	sta = stash
@@ -116,6 +117,11 @@
 	cmd = bcompare
 [format]
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
+
+[pretty]
+	# reflog, with relative date:
+	reflog = %C(auto)%h %<|(17)%gd %<|(30)%C(blue)%cr%C(reset) %s
+	; reflog = %C(auto)%h %<|(17)%gd %C(blue)%ci%C(reset) %s
 
 [push]
 	# "simple" not available with Git 1.7.10 (Debian stable), "current" is similar.

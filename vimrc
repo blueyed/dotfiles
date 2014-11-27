@@ -1198,10 +1198,12 @@ if has("autocmd") " Autocommands {{{1
   " across Vim instances
     " \   rviminfo |
   " NOTE: removed for SVN commit messages: && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp'
+  " ref: :h last-position-jump
   fun! AutojumpLastPosition()
     if ! exists('b:autojumped_init')
       let b:autojumped_init = 1
-      if &ft != 'gitcommit' && &ft != 'diff' && ! &diff && line("'\"") <= line("$")
+      if &ft != 'gitcommit' && &ft != 'diff' && ! &diff && line("'\"") <= line("$") && line("'\"") > 0
+        " NOTE: `zv` is ignored with foldlevel in modeline.
         exe 'normal! g`"zv'
       endif
     endif

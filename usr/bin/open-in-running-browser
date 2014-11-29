@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Pass through all arguments to the first running program from a list.
+# Fall back to $default.
+#
+# When used as default browser, it will prefer a running instance of Chrome
+# instead of launching Firefox (default).
+
+browsers="firefox chromium google-chrome-stable google-chrome /opt/google/chrome/chrome"
+default=firefox
+
+for browser in $browsers; do
+  if pgrep -f -n $browser > /dev/null ; then
+    if [ "$browser" = firefox ]; then
+      # Indicate to awesome that the client window should get raised and jumped to.
+      # echo $(pgrep -fn firefox) > /tmp/.awesome-raise-next-client
+
+      # continue any stopped processed (sigstop-if-not-focused)
+      pkill -CONT firefox
+    fi
+    exec $browser "$@"
+    exit
+  fi
+done
+
+exec $default "$@"

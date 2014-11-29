@@ -10,7 +10,7 @@ These are config files to set up a system the way I like it.
   # b) without a github account setup:
   git clone git://github.com/blueyed/dotfiles ~/.dotfiles
   cd ~/.dotfiles
-  make
+  make install
 
 == Environment
 

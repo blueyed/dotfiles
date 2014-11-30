@@ -2905,8 +2905,10 @@ if has('eval')
   " Source: http://vim.wikia.com/wiki/Run_a_command_in_multiple_buffers#Restoring_position
   " Like windo but restore the current window.
   function! Windo(command)
+    let curaltwin = winnr('#')
     let currwin=winnr()
     execute 'windo ' . a:command
+    execute curaltwin . 'wincmd w'
     execute currwin . 'wincmd w'
   endfunction
   com! -nargs=+ -complete=command Windo call Windo(<q-args>)

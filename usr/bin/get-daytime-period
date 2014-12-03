@@ -6,38 +6,66 @@
 # This defaults to the geoclue provider and falls back to lat/lon (via config
 # file). The result is cached for 10 minutes.
 
+USE_REDSHIFT=1
+USE_GEOCLUE=1
+CACHE_SECONDS=600
+
+if [ "$USE_REDSHIFT" = 1 ] && ! hash redshift 2> /dev/null; then
+  echo "redshift not found." >&2
+  USE_REDSHIFT=0
+fi
+
 cachefile=~/.cache/redshift-period
 latlonfile=~/.config/redshift-latlon-default
 
-# If `redshift` is not available, just look at the current hour.
-if ! hash redshift 2> /dev/null; then
+get_period_by_hour() {
   hour=$(date +%H)
   if [ "$hour" -gt 8 ] || [ "$hour" -lt 21 ]; then
     echo -n "Daytime"
   else
     echo -n "Night"
   fi
+}
+
+# If not using `redshift`, just look at the current hour.
+if [ "$USE_REDSHIFT" = 0 ]; then
+  get_period_by_hour
   exit
 fi
 
-if [ -e $cachefile ]; then
-  if [ `stat --format=%Y $cachefile` -gt $(( `date +%s` - 600 )) ]; then
+if [ -e "$cachefile" ]; then
+  if [ `stat --format=%Y $cachefile` -gt $(( `date +%s` - $CACHE_SECONDS )) ]; then
     cat $cachefile
-    exit 0
+    exit
   fi
 fi
 
-# Try geoclue
-if ! period=$(redshift -l geoclue -p 2>/dev/null | grep "^Period"); then
+# Try geoclue.
+if [ "$USE_GEOCLUE" = 1 ]; then
+  period=$(timeout 1 redshift -l geoclue -p 2>/dev/null)
+  timeout_ret=$?
+  if [ "$timeout_ret" = 124 ]; then
+    echo 'WARNING: redshift with geoclue timed out.' >&2
+  else
+    period=$(echo "$period" | grep "^Period")
+  fi
+fi
+
+if [ -z "$period" ]; then
   if [ ! -e $latlonfile ]; then
-    echo "ERROR: geoclue failed and fallback ($latlonfile) does not exist."
+    echo "ERROR: latlonfile ($latlonfile) does not exist." >&2
     exit 1
   fi
   period=$(redshift -l $(cat $latlonfile) -p | grep "^Period")
 fi
 
-if [ -n "$period" ]; then
-  period=$(echo $period | cut -d\  -f2)
+if [ -z "$period" ]; then
+  echo "WARNING: failed to determine period using redshift." >&2
+  echo "Falling back to get_period_by_hour." >&2
+  get_period_by_hour
+  exit
 fi
+
+period=$(echo $period | cut -d\  -f2)
 echo -n $period > $cachefile
 echo -n $period

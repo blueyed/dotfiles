@@ -1,0 +1,9 @@
+#!/bin/sh -x
+# Raise a client/window, given its process ID (PID).
+
+[ -z "$1" ] && {
+  echo "Raise which PID's window?"
+  exit
+}
+windowid=$(wmctrl -lp | awk "\$3 == $1 {print \$1}")
+wmctrl -i -a $windowid

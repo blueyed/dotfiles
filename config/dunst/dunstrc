@@ -1,5 +1,5 @@
 [global]
-    font = Monospace 8
+    font = Ubuntu Mono 12
 
     # Allow a small subset of html markup:
     #   <b>bold</b>
@@ -64,7 +64,7 @@
     # the top and down respectevly.
     # The width can be negative.  In this case the actual width is the
     # screen width minus the width defined in within the geometry option.
-    geometry = "300x5-30+20"
+    geometry = "300x5-10+25"
 
     # Shrink window if it's smaller than the width.  Will be ignored if
     # width is 0.
@@ -108,7 +108,7 @@
     # This adds empty space above and under the text.
     line_height = 0
 
-    # Draw a line of "separatpr_height" pixel height between two
+    # Draw a line of "separator_height" pixel height between two
     # notifications.
     # Set to 0 to disable.
     separator_height = 2
@@ -130,7 +130,7 @@
     # Print a notification on startup.
     # This is mainly for error detection, since dbus (re-)starts dunst
     # automatically after a crash.
-    startup_notification = false
+    startup_notification = true
 
     # dmenu path.
     dmenu = /usr/bin/dmenu -p dunst:
@@ -139,8 +139,8 @@
     browser = /usr/bin/firefox -new-tab
 
 [frame]
-    width = 3
-    color = "#aaaaaa"
+    width = 0
+    color = "#002B36"
 
 [shortcuts]
 
@@ -158,7 +158,7 @@
     # Redisplay last message(s).
     # On the US keyboard layout "grave" is normally above TAB and left
     # of "1".
-    history = ctrl+grave
+    history = ctrl+mod1+asciicircum
 
     # Context menu.
     context = ctrl+shift+period

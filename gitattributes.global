@@ -1,3 +1,10 @@
-*.odp diff=odf
-*.ods diff=odf
-*.odt diff=odf
+*.htm  diff=html
+*.html diff=html
+*.java diff=java
+*.odp  diff=odf
+*.ods  diff=odf
+*.odt  diff=odf
+*.php  diff=php
+*.pl   diff=perl
+*.py   diff=python
+*.rb   diff=ruby

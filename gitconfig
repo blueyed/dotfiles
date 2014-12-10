@@ -31,6 +31,7 @@
 	m = merge
 	ma = merge --abort
 	mm = merge --no-edit
+	mmm = merge -X theirs --no-edit
 	# preview/temp merge
 	mp = merge --no-commit
 	rb = rebase -i @{u}
@@ -40,8 +41,9 @@
 	rbs = rebase --skip
 	rl = reflog --pretty=reflog
 	s = status
+	st = status
 	sm = submodule
-	sta = stash
+	sta = stash --keep-index
 	sts = stash show -p
 	stp = stash pop
 	g = log -p
@@ -66,6 +68,12 @@
 	wipe = "!f() { rev=$(git rev-parse ${1-HEAD}); \
 		git add -A && git commit --allow-empty -qm 'WIPE SAVEPOINT' \
 		&& git reset $rev --hard; }; f"
+
+	# Merge file contents from another branch.
+	# Source: http://stackoverflow.com/a/24544974/15690
+	mergetool-file = "!sh -c 'git show $1:$2 > $2.theirs \
+		&& git show $(git merge-base $1 $(git rev-parse HEAD)):$2 > $2.base \
+		&& bcompare $2.theirs $2 $2.base $2 && { rm -f $2.theirs; rm -f $2.base; }' -"
 [browser "open-in-running-browser"]
 	cmd = open-in-running-browser
 [web]
@@ -93,8 +101,11 @@
 	pager = less --no-init --quit-if-one-screen
 	# -+F/-+X to override LESS selectively?! (http://stackoverflow.com/a/18781512/15690)
 	# pager = less -+F -+X
+# [pager]
+# 	blame = less -S --no-init --quit-if-one-screen
 [diff]
-	tool = bc3
+	# tool = bc3
+	tool = vimdiff
 	mnemonicprefix = true
 [difftool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE
@@ -102,11 +113,21 @@
 	prompt = false
 [merge]
 	tool = bc3
+	# http://sjl.bitbucket.org/splice.vim/
+	# tool = splice
 	stat = true
 	ff = no
-[mergetool "bc3"]
-	cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
+	# Insert common ancestor in conflict hunks.
+	conflictstyle = diff3
+
+[mergetool "splice"]
+	cmd = "vim -f $BASE $LOCAL $REMOTE $MERGED -c 'SpliceInit'"
 	trustExitCode = true
+[mergetool "bc3"]
+	# Not required (anymore?)?!
+	# cmd = bcompare $LOCAL $REMOTE $BASE $MERGED
+	trustExitCode = true
+
 [merge "dpkg-mergechangelogs"]
 	name = debian/changelog merge driver
 	driver = dpkg-mergechangelogs -m %O %A %B %A
@@ -120,7 +141,8 @@
 
 [pretty]
 	# reflog, with relative date:
-	reflog = %C(auto)%h %<|(17)%gd %<|(30)%C(blue)%cr%C(reset) %s
+	; reflog = %C(auto)%h %<|(17)%gd %<|(30)%C(blue)%cr%C(reset) %s
+	reflog = %C(auto)%h %<|(17)%gd %<|(31)%C(blue)%cr%C(reset) %gs (%s)
 	; reflog = %C(auto)%h %<|(17)%gd %C(blue)%ci%C(reset) %s
 
 [push]
@@ -150,3 +172,8 @@
 ; 	status = true
 
 # vim: ft=gitconfig
+[sendemail]
+	confirm = always
+[rerere]
+	autoupdate = true
+	enabled = true

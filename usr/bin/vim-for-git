@@ -12,6 +12,11 @@ FILE=$1
 # if [ -z $EDITOR ]; EDITOR=vim ; fi
 
 if [ "$(basename "$FILE")" = "COMMIT_EDITMSG" ]; then
+  # NOTE: there is also a FileType autocommand for "gitcommit" in ~/.vimrc.
+    # -c "set foldmethod=syntax foldlevel=1 nohlsearch nospell sw=2 scrolloff=0" \
+    # -c "g/^# \(Changes not staged\|Untracked files\)/norm zc" \
+    # -c "normal zt" \
+    # -c "set spell spl=en,de" \
   $EDITOR \
     -c "exe max([5, min([10, (winheight(0) / 3)])]).'split'" \
     -c "normal gg" \

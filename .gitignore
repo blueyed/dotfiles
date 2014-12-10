@@ -12,7 +12,16 @@ vim/neobundles/
 vim/spell
 vim/undo
 tags
+__pycache__
 *.pyc
 *.swp
 .passwd
 .stamps
+
+# Ignore .local files, typically symlinked to make them greppable from the root.
+pentadactylrc.local
+zshenv.local
+zshrc.local
+
+# Build dir, used for tests.
+build

@@ -1,28 +1,39 @@
 #!/bin/sh
 #
 # Shorten path according to hashed dir list ('hash -d' in Zsh)
+# It also replaces $HOME with ~.
 #
 # This is used from vimrc.
 
-# TODO: handle $HOME?! currently done by Vim
 # TODO: relative to current dir?! currently done by Vim
 
 path="$1"
 
 hash_file=$HOME/.cache/hashd
 
-# Regenerate hash cache file, if zshrc/zshrc.local (which contain hash commands) are newer.
+# Regenerate hash cache file, if zshrc/zshrc.local (which contains hash
+# commands) is newer.
 # if ! [ -f $hash_file ] || [ $(( $(date +%s) - $(stat -c %Y $hash_file) )) -gt 86400 ]; then
 if ! [ -f $hash_file ] || [ ~/.zshrc -nt $hash_file ] || [ ~/.zshrc.local -nt $hash_file ]; then
   # Generate list, sorted by length (so ~omz gets shortened instead of ~df/oh-my-zsh).
-  zsh -i -c 'hash -d' | awk '{print length, $0;}' | sort -nr | cut -d\  -f2- > $hash_file
+  # zsh -i -c 'hash -d' | awk '{print length, $0;}' | sort -nr | cut -d\  -f2- > $hash_file
+
+  # Use a temporary file to only get the output from "hash -d".
+  (cd /tmp \
+    && t=$(mktemp) \
+    && zsh -i -c "hash -d > $t" 2>/dev/null \
+    && awk '{print length, $0;}' $t | sort -nr | cut -d\  -f2- > $hash_file)
 fi
 
+set -f  # Disable path globbing, in case there's '*' in the cache file.
 IFS='
 '
 for line in $(cat $hash_file); do
   var=${line%%=*}
   val=${line#*=}
+  # Skip any unexpected lines.
+  [ "$var" != "$line" ] && [ "$val" != "" ] || continue
+
   # TODO: match only at beginning?!
   # echo "$var => $val"
   new=${path#$val}
@@ -32,4 +43,4 @@ for line in $(cat $hash_file); do
     exit
   fi
 done
-echo -n $path
+echo -n $path | sed "s:^$HOME:~:"

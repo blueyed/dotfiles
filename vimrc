@@ -285,6 +285,9 @@ if 1 " has('eval') / `let` may not be available.
     endif
     call neobundle#end()
 
+    " Use shallow copies by default.
+    let g:neobundle#types#git#clone_depth = 10
+
     " Installation check.
     NeoBundleCheck
 

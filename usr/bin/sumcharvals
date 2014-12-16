@@ -1,21 +1,29 @@
 #!/usr/bin/env zsh
 # Source: http://mika.l3ib.org/code/dot-zshrc
-if [[ $# -eq 0 ]]; then
-  echo "Usage: $0 [string] [mod] [parameter]"
-  echo
-  echo "sums the char values of string and modulates with mod"
-  echo "if parameter is given, assign result to it, otherwise echo"
-  return 0
-fi
-local name=$1 sum=0
-unset i
-integer i
-for (( i=1; i <= $#name; i++ )) {
-  (( sum+=##$name[i] ))
+
+sumcharvals() {
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: $0 [string] [mod] [parameter]"
+    echo
+    echo "sums the char values of string and modulates with mod"
+    echo "if parameter is given, assign result to it, otherwise echo"
+    return 0
+  fi
+  local name=$1 sum=0
+  unset i
+  integer i
+  for (( i=1; i <= $#name; i++ )) {
+    (( sum+=##$name[i] ))
+  }
+  [[ -n $2 ]] && (( sum%=$2 ))
+  if [[ -n $3 ]]; then
+    typeset -g $3=$sum
+  else
+    echo $sum
+  fi
 }
-[[ -n $2 ]] && (( sum%=$2 ))
-if [[ -n $3 ]]; then
-  typeset -g $3=$sum
-else
-  echo $sum
+
+if [[ $ZSH_EVAL_CONTEXT == 'toplevel' ]]; then
+  # not being sourced, run the function:
+  sumcharvals $@
 fi

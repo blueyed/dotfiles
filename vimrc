@@ -361,7 +361,7 @@ set backup          " enable backup (default off)
 set writebackup     " keep a backup while writing the file (default on)
 set backupcopy=yes  " important to keep the file descriptor (inotify)
 
-set directory=~/tmp/vim/swapfiles
+set directory=~/tmp/vim/swapfiles//  " // => use full path of original file
 
 set nowrap
 

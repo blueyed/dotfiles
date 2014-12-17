@@ -20,7 +20,7 @@ latlonfile=~/.config/redshift-latlon-default
 
 get_period_by_hour() {
   hour=$(date +%H)
-  if [ "$hour" -gt 8 ] || [ "$hour" -lt 21 ]; then
+  if [ "$hour" -gt 8 ] && [ "$hour" -lt 21 ]; then
     echo -n "Daytime"
   else
     echo -n "Night"

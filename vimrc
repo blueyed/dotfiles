@@ -930,6 +930,11 @@ endif
 
 for s:create_dir in s:check_create_dirs
   if ! isdirectory(s:create_dir)
+    if match(s:create_dir, ',')
+      echohl WarningMsg | echom "WARN: not creating dir: ".s:create_dir | echohl None
+      continue
+    endif
+    echom "Creating dir: ".s:create_dir
     call mkdir(s:create_dir, 'p', 0700 )
   endif
 endfor

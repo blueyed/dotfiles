@@ -13,7 +13,10 @@ is_remote() {
 }
 
 is_remote && USE_REDSHIFT=0 || USE_REDSHIFT=1
-USE_GEOCLUE=1
+# Do not use geoclue by default, too slow and fragile.
+# TODO: provide a method to easily update the latlonfile.
+USE_GEOCLUE=0
+GEOCLUE_TIMEOUT=2s
 CACHE_SECONDS=600
 
 if [ "$USE_REDSHIFT" = 1 ] && ! hash redshift 2> /dev/null; then
@@ -23,6 +26,7 @@ fi
 
 cachefile=~/.cache/redshift-period
 latlonfile=~/.config/redshift-latlon-default
+ok_to_cache=1
 
 get_period_by_hour() {
   hour=$(date +%H)
@@ -48,12 +52,17 @@ fi
 
 # Try geoclue.
 if [ "$USE_GEOCLUE" = 1 ]; then
-  period=$(timeout 1 redshift -l geoclue -p 2>/dev/null)
+  geoclue_period=$(timeout $GEOCLUE_TIMEOUT redshift -l geoclue -p 2>/dev/null)
   timeout_ret=$?
-  if [ "$timeout_ret" = 124 ]; then
-    echo 'WARNING: redshift with geoclue timed out.' >&2
+  if [ "$timeout_ret" = 0 ]; then
+    period=$(echo "$geoclue_period" | grep "^Period")
   else
-    period=$(echo "$period" | grep "^Period")
+    if [ "$timeout_ret" = 124 ]; then
+      echo 'WARNING: redshift with geoclue timed out.' >&2
+    else
+      echo "WARNING: redshift failed with exit code $timeout_ret." >&2
+    fi
+    ok_to_cache=0
   fi
 fi
 
@@ -73,5 +82,7 @@ if [ -z "$period" ]; then
 fi
 
 period=$(echo $period | cut -d\  -f2)
-echo -n $period > $cachefile
+if [ "$ok_to_cache" = 1 ]; then
+  echo -n $period > $cachefile
+fi
 echo -n $period

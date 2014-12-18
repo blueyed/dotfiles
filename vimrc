@@ -569,30 +569,40 @@ fun! MyToggleLangmap()
     silent! nunmap + ]
     silent! nunmap ä '
   else
-    " minimal
-    set langmap=ö:
-    set langmap+=-/,_?
-    " Work around problem where multibyte langmap lhs aborts too early
-    " (üuu/[uu, https://code.google.com/p/vim/issues/detail?id=297).
-    nmap ü [
-    " Map + normally, register names get langmapped, too!
-    nmap + ]
-    " " Map * to ' (Shift-#); would be 8 on en layout, but I do not like
-    " " to shift Shift-6…. ' would be ~ on en, but that's good with AltGr-+.
-    " set langmap+=ä'
-    nmap ä '
-    set langmap+='*
+    if exists('+langnoremap')
+      " Only use langmap when langnoremap is available.
+      set langnoremap
 
-    " Swap ´ and ` (avoid Shift for the one that considers column).
-    set langmap+=´`,`´
+      " minimal
+      set langmap=ö:
+      set langmap+=-/,_?
+      " Work around problem where multibyte langmap lhs aborts too early
+      " (üuu/[uu, https://code.google.com/p/vim/issues/detail?id=297).
+      nmap ü [
+      " Map + normally, register names get langmapped, too!
+      nmap + ]
+      " " Map * to ' (Shift-#); would be 8 on en layout, but I do not like
+      " " to shift Shift-6…. ' would be ~ on en, but that's good with AltGr-+.
+      " set langmap+=ä'
+      " nmap ä '
+      " set langmap+='*
 
-    " Mapped to A-h/A-l
-    " set langmap+=Ü{,*},
+      " Swap ´ and ` (avoid Shift for the one that considers column).
+      set langmap+=´`,`´
+
+      " Mapped to A-h/A-l
+      " set langmap+=Ü{,*},
+    else
+      nmap ö :
+      nmap - /
+      nmap _ ?
+      nmap ü [
+      nmap + ]
+    endif
   endif
   if &verbose | 0verb set langmap? | endif
 endfun
 nmap <f11> :verb call MyToggleLangmap()<CR>
-set langnoremap
 call MyToggleLangmap()
 
 

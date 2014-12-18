@@ -6,7 +6,13 @@
 # This defaults to the geoclue provider and falls back to lat/lon (via config
 # file). The result is cached for 10 minutes.
 
-[ -n "$SSH_CLIENT" ] && USE_REDSHIFT=0 || USE_REDSHIFT=1
+is_remote() {
+  [ -n "$SSH_CLIENT" ] && return
+  # Container in OpenVZ?
+  [ -r /proc/user_beancounters ] && ! [ -d /proc/bc ]
+}
+
+is_remote && USE_REDSHIFT=0 || USE_REDSHIFT=1
 USE_GEOCLUE=1
 CACHE_SECONDS=600
 

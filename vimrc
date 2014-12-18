@@ -2224,7 +2224,7 @@ vnoremap <Leader>< "ty:let @t=substitute(@t, '\v\n\s*\\', ' ', 'g')<cr>:@t<cr>
 command! RR ProjectRootLCD
 command! RRR ProjectRootCD
 
-" Toggle pattern (typically a char) at the end of line {{{2
+" Toggle pattern (typically a char) at the end of line(s). {{{2
 function! MyToggleLastChar(pat)
   let view = winsaveview()
   try
@@ -2235,11 +2235,14 @@ function! MyToggleLastChar(pat)
     call winrestview(view)
   endtry
 endfunction
-noremap <Leader>; :call MyToggleLastChar(';')<cr>
-noremap <Leader>: :call MyToggleLastChar(':')<cr>
-noremap <Leader>, :call MyToggleLastChar(',')<cr>
-noremap <Leader>. :call MyToggleLastChar('.')<cr>
-noremap <Leader>qa :call MyToggleLastChar('  # noqa')<cr>
+if has('vim_starting')
+  noremap <unique> <Leader>,; :call MyToggleLastChar(';')<cr>
+  noremap <unique> <Leader>,: :call MyToggleLastChar(':')<cr>
+  noremap <unique> <Leader>,, :call MyToggleLastChar(',')<cr>
+  noremap <unique> <Leader>,. :call MyToggleLastChar('.')<cr>
+  noremap <unique> <Leader>,qa :call MyToggleLastChar('  # noqa')<cr>
+endif
+
 
 " use 'en_us' also to work around matchit considering 'en' as 'endif'
 set spl=de,en_us

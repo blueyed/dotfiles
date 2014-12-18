@@ -610,6 +610,13 @@ call MyToggleLangmap()
 nnoremap Q :confirm q<cr>
 nnoremap <C-Q> :confirm qall<cr>
 
+" Use just "q" in special buffers.
+augroup vimrc_special_q
+  au!
+  autocmd FileType help,startify nnoremap <buffer> q :confirm q<cr>
+augroup END
+" }}}
+
 
 if 1 " has('eval') / `let` may not be available.
   " Use both , and Space as leader.

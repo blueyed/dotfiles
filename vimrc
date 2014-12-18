@@ -3367,6 +3367,15 @@ fun! MyGetNonDefaultServername()
   return ''
 endfun
 
+" Fixup screen terminfo, where italics is not defined and standout sends
+" italic (might have been fixed in ncurses after 5.9+20140118-1ubuntu1).
+if $TERM =~ '^screen' && &t_so == "\<Esc>[3m"
+  let &t_so = "\<Esc>[7m"
+  let &t_se = "\<Esc>[27m"
+  let &t_ZH = "\<Esc>[3m"
+  let &t_ZR = "\<Esc>[23m"
+endif
+
 " Change cursor shape for terminal mode. {{{1
 if exists('&t_SI')
   " 'start insert' and 'exit insert'.

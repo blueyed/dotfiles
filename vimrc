@@ -557,6 +557,50 @@ if has('gui_running')
 endif
 " }}}1
 
+" Generic mappings. {{{
+" Optimize mappings on German keyboard layout. {{{
+" Maps according to intl US keyboard layout.
+" Except for ":" shifted with ";" (saves pressing Shift for commands).
+
+fun! MyToggleLangmap()
+  if len(&langmap)
+    set langmap=
+    silent! nunmap ü [
+    silent! nunmap + ]
+    silent! nunmap ä '
+  else
+    " minimal
+    set langmap=ö:
+    set langmap+=-/,_?
+    " Work around problem where multibyte langmap lhs aborts too early
+    " (üuu/[uu, https://code.google.com/p/vim/issues/detail?id=297).
+    nmap ü [
+    " Map + normally, register names get langmapped, too!
+    nmap + ]
+    " " Map * to ' (Shift-#); would be 8 on en layout, but I do not like
+    " " to shift Shift-6…. ' would be ~ on en, but that's good with AltGr-+.
+    " set langmap+=ä'
+    nmap ä '
+    set langmap+='*
+
+    " Swap ´ and ` (avoid Shift for the one that considers column).
+    set langmap+=´`,`´
+
+    " Mapped to A-h/A-l
+    " set langmap+=Ü{,*},
+  endif
+  if &verbose | 0verb set langmap? | endif
+endfun
+nmap <f11> :verb call MyToggleLangmap()<CR>
+set langnoremap
+call MyToggleLangmap()
+
+
+" Quit with Q, exit with C-q.
+nnoremap Q :confirm q<cr>
+nnoremap <C-Q> :confirm qall<cr>
+
+
 if 1 " has('eval') / `let` may not be available.
   " Use both , and Space as leader.
   let mapleader = ","
@@ -2590,29 +2634,12 @@ fun! MyF5()
 endfun
 noremap <F5> :call MyF5()<cr>
 noremap <Leader>u :GundoToggle<cr>
-noremap <F6> gT
-noremap <F7> gt
 " noremap <F11> :YRShow<cr>
 " if has('gui_running')
 "   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
 "   imap <silent> <F11> <Esc><F11>a
 " endif
 
-" Mappings for german keyboard layout {{{
-" Map ö/ä to brackets used by unimpaired (more accessible on a German keyboard layout)
-map ö [
-map ä ]
-" For single hand mode:
-nmap äj :exec (getloclist(0) ? ':lnext' : ':cnext')."<CR>"
-nmap äk :exec (getloclist(0) ? ':lprev' : ':cprev')."<CR>"
-
-" Quit with ää / exit with ÄÄ
-nnoremap ÄÄ :confirm qall<cr>
-nnoremap ää :confirm q<cr>
-
-" Fast navigation.
-map ü {
-map + }
 " }}}
 
 " tagbar plugin
@@ -2850,16 +2877,6 @@ command! Maps Redir map
 " call Cabbrev('?',   '?\v')
 " call Cabbrev('s/',  's/\v')
 " call Cabbrev('%s/', '%s/\v')
-
-" Swap ' and ` keys (` is more useful, but requires shift on a German keyboard) {{{2
-noremap ' `
-sunmap '
-noremap ` '
-sunmap `
-noremap g' g`
-sunmap g'
-noremap g` g'
-sunmap g`
 
 " Make Y consistent with C and D / copy selection to gui-clipboard. {{{2
 nnoremap Y y$

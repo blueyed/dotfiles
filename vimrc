@@ -1097,6 +1097,19 @@ if 1 " has('eval')
   command! AutoBg call SetBgAccordingToShell()
   AutoBg
 
+  " Detect gnome-terminal. This is kind of obsolete with urxvt being the
+  " default terminal now.
+  fun! MyIsGnomeTerminal()
+    if !exists('g:_MyIsGnomeTerminal')
+      if len($COLORTERM)
+        let g:_MyIsGnomeTerminal = ($COLORTERM == 'gnome-terminal')
+      else
+        let g:_MyIsGnomeTerminal = len(system('pstree -A -s $$ | grep -- -gnome-terminal-')) > 0
+      endif
+    endif
+    return g:_MyIsGnomeTerminal
+  endfun
+
   " always light, because of airline theme issue
   " set bg=light
   " set fillchars+=stlnc:=
@@ -3415,18 +3428,18 @@ if exists('&t_SI')
   " 'start insert' and 'exit insert'.
   let &t_SI = ''
   let &t_EI = ''
-  if $COLORTERM =~ "rxvt"
+  if $COLORTERM =~ "^rxvt" || ($TERM =~ "^xterm" && !MyIsGnomeTerminal())
     " Reference: {{{
     " P s = 0 → blinking block.
     " P s = 1 → blinking block (default).
     " P s = 2 → steady block.
     " P s = 3 → blinking underline.
     " P s = 4 → steady underline.
-    " P s = 5 → blinking bar (xterm).
-    " P s = 6 → steady bar (xterm).
-    " source: http://vim.wikia.com/wiki/Configuring_the_cursor
+    " P s = 5 → blinking bar (xterm, urxvt).
+    " P s = 6 → steady bar (xterm, urxvt).
+    " Source: http://vim.wikia.com/wiki/Configuring_the_cursor
     " }}}
-    let &t_SI .= "\<Esc>[3 q"
+    let &t_SI .= "\<Esc>[5 q"
     let &t_EI .= "\<Esc>[1 q"
 
     " let &t_SI = "\<Esc>]12;purple\x7"
@@ -3435,7 +3448,10 @@ if exists('&t_SI')
     " mac / iTerm?!
     " let &t_SI = "\<Esc>]50;CursorShape=1\x7"
     " let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-  elseif &t_Co > 1
+  elseif $KONSOLE_PROFILE_NAME =~ "^Solarized.*"
+    let &t_EI = "\<Esc>]50;CursorShape=0;BlinkingCursorEnabled=1\x7"
+    let &t_SI = "\<Esc>]50;CursorShape=1;BlinkingCursorEnabled=1\x7"
+  elseif &t_Co > 1 && $TERM != "linux"
     " Fallback (e.g. for gnome-terminal): change only the color of the cursor.
     let &t_SI .= "\<Esc>]12;#0087ff\x7"
     let &t_EI .= "\<Esc>]12;#5f8700\x7"

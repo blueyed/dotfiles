@@ -6,7 +6,7 @@
 # This defaults to the geoclue provider and falls back to lat/lon (via config
 # file). The result is cached for 10 minutes.
 
-USE_REDSHIFT=1
+[ -n "$SSH_CLIENT" ] && USE_REDSHIFT=0 || USE_REDSHIFT=1
 USE_GEOCLUE=1
 CACHE_SECONDS=600
 

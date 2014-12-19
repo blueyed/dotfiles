@@ -3217,7 +3217,6 @@ if has('vim_starting') " only do this on startup, not when reloading .vimrc
   " nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
 endif
 
-" Fix xterm keys {{{
 " Map alt sequences for terminal via Esc.
 " source: http://stackoverflow.com/a/10216459/15690
 " NOTE: <Esc>O is used for special keys (e.g. OF (End))
@@ -3226,11 +3225,9 @@ endif
 " NOTE: Alt-<NR> mapped in tmux. TODO: change this?!
 if ! has('gui_running')
   fun! MySetupAltMapping(c)
-    " exec "set <A-".a:c.">=\e".a:c
-    " exec "imap \e".a:c." <A-".a:c.">"
-    exec "nmap \e".a:c." <A-".a:c.">"
-    " insert and command line mode:
-    " exec "map! \e".a:c." <A-".a:c.">"
+    " XXX: causes problems in macros: <Esc>a gets mapped to á.
+    "      Solution: use <C-c> / jk in macros.
+    exec "set <A-".a:c.">=\e".a:c
   endfun
   for [c, n] in items({'a':'z', 'A':'N', 'P':'Z', '0':'9'})
     while 1
@@ -3241,172 +3238,22 @@ if ! has('gui_running')
       let c = nr2char(1+char2nr(c))
     endw
   endfor
-  for c in [',', '.', '-', 'ö', 'ä', '#', 'ü', '+', '<']
+  " for c in [',', '.', '-', 'ö', 'ä', '#', 'ü', '+', '<']
+  for c in [',', '.', '-', '#', '+', '<']
     call MySetupAltMapping(c)
   endfor
 endif
 
-" Setup <Esc><Esc> as a map to <Esc> to workout timeout.
-" NOTE: mapping it to C-c is a bad idea, for leaving insert mode.
-" NOTE: not for insert mode, where there shouldn't be a timeout (no imap for
-"       Alt keys, ...)
-" NOTE: makes <Esc><Up> problematic.
-" noremap <Esc><Esc> <Esc>
+" Fix (shifted, altered) function and special keys in tmux. {{{
+" (requires `xterm-keys` option for tmux, works with screen).
+" Ref: http://unix.stackexchange.com/a/58469, http://superuser.com/a/402084/30216
+" See also: https://github.com/nacitar/terminalkeys.vim/blob/master/plugin/terminalkeys.vim
 
-" Map Shift-motion keys.
-nmap <Esc>[1;2A <S-Up>
-"map! <Esc>[1;2A <S-Up>
-nmap <Esc>[1;2B <S-Down>
-"map! <Esc>[1;2B <S-Down>
-nmap <Esc>[1;2C <S-Right>
-"map! <Esc>[1;2C <S-Right>
-nmap <Esc>[1;2D <S-Left>
-"map! <Esc>[1;2D <S-Left>
-nmap <Esc>[1;2F <S-End>
-"map! <Esc>[1;2F <S-End>
-nmap <Esc>[1;2H <S-Home>
-"map! <Esc>[1;2H <S-Home>
-nmap <Esc>[2;2~ <S-Insert>
-"map! <Esc>[2;2~ <S-Insert>
-nmap <Esc>[3;2~ <S-Delete>
-"map! <Esc>[3;2~ <S-Delete>
-nmap <Esc>[5;2~ <S-PageUp>
-"map! <Esc>[5;2~ <S-PageUp>
-nmap <Esc>[6;2~ <S-PageDown>
-"map! <Esc>[6;2~ <S-PageDown>
+if &term =~ '^screen'
+  " HACK: assume that the outer term is urxvt!
+  let &term = 'rxvt-unicode-256color'
+endif " }}}
 
-" Fix up M-motion keys
-nmap <Esc>[1;3A <M-Up>
-"map! <Esc>[1;3A <M-Up>
-nmap <Esc>[1;3B <M-Down>
-"map! <Esc>[1;3B <M-Down>
-nmap <Esc>[1;3C <M-Right>
-"map! <Esc>[1;3C <M-Right>
-nmap <Esc>[1;3D <M-Left>
-"map! <Esc>[1;3D <M-Left>
-nmap <Esc>[1;3F <M-End>
-"map! <Esc>[1;3F <M-End>
-nmap <Esc>[1;3H <M-Home>
-"map! <Esc>[1;3H <M-Home>
-nmap <Esc>[2;3~ <M-Insert>
-"map! <Esc>[2;3~ <M-Insert>
-nmap <Esc>[3;3~ <M-Delete>
-"map! <Esc>[3;3~ <M-Delete>
-nmap <Esc>[5;3~ <M-PageUp>
-"map! <Esc>[5;3~ <M-PageUp>
-nmap <Esc>[6;3~ <M-PageDown>
-"map! <Esc>[6;3~ <M-PageDown>
-
-" Fix up S-M-motion keys
-nmap <Esc>[1;4A <S-M-Up>
-"map! <Esc>[1;4A <S-M-Up>
-nmap <Esc>[1;4B <S-M-Down>
-"map! <Esc>[1;4B <S-M-Down>
-nmap <Esc>[1;4C <S-M-Right>
-"map! <Esc>[1;4C <S-M-Right>
-nmap <Esc>[1;4D <S-M-Left>
-"map! <Esc>[1;4D <S-M-Left>
-nmap <Esc>[1;4F <S-M-End>
-"map! <Esc>[1;4F <S-M-End>
-nmap <Esc>[1;4H <S-M-Home>
-"map! <Esc>[1;4H <S-M-Home>
-nmap <Esc>[2;4~ <S-M-Insert>
-"map! <Esc>[2;4~ <S-M-Insert>
-nmap <Esc>[3;4~ <S-M-Delete>
-"map! <Esc>[3;4~ <S-M-Delete>
-nmap <Esc>[5;4~ <S-M-PageUp>
-"map! <Esc>[5;4~ <S-M-PageUp>
-nmap <Esc>[6;4~ <S-M-PageDown>
-"map! <Esc>[6;4~ <S-M-PageDown>
-
-" Fix up C-motion keys
-nmap <Esc>[1;5A <C-Up>
-"map! <Esc>[1;5A <C-Up>
-nmap <Esc>[1;5B <C-Down>
-"map! <Esc>[1;5B <C-Down>
-nmap <Esc>[1;5C <C-Right>
-"map! <Esc>[1;5C <C-Right>
-nmap <Esc>[1;5D <C-Left>
-"map! <Esc>[1;5D <C-Left>
-nmap <Esc>[1;5F <C-End>
-"map! <Esc>[1;5F <C-End>
-nmap <Esc>[1;5H <C-Home>
-"map! <Esc>[1;5H <C-Home>
-nmap <Esc>[2;5~ <C-Insert>
-"map! <Esc>[2;5~ <C-Insert>
-nmap <Esc>[3;5~ <C-Delete>
-"map! <Esc>[3;5~ <C-Delete>
-nmap <Esc>[5;5~ <C-PageUp>
-"map! <Esc>[5;5~ <C-PageUp>
-nmap <Esc>[6;5~ <C-PageDown>
-"map! <Esc>[6;5~ <C-PageDown>
-
-" Fix up S-C-motion keys
-nmap <Esc>[1;6A <S-C-Up>
-"map! <Esc>[1;6A <S-C-Up>
-nmap <Esc>[1;6B <S-C-Down>
-"map! <Esc>[1;6B <S-C-Down>
-nmap <Esc>[1;6C <S-C-Right>
-"map! <Esc>[1;6C <S-C-Right>
-nmap <Esc>[1;6D <S-C-Left>
-"map! <Esc>[1;6D <S-C-Left>
-nmap <Esc>[1;6F <S-C-End>
-"map! <Esc>[1;6F <S-C-End>
-nmap <Esc>[1;6H <S-C-Home>
-"map! <Esc>[1;6H <S-C-Home>
-nmap <Esc>[2;6~ <S-C-Insert>
-"map! <Esc>[2;6~ <S-C-Insert>
-nmap <Esc>[3;6~ <S-C-Delete>
-"map! <Esc>[3;6~ <S-C-Delete>
-nmap <Esc>[5;6~ <S-C-PageUp>
-"map! <Esc>[5;6~ <S-C-PageUp>
-nmap <Esc>[6;6~ <S-C-PageDown>
-"map! <Esc>[6;6~ <S-C-PageDown>
-
-" Fix up M-C-motion keys
-nmap <Esc>[1;7A <M-C-Up>
-"map! <Esc>[1;7A <M-C-Up>
-nmap <Esc>[1;7B <M-C-Down>
-"map! <Esc>[1;7B <M-C-Down>
-nmap <Esc>[1;7C <M-C-Right>
-"map! <Esc>[1;7C <M-C-Right>
-nmap <Esc>[1;7D <M-C-Left>
-"map! <Esc>[1;7D <M-C-Left>
-nmap <Esc>[1;7F <M-C-End>
-"map! <Esc>[1;7F <M-C-End>
-nmap <Esc>[1;7H <M-C-Home>
-"map! <Esc>[1;7H <M-C-Home>
-nmap <Esc>[2;7~ <M-C-Insert>
-"map! <Esc>[2;7~ <M-C-Insert>
-nmap <Esc>[3;7~ <M-C-Delete>
-"map! <Esc>[3;7~ <M-C-Delete>
-nmap <Esc>[5;7~ <M-C-PageUp>
-"map! <Esc>[5;7~ <M-C-PageUp>
-nmap <Esc>[6;7~ <M-C-PageDown>
-"map! <Esc>[6;7~ <M-C-PageDown>
-
-" Fix up S-M-C-motion keys
-nmap <Esc>[1;8A <S-M-C-Up>
-"map! <Esc>[1;8A <S-M-C-Up>
-nmap <Esc>[1;8B <S-M-C-Down>
-"map! <Esc>[1;8B <S-M-C-Down>
-nmap <Esc>[1;8C <S-M-C-Right>
-"map! <Esc>[1;8C <S-M-C-Right>
-nmap <Esc>[1;8D <S-M-C-Left>
-"map! <Esc>[1;8D <S-M-C-Left>
-nmap <Esc>[1;8F <S-M-C-End>
-"map! <Esc>[1;8F <S-M-C-End>
-nmap <Esc>[1;8H <S-M-C-Home>
-"map! <Esc>[1;8H <S-M-C-Home>
-nmap <Esc>[2;8~ <S-M-C-Insert>
-"map! <Esc>[2;8~ <S-M-C-Insert>
-nmap <Esc>[3;8~ <S-M-C-Delete>
-"map! <Esc>[3;8~ <S-M-C-Delete>
-nmap <Esc>[5;8~ <S-M-C-PageUp>
-"map! <Esc>[5;8~ <S-M-C-PageUp>
-nmap <Esc>[6;8~ <S-M-C-PageDown>
-"map! <Esc>[6;8~ <S-M-C-PageDown>
-" }}}
 fun! MyGetNonDefaultServername()
   " Not for gvim in general (uses v:servername by default), and the global
   " server ("G").
@@ -3417,14 +3264,6 @@ fun! MyGetNonDefaultServername()
   return ''
 endfun
 
-" Fixup screen terminfo, where italics is not defined and standout sends
-" italic (might have been fixed in ncurses after 5.9+20140118-1ubuntu1).
-if $TERM =~ '^screen' && &t_so == "\<Esc>[3m"
-  let &t_so = "\<Esc>[7m"
-  let &t_se = "\<Esc>[27m"
-  let &t_ZH = "\<Esc>[3m"
-  let &t_ZR = "\<Esc>[23m"
-endif
 
 " Change cursor shape for terminal mode. {{{1
 if exists('&t_SI')

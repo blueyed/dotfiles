@@ -1,28 +1,33 @@
 ! Nasty hack to act more like XTerm
-*URxvt*termName:		xterm-256color
+! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt
+! Changed:
+!  - do not change TERM
+!  - only handle Shift/Control/Alt modifiers (as expected by Vim)
+
+! *URxvt*termName:		xterm-256color
 
 ! Normal
-*URxvt*keysym.Home:		\033OH
-*URxvt*keysym.End:		\033OF
-*URxvt*keysym.F1:		\033OP
-*URxvt*keysym.F2:		\033OQ
-*URxvt*keysym.F3:		\033OR
-*URxvt*keysym.F4:		\033OS
+! *URxvt*keysym.Home:		\033OH
+! *URxvt*keysym.End:		\033OF
+! *URxvt*keysym.F1:		\033OP
+! *URxvt*keysym.F2:		\033OQ
+! *URxvt*keysym.F3:		\033OR
+! *URxvt*keysym.F4:		\033OS
 
 ! Shift
 ! paste conflict
 !*URxvt*keysym.S-Insert:	\033[2;2~
 *URxvt*keysym.S-Delete:		\033[3;2~
-*URxvt*keysym.S-Home:		\033[1;2H
-*URxvt*keysym.S-End:		\033[1;2F
+*URxvt*keysym.S-Home:		\033[7;2~
+*URxvt*keysym.S-End:		\033[8;2~
 ! scrolling conflict
 !*URxvt*keysym.S-Page_Up:	\033[5;2~
 !*URxvt*keysym.S-Page_Down:	\033[6;2~
 
-*URxvt*keysym.S-F1:		\033[1;2P
-*URxvt*keysym.S-F2:		\033[1;2Q
-*URxvt*keysym.S-F3:		\033[1;2R
-*URxvt*keysym.S-F4:		\033[1;2S
+*URxvt*keysym.S-F1:		\033[11;2~
+*URxvt*keysym.S-F2:		\033[12;2~
+*URxvt*keysym.S-F3:		\033[13;2~
+*URxvt*keysym.S-F4:		\033[14;2~
 *URxvt*keysym.S-F5:		\033[15;2~
 *URxvt*keysym.S-F6:		\033[17;2~
 *URxvt*keysym.S-F7:		\033[18;2~
@@ -41,15 +46,15 @@
 ! Alt
 *URxvt*keysym.M-Insert:		\033[2;3~
 *URxvt*keysym.M-Delete:		\033[3;3~
-*URxvt*keysym.M-Home:		\033[1;3H
-*URxvt*keysym.M-End:		\033[1;3F
+*URxvt*keysym.M-Home:		\033[7;3~
+*URxvt*keysym.M-End:		\033[8;3~
 *URxvt*keysym.M-Page_Up:	\033[5;3~
 *URxvt*keysym.M-Page_Down:	\033[6;3~
 
-*URxvt*keysym.M-F1:		\033[1;3P
-*URxvt*keysym.M-F2:		\033[1;3Q
-*URxvt*keysym.M-F3:		\033[1;3R
-*URxvt*keysym.M-F4:		\033[1;3S
+*URxvt*keysym.M-F1:		\033[11;3~
+*URxvt*keysym.M-F2:		\033[12;3~
+*URxvt*keysym.M-F3:		\033[13;3~
+*URxvt*keysym.M-F4:		\033[14;3~
 *URxvt*keysym.M-F5:		\033[15;3~
 *URxvt*keysym.M-F6:		\033[17;3~
 *URxvt*keysym.M-F7:		\033[18;3~
@@ -65,10 +70,10 @@
 *URxvt*keysym.M-Left:		\033[1;3D
 
 ! Shift+Alt
-*URxvt*keysym.S-M-F1:		\033[1;4P
-*URxvt*keysym.S-M-F2:		\033[1;4Q
-*URxvt*keysym.S-M-F3:		\033[1;4R
-*URxvt*keysym.S-M-F4:		\033[1;4S
+*URxvt*keysym.S-M-F1:		\033[11;4~
+*URxvt*keysym.S-M-F2:		\033[12;4~
+*URxvt*keysym.S-M-F3:		\033[13;4~
+*URxvt*keysym.S-M-F4:		\033[14;4~
 *URxvt*keysym.S-M-F5:		\033[15;4~
 *URxvt*keysym.S-M-F6:		\033[17;4~
 *URxvt*keysym.S-M-F7:		\033[18;4~
@@ -80,8 +85,8 @@
 
 *URxvt*keysym.S-M-Insert:	\033[2;4~
 *URxvt*keysym.S-M-Delete:	\033[3;4~
-*URxvt*keysym.S-M-Home:		\033[1;4H
-*URxvt*keysym.S-M-End:		\033[1;4F
+*URxvt*keysym.S-M-Home:		\033[7;4~
+*URxvt*keysym.S-M-End:		\033[8;4~
 *URxvt*keysym.S-M-Page_Up:	\033[5;4~
 *URxvt*keysym.S-M-Page_Down:	\033[6;4~
 
@@ -91,10 +96,10 @@
 *URxvt*keysym.S-M-Left:		\033[1;4D
 
 ! Control
-*URxvt*keysym.C-F1:		\033[1;5P
-*URxvt*keysym.C-F2:		\033[1;5Q
-*URxvt*keysym.C-F3:		\033[1;5R
-*URxvt*keysym.C-F4:		\033[1;5S
+*URxvt*keysym.C-F1:		\033[11;5~
+*URxvt*keysym.C-F2:		\033[12;5~
+*URxvt*keysym.C-F3:		\033[13;5~
+*URxvt*keysym.C-F4:		\033[14;5~
 *URxvt*keysym.C-F5:		\033[15;5~
 *URxvt*keysym.C-F6:		\033[17;5~
 *URxvt*keysym.C-F7:		\033[18;5~
@@ -106,8 +111,8 @@
 
 *URxvt*keysym.C-Insert:		\033[2;5~
 *URxvt*keysym.C-Delete:		\033[3;5~
-*URxvt*keysym.C-Home:		\033[1;5H
-*URxvt*keysym.C-End:		\033[1;5F
+*URxvt*keysym.C-Home:		\033[7;5~
+*URxvt*keysym.C-End:		\033[8;5~
 *URxvt*keysym.C-Page_Up:	\033[5;5~
 *URxvt*keysym.C-Page_Down:	\033[6;5~
 
@@ -117,10 +122,10 @@
 *URxvt*keysym.C-Left:		\033[1;5D
 
 ! Shift+Control
-*URxvt*keysym.S-C-F1:		\033[1;6P
-*URxvt*keysym.S-C-F2:		\033[1;6Q
-*URxvt*keysym.S-C-F3:		\033[1;6R
-*URxvt*keysym.S-C-F4:		\033[1;6S
+*URxvt*keysym.S-C-F1:		\033[11;6~
+*URxvt*keysym.S-C-F2:		\033[12;6~
+*URxvt*keysym.S-C-F3:		\033[13;6~
+*URxvt*keysym.S-C-F4:		\033[14;6~
 *URxvt*keysym.S-C-F5:		\033[15;6~
 *URxvt*keysym.S-C-F6:		\033[17;6~
 *URxvt*keysym.S-C-F7:		\033[18;6~
@@ -132,8 +137,8 @@
 
 *URxvt*keysym.S-C-Insert:	\033[2;6~
 *URxvt*keysym.S-C-Delete:	\033[3;6~
-*URxvt*keysym.S-C-Home:		\033[1;6H
-*URxvt*keysym.S-C-End:		\033[1;6F
+*URxvt*keysym.S-C-Home:		\033[7;6~
+*URxvt*keysym.S-C-End:		\033[8;6~
 *URxvt*keysym.S-C-Page_Up:	\033[5;6~
 *URxvt*keysym.S-C-Page_Down:	\033[6;6~
 
@@ -143,10 +148,10 @@
 *URxvt*keysym.S-C-Left:		\033[1;6D
 
 ! Alt+Control
-*URxvt*keysym.M-C-F1:		\033[1;7P
-*URxvt*keysym.M-C-F2:		\033[1;7Q
-*URxvt*keysym.M-C-F3:		\033[1;7R
-*URxvt*keysym.M-C-F4:		\033[1;7S
+*URxvt*keysym.M-C-F1:		\033[11;7~
+*URxvt*keysym.M-C-F2:		\033[12;7~
+*URxvt*keysym.M-C-F3:		\033[13;7~
+*URxvt*keysym.M-C-F4:		\033[14;7~
 *URxvt*keysym.M-C-F5:		\033[15;7~
 *URxvt*keysym.M-C-F6:		\033[17;7~
 *URxvt*keysym.M-C-F7:		\033[18;7~
@@ -158,8 +163,8 @@
 
 *URxvt*keysym.M-C-Insert:	\033[2;7~
 *URxvt*keysym.M-C-Delete:	\033[3;7~
-*URxvt*keysym.M-C-Home:		\033[1;7H
-*URxvt*keysym.M-C-End:		\033[1;7F
+*URxvt*keysym.M-C-Home:		\033[7;7~
+*URxvt*keysym.M-C-End:		\033[8;7~
 *URxvt*keysym.M-C-Page_Up:	\033[5;7~
 *URxvt*keysym.M-C-Page_Down:	\033[6;7~
 
@@ -169,10 +174,10 @@
 *URxvt*keysym.M-C-Left:		\033[1;7D
 
 ! Shift+Alt+Control
-*URxvt*keysym.S-M-C-F1:		\033[1;8P
-*URxvt*keysym.S-M-C-F2:		\033[1;8Q
-*URxvt*keysym.S-M-C-F3:		\033[1;8R
-*URxvt*keysym.S-M-C-F4:		\033[1;8S
+*URxvt*keysym.S-M-C-F1:		\033[11;8~
+*URxvt*keysym.S-M-C-F2:		\033[12;8~
+*URxvt*keysym.S-M-C-F3:		\033[13;8~
+*URxvt*keysym.S-M-C-F4:		\033[14;8~
 *URxvt*keysym.S-M-C-F5:		\033[15;8~
 *URxvt*keysym.S-M-C-F6:		\033[17;8~
 *URxvt*keysym.S-M-C-F7:		\033[18;8~
@@ -184,8 +189,8 @@
 
 *URxvt*keysym.S-M-C-Insert:	\033[2;8~
 *URxvt*keysym.S-M-C-Delete:	\033[3;8~
-*URxvt*keysym.S-M-C-Home:	\033[1;8H
-*URxvt*keysym.S-M-C-End:	\033[1;8F
+*URxvt*keysym.S-M-C-Home:	\033[7;8~
+*URxvt*keysym.S-M-C-End:	\033[8;8~
 *URxvt*keysym.S-M-C-Page_Up:	\033[5;8~
 *URxvt*keysym.S-M-C-Page_Down:	\033[6;8~
 
@@ -194,3 +199,4 @@
 *URxvt*keysym.S-M-C-Right:	\033[1;8C
 *URxvt*keysym.S-M-C-Left:	\033[1;8D
 
+! vim: set ft=xdefaults:

@@ -158,3 +158,9 @@ URxvt.cutchars: "()*,<>[]{}|«»"
 *color7:                S_base2
 *color15:               S_base3
 
+
+! Hack to act more like XTerm.
+! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt
+! Fix Shift/Control/Meta with function and insert keys.
+! S-F1 is normally sent as F11-F20, and S-F11+S-F12 being extra strange.
+#include ".Xresources.d/urxvt-xtermcompat.txt"

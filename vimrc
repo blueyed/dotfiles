@@ -3250,8 +3250,40 @@ endif
 " See also: https://github.com/nacitar/terminalkeys.vim/blob/master/plugin/terminalkeys.vim
 
 if &term =~ '^screen'
-  " HACK: assume that the outer term is urxvt!
-  let &term = 'rxvt-unicode-256color'
+  exe "set <F1>=\e[11;*~"
+  exe "set <F2>=\e[12;*~"
+  exe "set <F3>=\e[13;*~"
+  exe "set <F4>=\e[14;*~"
+  exe "set <F5>=\e[15;*~"
+  exe "set <F6>=\e[17;*~"
+  exe "set <F7>=\e[18;*~"
+  exe "set <F8>=\e[19;*~"
+  exe "set <F9>=\e[20;*~"
+  exe "set <F10>=\e[21;*~"
+  exe "set <F11>=\e[23;*~"
+  exe "set <F12>=\e[24;*~"
+
+  exe "set <xF1>=\e[1;*P"
+  exe "set <xF2>=\e[1;*Q"
+  exe "set <xF3>=\e[1;*R"
+  exe "set <xF4>=\e[1;*S"
+
+  " Shift/Ctrl/Meta-Up/Down/Left/Right
+  exe "set <xUp>=\e[1;*A"
+  exe "set <xDown>=\e[1;*B"
+  exe "set <xRight>=\e[1;*C"
+  exe "set <xLeft>=\e[1;*D"
+
+  exe "set <Home>=\e[1;*H"
+  exe "set <End>=\e[1;*F"
+  exe "set <Insert>=\e[2;*~"
+  exe "set <Delete>=\e[3;*~"
+  exe "set <PageUp>=\e[5;*~"
+  exe "set <PageDown>=\e[6;*~"
+
+  " urxvt
+  exe "set <xHome>=\e[7;*~"
+  exe "set <xEnd>=\e[8;*~"
 endif " }}}
 
 fun! MyGetNonDefaultServername()

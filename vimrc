@@ -3249,7 +3249,29 @@ endif
 " Ref: http://unix.stackexchange.com/a/58469, http://superuser.com/a/402084/30216
 " See also: https://github.com/nacitar/terminalkeys.vim/blob/master/plugin/terminalkeys.vim
 
-if &term =~ '^screen'
+" With tmux' 'xterm-keys' option, we can make use of these. {{{
+" Based on tmux's examples/xterm-keys.vim.
+if exists('$TMUX') || &term =~ '^screen.*-it'  " TMUX, screen-italics
+  set ttymouse=sgr
+
+  exe "set <xUp>=\e[1;*A"
+  exe "set <xDown>=\e[1;*B"
+  exe "set <xRight>=\e[1;*C"
+  exe "set <xLeft>=\e[1;*D"
+
+  exe "set <xHome>=\e[1;*H"
+  exe "set <xEnd>=\e[1;*F"
+
+  exe "set <Insert>=\e[2;*~"
+  exe "set <Delete>=\e[3;*~"
+  exe "set <PageUp>=\e[5;*~"
+  exe "set <PageDown>=\e[6;*~"
+
+  exe "set <xF1>=\e[1;*P"
+  exe "set <xF2>=\e[1;*Q"
+  exe "set <xF3>=\e[1;*R"
+  exe "set <xF4>=\e[1;*S"
+
   exe "set <F1>=\e[11;*~"
   exe "set <F2>=\e[12;*~"
   exe "set <F3>=\e[13;*~"
@@ -3262,28 +3284,8 @@ if &term =~ '^screen'
   exe "set <F10>=\e[21;*~"
   exe "set <F11>=\e[23;*~"
   exe "set <F12>=\e[24;*~"
-
-  exe "set <xF1>=\e[1;*P"
-  exe "set <xF2>=\e[1;*Q"
-  exe "set <xF3>=\e[1;*R"
-  exe "set <xF4>=\e[1;*S"
-
-  " Shift/Ctrl/Meta-Up/Down/Left/Right
-  exe "set <xUp>=\e[1;*A"
-  exe "set <xDown>=\e[1;*B"
-  exe "set <xRight>=\e[1;*C"
-  exe "set <xLeft>=\e[1;*D"
-
-  exe "set <Home>=\e[1;*H"
-  exe "set <End>=\e[1;*F"
-  exe "set <Insert>=\e[2;*~"
-  exe "set <Delete>=\e[3;*~"
-  exe "set <PageUp>=\e[5;*~"
-  exe "set <PageDown>=\e[6;*~"
-
-  " urxvt
-  exe "set <xHome>=\e[7;*~"
-  exe "set <xEnd>=\e[8;*~"
+elseif &term =~ '^screen'
+  call MyWarningMsg("Skipping xterm-keys setup for TERM!=screen*-it")
 endif " }}}
 
 fun! MyGetNonDefaultServername()

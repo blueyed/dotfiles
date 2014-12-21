@@ -10,7 +10,7 @@ INSTALL_FILES := ackrc agignore aptitude/config autojump \
 	xsessionrc \
 	$(wildcard config/*/*)
 # zshrc needs to get installed after submodules have been initialized
-INSTALL_FILES_AFTER_SM := zlogin zshenv zshrc
+INSTALL_FILES_AFTER_SM := zshenv zshrc
 
 # first install/update, and than migrate (might update submodules to be removed)
 default: install migrate

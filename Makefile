@@ -80,7 +80,8 @@ install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 	@{ test -h $@ && test -e $@; } \
 		|| { test -f $@ && echo "Skipping existing target (file): $@"; } \
 		|| { test -d $@ && echo "Skipping existing target (dir): $@"; } \
-		|| { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ ; }
+		|| { test ! -e "${CURDIR}/$<" && echo "Target does not exist: ${CURDIR}/$<" ; } \
+		|| { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ && echo "Installed symlink: $@" ; }
 
 diff_files: $(ALL_FILES)
 	@for i in $^ ; do \

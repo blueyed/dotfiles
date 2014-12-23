@@ -439,7 +439,12 @@ set clipboard+=autoselectml
 if has('mouse')
   set mouse=a " Enable mouse
 endif
-set ttymouse=xterm2  " Make mouse work with Vim in tmux
+" Make mouse work with Vim in tmux
+try
+  set ttymouse=sgr
+catch
+  set ttymouse=xterm2
+endtry
 
 set showmatch  " show matching pairs
 set matchtime=3
@@ -3252,8 +3257,6 @@ endif
 " With tmux' 'xterm-keys' option, we can make use of these. {{{
 " Based on tmux's examples/xterm-keys.vim.
 if exists('$TMUX') || &term =~ '^screen.*-it'  " TMUX, screen-italics
-  set ttymouse=sgr
-
   exe "set <xUp>=\e[1;*A"
   exe "set <xDown>=\e[1;*B"
   exe "set <xRight>=\e[1;*C"

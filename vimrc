@@ -3257,36 +3257,32 @@ endif
 " With tmux' 'xterm-keys' option, we can make use of these. {{{
 " Based on tmux's examples/xterm-keys.vim.
 if exists('$TMUX') || &term =~ '^screen.*-it'  " TMUX, screen-italics
-  exe "set <xUp>=\e[1;*A"
-  exe "set <xDown>=\e[1;*B"
-  exe "set <xRight>=\e[1;*C"
-  exe "set <xLeft>=\e[1;*D"
+  execute "set <xUp>=\e[1;*A"
+  execute "set <xDown>=\e[1;*B"
+  execute "set <xRight>=\e[1;*C"
+  execute "set <xLeft>=\e[1;*D"
 
-  exe "set <xHome>=\e[1;*H"
-  exe "set <xEnd>=\e[1;*F"
+  execute "set <xHome>=\e[1;*H"
+  execute "set <xEnd>=\e[1;*F"
 
-  exe "set <Insert>=\e[2;*~"
-  exe "set <Delete>=\e[3;*~"
-  exe "set <PageUp>=\e[5;*~"
-  exe "set <PageDown>=\e[6;*~"
+  execute "set <Insert>=\e[2;*~"
+  execute "set <Delete>=\e[3;*~"
+  execute "set <PageUp>=\e[5;*~"
+  execute "set <PageDown>=\e[6;*~"
 
-  exe "set <xF1>=\e[1;*P"
-  exe "set <xF2>=\e[1;*Q"
-  exe "set <xF3>=\e[1;*R"
-  exe "set <xF4>=\e[1;*S"
+  execute "set <xF1>=\e[1;*P"
+  execute "set <xF2>=\e[1;*Q"
+  execute "set <xF3>=\e[1;*R"
+  execute "set <xF4>=\e[1;*S"
 
-  exe "set <F1>=\e[11;*~"
-  exe "set <F2>=\e[12;*~"
-  exe "set <F3>=\e[13;*~"
-  exe "set <F4>=\e[14;*~"
-  exe "set <F5>=\e[15;*~"
-  exe "set <F6>=\e[17;*~"
-  exe "set <F7>=\e[18;*~"
-  exe "set <F8>=\e[19;*~"
-  exe "set <F9>=\e[20;*~"
-  exe "set <F10>=\e[21;*~"
-  exe "set <F11>=\e[23;*~"
-  exe "set <F12>=\e[24;*~"
+  execute "set <F5>=\e[15;*~"
+  execute "set <F6>=\e[17;*~"
+  execute "set <F7>=\e[18;*~"
+  execute "set <F8>=\e[19;*~"
+  execute "set <F9>=\e[20;*~"
+  execute "set <F10>=\e[21;*~"
+  execute "set <F11>=\e[23;*~"
+  execute "set <F12>=\e[24;*~"
 elseif &term =~ '^screen'
   call MyWarningMsg("Skipping xterm-keys setup for TERM!=screen*-it")
 endif " }}}

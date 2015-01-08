@@ -3378,6 +3378,11 @@ augroup CenteringReadOnly
 augroup END
 
 
+fun! MyWarningMsg(msg)
+  redraw
+  echohl WarningMsg | echom a:msg | echohl None
+endfun
+
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

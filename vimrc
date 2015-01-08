@@ -17,6 +17,11 @@ endif
 
 
 if 1 " has('eval') / `let` may not be available.
+  fun! MyWarningMsg(msg)
+    redraw
+    echohl WarningMsg | echom a:msg | echohl None
+  endfun
+
   " Try to init neobundle.
   try
     set rtp+=~/.vim/bundle/neobundle
@@ -3377,11 +3382,6 @@ augroup CenteringReadOnly
     autocmd BufEnter * if !&modifiable || &ft=='help' | setl scrolloff=999 | endif
 augroup END
 
-
-fun! MyWarningMsg(msg)
-  redraw
-  echohl WarningMsg | echom a:msg | echohl None
-endfun
 
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))

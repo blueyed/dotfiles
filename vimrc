@@ -375,7 +375,11 @@ set nowrap
 
 set autoindent    " always set autoindenting on (fallback after 'indentexpr')
 
-set colorcolumn=78
+augroup VimrcColorColumn
+  au!
+  au ColorScheme * if expand("<amatch>") == "solarized" | set colorcolumn=78 | else | set colorcolumn= | endif
+augroup END
+
 set numberwidth=1  " Initial default, gets adjusted dynamically.
 
 set tabstop=2

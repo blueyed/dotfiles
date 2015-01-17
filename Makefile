@@ -8,7 +8,11 @@ INSTALL_FILES := ackrc agignore aptitude/config autojump \
 	sackrc screenrc screenrc.common subversion/servers \
 	terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
 	xsessionrc \
-	$(wildcard config/*/*)
+	config/mc/ini \
+	config/gnome-session/sessions \
+	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
+	$(wildcard local/share/applications/*)
+
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc
 

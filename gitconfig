@@ -1,6 +1,8 @@
 [user]
 	name = Daniel Hahler
 	email = git@thequod.de
+[init]
+	templatedir = ~/.config/git/template
 [alias]
 	a = add
 	ae = add -e

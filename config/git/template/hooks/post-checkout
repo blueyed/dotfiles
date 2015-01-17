@@ -1,0 +1,12 @@
+#!/bin/sh
+# Git hook to display last commit information when switching branches.
+
+# prev_head=$1
+# new_head=$2
+# changing_branch=$3
+
+if [ "$3" = 0 ]; then
+  exit
+fi
+
+git log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %cN)"

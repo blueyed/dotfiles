@@ -3294,11 +3294,12 @@ endfun
 
 
 " Change cursor shape for terminal mode. {{{1
+" See also ~/.dotfiles/oh-my-zsh/themes/blueyed.zsh-theme.
 if exists('&t_SI')
   " 'start insert' and 'exit insert'.
   let &t_SI = ''
   let &t_EI = ''
-  if $COLORTERM =~ "^rxvt" || ($TERM =~ "^xterm" && !MyIsGnomeTerminal())
+  if $_USE_XTERM_CURSOR_CODES == 1
     " Reference: {{{
     " P s = 0 → blinking block.
     " P s = 1 → blinking block (default).

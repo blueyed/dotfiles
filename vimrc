@@ -573,19 +573,35 @@ endif
 
 " Generic mappings. {{{
 " Optimize mappings on German keyboard layout. {{{
-" Maps according to intl US keyboard layout.
+" Maps inspired by the intl US keyboard layout.
 " Except for ":" shifted with ";" (saves pressing Shift for commands).
-
+" Moving away from langmap, bugs:
+"  - used with input for LustyBufferGrep
 fun! MyToggleLangmap()
-  if len(&langmap)
+  let use_langmap = 0
+  let maps = {'ö': ':', '-': '/', '_': '?', 'ü': '[', '+': ']', 'ä': "'"}
+
+  if maparg(keys(maps)[0], 'n') != '' || len(&langmap)
     set langmap=
-    silent! nunmap ü [
-    silent! nunmap + ]
-    silent! nunmap ä '
+    for k in keys(maps)
+      if maparg(k, 'n') != ''
+        exe 'unmap '.k
+      endif
+    endfor
+    if &verbose | echom "Disabled mappings." | endif
   else
-    if exists('+langnoremap')
+    if use_langmap && exists('+langnoremap')  " {{{
       " Only use langmap when langnoremap is available.
       set langnoremap
+
+      " set langmap=ß-,´=,`+,ü[,Ü{,ö:,Ö\\;,ä',Ä@,'~,-/,_?,^`
+      " XXX: causes "]" to be inserted in insert mode!
+      " Buggy with delimitMate, inserts '+' in insert-mode!
+      " Ref: https://github.com/Raimondi/delimitMate/issues/197
+      " set langmap+=+],*}
+      " Keeping: ?_ ('_' is not that useful)
+      " - <\\,>\|,
+      " - ,;<\\,:>
 
       " minimal
       set langmap=ö:
@@ -595,10 +611,12 @@ fun! MyToggleLangmap()
       nmap ü [
       " Map + normally, register names get langmapped, too!
       nmap + ]
+      " set langmap+=+]
+      " ,Ö\\;,Ä@,
       " " Map * to ' (Shift-#); would be 8 on en layout, but I do not like
       " " to shift Shift-6…. ' would be ~ on en, but that's good with AltGr-+.
       " set langmap+=ä'
-      " nmap ä '
+      nmap ä '
       " set langmap+='*
 
       " Swap ´ and ` (avoid Shift for the one that considers column).
@@ -606,15 +624,15 @@ fun! MyToggleLangmap()
 
       " Mapped to A-h/A-l
       " set langmap+=Ü{,*},
+      if &verbose | 0verb set langmap? | endif
+      " }}}
     else
-      nmap ö :
-      nmap - /
-      nmap _ ?
-      nmap ü [
-      nmap + ]
+      for [k,v] in items(maps)
+        exe 'silent! map '.k.' '.v
+      endfor
+      if &verbose | echom "Enabled mappings." | endif
     endif
   endif
-  if &verbose | 0verb set langmap? | endif
 endfun
 nmap <f11> :verb call MyToggleLangmap()<CR>
 call MyToggleLangmap()

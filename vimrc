@@ -470,7 +470,7 @@ set nostartofline " do not go to start of line automatically when moving
 " scrolloff: number of lines visible above/below the cursor.
 " Special handling for &bt!="" and &diff.
 set scrolloff=3
-if has('autocmd')"
+if has('autocmd')
   fun! MyAutoScrollOff() " {{{
     if exists('g:no_auto_scrolloff')
       return
@@ -609,10 +609,12 @@ nnoremap Q :confirm q<cr>
 nnoremap <C-Q> :confirm qall<cr>
 
 " Use just "q" in special buffers.
-augroup vimrc_special_q
-  au!
-  autocmd FileType help,startify nnoremap <buffer> q :confirm q<cr>
-augroup END
+if has('autocmd')
+  augroup vimrc_special_q
+    au!
+    autocmd FileType help,startify nnoremap <buffer> q :confirm q<cr>
+  augroup END
+endif
 " }}}
 
 
@@ -3130,7 +3132,7 @@ endif
 
 
 " Setup late autocommands {{{
-if has('autocmd')"
+if has('autocmd')
   augroup vimrc_late
     au!
     " See also ~/.dotfiles/usr/bin/vim-for-git, which uses this setup and

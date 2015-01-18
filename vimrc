@@ -573,69 +573,34 @@ endif
 
 " Generic mappings. {{{
 " Optimize mappings on German keyboard layout. {{{
-" Maps inspired by the intl US keyboard layout.
-" Except for ":" shifted with ";" (saves pressing Shift for commands).
-" Moving away from langmap, bugs:
+" Maps initially inspired by the intl US keyboard layout.
+" Not using langmap, because of bugs / issues, e.g.:
 "  - used with input for LustyBufferGrep
-fun! MyToggleLangmap()
-  let use_langmap = 0
-  let maps = {'ö': ':', '-': '/', '_': '?', 'ü': '[', '+': ']', 'ä': "'"}
+" Not using a function to have this in minimal Vims, too.
+" `sunmap` is used to use the key as-is in select mode.
+map ö :
+sunmap ö
+map - /
+sunmap -
+map _ ?
+sunmap _
+map ü [
+sunmap ü
+map + ]
+sunmap +
 
-  if maparg(keys(maps)[0], 'n') != '' || len(&langmap)
-    set langmap=
-    for k in keys(maps)
-      if maparg(k, 'n') != ''
-        exe 'unmap '.k
-      endif
-    endfor
-    if &verbose | echom "Disabled mappings." | endif
-  else
-    if use_langmap && exists('+langnoremap')  " {{{
-      " Only use langmap when langnoremap is available.
-      set langnoremap
+" TODO: ä
 
-      " set langmap=ß-,´=,`+,ü[,Ü{,ö:,Ö\\;,ä',Ä@,'~,-/,_?,^`
-      " XXX: causes "]" to be inserted in insert mode!
-      " Buggy with delimitMate, inserts '+' in insert-mode!
-      " Ref: https://github.com/Raimondi/delimitMate/issues/197
-      " set langmap+=+],*}
-      " Keeping: ?_ ('_' is not that useful)
-      " - <\\,>\|,
-      " - ,;<\\,:>
-
-      " minimal
-      set langmap=ö:
-      set langmap+=-/,_?
-      " Work around problem where multibyte langmap lhs aborts too early
-      " (üuu/[uu, https://code.google.com/p/vim/issues/detail?id=297).
-      nmap ü [
-      " Map + normally, register names get langmapped, too!
-      nmap + ]
-      " set langmap+=+]
-      " ,Ö\\;,Ä@,
-      " " Map * to ' (Shift-#); would be 8 on en layout, but I do not like
-      " " to shift Shift-6…. ' would be ~ on en, but that's good with AltGr-+.
-      " set langmap+=ä'
-      nmap ä '
-      " set langmap+='*
-
-      " Swap ´ and ` (avoid Shift for the one that considers column).
-      set langmap+=´`,`´
-
-      " Mapped to A-h/A-l
-      " set langmap+=Ü{,*},
-      if &verbose | 0verb set langmap? | endif
-      " }}}
-    else
-      for [k,v] in items(maps)
-        exe 'silent! map '.k.' '.v
-      endfor
-      if &verbose | echom "Enabled mappings." | endif
-    endif
-  endif
-endfun
-nmap <f11> :verb call MyToggleLangmap()<CR>
-call MyToggleLangmap()
+" Swap ' and ` keys (` is more useful, but requires shift on a German keyboard) {{{
+noremap ' `
+sunmap '
+noremap ` '
+sunmap `
+noremap g' g`
+sunmap g'
+noremap g` g'
+sunmap g`
+" }}}
 
 
 " Quit with Q, exit with C-q.

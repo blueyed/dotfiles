@@ -375,11 +375,6 @@ set nowrap
 
 set autoindent    " always set autoindenting on (fallback after 'indentexpr')
 
-augroup VimrcColorColumn
-  au!
-  au ColorScheme * if expand("<amatch>") == "solarized" | set colorcolumn=78 | else | set colorcolumn= | endif
-augroup END
-
 set numberwidth=1  " Initial default, gets adjusted dynamically.
 
 set tabstop=2
@@ -393,6 +388,11 @@ if has('autocmd')
     " Remove '-' and ':' from keyword characters (to highlight e.g. 'width:…' and 'font-size:foo' correctly)
     " XXX: should get fixed in syntax/css.vim probably!
     au FileType css setlocal iskeyword-=-:
+  augroup END
+
+  augroup VimrcColorColumn
+    au!
+    au ColorScheme * if expand("<amatch>") == "solarized" | set colorcolumn=78 | else | set colorcolumn= | endif
   augroup END
 endif
 
@@ -447,13 +447,14 @@ set clipboard+=autoselectml
 
 if has('mouse')
   set mouse=a " Enable mouse
+
+  " Make mouse work with Vim in tmux
+  try
+    set ttymouse=sgr
+  catch
+    set ttymouse=xterm2
+  endtry
 endif
-" Make mouse work with Vim in tmux
-try
-  set ttymouse=sgr
-catch
-  set ttymouse=xterm2
-endtry
 
 set showmatch  " show matching pairs
 set matchtime=3

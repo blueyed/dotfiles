@@ -57,6 +57,9 @@ call eclim#AddVimSetting(
 call eclim#AddVimSetting(
   \ 'Core', 'g:EclimHighlightError', 'Error',
   \ 'Sets the vim highlight group to be used for error messages/signs.')
+call eclim#AddVimSetting(
+  \ 'Core', 'g:EclimHighlightSuccess', 'MoreMsg',
+  \ 'Sets the vim highlight group to be used for success messages/signs.')
 
 call eclim#AddVimSetting(
   \ 'Core', 'g:EclimMenus', 1,
@@ -133,12 +136,20 @@ call eclim#AddVimSetting(
   \ '\(0\|1\)')
 
 call eclim#AddVimSetting(
+  \ 'Core', 'g:EclimQuickFixOpen', 'botright copen',
+  \ 'Determines the command to use when eclim opens the quickfix window.')
+call eclim#AddVimSetting(
+  \ 'Core', 'g:EclimQuickFixHeight', 10,
+  \ 'Determines the height of the quickfix window when eclim opens it.',
+  \ '\d\+')
+
+call eclim#AddVimSetting(
   \ 'Core/Signs', 'g:EclimSignLevel', has('signs') ? 'info' : 'off',
   \ 'Sets the level of signs (markers) that will be placed by eclim.',
   \ '\(info\|warning\|error\|off\)')
 
 call eclim#AddVimSetting(
-  \ 'Core/Signs', 'g:EclimShowQuickfixSigns', 1,
+  \ 'Core/Signs', 'g:EclimShowQuickfixSigns', 0,
   \ 'Determines if a sign is placed on lines found in the quickfix list.',
   \ '\(0\|1\)')
 call eclim#AddVimSetting(
@@ -384,7 +395,7 @@ augroup eclim_archive_read
   autocmd BufReadCmd
     \ jar:/*,jar:\*,jar:file:/*,jar:file:\*,
     \tar:/*,tar:\*,tar:file:/*,tar:file:\*,
-    \tbz2:/*,tgz:\*,tbz2:file:/*,tbz2:file:\*,
+    \tbz2:/*,tbz2:\*,tbz2:file:/*,tbz2:file:\*,
     \tgz:/*,tgz:\*,tgz:file:/*,tgz:file:\*,
     \zip:/*,zip:\*,zip:file:/*,zip:file:\*
     \ call eclim#common#util#ReadFile()
@@ -411,7 +422,7 @@ if g:EclimMakeQfFilter
   augroup eclim_qf_filter
     autocmd!
     autocmd QuickFixCmdPost make
-      \ if exists('b:EclimQuickfixFilter') |
+      \ if exists('b:EclimQuickFixFilter') |
       \   call eclim#util#SetQuickfixList(getqflist(), 'r') |
       \ endif
   augroup END

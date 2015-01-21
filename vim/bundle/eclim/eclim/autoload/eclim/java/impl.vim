@@ -297,6 +297,8 @@ function! eclim#java#impl#Add(command, function, visual) " {{{
 endfunction " }}}
 
 function! eclim#java#impl#Window(command, name) " {{{
+  let matches = matchlist(a:command, '-o \([0-9]*\)')
+  let offset = len(matches) > 1 ? matches[1] : 0
   let name = eclim#project#util#GetProjectRelativeFilePath() . '_' . a:name
   let project = eclim#project#util#GetCurrentProjectName()
   let result = eclim#Execute(a:command, {'project': project})
@@ -323,12 +325,17 @@ function! eclim#java#impl#Window(command, name) " {{{
   call eclim#util#TempWindow(name, content, {'preserveCursor': 1})
   setlocal ft=java
   call eclim#java#impl#ImplWindowFolding()
+  let b:eclim_offset = offset
   return 1
 endfunction " }}}
 
 function! s:AddImpl(visual) " {{{
+  let command = s:command_impl_insert
+  if g:EclimJavaImplInsertAtCursor
+    let command .= ' -o ' . b:eclim_offset
+  endif
   call eclim#java#impl#Add
-    \ (s:command_impl_insert, function("eclim#java#impl#ImplWindow"), a:visual)
+    \ (command, function("eclim#java#impl#ImplWindow"), a:visual)
 endfunction " }}}
 
 function! s:AddDelegate(visual) " {{{

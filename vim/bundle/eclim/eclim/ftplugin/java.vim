@@ -196,6 +196,11 @@ if !exists(":JavaMove")
     \ JavaMove :call eclim#java#refactor#Move('<args>')
 endif
 
+if !exists(":JavaNew")
+  command -nargs=+ -buffer -complete=customlist,eclim#java#new#CommandComplete
+    \ JavaNew :call eclim#java#new#Create(<f-args>)
+endif
+
 if !exists(":JavaLoggingInit")
   command -buffer JavaLoggingInit :call eclim#java#logging#LoggingInit()
 endif
@@ -217,6 +222,28 @@ endif
 
 if !exists(":Checkstyle")
   command -nargs=0 -buffer Checkstyle :call eclim#java#src#Checkstyle()
+endif
+
+if !exists(":JavaDebug")
+  command -nargs=* -buffer JavaDebugStart
+    \ :call eclim#java#debug#DebugStart(<f-args>)
+  command -nargs=0 -buffer JavaDebugStop :call eclim#java#debug#DebugStop()
+  command -nargs=0 -buffer JavaDebugStatus :call eclim#java#debug#Status()
+  command -nargs=+ -buffer JavaDebugStep :call eclim#java#debug#Step(<f-args>)
+
+  command -nargs=0 -buffer JavaDebugThreadSuspendAll
+    \ :call eclim#java#debug#DebugThreadSuspendAll()
+  command -nargs=0 -buffer JavaDebugThreadResume
+    \ :call eclim#java#debug#DebugThreadResume()
+  command -nargs=0 -buffer JavaDebugThreadResumeAll
+    \ :call eclim#java#debug#DebugThreadResumeAll()
+
+  command -nargs=0 -buffer -bang JavaDebugBreakpointToggle
+    \ :call eclim#java#debug#BreakpointToggle('<bang>')
+  command -nargs=0 -buffer -bang JavaDebugBreakpointsList
+    \ :call eclim#java#debug#BreakpointsList('<bang>')
+  command -nargs=0 -buffer -bang JavaDebugBreakpointRemove
+    \ :call eclim#java#debug#BreakpointRemove('<bang>')
 endif
 
 " }}}

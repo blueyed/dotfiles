@@ -127,7 +127,7 @@ function! s:EchoLevel(message, level, highlight) " {{{
     return
   endif
 
-  if s:log_levels[g:EclimLogLevel] < s:log_levels[a:level]
+  if s:log_levels[g:EclimLogLevel] < s:log_levels[a:level] && !&verbose
     return
   endif
 
@@ -157,8 +157,17 @@ endfunction " }}}
 
 function! eclim#util#Echo(message) " {{{
   " Echos a message using the info highlight regardless of what log level is set.
+  call s:EchoHighlight(a:message, g:EclimHighlightInfo)
+endfunction " }}}
+
+function! eclim#util#EchoSuccess(message) " {{{
+  " Echos a message using the 'success' highlight regardless log level
+    call s:EchoHighlight(a:message, g:EclimHighlightSuccess)
+endfunction " }}}
+
+function! s:EchoHighlight(message, highlight) " {{{
   if a:message != "0"
-    exec "echohl " . g:EclimHighlightInfo
+    exec "echohl " . a:highlight
     redraw
     for line in split(a:message, '\n')
       echom line
@@ -530,22 +539,68 @@ function! eclim#util#GoToBufferWindow(buf)
     let winnr = bufwinnr(bufnr('^' . name . '$'))
   endif
   if winnr != -1
-    exec winnr . "winc w"
-    call eclim#util#DelayedCommand('doautocmd WinEnter')
+    if winnr != winnr()
+      exec winnr . "winc w"
+      call eclim#util#DelayedCommand('doautocmd WinEnter')
+    endif
     return 1
   endif
   return 0
 endfunction " }}}
 
-" GoToBufferWindowOrOpen(name, cmd) {{{
-" Gives focus to the window containing the buffer for the supplied file, or if
-" none, opens the file using the supplied command.
-function! eclim#util#GoToBufferWindowOrOpen(name, cmd)
+function! eclim#util#GoToBufferWindowOrOpen(name, cmd, ...) " {{{
+  " Gives focus to the window containing the buffer for the supplied file, or if
+  " none, opens the file using the supplied command.
+  " Optional args:
+  "   line: the line number to jump to in the file
+  "   column: the column number to jump to in the file
+
   let name = eclim#util#EscapeBufferName(a:name)
+  let line = a:0 ? a:1 : 0
+  let col = a:0 ? a:2 : 0
   let winnr = bufwinnr(bufnr('^' . name . '$'))
   if winnr != -1
-    exec winnr . "winc w"
-    call eclim#util#DelayedCommand('doautocmd WinEnter')
+    if winnr != winnr()
+      exec winnr . "winc w"
+      call eclim#util#DelayedCommand('doautocmd WinEnter')
+    endif
+
+    " set the cursor line mark if we plan on moving the cursor
+    if line
+      mark '
+    endif
+  else
+    let cmd = a:cmd
+    " if splitting and the buffer is a unamed empty buffer, then switch to an
+    " edit.
+    if cmd == 'split' && expand('%') == '' &&
+     \ !&modified && line('$') == 1 && getline(1) == ''
+      let cmd = 'edit'
+    endif
+    exec cmd . ' ' . escape(eclim#util#Simplify(a:name), ' ')
+  endif
+  call cursor(line, col)
+endfunction " }}}
+
+" GoToTabAwareBufferWindowOrOpen(name, cmd) {{{
+" Gives focus to the window containing the buffer for the supplied file even
+" if it is in a different tab. If none is found, then opens the file using the
+" supplied command.
+function! eclim#util#GoToTabAwareBufferWindowOrOpen(name, cmd)
+  let name = eclim#util#EscapeBufferName(a:name)
+  let bufnr = bufnr('^' . name . '$')
+  if bufnr != -1
+    try 
+      " Backup switchbuf option before resetting it
+      let old_switchbuf = &switchbuf
+      exec 'set switchbuf=usetab,newtab'
+
+      exec 'sb ' . bufnr
+      call eclim#util#DelayedCommand('doautocmd WinEnter')
+    finally 
+      " Restore switchbuf option to original value
+      let &switchbuf = old_switchbuf
+    endtry
   else
     let cmd = a:cmd
     " if splitting and the buffer is a unamed empty buffer, then switch to an
@@ -1069,11 +1124,10 @@ function! eclim#util#PromptConfirm(prompt, ...)
   return response =~ '\c\s*\(y\(es\)\?\)\s*'
 endfunction " }}}
 
-" Complete(start, completions) {{{
-" Returns 1 if completion has been setup/triggered, 0 if not (because it is
-" active already) and any input trigger would need to be inserted by the
-" caller.
 function! eclim#util#Complete(start, completions) " {{{
+  " Returns 1 if completion has been setup/triggered, 0 if not (because it is
+  " active already) and any input trigger would need to be inserted by the
+  " caller.
   if !exists('##CompleteDone')
     call complete(a:start, a:completions)
     return 1
@@ -1169,62 +1223,14 @@ function! eclim#util#SetLocationList(list, ...) " {{{
   " Sets the contents of the location list for the current window.
   " Optional args:
   "   action: The action passed to the setloclist() function call.
-  let loclist = a:list
-
-  " filter the list if the current buffer defines a list of filters.
-  if exists('b:EclimLocationListFilter')
-    let newlist = []
-    for item in loclist
-      let addit = 1
-
-      for filter in b:EclimLocationListFilter
-        if item.text =~ filter
-          let addit = 0
-          break
-        endif
-      endfor
-
-      if addit
-        call add(newlist, item)
-      endif
-    endfor
-    let loclist = newlist
-  endif
-
-  if a:0 == 0
-    call setloclist(0, loclist)
-  else
-    call setloclist(0, loclist, a:1)
-  endif
-
-  silent let projectName = eclim#project#util#GetCurrentProjectName()
-  if projectName != ''
-    " setbufvar seems to have the side affect of changing to the buffer's dir
-    " when autochdir is set.
-    let save_autochdir = &autochdir
-    set noautochdir
-
-    for item in getloclist(0)
-      call setbufvar(item.bufnr, 'eclim_project', projectName)
-    endfor
-
-    let &autochdir = save_autochdir
-  endif
-
-  if g:EclimShowCurrentError && len(loclist) > 0
-    call eclim#util#DelayedCommand('call eclim#util#ShowCurrentError()')
-  endif
-
-  let b:eclim_loclist = 1
-  call eclim#display#signs#Update()
+  call s:SetList('loclist', a:list, a:0 ? a:1 : ' ')
 endfunction " }}}
 
-" ClearLocationList([namespace, namespace, ...]) {{{
-" Clears the current location list.  Optionally 'namespace' arguments can be
-" supplied which will only clear items with text prefixed with '[namespace]'.
-" Also the special namespace 'global' may be supplied which will only remove
-" items with no namepace prefix.
-function! eclim#util#ClearLocationList(...)
+function! eclim#util#ClearLocationList(...) " {{{
+  " Clears the current location list.  Optionally 'namespace' arguments can be
+  " supplied which will only clear items with text prefixed with '[namespace]'.
+  " Also the special namespace 'global' may be supplied which will only remove
+  " items with no namepace prefix.
   if a:0 > 0
     let loclist = getloclist(0)
     if len(loclist) > 0
@@ -1251,16 +1257,24 @@ function! eclim#util#ClearLocationList(...)
   unlet! b:eclim_loclist
 endfunction " }}}
 
-" SetQuickfixList(list, [action]) {{{
-" Sets the contents of the quickfix list.
-function! eclim#util#SetQuickfixList(list, ...)
-  let qflist = a:list
-  if exists('b:EclimQuickfixFilter')
+function! eclim#util#SetQuickfixList(list, ...) " {{{
+  " Sets the contents of the quickfix list.
+  " Optional args:
+  "   action: The action to pass into vim's setqflist function
+  call s:SetList('qflist', a:list, a:0 ? a:1 : ' ')
+endfunction " }}}
+
+function! s:SetList(type, list, action) " {{{
+  " Sets the contents of the <type> list.
+  let list = a:list
+  let list_filter = a:type == 'qflist' ?
+    \ 'EclimQuickFixFilter' : 'EclimLocationListFilter'
+  if exists('b:' . list_filter)
     let newlist = []
-    for item in qflist
+    for item in list
       let addit = 1
 
-      for filter in b:EclimQuickfixFilter
+      for filter in b:{list_filter}
         if item.text =~ filter
           let addit = 0
           break
@@ -1271,22 +1285,25 @@ function! eclim#util#SetQuickfixList(list, ...)
         call add(newlist, item)
       endif
     endfor
-    let qflist = newlist
+    let list = newlist
   endif
-  if a:0 == 0
-    call setqflist(qflist)
+
+  if a:type == 'qflist'
+    call setqflist(list, a:action)
   else
-    call setqflist(qflist, a:1)
+    call setloclist(0, list, a:action)
   endif
-  if g:EclimShowCurrentError && len(qflist) > 0
+
+  if g:EclimShowCurrentError && len(list) > 0
     call eclim#util#DelayedCommand('call eclim#util#ShowCurrentError()')
   endif
+
+  let b:eclim_loclist = 1
   call eclim#display#signs#Update()
 endfunction " }}}
 
-" ShowCurrentError() {{{
-" Shows the error on the cursor line if one.
-function! eclim#util#ShowCurrentError()
+function! eclim#util#ShowCurrentError() " {{{
+  " Shows the error on the cursor line if one.
   if mode() != 'n' || expand('%') == ''
     return
   endif
@@ -1309,9 +1326,8 @@ function! eclim#util#ShowCurrentError()
   endif
 endfunction " }}}
 
-" Simplify(file) {{{
-" Simply the supplied file to the shortest valid name.
-function! eclim#util#Simplify(file)
+function! eclim#util#Simplify(file) " {{{
+  " Simply the supplied file to the shortest valid name.
   let file = a:file
 
   " Don't run simplify on url files, it will screw them up.
@@ -1469,6 +1485,16 @@ endfunction " }}}
 function! eclim#util#TempWindow(name, lines, ...) " {{{
   " Opens a temp window w/ the given name and contents which is readonly unless
   " specified otherwise.
+  " Optional Args:
+  "   options: dict of supported options
+  "     readonly (default: 1): if non-zero, the contents are readonly
+  "     orientation (default horizontal): horizontal or vertical
+  "     height (default: 10): height if horizontal
+  "     width (default: 50): width if vertical
+  "     location (default: belowright/botright): the location to open the window at.
+  "     preserveCursor: preserve the cursor position if this temp window exists
+  "                     and will be cleared before loading the new content.
+
   let options = a:0 > 0 ? a:1 : {}
   let filename = expand('%:p')
   let winnr = winnr()
@@ -1482,9 +1508,27 @@ function! eclim#util#TempWindow(name, lines, ...) " {{{
   let line = 1
   let col = 1
 
+  if get(options, 'singleWinOnly', 0)
+    if (bufnr(bufname) != -1 && bufwinnr(bufname) == -1)
+      " Pass the unescaped name as it will be escaped in the function
+      call eclim#util#DeleteBuffer(a:name)
+    endif
+  endif
+
   if bufwinnr(bufname) == -1
-    let height = get(options, 'height', 10)
-    silent! noautocmd exec "keepalt botright " . height . "sview " . name
+    let orient = get(options, 'orientation', 'horizontal')
+    if orient == 'vertical'
+      let location = get(options, 'location', 'belowright')
+      let width = get(options, 'width', 50)
+      let split_cmd = location . " vertical " . width . " sview "
+      silent! noautocmd exec "keepalt " . split_cmd . name
+    else
+      let location = get(options, 'location', 'botright')
+      let height = get(options, 'height', 10)
+      let split_cmd = location . " " . height . " sview "
+      silent! noautocmd exec "keepalt " . split_cmd . name
+    endif
+
     setlocal nowrap
     setlocal winfixheight
     setlocal noswapfile
@@ -1539,8 +1583,10 @@ function! eclim#util#TempWindow(name, lines, ...) " {{{
   endif
 endfunction " }}}
 
-function! eclim#util#TempWindowClear(name) " {{{
+function! eclim#util#TempWindowClear(name, ...) " {{{
   " Clears the contents of the temp window with the given name.
+  " It also accepts an optional argument. If specified, the value will be
+  " treated as new content to be added to the window after clearing it.
   let name = eclim#util#EscapeBufferName(a:name)
   if bufwinnr(name) != -1
     let curwinnr = winnr()
@@ -1548,7 +1594,157 @@ function! eclim#util#TempWindowClear(name) " {{{
     setlocal modifiable
     setlocal noreadonly
     silent 1,$delete _
+
+    if a:0 == 1
+      call append(0, a:1)
+    endif
+
     exec curwinnr . "winc w"
+  endif
+endfunction " }}}
+
+function! eclim#util#FileList(name, entries, ...) " {{{
+  " Very similar to vim's location list or quickfix list, but using a named temp
+  " window and with some slightly different features.
+  " Args:
+  "   name: The name to give/display for this file list.
+  "   entries: A list of dicts containing:
+  "     filename
+  "     line (optional)
+  "     column (optional)
+  "     message (optional)
+  " Optional Args:
+  "   options: options dict that will be passed to the TempWindow call and can
+  "            also contain options for how the FileList is formatted.
+  "     group_by: list of attributes from the entry dicts to group by
+
+  let options = a:0 > 0 ? a:1 : {}
+  let entries = a:entries
+
+  if has_key(options, 'group_by')
+    let grouped = {}
+    for entry in entries
+      let group = grouped
+      let level = 1
+      for by in options.group_by
+        let by_value = entry[by]
+        if level < len(options.group_by)
+          if !has_key(group, by_value)
+            let group[by_value] = {}
+          endif
+          let group = group[by_value]
+        else
+          if !has_key(group, by_value)
+            let group[by_value] = []
+          endif
+          let entries = group[by_value]
+        endif
+        let level += 1
+      endfor
+      call add(entries, entry)
+    endfor
+
+    let entries = []
+    call s:FileListFormatGrouped(entries, grouped, 0)
+  endif
+
+  let content = []
+  for entry in entries
+    let line = ''
+    if has_key(entry, 'padding')
+      let line .= entry.padding
+    endif
+
+    if has_key(entry, 'name')
+      let line .= entry.name
+    else
+      let line .= eclim#util#Simplify(entry.filename)
+    endif
+
+    if has_key(entry, 'line')
+      let line .= '|' . entry.line
+      if has_key(entry, 'column')
+        let line .= ' col ' . entry.column
+      endif
+    endif
+
+    if has_key(entry, 'message')
+      let line .= '|' . entry.message
+    endif
+    call add(content, line)
+  endfor
+
+  let shiftwidth = &shiftwidth
+  call eclim#util#TempWindow(a:name, content, options)
+  set filetype=eclim_filelist
+  let &l:shiftwidth = shiftwidth
+  setlocal foldmethod=expr
+  setlocal foldexpr=eclim#display#fold#GetTreeFold(v:lnum)
+  setlocal foldtext=eclim#display#fold#TreeFoldText()
+  setlocal foldlevel=99
+  let b:eclim_filelist = entries
+
+  nnoremap <silent> <buffer> <cr> :call eclim#util#FileListOpenFile('edit')<cr>
+  nnoremap <silent> <buffer> s    :call eclim#util#FileListOpenFile('split')<cr>
+  nnoremap <silent> <buffer> t    :call eclim#util#FileListOpenFile('tabnew')<cr>
+
+  nnoremap <silent> <buffer> ? :call eclim#help#BufferHelp(
+    \ [
+      \ '<cr> - open the file under the cursor using :edit',
+      \ 's    - open the file under the cursor using :split',
+      \ 't    - open the file under the cursor using :tabnew',
+      \ ],
+    \ 'vertical', 40)<CR>
+endfunction " }}}
+
+function! eclim#util#FileListOpenFile(action) " {{{
+  let entry = b:eclim_filelist[line('.') - 1]
+  if has_key(entry, 'filename')
+    let filename = entry.filename
+    let line = get(entry, 'line', 0)
+    let col = get(entry, 'column', 0)
+    exec b:winnr . 'winc w'
+    call eclim#util#GoToBufferWindowOrOpen(filename, a:action, line, col)
+  endif
+endfunction " }}}
+
+function! s:FileListFormatGrouped(entries, grouped, level) " {{{
+  let keys = sort(keys(a:grouped))
+  for key in keys
+    let padding = ''
+    let index = 0
+    while index < a:level
+      let shift = 0
+      while shift < &shiftwidth
+        let padding .= ' '
+        let shift += 1
+      endwhile
+      let index += 1
+    endwhile
+
+    call add(a:entries, {'name': padding . key})
+    if type(a:grouped[key]) == g:DICT_TYPE
+      call s:FileListFormatGrouped(a:entries, a:grouped[key], a:level + 1)
+    else
+      for entry in sort(a:grouped[key])
+        let entry.padding = padding
+        let shift = 0
+        while shift < &shiftwidth
+          let entry.padding .= ' '
+          let shift += 1
+        endwhile
+        call add(a:entries, entry)
+      endfor
+    endif
+  endfor
+endfunction " }}}
+
+function! eclim#util#DeleteBuffer(name) " {{{
+  " Deletes the buffer with given name and closes window holding it.
+  let name = eclim#util#EscapeBufferName(a:name)
+  let bufnr = bufnr(name)
+  if bufnr != -1
+    exec 'bd' . bufnr
   endif
 endfunction " }}}
 

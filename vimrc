@@ -573,6 +573,15 @@ endif
 " }}}1
 
 " Generic mappings. {{{
+
+" Use both , and Space as leader.
+let mapleader = ","
+" Not for imap!
+nmap <space> <Leader>
+vmap <space> <Leader>
+
+
+nnoremap <Leader><c-l> :redraw!<cr>
 " Optimize mappings on German keyboard layout. {{{
 " Maps initially inspired by the intl US keyboard layout.
 " Not using langmap, because of bugs / issues, e.g.:
@@ -619,12 +628,6 @@ endif
 
 
 if 1 " has('eval') / `let` may not be available.
-  " Use both , and Space as leader.
-  let mapleader = ","
-  " Not for imap!
-  nmap <space> <Leader>
-  vmap <space> <Leader>
-
   " Close preview and quickfix windows.
   nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 
@@ -2690,13 +2693,6 @@ endfor
 let NERDTreeIgnore += ['^\.bundle$', '^\.bzr$', '^\.git$', '^\.hg$', '^\.sass-cache$', '^\.svn$', '^\.$', '^\.\.$', '^Thumbs\.db$']
 let NERDTreeIgnore += ['__pycache__', '.ropeproject']
 " }}}
-
-" Smart way to move btw. windows {{{2
-" (use cursor keys to not overwrite C-l (redraw))
-map <C-Down> <C-W>j
-map <C-Up> <C-W>k
-map <C-Left> <C-W>h
-map <C-Right> <C-W>l
 
 " TODO
 " noremap <Up> gk

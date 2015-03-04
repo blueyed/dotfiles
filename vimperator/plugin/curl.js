@@ -1,7 +1,7 @@
 "use strict";
 var INFO =
 ["plugin", { name: "curl",
-             version: "0.2",
+             version: "0.3",
              href: "http://dactyl.sf.net/pentadactyl/plugins#curl-plugin",
              summary: "Curl command-line generator",
              xmlns: "dactyl" },
@@ -40,7 +40,7 @@ hints.addMode('C', "Generate curl command for a form", function(elem) {
 
     dactyl.clipboardWrite(["curl"].concat(
         [].concat(
-            [["--form-string", shellEscape(datum)] for ([n, datum] in Iterator(elements || []))],
+            [["--form-string", shellEscape(datum)] for (datum of (elements || []))],
             postData != null && !elements.length ? [["-d", shellEscape("")]] : [],
             [["-H", shellEscape("Cookie: " + elem.ownerDocument.cookie)],
              ["-A", shellEscape(navigator.userAgent)],

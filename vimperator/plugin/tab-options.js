@@ -107,7 +107,7 @@ group.options.add(["tabopen", "to"],
                     ["external", "Tabs opened from an external application"],
                     ["link", "Tabs opened by clicking links and the like"],
                     ["orphan", "Tabs opened by any other means"]
-                ].filter(function (e) !Set.has(extra.values, e[0]));
+                ].filter(function (e) !hasOwnProperty(extra.values, e[0]));
             return [
                 ["end", "Open new tabs at the end of the tab bar"],
                 ["groupleft", "Open tabs to the left of the current group"],

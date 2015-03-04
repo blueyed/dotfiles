@@ -3,7 +3,7 @@ isGlobalModule = true;
 
 var INFO =
 ["plugin", { name: "http-headers",
-             version: "0.5",
+             version: "0.6",
              href: "http://dactyl.sf.net/pentadactyl/plugins#http-headers-plugin",
              summary: "HTTP header info",
              xmlns: "dactyl" },
@@ -120,7 +120,7 @@ var HttpObserver = Class("HttpObserver",
     }),
 
     getController: function getController(win) {
-        for (let i in util.range(0, win.controllers.getControllerCount())) {
+        for (let i of util.range(0, win.controllers.getControllerCount())) {
             let controller = win.controllers.getControllerAt(i);
             if (controller.supportsCommand("dactyl-headers") && controller.wrappedJSObject instanceof Controller)
                 return controller.wrappedJSObject;
@@ -138,7 +138,7 @@ function iterHeaders(buffer, type) {
         store = observer.getController(win);
 
     if (store)
-        for (let [k, v] in values(store.headers[type] || []))
+        for (let [k, v] of values(store.headers[type] || []))
             yield [k, v];
 }
 

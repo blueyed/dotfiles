@@ -1,7 +1,7 @@
 "use strict";
 var INFO =
 ["plugin", { name: "jscompletion",
-             version: "1.0.2",
+             version: "1.0.3",
              href: "http://dactyl.sf.net/pentadactyl/plugins#jscompletion-plugin",
              summary: "JavaScript completion enhancements",
              xmlns: "dactyl" },
@@ -46,12 +46,12 @@ let NAMESPACES = [
 ];
 
 function addCompleter(names, fn) {
-    for (let [, name] in Iterator(util.debrace(names)))
+    for (let name of util.debrace(names))
         javascript.completers[name] = fn;
 }
 function uniq(iter) {
     let seen = {};
-    for (let val in iter)
+    for (let val of iter)
         if (!Set.add(seen, val))
             yield val;
 }
@@ -59,8 +59,8 @@ function uniq(iter) {
 addCompleter("__lookup{Getter,Setter}__", function (context, func, obj, args) {
     if (args.length == 1)
         context.completions =
-            [[k, obj[func](k)] for (k in properties(obj))].concat(
-            [[k, obj[func](k)] for (k in properties(obj, true))]).filter(
+            [[k, obj[func](k)] for (k of properties(obj))].concat(
+            [[k, obj[func](k)] for (k of properties(obj, true))]).filter(
                 function ([k, v]) v);
 });
 
@@ -109,14 +109,14 @@ function addCompleterNS(names, fn) {
 addCompleterNS("getElementsByClassName", function (context, func, doc, args, prefix, namespace) {
     if (args.length == 1) {
         let iter = evalXPath("//@" + prefix + "class", doc, namespace);
-        return array(e.value.split(" ") for (e in iter)).flatten().uniq().array;
+        return array(e.value.split(" ") for (e of iter)).flatten().uniq().array;
     }
 });
 
 addCompleterNS("{getElementsByTagName,createElement}", function (context, func, doc, args, prefix, namespace) {
     if (args.length == 1) {
         let iter = evalXPath("//" + prefix + "*", doc, namespace);
-        return uniq(e.localName.toLowerCase() for (e in iter));
+        return uniq(e.localName.toLowerCase() for (e of iter));
     }
 });
 
@@ -124,10 +124,10 @@ addCompleterNS("getElementsByAttribute", function (context, func, doc, args, pre
     switch (args.length) {
     case 1:
         let iter = evalXPath("//@" + prefix + "*", doc, namespace);
-        return uniq(e.name for (e in iter));
+        return uniq(e.name for (e of iter));
     case 2:
         iter = evalXPath("//@" + prefix + args[0], doc, namespace);
-        return uniq(e.value for (e in iter));
+        return uniq(e.value for (e of iter));
     }
 });
 
@@ -135,7 +135,7 @@ addCompleterNS("{get,set,remove}Attribute", function (context, func, node, args,
     context.keys = { text: 0, description: 1 };
     if (args.length == 1)
         return [[a.localName, a.value]
-                for (a in array.iterValues(node.attributes))
+                for (a of array.iterValues(node.attributes))
                 if (!namespace || a.namespaceURI == namespace)];
 });
 

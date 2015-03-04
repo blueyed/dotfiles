@@ -6,6 +6,7 @@ hgext.patchbomb =
 graphlog =
 # Disabled for now - may ship it with dotfiles as in: mercurial_keyring = ~/.dotfiles/lib/...
 # mercurial_keyring =
+progress =
 
 [email]
 method = /usr/sbin/sendmail
@@ -18,6 +19,9 @@ lu1.lugensa.net = 60:3A:2E:1B:D5:DD:12:0D:CF:C5:90:BF:38:98:68:83:68:B2:1E:5E
 [extensions]
 color =
 pager =
+rebase =
+histedit =
+shelve =
 
 [pager]
 pager = LESS='FRSXQ' less

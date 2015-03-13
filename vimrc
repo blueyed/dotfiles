@@ -1316,9 +1316,28 @@ if has("autocmd") " Autocommands {{{1
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
 
   " Python
-  au FileType python setlocal tabstop=4 shiftwidth=4 expandtab autoindent foldmethod=expr
-  " from pymode, minus relativenumber (~/vim/bundle/python-mode/ftplugin/python/pymode.vim)
-  au FileType python setlocal complete+=t formatoptions-=t nowrap textwidth=79
+  " irrelevant, using python-pep8-indent
+  " let g:pyindent_continue = '&sw * 1'
+  " let g:pyindent_open_paren = '&sw * 1'
+  " let g:pyindent_nested_paren = '&sw'
+
+  " python-mode
+  let g:pymode_options = 0              " do not change relativenumber
+  let g:pymode_indent = 0               " use vim-python-pep8-indent (upstream of pymode)
+  let g:pymode_lint = 0                 " prefer syntastic; pymode has problems when PyLint was invoked already before VirtualEnvActivate..!?!
+  let g:pymode_virtualenv = 0           " use virtualenv plugin (required for pylint?!)
+  let g:pymode_doc = 0                  " use pydoc
+  let g:pymode_rope_completion = 0      " use YouCompleteMe instead (python-jedi)
+  let g:pymode_syntax_space_errors = 0  " using MyWhitespaceSetup
+  let g:pymode_trim_whitespaces = 0
+  let g:pymode_debug = 0
+  let g:pymode_rope = 0
+
+  let g:pydoc_window_lines=0.5          " use 50% height
+  let g:pydoc_perform_mappings=0
+
+  " let python_space_error_highlight = 1  " using MyWhitespaceSetup
+
 
   " C
   au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r

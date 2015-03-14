@@ -1944,6 +1944,9 @@ endif
 " Automatic line numbers {{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 set number relativenumber
+if !&number  " Older Vim: start with 'number' (both are not supported).
+  set number
+endif
 " No relative numbers with quickfix and other special windows like __TMRU__.
 augroup vimrc_number_qf
   au!
@@ -1953,17 +1956,20 @@ augroup vimrc_number_qf
 augroup END
 let &showbreak = '↪ '
 function! CycleLineNr()
-  " states: [start] => norelative/number => relative/number => relative/nonumber => nonumber/norelative
+  " states: [start] => norelative/number => relative/number (=> relative/nonumber) => nonumber/norelative
   if exists('+relativenumber')
     if &relativenumber
-      if &number
-        set relativenumber nonumber
-      else
+      " if &number
+      "   set relativenumber nonumber
+      " else
         set norelativenumber nonumber
-      endif
+      " endif
     else
       if &number
-        set relativenumber number
+        set number relativenumber
+        if !&number  " Older Vim.
+          set relativenumber
+        endif
       else
         " init:
         set norelativenumber number

@@ -1943,10 +1943,8 @@ endif
 
 " Automatic line numbers {{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
-set number relativenumber
-if !&number  " Older Vim: start with 'number' (both are not supported).
-  set number
-endif
+" NOTE: relativenumber might slow Vim down: https://code.google.com/p/vim/issues/detail?id=311
+set number norelativenumber
 " No relative numbers with quickfix and other special windows like __TMRU__.
 augroup vimrc_number_qf
   au!

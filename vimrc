@@ -1996,7 +1996,7 @@ function! SetNumberWidth()
     set numberwidth=2
   endif
 endfun
-nmap <leader>sa :call CycleLineNr()<CR>
+nnoremap <leader>sa :call CycleLineNr()<CR>
 
 " Toggle numbers, but with relativenumber turned on
 fun! ToggleLineNr()

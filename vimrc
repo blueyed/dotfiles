@@ -2128,7 +2128,9 @@ command! FoldParagraphs call FoldParagraphs()
 " }}}
 
 " Sort Python imports.
-command! -range=% Isort :<line1>,<line2>! isort --lines 79 -
+if executable('isort')
+  command! -range=% Isort :<line1>,<line2>! isort --lines 79 -
+endif
 
 " Paste register `reg`, while remembering current state of &paste
 function! MyPasteRegister(reg, mode)

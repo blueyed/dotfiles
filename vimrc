@@ -993,6 +993,8 @@ if has('persistent_undo')
 endif
 
 for s:create_dir in s:check_create_dirs
+  " Remove trailing slashes, especially for &directory.
+  let s:create_dir = substitute(s:create_dir, '/\+$', '', '')
   if ! isdirectory(s:create_dir)
     if match(s:create_dir, ',') != -1
       echohl WarningMsg | echom "WARN: not creating dir: ".s:create_dir | echohl None

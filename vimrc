@@ -2092,11 +2092,27 @@ function! MyIfToVarDump()
   s/\m{\s*$/; die();/
 endfunction
 
-" nmap <Space><Space> cox
-
-" Toggle folds
-nnoremap <Leader><space> za
+" Toggle fold under cursor.  {{{
+fun! MyToggleFold()
+  if !&foldenable
+    echom "Folds are not enabled."
+  endif
+  let level = foldlevel('.')
+  echom "Current foldlevel:" level
+  if level == 0
+    return
+  endif
+  if foldclosed('.') > 0
+    " Open recursively
+    norm! zA
+  else
+    " Close only one level.
+    norm! za
+  endif
+endfun
+nnoremap <Leader><space> :call MyToggleFold()<cr>
 vnoremap <Leader><space> zf
+" }}}
 
 " Easily switch between different fold methods {{{
 " Source: https://github.com/pydave/daveconfig/blob/master/multi/vim/.vim/bundle/foldtoggle/plugin/foldtoggle.vim

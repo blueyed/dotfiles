@@ -1250,7 +1250,7 @@ if has("autocmd") " Autocommands {{{1
     endif
     let fname = a:0 ? a:1 : expand('%')
     if fname =~ '^\w\+:/'
-      " do not mess with 'fugitive://' etc
+      " Do not mess with 'fugitive://' etc.
       return
     endif
     let fname = simplify(fname)
@@ -1260,23 +1260,22 @@ if has("autocmd") " Autocommands {{{1
       return
     endif
     let resolvedfile = fnameescape(resolvedfile)
-    if &modifiable
-      " Only display a warning when editing a file, especially not for `:help`.
-      " echohl WarningMsg | echomsg 'Resolving symlink' fname '=>' resolvedfile | echohl None
-      " Redraw now, to avoid hit-enter with the following notice.
-      redraw
-      echomsg 'Resolving symlink' fname '=>' resolvedfile
-    endif
-    " exec 'noautocmd file ' . resolvedfile
-    " XXX: problems with AutojumpLastPosition: line("'\"") is 1 always.
     let sshm = &shm
     set shortmess+=A  " silence ATTENTION message about swap file (would get displayed twice)
-    exec 'silent file ' . resolvedfile
+    exec 'file ' . resolvedfile
     let &shm=sshm
+
+    " Re-init fugitive.
+    call fugitive#detect(resolvedfile)
+    if &modifiable
+      " Only display a note when editing a file, especially not for `:help`.
+      redraw  " Redraw now, to avoid hit-enter prompt.
+      echomsg 'Resolved symlink: =>' resolvedfile
+    endif
   endfunction
   command! FollowSymlink call MyFollowSymlink()
   command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
-  au BufReadPost * nested call MyFollowSymlink(expand('<afile>'))
+  au BufReadPost * nested call MyFollowSymlink(expand('%'))
 
   " Jump to last known cursor position on BufReadPost {{{
   " Don't do it when the position is invalid or when inside an event handler

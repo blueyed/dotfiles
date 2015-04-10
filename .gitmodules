@@ -68,7 +68,7 @@
 	url = git://github.com/majutsushi/urxvt-font-size.git
 [submodule "lib/solarized-xresources"]
 	path = lib/solarized-xresources
-	url = git://github.com/solarized/xresources.git
+	url = git://github.com/blueyed/xresources.git
 [submodule "urxvt/ext/urxvt-perls"]
 	path = urxvt/ext/urxvt-perls
 	url = git://github.com/muennich/urxvt-perls.git

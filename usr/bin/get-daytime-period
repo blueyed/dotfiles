@@ -24,7 +24,7 @@ if [ "$USE_REDSHIFT" = 1 ] && ! hash redshift 2> /dev/null; then
   USE_REDSHIFT=0
 fi
 
-cachefile=~/.cache/redshift-period
+cachefile=/tmp/redshift-period
 latlonfile=~/.config/redshift-latlon-default
 ok_to_cache=1
 

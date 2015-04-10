@@ -80,8 +80,8 @@ URxvt.cutchars: "()*,<>[]{}|«»"
 ! URxvt.color15:      #e1dddd
 ! }}}
 
-! Solarized colorscheme.
-#include ".dotfiles/lib/solarized-xresources/solarized"
+! Solarized colorscheme: light by default, gets adjusted via zsh theme.
+#include ".dotfiles/lib/solarized-xresources/Xresources.light"
 
 ! Hack to act more like XTerm.
 ! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt

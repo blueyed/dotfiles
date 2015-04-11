@@ -100,7 +100,7 @@
 	# do not use $PAGER/vimpager for now (https://github.com/rkitover/vimpager/issues/11)
 	# -F: --quit-if-one-screen: Quit if entire file fits on first screen.
 	# -X: --no-init: Don't use termcap init/deinit strings.
-	pager = less --no-init --quit-if-one-screen
+	pager = less --no-init --quit-if-one-screen -+S
 	# -+F/-+X to override LESS selectively?! (http://stackoverflow.com/a/18781512/15690)
 	# pager = less -+F -+X
 # [pager]

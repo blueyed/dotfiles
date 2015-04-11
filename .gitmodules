@@ -75,3 +75,6 @@
 [submodule "lib/zsh-autoenv"]
 	path = lib/zsh-autoenv
 	url = git://github.com/Tarrasch/zsh-autoenv.git
+[submodule "lib/tmux-colors-solarized"]
+	path = lib/tmux-colors-solarized
+	url = git://github.com/seebi/tmux-colors-solarized.git

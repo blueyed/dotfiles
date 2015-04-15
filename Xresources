@@ -81,7 +81,40 @@ URxvt.cutchars: "()*,<>[]{}|«»"
 ! }}}
 
 ! Solarized colorscheme: light by default, gets adjusted via zsh theme.
+
+#if !defined(SOLARIZED_LIGHT) && !defined(SOLARIZED_DARK)
+#define SOLARIZED_LIGHT
+#elif defined(SOLARIZED_LIGHT) && defined(SOLARIZED_DARK)
+#undef SOLARIZED_DARK
+#endif
+
+#ifdef SOLARIZED_DARK
+#include ".dotfiles/lib/solarized-xresources/Xresources.dark"
+#else
 #include ".dotfiles/lib/solarized-xresources/Xresources.light"
+#endif
+
+! light
+*solarizedlight.background:            S_base3
+*solarizedlight.foreground:            S_base00
+*solarizedlight.fadeColor:             S_base3
+*solarizedlight.cursorColor:           S_base01
+*solarizedlight.pointerColorBackground:S_base1
+*solarizedlight.pointerColorForeground:S_base01
+
+! dark
+*solarizeddark.background:            S_base03
+*solarizeddark.foreground:            S_base0
+*solarizeddark.fadeColor:             S_base03
+*solarizeddark.cursorColor:           S_base1
+*solarizeddark.pointerColorBackground:S_base01
+*solarizeddark.pointerColorForeground:S_base1
+
+! Switch between light/dark!
+! (not in there: fadeColor, pointerColorBackground)
+URxvt.keysym.M-C-0: command:\033]11;S_base3\007\033]10;S_base00\007\033]12;S_base01\007\033]13;S_base01\007
+URxvt.keysym.M-C-9: command:\033]11;S_base03\007\033]10;S_base0\007\033]12;S_base1\007\033]13;S_base1\007
+
 
 ! Hack to act more like XTerm.
 ! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt

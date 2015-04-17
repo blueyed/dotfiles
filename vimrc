@@ -676,10 +676,6 @@ if 1 " has('eval') / `let` may not be available.
   " '<c-n>' by default!
   let g:sparkupNextMapping = '<Leader><c-n>'
 
-  " autocomplpop: do not complete from dictionary; -= "k"
-  " (manually trigger it by C-X C-K instead).
-  let g:acp_completeOption = '.,w,b'
-
   " Syntastic {{{
   let g:syntastic_enable_signs=1
   " let g:syntastic_auto_jump=2

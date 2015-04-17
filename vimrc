@@ -201,7 +201,6 @@ if 1 " has('eval') / `let` may not be available.
       NeoBundle 'tomtom/tmru_vim.git', { 'directory': 'tmru', 'depends':
             \ [['tomtom/tlib_vim.git', { 'directory': 'tlib' }]]}
       NeoBundle 'blueyed/vim-tmux-navigator.git', { 'directory': 'tmux-navigator' }
-      NeoBundle 'tomtom/tplugin_vim.git', { 'directory': 'tplugin' }
       NeoBundle 'vim-scripts/tracwiki.git', { 'directory': 'tracwiki' }
       NeoBundle 'tomtom/ttagecho_vim.git', { 'directory': 'ttagecho' }
       NeoBundle 'SirVer/ultisnips.git', { 'directory': 'ultisnips' }

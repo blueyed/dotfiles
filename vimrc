@@ -46,7 +46,20 @@ if 1 " has('eval') / `let` may not be available.
   if s:use_neobundle
     filetype off
 
-    " if neobundle#has_cache()
+    " If the NeoBundle cache exists and is not writable, fall back to using
+    " a separate cache in /tmp.
+    " This works around cache issues (different paths) when using it through a
+    " (read-only) bind mount.
+    " Ref: https://github.com/Shougo/neobundle.vim/issues/377
+    if len(glob(neobundle#commands#get_cache_file(), 1))
+          \ && !filewritable(neobundle#commands#get_cache_file())
+      let s:vim_cache = '/tmp/.vim-cache-' . $USER
+      if !isdirectory(s:vim_cache)
+        call mkdir(s:vim_cache, "", 0700)
+      endif
+      let g:neobundle#cache_file = s:vim_cache . '/neobundle.cache'
+    endif
+
     if neobundle#has_fresh_cache()
       NeoBundleLoadCache
     else

@@ -1,18 +1,23 @@
 #!/bin/sh
-
-# switch from qwertz to neo layout and back (depending on command name)
+# Switch from qwertz to neo layout and back (depending on command name)
 
 cmd=$(basename $0)
 
-local VARIANT OPTION
+# OPTION="-option ctrl:nocaps -option lv3:ralt_switch_multikey"
 
-case $cmd in
-	asdf) VARIANT=neo;;
-	uiae) VARIANT=basic; OPTION="-option ctrl:nocaps -option lv3:ralt_switch_multikey";;
-	*) exit 1;;
-esac
-	
+if [ $cmd = asdf ]; then
+	# Activate workman / workman-p.
+	setxkbmap -v workman-p && xset r 66
+	echo "Good luck! :)"
+	exit
+fi
+
+# TO THE RESCUE!
+
 # empty option to reset
-echo setxkbmap -layout de -variant $VARIANT -option $OPTION
-setxkbmap -layout de -variant $VARIANT -option $OPTION
+setxkbmap -layout de -variant nodeadkeys
+# setxkbmap -option $OPTION
+# Revert repeating on CapsLock (BackSpace/Escape).
+xset -r 66
 
+echo "Welcome back, qwertz!"

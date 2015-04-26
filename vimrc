@@ -835,8 +835,9 @@ if 1 " has('eval') / `let` may not be available.
   endif
 
   let g:ycm_filetype_blacklist = {
-    \ 'ycmblacklisted': 1
-    \}
+        \ 'python' : 1,
+        \ 'ycmblacklisted': 1
+        \}
   let g:ycm_complete_in_comments = 1
   let g:ycm_complete_in_strings = 1
   let g:ycm_collect_identifiers_from_comments_and_strings = 1
@@ -1072,7 +1073,7 @@ if has("user_commands")
   let g:jedi#goto_definitions_command = ''  " dynamically done for ft=python.
   let g:jedi#rename_command = 'cR'
   let g:jedi#usages_command = 'gr'
-  let g:jedi#completions_enabled = 0
+  let g:jedi#completions_enabled = 1
 
   " Unite/ref and pydoc are more useful.
   let g:jedi#documentation_command = '<Leader>_K'
@@ -1084,8 +1085,6 @@ if has("user_commands")
       au FileType python call jedi#configure_call_signatures()
     augroup END
   endif
-
-  let g:jedi#completions_enabled = 0
 
   let g:jedi#auto_close_doc = 1
     " if g:jedi#auto_close_doc

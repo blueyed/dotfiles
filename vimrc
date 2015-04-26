@@ -2046,29 +2046,13 @@ nnoremap cov :set <C-R>=empty(&virtualedit) ? 'virtualedit=all' : 'virtualedit='
 " Tab completion options
 " (only complete to the longest unambiguous match, and show a menu)
 " set completeopt=longest,menu
-set completeopt=menuone
-" set completeopt=menuone,preview  " experimental
+set completeopt=longest,menuone
+" set completeopt+=preview  " experimental
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
 " set dictionary+=spell " very useful (via C-X C-K), but requires ':set spell' once
-if has("autocmd") && exists("+omnifunc")
-  augroup filetype_omnifunc
-  au!
-  " au Filetype *
-  "   \   if &omnifunc == "" |
-  "   \     setlocal omnifunc=syntaxcomplete#Complete |
-  "   \   endif
-  " use eclim for PHP omnicompletion (does not pollute quickfix window and is better in general)
-  "  au Filetype php setlocal omnifunc=eclim#php#complete#CodeComplete
-  " ref: https://github.com/Valloric/YouCompleteMe/issues/103#issuecomment-14149318
-  " NOTE: this is done via g:EclimCompletionMethod now instead
-  " au Filetype * runtime! autoload/eclim/<amatch>/complete.vim
-  "   \	| let s:cfunc = 'eclim#'.expand('<amatch>').'#complete#CodeComplete'
-  "   \	| if exists('*'.s:cfunc) | let &l:omnifunc=s:cfunc | endif
-  augroup END
-endif
 
-
+" NOTE: gets handled dynamically via cursorcross plugin.
 " set cursorline
 " highlight CursorLine guibg=lightblue ctermbg=lightgray
 
@@ -2496,7 +2480,9 @@ map <leader>tb :CommandTBuffer<CR>
 " Setup completefunc / base completion. {{{
 " (used by neocomplcache and as fallback (manual)).
 " au FileType python set completefunc=eclim#python#complete#CodeComplete
-if has("autocmd") && exists("+omnifunc")
+if !s:use_ycm && has("autocmd") && exists("+omnifunc")
+  augroup vimrc_base_omnifunc
+    au!
   if &rtp =~ '\<eclim\>'
     au FileType * if index(
           \ ["php", "javascript", "css", "python", "xml", "java", "html"], &ft) != -1 |
@@ -2519,12 +2505,14 @@ if has("autocmd") && exists("+omnifunc")
     au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
     "au FileType ruby setlocal omnifunc=rubycomplete#Complete
   endif
+  au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
 
   " Use syntaxcomplete, if there is no better omnifunc.
   autocmd Filetype *
         \ if &omnifunc == "" |
         \   setlocal omnifunc=syntaxcomplete#Complete |
         \ endif
+  augroup END
 endif
 " }}}
 

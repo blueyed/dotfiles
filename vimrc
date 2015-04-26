@@ -828,6 +828,12 @@ if 1 " has('eval') / `let` may not be available.
 
 
   " YouCompleteMe {{{
+  " This needs to be the Python that YCM was built against.  (set in ~/.zshrc.local).
+  if filereadable($PYTHON_YCM)
+    let g:ycm_path_to_python_interpreter = $PYTHON_YCM
+    " let g:ycm_path_to_python_interpreter = 'python-in-terminal'
+  endif
+
   let g:ycm_filetype_blacklist = {
     \ 'ycmblacklisted': 1
     \}
@@ -3432,6 +3438,16 @@ augroup CenteringReadOnly
 augroup END
 
 
+" NeoVim {{{
+" Use the Python 2 version YCM was built with.
+" Defining it also skips auto-detecting it (~/Vcs/neovim/runtime/autoload/remote/host.vim)
+if filereadable($PYTHON_YCM)
+  let g:python_host_prog=$PYTHON_YCM
+endif
+
+" Avoid loading python3 host.
+let g:UltiSnipsUsePythonVersion = 2
+" }}}
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

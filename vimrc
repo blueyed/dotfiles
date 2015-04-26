@@ -836,6 +836,18 @@ if 1 " has('eval') / `let` may not be available.
   let g:ycm_collect_identifiers_from_comments_and_strings = 1
   let g:ycm_extra_conf_globlist = ['~/src/awesome/.ycm_extra_conf.py']
 
+  " Jump mappings, overridden in Python mode with jedi-vim.
+  nnoremap <leader>j :YcmCompleter GoToDefinition<CR>
+  nnoremap <leader>gj :YcmCompleter GoToDeclaration<CR>
+  fun! MySetupPythonMappings()
+    nnoremap <buffer> <leader>j  :call jedi#goto_definitions()<CR>
+    nnoremap <buffer> <leader>gj :call jedi#goto_assignments()<CR>
+  endfun
+  augroup vimrc_jump_maps
+    au!
+    au FileType python call MySetupPythonMappings()
+  augroup END
+
   " Deactivated: causes huge RAM usage (YCM issue 595)
   " let g:ycm_collect_identifiers_from_tags_files = 1
 
@@ -1050,8 +1062,8 @@ if has("user_commands")
   " jedi-vim (besides YCM with jedi library) {{{1
   " let g:jedi#force_py_version = 3
   let g:jedi#auto_vim_configuration = 0
-  let g:jedi#goto_assignments_command = 'gd'
-  let g:jedi#goto_definitions_command = 'gD'
+  let g:jedi#goto_assignments_command = ''  " dynamically done for ft=python.
+  let g:jedi#goto_definitions_command = ''  " dynamically done for ft=python.
   let g:jedi#rename_command = 'cR'
   let g:jedi#usages_command = 'gr'
   let g:jedi#completions_enabled = 0

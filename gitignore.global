@@ -7,7 +7,25 @@ tags
 tags-??
 # LibreOffice lock files
 .~lock.*#
-*.pyc
+
 .sass-cache
 
+# Python cache files.
+*.pyc
+__pycache__/
+
+# IPython notebooks.
 *.ipynb
+
+# zsh-autoenv.
+.env
+# vim-localvimrc.
+.lvimrc
+# Local pyenv versions.
+.python-version
+
+# Config for YouCompleteMe.
+.ycm_extra_conf.py
+
+# Custom stuff.
+ablage

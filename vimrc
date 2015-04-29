@@ -124,7 +124,7 @@ if 1 " has('eval') / `let` may not be available.
       NeoBundle 'tommcdo/vim-exchange.git', { 'directory': 'exchange' }
       NeoBundle 'int3/vim-extradite.git', { 'directory': 'extradite' }
       NeoBundle 'jmcantrell/vim-fatrat.git', { 'directory': 'fatrat' }
-      NeoBundle 'blueyed/file-line.git', { 'directory': 'file-line' }
+      NeoBundle 'kopischke/vim-fetch', { 'directory': 'fetch' }
       NeoBundle 'thinca/vim-fontzoom.git', { 'directory': 'fontzoom' }
       NeoBundle 'tpope/vim-fugitive.git', { 'directory': 'fugitive',
             \ 'augroup': 'fugitive' }

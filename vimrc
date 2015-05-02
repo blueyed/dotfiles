@@ -3247,8 +3247,9 @@ if has('autocmd')
           \ |   set nomodifiable readonly
           \ | endif
 
-    " Make Vim help files modifiable by default.
-    au FileType help setl modifiable
+    " Vim help files: modidiable (easier to edit for typo fixes); buflisted
+    " for easier switching to them.
+    au FileType help setl modifiable buflisted
   augroup END
 endif " }}}
 

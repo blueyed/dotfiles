@@ -2703,16 +2703,9 @@ endfunction
 endif " 1}}} eval guard
 
 " Mappings {{{1
-" Map cursor keys in normal mode to navigate windows/tabs
-" via http://www.reddit.com/r/vim/comments/flidz/partial_completion_with_arrows_off/c1gx8it
-" nnoremap  <Down> <C-W>j
-" nnoremap  <Up> <C-W>k
-" nnoremap  <Right> <C-W>l
-" nnoremap  <Left> <C-W>h
-
-" does not work with gnome-terminal
-nnoremap <C-s> :up<CR>
-inoremap <C-s> <Esc>:up<CR>
+" Save.
+nnoremap <C-s>     :up<CR>
+inoremap <C-s>     <Esc>:up<CR>
 
 " swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U)
 nnoremap <C-z> <C-y>

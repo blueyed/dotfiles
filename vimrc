@@ -1748,11 +1748,12 @@ fun! MyGotoMRUTab()
   endif
   exe "tabn ".g:mrutab
 endfun
-" XXX: stupid map
-nmap gh :call MyGotoMRUTab()<CR>
-" nmap <tab><tab> :call MyGotoMRUTab()<CR>
-" nmap °  :call MyGotoMRUTab()<CR>
-" nmap <C-^>  :call MyGotoMRUTab()<CR>
+" Overrides Vim's gh command (start select-mode, but I don't use that).
+" It can be simulated using v<C-g> also.
+nnoremap gh  :call MyGotoMRUTab()<CR>
+" nnoremap °  :call MyGotoMRUTab()<CR>
+" nnoremap <C-^>  :call MyGotoMRUTab()<CR>
+" nnoremap <tab><tab> :call MyGotoMRUTab()<CR>
 augroup MyTL
   au!
   au TabLeave * let g:mrutab = tabpagenr()

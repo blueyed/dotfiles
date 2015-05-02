@@ -2654,26 +2654,51 @@ augroup AdjustWindowHeight
   au FileType qf call AdjustWindowHeight(1, 10)
 augroup END
 function! AdjustWindowHeight(minheight, maxheight)
-  exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
+  if exists('w:did_AdjustWindowHeight')
+    return
+  endif
+
+  let newheight = max([min([line("$"), a:maxheight]), a:minheight])
+  let diff = newheight - winheight(0)
+  if diff == 0 | return | endif
+
+  let w:did_AdjustWindowHeight = 1
+
+  " Special handling for if there are windows below.
+  " (For example from "belowright copen")
+  " The size adjustment should be carried out to the windows above.
+  let orig_winnr = winnr()
+  let orig_prev_winnr = winnr('#')
+
+  let windows_below = []
+  let w = orig_winnr
+  while 1
+    noautocmd wincmd j
+    if w == winnr()
+      break
+    endif
+    let w = winnr()
+    if ! &winfixheight
+      let windows_below += [w]
+    endif
+  endwhile
+
+  " Go back to current window, restoring "wincmd p" functionality.
+  exe 'noautocmd' orig_prev_winnr 'wincmd w'
+  exe 'noautocmd' orig_winnr 'wincmd w'
+
+  " Lock height of windows below.
+  for w in windows_below
+    call setwinvar(w, '&winfixheight', 1)
+  endfor
+
+  exe newheight "wincmd _"
+
+  " Unlock height of windows below.
+  for w in windows_below
+    call setwinvar(w, '&winfixheight', 0)
+  endfor
 endfunction
-" function! AdjustWindowHeight(minheight, maxheight)
-"   let totallines = line('$')
-"   if totallines >= a:maxheight
-"     n_lines = a:maxheight
-"   else
-"     let l = 1
-"     let n_lines = 0
-"     let w_width = winwidth(0)
-"     while l <= totallines && n_lines < a:maxheight
-"       " number to float for division
-"       let l_len = strlen(getline(l)) + 0.0
-"       let line_width = l_len/w_width
-"       let n_lines += float2nr(ceil(line_width))
-"       let l += 1
-"     endw
-"   endif
-"   exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
-" endfunction
 " 2}}}
 endif " 1}}} eval guard
 

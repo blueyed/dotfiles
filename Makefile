@@ -6,7 +6,7 @@ INSTALL_FILES := ackrc agignore aptitude/config autojump \
 	hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc \
 	sackrc screenrc screenrc.common subversion/servers \
-	terminfo tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
+	terminfo tigrc tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
 	xsessionrc \
 	config/mc/ini \
 	config/gnome-session/sessions \

@@ -686,16 +686,15 @@ if 1 " has('eval') / `let` may not be available.
   " '<c-n>' by default!
   let g:sparkupNextMapping = '<Leader><c-n>'
 
-  " Syntastic {{{
+  " Syntastic {{{2
   let g:syntastic_enable_signs=1
-  " let g:syntastic_auto_jump=2
   let g:syntastic_check_on_wq=1  " Only for active filetypes.
   let g:syntastic_auto_loc_list=1
-  " let g:syntastic_always_populate_loc_list=1  " Default: 0
+  let g:syntastic_always_populate_loc_list=1
   " let g:syntastic_echo_current_error=0 " TEST: faster?!
   let g:syntastic_mode_map = {
-        \'mode': 'passive',
-        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python'],
+        \ 'mode': 'passive',
+        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python', 'sh', 'zsh'],
         \ 'passive_filetypes': [] }
   let g:syntastic_error_symbol='✗'
   let g:syntastic_warning_symbol='⚠'
@@ -703,6 +702,7 @@ if 1 " has('eval') / `let` may not be available.
   " let g:syntastic_python_python_exe = 'python3'
   " let g:syntastic_python_checkers = ['pyflakes', 'flake8', 'pep8', 'pylint', 'python']
   let g:syntastic_python_checkers = ['python', 'frosted', 'flake8']
+
   " let g:syntastic_php_checkers = ['php']
   let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
 
@@ -712,8 +712,7 @@ if 1 " has('eval') / `let` may not be available.
   "       \ "type":  "style",
   "       \ "regex": '\m\[C03\d\d\]',
   "       \ "file":  ['\m^/usr/include/', '\m\c\.h$'] }
-  let g:syntastic_quiet_messages = { "level": [],
-        \ 'type': ['style'] }
+  let g:syntastic_quiet_messages = { "level": [], 'type': ['style'] }
 
   fun! SyntasticToggleQuiet(k, v)
     let idx = index(g:syntastic_quiet_messages[a:k], a:v)
@@ -727,10 +726,36 @@ if 1 " has('eval') / `let` may not be available.
   endfun
   command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings')
   command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style')
-  nmap <Leader>se :SyntasticToggleMode<cr>
 
+  fun! MySyntasticCheckAll()
+    let save = g:syntastic_quiet_messages
+    let g:syntastic_quiet_messages = { "level": [], 'type': [] }
+    SyntasticCheck
+    let g:syntastic_quiet_messages = save
+  endfun
+  command! MySyntasticCheckAll call MySyntasticCheckAll()
 
-  " gist-vim {{{
+  " Source: https://github.com/scrooloose/syntastic/issues/1361#issuecomment-82312541
+  function! SyntasticDisableToggle()
+      if !exists('s:syntastic_disabled')
+          let s:syntastic_disabled = 0
+      endif
+      if !s:syntastic_disabled
+          let s:modemap_save = deepcopy(g:syntastic_mode_map)
+          let g:syntastic_mode_map['active_filetypes'] = []
+          let g:syntastic_mode_map['mode'] = 'passive'
+          let s:syntastic_disabled = 1
+          SyntasticReset
+          echom "Syntastic disabled."
+      else
+          let g:syntastic_mode_map = deepcopy(s:modemap_save)
+          let s:syntastic_disabled = 0
+          echom "Syntastic enabled."
+      endif
+  endfunction
+  command! SyntasticDisableToggle call SyntasticDisableToggle()
+
+  " gist-vim {{{2
   let g:gist_detect_filetype = 1
   " }}}
 

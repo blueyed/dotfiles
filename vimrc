@@ -498,9 +498,12 @@ if has('autocmd')
       let &scrolloff = scrolloff
     endif
   endfun
-  augroup set_scrollof
+  augroup set_scrolloff
     au!
     au BufEnter,WinEnter * call MyAutoScrollOff()
+    if exists('#TermOpen')  " neovim
+      au TermOpen * set sidescrolloff=0 scrolloff=0
+    endif
   augroup END
 endif " }}}
 

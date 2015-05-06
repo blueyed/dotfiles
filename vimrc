@@ -487,19 +487,14 @@ if has('autocmd')
     if exists('g:no_auto_scrolloff')
       return
     endif
-    if ! exists('g:scrolloff_default')
-      let g:scrolloff_default = &scrolloff
-    endif
+    let scrolloff = &scrolloff
     if &buftype != ""
       " Especially with quickfix (mouse jumping, more narrow).
       let scrolloff = 0
     elseif &diff
       let scrolloff = 10
-    else
-      let scrolloff = g:scrolloff_default
     endif
     if &scrolloff != scrolloff
-      " echom "Setting scrolloff:" scrolloff
       let &scrolloff = scrolloff
     endif
   endfun

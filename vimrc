@@ -1273,6 +1273,9 @@ if has("autocmd") " Autocommands {{{1
     if exists('w:no_resolve_symlink') && w:no_resolve_symlink
       return
     endif
+    if &ft == 'help'
+      return
+    endif
     let fname = a:0 ? a:1 : expand('%')
     if fname =~ '^\w\+:/'
       " Do not mess with 'fugitive://' etc.
@@ -1287,6 +1290,7 @@ if has("autocmd") " Autocommands {{{1
     let resolvedfile = fnameescape(resolvedfile)
     let sshm = &shm
     set shortmess+=A  " silence ATTENTION message about swap file (would get displayed twice)
+    redraw  " Redraw now, to avoid hit-enter prompt.
     exec 'file ' . resolvedfile
     let &shm=sshm
 

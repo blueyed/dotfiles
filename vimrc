@@ -3465,10 +3465,10 @@ endfunc
 
 " Keep cursor centered (mode and for readonly files).
 " Source: http://www.reddit.com/r/vim/comments/27nnsz/top_shortcuts_commands_configuration_for_vim/ci2os92
-nnoremap <Leader>z :let &scrolloff=999-&scrolloff<CR>
+" nnoremap <Leader>z :let &scrolloff=999-&scrolloff<CR>
 augroup CenteringReadOnly
     autocmd!
-    autocmd BufEnter * if !&modifiable || &ft=='help' | setl scrolloff=999 | endif
+    autocmd BufEnter * if &ft=='help' | setl scrolloff=999 | endif
 augroup END
 
 

@@ -1359,7 +1359,7 @@ if has("autocmd") " Autocommands {{{1
 
   " autocommands for fugitive {{{2
   " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
-  au User fugitive
+  au User Fugitive
     \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)' |
     \   nnoremap <buffer> .. :edit %:h<CR> |
     \ endif

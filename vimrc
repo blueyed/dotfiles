@@ -1965,12 +1965,14 @@ imap <C-F> <C-R>=expand("%")<CR>
 
 " imap <C-L> <Space>=><Space>
 
-" toggle settings, mnemonic "set paste", "set wrap", ..
+" Toggle settings, mnemonic "set paste", "set color", ..
 " NOTE: see also unimpaired
 set pastetoggle=<leader>sp
-nmap <leader>sc :ColorToggle<cr>
-nmap <leader>sq :QuickfixsignsToggle<cr>
-nmap <leader>si :IndentGuidesToggle<cr>
+nnoremap <leader>sc :ColorToggle<cr>
+nnoremap <leader>sq :QuickfixsignsToggle<cr>
+nnoremap <leader>si :IndentGuidesToggle<cr>
+" Toggle mouse.
+nnoremap <leader>sm :exec 'set mouse='.(&mouse == 'a' ? '' : 'a')<cr>:set mouse?<cr>
 
 " let g:colorizer_fgcontrast=-1
 let g:colorizer_startup = 0

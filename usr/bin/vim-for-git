@@ -22,5 +22,5 @@ if [ "$(basename "$FILE")" = "COMMIT_EDITMSG" ]; then
     -c "normal gg" \
     -c "command! Q qa" "$@"
 else
-  $EDITOR "$@"  
+  $EDITOR "$@"
 fi

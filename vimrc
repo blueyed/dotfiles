@@ -487,12 +487,15 @@ if has('autocmd')
     if exists('g:no_auto_scrolloff')
       return
     endif
-    let scrolloff = &scrolloff
-    if &buftype != ""
+    if &ft == 'help'
+      let scrolloff = 999
+    elseif &buftype != ""
       " Especially with quickfix (mouse jumping, more narrow).
       let scrolloff = 0
     elseif &diff
       let scrolloff = 10
+    else
+      let scrolloff = 3
     endif
     if &scrolloff != scrolloff
       let &scrolloff = scrolloff
@@ -3464,14 +3467,6 @@ func! s:ExecCheckBdErrs(bdrangecmd)
 endfunc
 " }}}
 
-
-" Keep cursor centered (mode and for readonly files).
-" Source: http://www.reddit.com/r/vim/comments/27nnsz/top_shortcuts_commands_configuration_for_vim/ci2os92
-" nnoremap <Leader>z :let &scrolloff=999-&scrolloff<CR>
-augroup CenteringReadOnly
-    autocmd!
-    autocmd BufEnter * if &ft=='help' | setl scrolloff=999 | endif
-augroup END
 
 
 " NeoVim {{{

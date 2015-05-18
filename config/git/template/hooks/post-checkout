@@ -9,4 +9,6 @@ if [ "$3" = 0 ]; then
   exit
 fi
 
-git log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %cN)"
+git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)"
+# Note: --no-pager does not add a newline.
+echo

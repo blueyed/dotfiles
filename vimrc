@@ -2303,10 +2303,30 @@ command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
 command! -range=% UntrailSpecial keepjumps call StripWhitespace(<line1>,<line2>,'[\\]\@<!\s\+│\?$')
 noremap <leader>st :Untrail<CR>
 
-" Execute current line/selection, merging escaped newlines.
-command! -range ExecThis <line1>,<line2>yank t | let @t=substitute(@t, '\v\n\s*\\', ' ', 'g') | @t
-map <Leader>< :ExecThis<cr>
-vnoremap <Leader>< "ty:let @t=substitute(@t, '\v\n\s*\\', ' ', 'g')<cr>:@t<cr>
+" Source/execute current line/selection/operator-pending. {{{
+" This uses a temporary file instead of "exec", which does not handle
+" statements after "endfunction".
+fun! SourceViaFile() range
+  echom "first/last" a:firstline a:lastline
+  let tmpfile = tempname()
+  exe a:firstline.",".a:lastline."w ".tmpfile
+  exe "source" tmpfile
+  if &verbose
+    echom "Sourced ".(a:lastline - a:firstline + 1)." lines."
+  endif
+endfun
+command! -range SourceThis <line1>,<line2>call SourceViaFile()
+
+map <Leader><  <Plug>(operator-source)
+nnoremap <Leader><<  :call SourceViaFile()<cr>
+call operator#user#define('source', 'Op_source_via_file')
+" call operator#user#define_ex_command('source', 'SourceThis')
+function! Op_source_via_file(motion_wiseness)
+  " execute (line("']") - line("'[") + 1) 'wincmd' '_'
+  '[,']call SourceViaFile()
+endfunction
+" }}}
+
 
 command! RR ProjectRootLCD
 command! RRR ProjectRootCD

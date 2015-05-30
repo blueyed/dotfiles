@@ -1128,13 +1128,8 @@ if (&t_Co > 2 || has("gui_running"))
   syntax on " after 'filetype plugin indent on' (ref:
   set nohlsearch
 
-  " Inject "TODO highlighting" via @Spell cluster (e.g. into cssComment)
-  function! MyHighlightTodo()
-    syn keyword MyTodo  FIXME NOTE TODO OPTIMIZE XXX TODO: XXX:
-    " XXX: using "Spell" (without "@") will disable spell checking with e.g. ft=mail!
-    syn cluster @Spell add=MyTodo
-  endfunction
-  au Syntax * call MyHighlightTodo()
+  " Improved syntax handling of TODO etc.
+  au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO|OPTIMIZE|XXX):/ containedin=.*Comment
   hi def link MyTodo Todo
 endif
 

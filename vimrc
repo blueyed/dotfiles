@@ -1129,7 +1129,8 @@ if (&t_Co > 2 || has("gui_running"))
   set nohlsearch
 
   " Improved syntax handling of TODO etc.
-  au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO|OPTIMIZE|XXX):/ containedin=.*Comment
+  au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO|OPTIMIZE|XXX):/
+        \ containedin=.*Comment,vimCommentTitle
   hi def link MyTodo Todo
 endif
 

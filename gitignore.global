@@ -18,7 +18,7 @@ __pycache__/
 *.ipynb
 
 # zsh-autoenv.
-.env
+.autoenv.zsh
 # vim-localvimrc.
 .lvimrc
 # Local pyenv versions.

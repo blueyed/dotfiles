@@ -25,3 +25,5 @@ zshrc.local
 
 # Build dir, used for tests.
 build
+
+usr/share/man/index.db

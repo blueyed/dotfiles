@@ -2315,12 +2315,14 @@ command! -range SourceThis <line1>,<line2>call SourceViaFile()
 
 map <Leader><  <Plug>(operator-source)
 nnoremap <Leader><<  :call SourceViaFile()<cr>
-call operator#user#define('source', 'Op_source_via_file')
-" call operator#user#define_ex_command('source', 'SourceThis')
-function! Op_source_via_file(motion_wiseness)
-  " execute (line("']") - line("'[") + 1) 'wincmd' '_'
-  '[,']call SourceViaFile()
-endfunction
+if &rtp =~ '\<operator-user\>'
+  call operator#user#define('source', 'Op_source_via_file')
+  " call operator#user#define_ex_command('source', 'SourceThis')
+  function! Op_source_via_file(motion_wiseness)
+    " execute (line("']") - line("'[") + 1) 'wincmd' '_'
+    '[,']call SourceViaFile()
+  endfunction
+endif
 " }}}
 
 

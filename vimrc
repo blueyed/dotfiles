@@ -2003,9 +2003,10 @@ set number norelativenumber
 " No relative numbers with quickfix and other special windows like __TMRU__.
 augroup vimrc_number_qf
   au!
-  au FileType qf set number norelativenumber
-  au FileType * if bufname("%") =~ '^__' | set nonumber norelativenumber | endif
-  au CmdwinEnter * set number norelativenumber
+  au FileType qf,cram,vader setl number norelativenumber
+  au FileType * if bufname("%") =~ '^__' || &ft == "help" |
+        \ setl nonumber norelativenumber | endif
+  au CmdwinEnter * setl number norelativenumber
 augroup END
 let &showbreak = '↪ '
 function! CycleLineNr()

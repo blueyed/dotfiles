@@ -2009,6 +2009,7 @@ augroup vimrc_number_qf
   au CmdwinEnter * setl number norelativenumber
 augroup END
 let &showbreak = '↪ '
+set cpoptions+=n  " Use line column for wrapped text / &showbreak.
 function! CycleLineNr()
   " states: [start] => norelative/number => relative/number (=> relative/nonumber) => nonumber/norelative
   if exists('+relativenumber')
@@ -2034,11 +2035,6 @@ function! CycleLineNr()
     set number!
   endif
   call SetNumberWidth()
-  if &relativenumber == 0 && &number == 0
-    let &showbreak='↪ '
-  else
-    set showbreak= " not required with line numbers
-  endif
 endfunction
 function! SetNumberWidth()
   " NOTE: 'numberwidth' will get expanded by Vim automatically to fit the last line
@@ -2067,7 +2063,7 @@ fun! ToggleLineNr()
   endif
 endfun
 " map according to unimpaired, mnemonic "a on the left, like numbers".
-nmap coa :call ToggleLineNr()<cr>
+nnoremap coa :call ToggleLineNr()<cr>
 
 " Allow cursor to move anywhere in all modes.
 nnoremap cov :set <C-R>=empty(&virtualedit) ? 'virtualedit=all' : 'virtualedit='<CR><CR>

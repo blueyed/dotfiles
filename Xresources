@@ -122,4 +122,4 @@ URxvt.keysym.M-C-9: command:\033]11;S_base03\007\033]10;S_base0\007\033]12;S_bas
 ! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt
 ! Fix Shift/Control/Meta with function and insert keys.
 ! S-F1 is normally sent as F11-F20, and S-F11+S-F12 being extra strange.
-#include ".Xresources.d/urxvt-xtermcompat.txt"
+#include ".dotfiles/Xresources.d/urxvt-xtermcompat.txt"

@@ -377,11 +377,13 @@ set incsearch   " do incremental searching
 
 set nowrapscan  " do not wrap around when searching.
 
-set backup          " enable backup (default off)
 set writebackup     " keep a backup while writing the file (default on)
 set backupcopy=yes  " important to keep the file descriptor (inotify)
 
-set directory=~/tmp/vim/swapfiles//  " // => use full path of original file
+if 1  " has('eval'), and can create the dir dynamically.
+  set directory=~/tmp/vim/swapfiles//  " // => use full path of original file
+  set backup          " enable backup (default off), if 'backupdir' can be created dynamically.
+endif
 
 set nowrap
 
@@ -588,7 +590,9 @@ endif
 " Generic mappings. {{{
 
 " Use both , and Space as leader.
-let mapleader = ","
+if 1  " has('eval')
+  let mapleader = ","
+endif
 " Not for imap!
 nmap <space> <Leader>
 vmap <space> <Leader>

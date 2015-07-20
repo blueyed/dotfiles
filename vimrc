@@ -1144,14 +1144,36 @@ if 1 " has('eval')
   " Use light/dark background based on day/night period (according to
   " get-daytime-period (uses redshift))
   fun! SetBgAccordingToShell()
-    if len($ZSH_THEME_VARIANT)
-      exec 'set bg='.$ZSH_THEME_VARIANT
+    if len($MY_X_THEME_VARIANT) && $MY_X_THEME_VARIANT != "auto"
+      exec 'set bg='.$MY_X_THEME_VARIANT
     else
-      set bg=light
+      " let daytime = system('get-daytime-period')
+      let daytime_file = expand('/tmp/redshift-period')
+      if filereadable(daytime_file)
+        let daytime = readfile(daytime_file)[0]
+        if daytime == 'Daytime'
+          set bg=light
+        else
+          set bg=dark
+        endif
+      else
+        set bg=dark
+      endif
     endif
   endfun
   command! AutoBg call SetBgAccordingToShell()
-  AutoBg
+  if has('vim_starting')
+    AutoBg
+  endif
+
+  fun! ToggleBg()
+    if &bg == 'dark'
+      set bg=light
+    else
+      set bg=dark
+    endif
+  endfun
+  nnoremap <Leader>sb :call ToggleBg()<cr>
 
   " Detect gnome-terminal. This is kind of obsolete with urxvt being the
   " default terminal now.

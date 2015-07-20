@@ -1,0 +1,153 @@
+#!/bin/sh
+#
+# Change X/xrdb theme between light/dark (solarized).
+#
+# This script's output is meant to be eval'd.
+# It is used from my Zsh theme and in ~/.xsessionrc.
+# See the theme_variant function for a wrapper arount it.
+#
+# $1: theme to use: auto/light/dark.
+# $2: "save" to save the value to the config file.
+#
+# MY_X_THEME_VARIANT: set to the effective variant: "light" or "dark".
+#
+# TODO: query urxvt's current bg and use it for dircolors.
+#       see ~/bin/query-urxvt and ~/bin/xterm-bg.
+
+X_THEME_VARIANT_CONFIG_FILE=~/.config/x-theme-variant
+
+# Init once and export the value.
+# This gets used in Vim to auto-set the background, too.
+
+if [ "$1" = "-d" ]; then
+  DEBUG=1
+  shift
+fi
+debug() {
+  if [ -n "$DEBUG" ]; then
+    echo "$(date +%FT%T) [sh-setup-x-theme] $@" >&2
+  fi
+  echo "$(date +%FT%T) [sh-setup-x-theme:$$:$(ps -o cmd -h $$)] $@" >> /tmp/debug-sh-setup-x-theme.log
+  :
+}
+
+debug "RUN: $0 $@"
+variant=$1
+
+# Query/info.
+if [ x"$variant" = "x-q" ]; then
+  echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
+  echo "Theme in config: $(cat $X_THEME_VARIANT_CONFIG_FILE)."
+  echo "Use 'auto', 'dark' or 'light' to change it."
+  return 0
+
+# No argument provided: read config/env.
+elif [ -z "$variant" ]; then
+  if [ -f $X_THEME_VARIANT_CONFIG_FILE ]; then
+    variant=$(cat $X_THEME_VARIANT_CONFIG_FILE)
+    debug "variant from cfg: $variant"
+  fi
+  if [ -z "$variant" ]; then
+      variant=auto
+      debug "variant from fallback: $variant"
+    # fi
+  fi
+
+else
+  debug "variant from arg: $variant"
+
+  # Save given value.
+  case $variant in
+    auto)
+      if [ -f "$X_THEME_VARIANT_CONFIG_FILE" ]; then
+        rm "$X_THEME_VARIANT_CONFIG_FILE"
+      fi
+      ;;
+    light|dark)
+      echo $1 > "$X_THEME_VARIANT_CONFIG_FILE"
+      echo "Saved variant=$1." >&2 ;;
+    * ) echo "Invalid variant: $variant" >&2; return 64
+  esac
+fi
+
+# Get auto-theme from get-daytime-period for "auto",
+# and validate value.
+case $variant in
+  auto)
+    dt_period="$(get-daytime-period)"
+    if [ "$dt_period" = 'Daytime' ]; then
+      variant=light
+    elif [ -n "$dt_period" ]; then
+      variant=dark
+    else
+      echo "get-daytime-period failed."
+    fi
+    debug "=> variant: $variant"
+    ;;
+  light|dark ) ;;
+  * ) echo "Invalid variant: $variant" >&2; return 64
+esac
+
+
+if [ -n "$DISPLAY" ] && [ "$USER" != "root" ]; then
+  # Query "mythemevariant" resource, used to hold the current state.
+  # Set to "auto" by default in ~/.Xresources.
+  cur_xrdb_theme="$(xrdb -query|sed -n -E -e '/mythemevariant:\t/ {s/.*:\t//p;q}')"
+  debug "cur_xrdb_theme=$cur_xrdb_theme"
+  if [ "$cur_xrdb_theme" != "$variant" ]; then
+    if [ "$variant" = dark ]; then
+      xrdb -DSOLARIZED_DARK -merge ~/.Xresources
+
+      # Send escape codes for urxvt to change colors.
+      if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
+        # [ -n "$TMUX" ] && echo "printf '\033Ptmux;\033'"
+        echo "printf '\033]11;#002b36\007\033]10;#839496\007\033]12;#93a1a1\007\033]13;#93a1a1\007\033]708;#002b36\007'"
+        # [ -n "$TMUX" ] && echo "printf '\033\\'"
+      fi
+    elif [ "$variant" = light ]; then
+      xrdb -DSOLARIZED_LIGHT -merge ~/.Xresources
+
+      # Send escape codes for urxvt to change colors.
+      if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
+        # [ -n "$TMUX" ] && echo "printf '\033Ptmux;\033'"
+        echo "printf '\033]11;#fdf6e3\007\033]10;#657b83\007\033]12;#586e75\007\033]13;#586e75\007\033]708;#fdf6e3\007'"
+        # [ -n "$TMUX" ] && echo "printf '\033\\'"
+      fi
+    fi
+    echo "mythemevariant: $variant" | xrdb -merge
+    echo "Changed X/xrdb theme variant to $variant." >&2
+  fi
+fi
+
+if [ "$variant" = "light" ]; then
+  DIRCOLORS_FILE=~/.dotfiles/lib/dircolors-solarized/dircolors.ansi-light
+else
+  # DIRCOLORS_FILE=~/.dotfiles/lib/dircolors-solarized/dircolors.ansi-dark
+  # Prefer LS_COLORS repo, which is more fine-grained, but does not look good on light bg.
+  DIRCOLORS_FILE=~/.dotfiles/lib/LS_COLORS/LS_COLORS
+fi
+
+# Setup dircolors once.
+if [ "$DIRCOLORS_SETUP" != "$DIRCOLORS_FILE" ]; then
+  debug "Setting up DIRCOLORS_FILE=$DIRCOLORS_FILE"
+  debug "DIRCOLORS_SETUP=$DIRCOLORS_SETUP"
+  if [ -n "$DIRCOLORS_SETUP" ]; then
+    debug "Adjusting dircolors for variant=$variant."
+  else
+    debug "TODO: dircolors only during .xresources ($(basename $0))."
+  fi
+
+  # debug "running: dircolors -b $DIRCOLORS_FILE"
+  echo "$(dircolors -b $DIRCOLORS_FILE);"
+  echo "export DIRCOLORS_SETUP=$DIRCOLORS_FILE;"
+fi
+
+# Used in ~/.vimrc.
+echo "export MY_X_THEME_VARIANT=$variant;"
+
+# Update tmux env.
+if [ -n "$TMUX" ]; then
+  tmux if "[ \$MY_X_THEME_VARIANT != $variant ]" \
+    "set-environment MY_X_THEME_VARIANT $variant; \
+      source-file ~/.tmux.conf; display 'Reloaded tmux.'" >/dev/null
+fi

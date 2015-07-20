@@ -1147,27 +1147,31 @@ if 1 " has('eval')
 
   " Use light/dark background based on day/night period (according to
   " get-daytime-period (uses redshift))
-  fun! SetBgAccordingToShell()
-    if len($MY_X_THEME_VARIANT) && $MY_X_THEME_VARIANT != "auto"
-      exec 'set bg='.$MY_X_THEME_VARIANT
+  fun! SetBgAccordingToShell(...)
+    let variant = a:0 ? a:1 : ""
+    if len(variant) && variant != "auto"
+      let bg = variant
     else
       " let daytime = system('get-daytime-period')
       let daytime_file = expand('/tmp/redshift-period')
       if filereadable(daytime_file)
         let daytime = readfile(daytime_file)[0]
         if daytime == 'Daytime'
-          set bg=light
+          let bg = "light"
         else
-          set bg=dark
+          let bg = "dark"
         endif
       else
-        set bg=dark
+        let bg = "dark"
       endif
+    endif
+    if bg != &bg
+      let &bg = bg
     endif
   endfun
   command! AutoBg call SetBgAccordingToShell()
   if has('vim_starting')
-    AutoBg
+    call SetBgAccordingToShell($MY_X_THEME_VARIANT)
   endif
 
   fun! ToggleBg()

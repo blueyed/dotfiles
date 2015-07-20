@@ -455,19 +455,23 @@ set keymodel-=stopsel " do not stop visual selection with cursor keys
 set selection=inclusive
 " set clipboard=unnamed
 " Do not mess with X selection by default (only in modeless mode).
-set clipboard-=autoselect
-set clipboard+=autoselectml
+if !has('nvim')
+  set clipboard-=autoselect
+  set clipboard+=autoselectml
+endif
 
 
 if has('mouse')
-  set mouse=a " Enable mouse
+  set mouse=nvi " Enable mouse (not for command line mode)
 
-  " Make mouse work with Vim in tmux
-  try
-    set ttymouse=sgr
-  catch
-    set ttymouse=xterm2
-  endtry
+  if !has('nvim')
+    " Make mouse work with Vim in tmux
+    try
+      set ttymouse=sgr
+    catch
+      set ttymouse=xterm2
+    endtry
+  endif
 endif
 
 set showmatch  " show matching pairs
@@ -3365,7 +3369,7 @@ endif
 " NOTE: drawback (with imap) - triggers timeout for Esc: use jk/kj,
 "       or press it twice.
 " NOTE: Alt-<NR> mapped in tmux. TODO: change this?!
-if ! has('gui_running')
+if ! has('nvim') && ! has('gui_running')
   fun! MySetupAltMapping(c)
     " XXX: causes problems in macros: <Esc>a gets mapped to á.
     "      Solution: use <C-c> / jk in macros.
@@ -3437,6 +3441,7 @@ endfun
 
 " Change cursor shape for terminal mode. {{{1
 " See also ~/.dotfiles/oh-my-zsh/themes/blueyed.zsh-theme.
+" Note: with neovim, this gets controlled via $NVIM_TUI_ENABLE_CURSOR_SHAPE.
 if exists('&t_SI')
   " 'start insert' and 'exit insert'.
   let &t_SI = ''

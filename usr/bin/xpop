@@ -3,7 +3,5 @@
 # A wrapper around xprop to easily get class and name of windows.
 
 zenity --info --no-markup --text "$(\
-	xprop \
-		| grep --color=none \
-		"^WM_CLASS\|^WM_NAME\|^WM_WINDOW_ROLE\|^WM_TRANSIENT_FOR\|^_NET_WM_WINDOW_TYPE\|^_NET_WM_STATE\|^_NET_WM_PID" \
+	xprop WM_CLASS WM_NAME WM_WINDOW_ROLE WM_TRANSIENT_FOR _NET_WM_WINDOW_TYPE _NET_WM_STATE _NET_WM_PID \
 	)"

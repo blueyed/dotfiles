@@ -844,9 +844,6 @@ if 1 " has('eval') / `let` may not be available.
 
     " let g:neocomplcache_enable_insert_char_pre=1
 
-    " auto-select first entry
-    let g:neocomplcache_enable_auto_select = 1
-
     " Force overwriting completefunc set by eclim
     let g:neocomplcache_force_overwrite_completefunc = 1
 

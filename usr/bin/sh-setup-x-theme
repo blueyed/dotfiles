@@ -27,8 +27,7 @@ debug() {
   if [ -n "$DEBUG" ]; then
     echo "$(date +%FT%T) [sh-setup-x-theme] $@" >&2
   fi
-  echo "$(date +%FT%T) [sh-setup-x-theme:$$:$(ps -o cmd= $$)] $@" >> /tmp/debug-sh-setup-x-theme.log
-  :
+  # echo "$(date +%FT%T) [sh-setup-x-theme:$$:$(ps -o cmd= $$)] $@" >> /tmp/debug-sh-setup-x-theme.log
 }
 
 debug "RUN: $0 $@"

@@ -146,7 +146,7 @@ echo "export MY_X_THEME_VARIANT=$variant;"
 
 # Update tmux env.
 if [ -n "$TMUX" ]; then
-  tmux if "[ \$MY_X_THEME_VARIANT != $variant ]" \
+  tmux if "[ \"\$(tmux show-env MY_X_THEME_VARIANT)\" != 'MY_X_THEME_VARIANT=$variant' ]" \
     "set-environment MY_X_THEME_VARIANT $variant; \
       source-file ~/.tmux.conf; display 'Reloaded tmux.'" >/dev/null
 fi

@@ -2030,13 +2030,22 @@ endif
 " Automatic line numbers {{{
 " au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 " NOTE: relativenumber might slow Vim down: https://code.google.com/p/vim/issues/detail?id=311
-set number norelativenumber
+set norelativenumber
+fun! MySetDefaultNumberSettings()
+  if &ft =~# 'qf\|cram\|vader'
+    setl number
+  elseif bufname("%") =~ '^__' || &ft == "help"
+    setl nonumber
+  elseif &columns > 90
+    set number
+  else
+    set nonumber
+  endif
+endfun
 " No relative numbers with quickfix and other special windows like __TMRU__.
-augroup vimrc_number_qf
+augroup vimrc_number_setup
   au!
-  au FileType qf,cram,vader setl number norelativenumber
-  au FileType * if bufname("%") =~ '^__' || &ft == "help" |
-        \ setl nonumber norelativenumber | endif
+  au VimResized,FileType * call MySetDefaultNumberSettings()
   au CmdwinEnter * setl number norelativenumber
 augroup END
 let &showbreak = '↪ '

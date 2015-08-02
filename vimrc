@@ -1347,8 +1347,9 @@ if has("autocmd") " Autocommands {{{1
     exec 'file ' . resolvedfile
     let &shm=sshm
 
-    " Re-init fugitive.
+    call AutojumpLastPosition()
     call fugitive#detect(resolvedfile)
+
     if &modifiable
       " Only display a note when editing a file, especially not for `:help`.
       redraw  " Redraw now, to avoid hit-enter prompt.

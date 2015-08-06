@@ -1747,7 +1747,6 @@ map <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
 "     enhanced to support range (via v:count)
 fun! MyGotoNextTabOrBuffer(...)
   let c = a:0 ? a:1 : v:count
-  echom count
   exec (c ? c : '') . (tabpagenr('$') == 1 ? 'bn' : 'tabnext')
 endfun
 fun! MyGotoPrevTabOrBuffer()

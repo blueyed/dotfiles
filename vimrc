@@ -1758,12 +1758,12 @@ endfun
 nmap <silent> <Plug>NextTabOrBuffer :<C-U>call MyGotoNextTabOrBuffer()<CR>
 nmap <silent> <Plug>PrevTabOrBuffer :<C-U>call MyGotoPrevTabOrBuffer()<CR>
 
-" NOTE: <C-N> used for GoldenViewNext
-" nmap <C-N> :tabnew<cr>
-" Ctrl-Space
-nmap <C-Space> :tabnew<cr>
+" Ctrl-Space: split into new tab.
+" Disables diff mode, which gets taken over from the old buffer.
+nnoremap <C-Space> :tab sp \| set nodiff<cr>
+nnoremap <A-Space> :tabnew<cr>
 " For terminal.
-nmap <C-@> :tabnew<cr>
+nnoremap <C-@> :tab sp \| set nodiff<cr>
 
 " Opens a tab edit command with the path of the currently edited file filled in
 map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>

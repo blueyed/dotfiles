@@ -1348,7 +1348,7 @@ if 1 " has('eval')
       let &bg = bg
     endif
   endfun
-  command! AutoBg call SetBgAccordingToShell()
+  command! Autobg call SetBgAccordingToShell()
   if has('vim_starting')
     call SetBgAccordingToShell($MY_X_THEME_VARIANT)
   endif

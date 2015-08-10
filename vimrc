@@ -1257,6 +1257,8 @@ if has("user_commands")
   let g:airline#extensions#branch#use_vcscommand = 1
   let g:airline#extensions#branch#displayed_head_limit = 7
 
+  let g:airline#extensions#hunks#non_zero_only = 1
+
   let g:airline#extensions#tabline#enabled = 1
   let g:airline#extensions#tabline#show_buffers = 0
   let g:airline#extensions#tabline#tab_nr_type = '[__tabnr__.%{len(tabpagebuflist(__tabnr__))}]'

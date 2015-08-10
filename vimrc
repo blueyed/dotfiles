@@ -2218,7 +2218,7 @@ set norelativenumber
 fun! MySetDefaultNumberSettings()
   if &ft =~# 'qf\|cram\|vader'
     setl number
-  elseif bufname("%") =~ '^__' || &ft == "help"
+  elseif &buftype ==# "nofile" ||bufname("%") =~ '^__' || &ft == "help"
     setl nonumber
   elseif &columns > 90
     set number

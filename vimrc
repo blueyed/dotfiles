@@ -1275,10 +1275,6 @@ if has("user_commands")
   " endfunction
   " au VimEnter * call AirlineInit()
 
-  if &rtp =~ '\<airline\>'
-    call airline#parts#define_function('file', 'ShortenFilenameWithSuffix')
-  endif
-
   filetype plugin indent on
 
   " jedi-vim (besides YCM with jedi library) {{{1
@@ -1668,20 +1664,21 @@ if has("autocmd") " Autocommands {{{1
   augroup end
 endif " has("autocmd") }}}
 
-" statusline {{{
-" old
-" set statusline=%t%<%m%r%{fugitive#statusline()}%h%w\ [%{&ff}]\ [%Y]\ [\%03.3b]\ [%04l,%04v][%p%%]\ [%L\ lines\]
+" Statusline {{{
 
-" Shorten a given filename by truncating path segments.
+" Shorten a given (absolute) file path, via external `shorten_path` script.
+" This mainly shortens entries from Zsh's `hash -d` list.
 let s:_cache_shorten_path = {}
-fun! ShortenPath(path)
+fun! ShortenPath(path, ...)
   if ! len(a:path)
     return ''
   endif
-  if ! exists('s:_cache_shorten_path[a:path]')
-    let s:_cache_shorten_path[a:path] = system('shorten_path '.shellescape(a:path))
+  let base = a:0 ? a:1 : ""
+  let cache_key = base . ":" . a:path
+  if ! exists('s:_cache_shorten_path[cache_key]')
+    let s:_cache_shorten_path[cache_key] = system('shorten_path '.shellescape(a:path).' '.shellescape(base))
   endif
-  return s:_cache_shorten_path[a:path]
+  return s:_cache_shorten_path[cache_key]
 endfun
 
 " Shorten a given filename by truncating path segments.
@@ -1696,7 +1693,7 @@ function! ShortenFilename(...)  " {{{
   else
     let bufname = bufname("%")
     if !len(bufname)
-      if len(&ft)
+      if &bt != '' && len(&ft)
         " Use &ft for name (e.g. with 'startify' and quickfix windows).
         let alt_name = expand('#')
         if len(alt_name)
@@ -1726,14 +1723,15 @@ function! ShortenFilename(...)  " {{{
   " if a:0>1 | echom a:2 | endif
 
   " Check for cache (avoiding fnamemodify):
-  let cache_key = escape(bufname.'::'.getcwd().'::'.maxlen, "'")
-  if exists("g:_cache_shorten_filename['".cache_key."']")
+  let cache_key = bufname.'::'.getcwd().'::'.maxlen
+  if has_key(g:_cache_shorten_filename, cache_key)
     return g:_cache_shorten_filename[cache_key]
   endif
 
-  " let fullpath = fnamemodify(bufname, ':p')
-  let bufname = fnamemodify(bufname, ":p:~:.")
-  let bufname = ShortenPath(bufname)  " uses internal cache
+  " Make path relative first, which might not work with the result from
+  " `shorten_path`.
+  let rel_path = fnamemodify(bufname, ":.")
+  let bufname = ShortenPath(rel_path, getcwd())
   " }}}
 
   " Loop over all segments/parts, to mark symlinks.
@@ -1786,103 +1784,37 @@ endfunction "}}}
 " Shorten filename, and append suffix(es), e.g. for modified buffers. {{{2
 fun! ShortenFilenameWithSuffix(...)
   let r = call('ShortenFilename', a:000)
-  if &buftype == ''
-    if &modified
-      let r .= ',+'
-    endif
+  if &modified
+    let r .= ',+'
   endif
   return r
 endfun
 " }}}
 
-if 0 && has('statusline') " disabled {{{10
-set statusline=%!MyStatusLine('Enter')
-function! FileSize()
-  let bytes = getfsize(expand("%:p"))
-  if bytes <= 0
-    return ""
-  endif
-  if bytes < 1024
-    return bytes
-  else
-    return (bytes / 1024) . "K"
-  endif
-endfunction
+" Setup custom "file" part for airline, using a buffer-local var for caching
+" it (ref: https://github.com/bling/vim-airline/issues/658#issuecomment-64650886). {{{
+if &rtp =~ '\<airline\>'
+  " NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
+  augroup vimrc_airline
+    au!
+    au BufWritePost,BufEnter,CursorHold,InsertLeave,TextChanged,TextChangedI,FileChangedShellPost *
+          \ if exists('b:my_airline_file_cache')
+          \ && (!exists('b:my_airline_file_cache_key') || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
+          \ | let b:my_airline_file_cache_key = bufname('%').&modified.&ft
+          \ | unlet! b:my_airline_file_cache
+          \ | endif
+  augroup END
+  fun! ShortenFilenameForAirline()
+    if exists('b:my_airline_file_cache')
+      return b:my_airline_file_cache
+    endif
+    let b:my_airline_file_cache = ShortenFilenameWithSuffix()
+    return b:my_airline_file_cache
+  endfun
+  call airline#parts#define_function('file', 'ShortenFilenameForAirline')
+endif
+" }}}
 
-" colorize start of statusline according to file status,
-" source: http://www.reddit.com/r/vim/comments/gexi6/a_smarter_statusline_code_in_comments/c1n2oo5
-hi StatColor guibg=#95e454 guifg=black ctermbg=lightgreen ctermfg=black
-hi Modified guibg=orange guifg=black ctermbg=lightred ctermfg=black
-function! InsertStatuslineColor(mode)
-  if a:mode == 'i'
-    hi StatColor guibg=orange guifg=black ctermbg=lightred ctermfg=black
-  elseif a:mode == 'r'
-    hi StatColor guibg=#e454ba guifg=black ctermbg=magenta ctermfg=black
-  elseif a:mode == 'v'
-    hi StatColor guibg=#e454ba guifg=black ctermbg=magenta ctermfg=black
-  else
-    hi StatColor guibg=red ctermbg=red
-  endif
-endfunction
-augroup MyStatusLine
-  au!
-  au WinEnter * setlocal statusline=%!MyStatusLine('Enter')
-  au WinLeave * setlocal statusline=%!MyStatusLine('Leave')
-  au InsertEnter * call InsertStatuslineColor(v:insertmode)
-  au InsertLeave * hi StatColor guibg=#95e454 guifg=black ctermbg=lightgreen ctermfg=black
-  au InsertLeave * hi Modified guibg=orange guifg=black ctermbg=lightred ctermfg=black
-augroup END
-
-fun! MyStatusLine(mode)
-  let r = []
-  if a:mode == 'Enter'
-    let r += ["%#StatColor#"]
-  endif
-  let r += ['[%n@%{winnr()}] ']  " buffer and windows nr
-  " Shorten filename while reserving 50 characters for the rest of the statusline.
-  let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
-  if a:mode == 'Enter'
-    let r += ["%*"]
-  endif
-
-  " syntax errors
-  if exists('*SyntasticStatuslineFlag')
-    let r+=['%#WarningMsg#']
-    let r+=['%{SyntasticStatuslineFlag()}']
-    let r+=['%*']
-  endif
-
-  " modified flag
-  let r += ["%#Modified#"]
-  let r += ["%{getbufvar(bufnr('%'), '&modified') ? ' [+]' : '' }"]
-  if a:mode == 'Leave' | let r += ["%*"] | endif
-
-  " readonly flag
-  let r += ["%{getbufvar(bufnr('%'), '&readonly') && getbufvar(bufnr('%'), '&ft') != 'help' ? '[RO]' : '' }"]
-  if a:mode == 'Enter' | let r += ["%*"] | endif
-
-  let r += ['%<']       "cut here
-  let r += ['%( [']
-  let r += ['%Y']      "filetype
-  " let r += ['%H']      "help file flag
-  let r += ['%W']      "preview window flag
-  " let r += ['%R']      "read only flag
-  let r += ['%{&ff=="unix"?"":",".&ff}']  "file format (if !=unix)
-  let r += ['%{strlen(&fenc) && &fenc!="utf-8"?",".&fenc:""}'] "file encoding (if !=utf-8)
-  let r += ['] %)']
-  if exists("*fugitive#statusline") " might not exist, e.g.  when :redrawing during startup (eclim debug)
-    let r += ['%{fugitive#statusline()}']
-  endif
-
-  let r += ['%=']      "left/right separator
-  " let r += ['%b,0x%-8B '] " Current character in decimal and hex representation
-  let r += [' %{FileSize()} ']  " size of file (human readable)
-  let r += ['%-12(L%l/%L:C%c%V%)'] " Current line and column
-  " let r += ['%l/%L']   "cursor line/total lines
-  let r += [' %P']    "percent through file
-  return join(r, '')
-endfunction
-endif "}}}
 "}}}
 
 
@@ -2022,40 +1954,40 @@ fun! MyGetNonDefaultServername()
   return ''
 endfun
 
-fun! MyGetPrettyFileDir()
-  " TODO: use shorten_path / abstract it
-  let dir=expand('%:~:h')
-  if len(dir) && dir != '.'
-    return '('.dir.')'
-  endif
-  return ''
-endfun
-
-" Set titlestring, used to set terminal title (pane title in tmux). {{{2
-set title
-" Setup titlestring on VimEnter, when v:servername is available.
-" set titlestring=✐\ %t%M%R%(\ %<%{MyGetPrettyFileDir()}%)
-fun! MySetupTitleString()
-  let &titlestring = '✐'
-
+fun! MyGetSessionName()
   " Use / auto-set g:MySessionName
   if (!exists("g:MySessionName") || !len(g:MySessionName)) && exists('v:this_session')
     let g:MySessionName = fnamemodify(v:this_session, ':t:r')
   endif
-  if exists("g:MySessionName") && len(g:MySessionName)
-    let &titlestring .= ' ['.g:MySessionName.']'
+  return g:MySessionName
+endfun
+
+" titlestring handling, with tmux support {{{
+" Set titlestring, used to set terminal title (pane title in tmux).
+set title
+
+" Setup titlestring on BufEnter, when v:servername is available.
+fun! MySetupTitleString()
+  let &titlestring = '✐ '
+
+  let session_name = MyGetSessionName()
+  if len(session_name)
+    let &titlestring .= '['.session_name.'] '
   else
     " Add non-default servername to titlestring.
     let sname = MyGetNonDefaultServername()
     if len(sname)
-      let &titlestring .= ' ['.sname.']'
+      let &titlestring .= '['.sname.'] '
     endif
   endif
 
-  " let &titlestring .= ': %t%M%R%( %<%{MyGetPrettyFileDir()}%)'
-  let &titlestring .= '%( %<%{ShortenFilenameWithSuffix(''%'', 15)}%)'
+  " Call the function and use its result, rather than including it.
+  " (for performance reasons).
+  let &titlestring .= substitute(
+        \ ShortenFilenameWithSuffix('%', 15).' ('.ShortenPath(getcwd()).')',
+        \ '%', '%%', 'g')
 
-  " easier to type/find than the unicode symbol prefix.
+  " Easier to type/find than the unicode symbol prefix.
   let &titlestring .= ' - vim'
 
   " Append $_TERM_TITLE_SUFFIX (e.g. user@host) to title (set via zsh, used
@@ -2087,14 +2019,17 @@ fun! MySetupTitleString()
       let &t_fs="\e\\"
     endif
   endif
+
+  " Set icon text according to &titlestring (used for minimized windows).
+  let &iconstring = '(v) '.&titlestring
 endfun
 
-if has('vim_starting')
-  au! VimEnter * call MySetupTitleString() | redraw
-  au! SessionLoadPost * if ! exists('g:loaded_title') | let g:loaded_title=1 | call MySetupTitleString() | endif
-else
-  call MySetupTitleString()
-endif
+augroup vimrc_title
+  au!
+  " XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
+  autocmd BufEnter * call MySetupTitleString()
+augroup END
+
 
 fun! MySetSessionName(name)
   let g:MySessionName = a:name

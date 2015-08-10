@@ -43,7 +43,50 @@ if 1 " has('eval') / `let` may not be available.
   let s:use_neocomplcache = ! s:use_ycm
   " }}}
 
-  if s:use_neobundle
+  " Light(er) setup?
+  if exists('MyRcProfile')
+    if MyRcProfile ==# 'email'
+      " Used with External Editor addon for Thunderbird (~/bin/gvim-email).
+      fun! MySetupForEmail()
+        if exists('b:did_setup_spl_email')
+          return
+        endif
+        let b:did_setup_spl_email=1
+        let l:cursor = getcurpos()
+        if !search('\v%<5l^(To:|Cc:|Bcc:).*\@(\.de)@!', 'n')
+          " Only german recipients.
+          set spl=de
+        endif
+        call setpos('.', l:cursor)
+      endfun
+      augroup VimRcEmail
+        au!
+        " Not for help windows.
+        au FileType * if &bt == '' | call MySetupForEmail() | endif
+      augroup END
+
+      let MyRcProfile = 'light'
+    endif
+  else
+    let MyRcProfile = 'default'
+  endif
+
+  if s:use_neobundle  " {{{
+    let g:neobundle#enable_name_conversion = 1  " Use normalized names.
+    let g:neobundle#default_options = {
+          \ 'manual': { 'base': '~/.vim/bundle', 'type': 'nosync' },
+          \ 'colors': { 'script_type' : 'colors' } }
+
+
+    let s:cache_key = '_' . g:MyRcProfile . '_' . executable("tmux")
+
+    let s:neobundle_default_cache_file = neobundle#commands#get_default_cache_file()
+    let g:neobundle#cache_file = s:neobundle_default_cache_file . s:cache_key
+    " Remove any previous cache file.
+    if filereadable(s:neobundle_default_cache_file)
+      call delete(s:neobundle_default_cache_file)
+    endif
+
     filetype off
 
     " If the NeoBundle cache exists and is not writable, fall back to using
@@ -60,29 +103,42 @@ if 1 " has('eval') / `let` may not be available.
       let g:neobundle#cache_file = s:vim_cache . '/neobundle.cache'
     endif
 
-    if neobundle#has_fresh_cache()
-      NeoBundleLoadCache
-    else
+    if neobundle#load_cache($MYVIMRC)
+      " NeoBundles list - here be dragons! {{{
+      fun! MyNeoBundleWrapper(cmd_args, default, light)
+        let lazy = g:MyRcProfile == "light" ? a:light : a:default
+        if lazy == -1
+          return
+        endif
+        if lazy
+          exec 'NeoBundleLazy ' . a:cmd_args
+        else
+          exec 'NeoBundle ' . a:cmd_args
+        endif
+      endfun
+      com! -nargs=+ MyNeoBundle call MyNeoBundleWrapper(<q-args>, 1, 1)
+      com! -nargs=+ MyNeoBundleLazy call MyNeoBundleWrapper(<q-args>, 1, 1)
+
+      com! -nargs=+ MyNeoBundleNeverLazy call MyNeoBundleWrapper(<q-args>, 0, 0)
+      com! -nargs=+ MyNeoBundleNoLazyForDefault call MyNeoBundleWrapper(<q-args>, 0, 1)
+      com! -nargs=+ MyNeoBundleNoLazyNotForLight call MyNeoBundleWrapper(<q-args>, 0, -1)
+
       if s:use_ycm
-        NeoBundle 'blueyed/YouCompleteMe.git' , {
+        MyNeoBundleNoLazyForDefault 'blueyed/YouCompleteMe' , {
               \ 'build': {
               \   'unix': './install.sh --clang-completer --system-libclang'
               \           .' || ./install.sh --clang-completer',
-              \ 'directory': 'YouCompleteMe',
-              \ }}
+              \ },
+              \ 'augroup': 'youcompletemeStart',
+              \ 'autoload': { 'filetypes': ['c', 'vim'], 'commands': 'YcmCompleter' }
+              \ }
       else
-        NeoBundle 'Shougo/neocomplcache.git', { 'directory': 'neocomplcache' }
+        MyNeoBundle 'Shougo/neocomplcache', { 'directory': 'neocomplcache' }
       endif
 
-      NeoBundle 'wincent/command-t', {
-            \ 'build': {
-            \   'unix': 'rake make' },
-            \ 'autoload': { 'commands': ['CommandT', 'CommandTBuffer'] },
-            \ }
-
-      NeoBundleLazy 'davidhalter/jedi-vim.git', '', {
+      MyNeoBundleLazy 'davidhalter/jedi-vim', '', {
             \ 'directory': 'jedi',
-            \ 'autoload': { 'filetypes': ['python'] }}
+            \ 'autoload': { 'filetypes': ['python'], 'commands': ['Pyimport'] }}
 
       " Generate NeoBundle statements from .gitmodules.
       " (migration from pathogen to neobundle).
@@ -90,214 +146,341 @@ if 1 " has('eval') / `let` may not be available.
       "   echo "NeoBundle '${url#*://github.com/}', { 'directory': '${${p##*/}%.url}' }"; \
       " done < <(git config -f .gitmodules --get-regexp 'submodule.vim/bundle/\S+.(url)' | sort)
 
-      NeoBundle 'tpope/vim-abolish.git', { 'directory': 'abolish' }
-      NeoBundle 'mileszs/ack.vim.git', { 'directory': 'ack' }
-      NeoBundle 'tpope/vim-afterimage.git', { 'directory': 'afterimage' }
-      NeoBundle 'ervandew/ag.git', { 'directory': 'ag' }
-      NeoBundle 'blueyed/vim-airline.git', { 'directory': 'airline' }
-      NeoBundle 'ntpeters/vim-better-whitespace.git', { 'directory': 'better-whitespace' }
-      NeoBundle 'vim-scripts/bufexplorer.zip.git', { 'directory': 'bufexplorer' }
-      NeoBundle 'blueyed/bufkill.vim.git', { 'directory': 'bufkill' }
-      NeoBundle 'vim-scripts/cmdline-completion.git', { 'directory': 'cmdline-completion' }
-      NeoBundle 'kchmck/vim-coffee-script.git', { 'directory': 'coffee-script' }
-      " NeoBundle 'blueyed/colorhighlight.vim.git', { 'directory': 'colorhighlight' }
-      " NeoBundle 'chrisbra/color_highlight.git', { 'directory': 'color_highlight' }
-      NeoBundle 'chrisbra/Colorizer.git', { 'directory': 'colorizer' }
-      " NeoBundle 'lilydjwg/colorizer.git', { 'directory': 'colorizer' }
-      NeoBundle 'wincent/Command-T.git', { 'directory': 'command-t' }
-      NeoBundle 'JulesWang/css.vim.git', { 'directory': 'css' }
-      NeoBundle 'kien/ctrlp.vim.git', { 'directory': 'ctrlp' }
-      NeoBundle 'mtth/cursorcross.vim.git', { 'directory': 'cursorcross' }
-      NeoBundle 'blueyed/CycleColor.git', { 'directory': 'cyclecolor' }
-      " NeoBundle 'Raimondi/delimitMate.git', { 'directory': 'delimitMate' }
-      NeoBundleLazy 'blueyed/delimitMate.git', {
-            \ 'directory': 'delimitMate',
-            \ 'autoload': { 'insert': 1 }}
-      NeoBundle 'raymond-w-ko/detectindent.git', { 'directory': 'detectindent' }
-      NeoBundle 'tpope/vim-dispatch.git', { 'directory': 'dispatch' }
-      NeoBundle 'jmcomets/vim-pony.git', { 'directory': 'django-pony' }
-      NeoBundle 'mjbrownie/django-template-textobjects.git', { 'directory': 'django-template-textobjects' }
-      NeoBundle 'xolox/vim-easytags.git', { 'directory': 'easytags' }
-      NeoBundleLazy 'tpope/vim-endwise.git', { 'directory': 'endwise',
-            \ 'autoload': { 'insert': 1 }}
-      NeoBundle 'tpope/vim-eunuch.git', { 'directory': 'eunuch' }
-      NeoBundle 'tommcdo/vim-exchange.git', { 'directory': 'exchange' }
-      NeoBundle 'int3/vim-extradite.git', { 'directory': 'extradite' }
-      NeoBundle 'jmcantrell/vim-fatrat.git', { 'directory': 'fatrat' }
-      NeoBundle 'kopischke/vim-fetch', { 'directory': 'fetch' }
-      NeoBundle 'thinca/vim-fontzoom.git', { 'directory': 'fontzoom' }
-      NeoBundle 'tpope/vim-fugitive.git', { 'directory': 'fugitive',
-            \ 'augroup': 'fugitive' }
-      NeoBundle 'mkomitee/vim-gf-python.git', { 'directory': 'gf-python' }
-      NeoBundle 'mattn/gist-vim.git', { 'directory': 'gist' }
-      NeoBundle 'jaxbot/github-issues.vim.git', { 'directory': 'github-issues' }
-      NeoBundle 'gregsexton/gitv.git', { 'directory': 'gitv' }
-      NeoBundle 'jamessan/vim-gnupg.git', { 'directory': 'gnupg' }
-      NeoBundle 'zhaocai/GoldenView.Vim.git', { 'directory': 'GoldenView' }
-      NeoBundle 'google/maktaba.git', { 'directory': 'maktaba' }
-      NeoBundle 'blueyed/grep.vim.git', { 'directory': 'grep' }
-      NeoBundle 'sjl/gundo.vim.git', { 'directory': 'gundo' }
-      NeoBundle 'tpope/vim-haml.git', { 'directory': 'haml' }
-      NeoBundle 'nathanaelkane/vim-indent-guides.git', { 'directory': 'indent-guides' }
-      " NeoBundle 'ivanov/vim-ipython.git', { 'directory': 'ipython' }
-      " NeoBundle 'johndgiese/vipy.git', { 'directory': 'vipy' }
-      NeoBundle 'vim-scripts/keepcase.vim.git', { 'directory': 'keepcase' }
-      NeoBundle 'vim-scripts/LargeFile.git', { 'directory': 'LargeFile' }
-      NeoBundle 'groenewege/vim-less.git', { 'directory': 'less' }
-      NeoBundle 'embear/vim-localvimrc.git', { 'directory': 'localvimrc' }
-      NeoBundle 'xolox/vim-lua-ftplugin.git', { 'directory': 'lua-ftplugin' }
-      NeoBundle 'vim-scripts/luarefvim.git', { 'directory': 'luarefvim' }
-      NeoBundle 'sjbach/lusty.git', { 'directory': 'lusty' }
-      NeoBundle 'vim-scripts/mail.tgz.git', { 'directory': 'mail_tgz' }
-      NeoBundle 'tpope/vim-markdown.git', { 'directory': 'markdown' }
-      NeoBundle 'nelstrom/vim-markdown-folding.git', { 'directory': 'markdown-folding' }
-      NeoBundle 'vim-scripts/matchit.zip.git', { 'directory': 'matchit' }
-      NeoBundle 'Shougo/neomru.vim.git', { 'directory': 'neomru' }
-      NeoBundle 'blueyed/nerdtree.git', {
-            \ 'directory': 'nerdtree',
+      MyNeoBundle 'tpope/vim-abolish'
+      MyNeoBundle 'mileszs/ack.vim'
+      MyNeoBundle 'tpope/vim-afterimage'
+      MyNeoBundleNoLazyForDefault 'ervandew/ag'
+      MyNeoBundleNoLazyForDefault 'gabesoft/vim-ags'
+      MyNeoBundleNoLazyForDefault 'blueyed/vim-airline'
+      MyNeoBundle 'vim-scripts/bufexplorer.zip', { 'name': 'bufexplorer' }
+      MyNeoBundleNoLazyForDefault 'blueyed/bufkill.vim'
+      MyNeoBundle 'vim-scripts/cmdline-completion', {
+            \ 'autoload': {'mappings': [['c', '<Plug>CmdlineCompletion']]}}
+      MyNeoBundle 'kchmck/vim-coffee-script'
+      MyNeoBundle 'chrisbra/colorizer'
+            \, { 'autoload': { 'commands': ['ColorToggle'] } }
+      MyNeoBundle 'chrisbra/vim-diff-enhanced'
+            \, { 'autoload': { 'commands': ['CustomDiff', 'PatienceDiff'] } }
+      MyNeoBundle 'chrisbra/vim-zsh', {
+            \ 'autoload': {'filetypes': ['zsh']} }
+      " MyNeoBundle 'lilydjwg/colorizer'
+      MyNeoBundle 'JulesWang/css.vim'
+      MyNeoBundleNoLazyForDefault 'ctrlpvim/ctrlp.vim'
+      MyNeoBundleNoLazyForDefault 'JazzCore/ctrlp-cmatcher'
+
+      MyNeoBundle 'mtth/cursorcross.vim'
+            \, { 'autoload': { 'insert': 1, 'filetypes': 'all' } }
+      MyNeoBundleLazy 'tpope/vim-endwise', {
+            \ 'autoload': {'filetypes': ['lua','elixir','ruby','sh','zsh','vb','vbnet','aspvbs','vim','c','cpp','xdefaults','objc','matlab']} }
+      MyNeoBundle 'blueyed/cyclecolor'
+      MyNeoBundleLazy 'Raimondi/delimitMate'
+            \, { 'autoload': { 'insert': 1, 'filetypes': 'all' }}
+      " MyNeoBundleNeverLazy 'cohama/lexima.vim'
+      " MyNeoBundleNoLazyForDefault 'raymond-w-ko/detectindent'
+      MyNeoBundleNoLazyForDefault 'roryokane/detectindent'
+      MyNeoBundleNoLazyForDefault 'tpope/vim-dispatch'
+      MyNeoBundle 'jmcomets/vim-pony', { 'directory': 'django-pony' }
+      MyNeoBundle 'xolox/vim-easytags', {
+            \ 'autoload': { 'commands': ['UpdateTags'] },
+            \ 'depends': [['xolox/vim-misc', {'name': 'vim-misc'}]]}
+      MyNeoBundleNoLazyForDefault 'tpope/vim-eunuch'
+      MyNeoBundleNoLazyForDefault 'tommcdo/vim-exchange'
+      MyNeoBundle 'int3/vim-extradite'
+      MyNeoBundle 'jmcantrell/vim-fatrat'
+      MyNeoBundleNoLazyForDefault 'kopischke/vim-fetch'
+      MyNeoBundle 'thinca/vim-fontzoom'
+      MyNeoBundleNoLazyForDefault 'idanarye/vim-merginal'
+      MyNeoBundle 'mkomitee/vim-gf-python'
+      MyNeoBundle 'mattn/gist-vim', {
+            \ 'depends': [['mattn/webapi-vim']]}
+      MyNeoBundle 'jaxbot/github-issues.vim'
+      MyNeoBundle 'gregsexton/gitv'
+      MyNeoBundleNeverLazy 'jamessan/vim-gnupg'
+      MyNeoBundle 'zhaocai/GoldenView.Vim'
+      MyNeoBundle 'google/maktaba'
+      MyNeoBundle 'blueyed/grep.vim'
+      MyNeoBundle 'sjl/gundo.vim'
+      MyNeoBundle 'mbbill/undotree', {
+            \ 'autoload': {'command_prefix': 'Undotree'}}
+      MyNeoBundle 'tpope/vim-haml'
+      MyNeoBundle 'nathanaelkane/vim-indent-guides'
+      " MyNeoBundle 'ivanov/vim-ipython'
+      " MyNeoBundle 'johndgiese/vipy'
+      MyNeoBundle 'vim-scripts/keepcase.vim'
+      " NOTE: sets eventsignore+=FileType globally.. use a own snippet instead.
+      " NOTE: new patch from author.
+      MyNeoBundleNoLazyForDefault 'vim-scripts/LargeFile'
+      " MyNeoBundleNoLazyForDefault 'mhinz/vim-hugefile'
+      " MyNeoBundle 'groenewege/vim-less'
+      MyNeoBundleNoLazyForDefault 'embear/vim-localvimrc'
+      MyNeoBundle 'xolox/vim-lua-ftplugin', {
+            \ 'autoload': {'filetypes': 'lua'},
+            \ 'depends': [['xolox/vim-misc', {'name': 'vim-misc'}]]}
+      MyNeoBundle 'raymond-w-ko/vim-lua-indent', {
+            \ 'autoload': {'filetypes': 'lua'}}
+
+      MyNeoBundle 'vim-scripts/luarefvim'
+      MyNeoBundleNoLazyForDefault 'sjbach/lusty'
+      MyNeoBundle 'vim-scripts/mail.tgz', { 'name': 'mail', 'directory': 'mail_tgz' }
+      MyNeoBundle 'tpope/vim-markdown'
+      MyNeoBundle 'nelstrom/vim-markdown-folding'
+            \, {'autoload': {'filetypes': 'markdown'}}
+
+      MyNeoBundle 'Shougo/neomru.vim'
+      MyNeoBundleLazy 'blueyed/nerdtree', {
             \ 'augroup' : 'NERDTreeHijackNetrw' }
-      NeoBundle 'blueyed/nginx.vim.git', { 'directory': 'nginx' }
-      NeoBundle 'tyru/open-browser.vim.git', { 'directory': 'open-browser' }
-      NeoBundle 'kana/vim-operator-replace.git', { 'directory': 'operator-replace' }
-      NeoBundle 'kana/vim-operator-user.git', { 'directory': 'operator-user' }
-      NeoBundle 'vim-scripts/pac.vim.git', { 'directory': 'pac' }
-      NeoBundle 'vim-scripts/Parameter-Text-Objects.git', { 'directory': 'parameter-text-objects' }
-      NeoBundle 'mattn/pastebin-vim.git', { 'directory': 'pastebin' }
-      NeoBundle 'tpope/vim-pathogen.git', { 'directory': 'pathogen' }
-      NeoBundle 'shawncplus/phpcomplete.vim.git', { 'directory': 'phpcomplete' }
-      NeoBundle '2072/PHP-Indenting-for-VIm.git', { 'directory': 'php-indent' }
-      NeoBundle 'greyblake/vim-preview.git', { 'directory': 'preview' }
-      NeoBundle 'tpope/vim-projectionist.git', { 'directory': 'projectionist' }
-      NeoBundle 'dbakker/vim-projectroot.git', { 'directory': 'projectroot' }
-      NeoBundle 'fs111/pydoc.vim.git', { 'directory': 'pydoc' }
-      NeoBundle 'alfredodeza/pytest.vim.git', { 'directory': 'pytest' }
-      NeoBundle '5long/pytest-vim-compiler.git', { 'directory': 'pytest-vim-compiler' }
-      NeoBundle 'hynek/vim-python-pep8-indent.git', { 'directory': 'python-pep8-indent' }
-      NeoBundle 'tomtom/quickfixsigns_vim.git', { 'directory': 'quickfixsigns' }
-      NeoBundle 't9md/vim-quickhl.git', { 'directory': 'quickhl' }
-      NeoBundle 'aaronbieber/vim-quicktask.git', { 'directory': 'quicktask' }
-      NeoBundle 'tpope/vim-ragtag.git', { 'directory': 'ragtag' }
-      NeoBundle 'tpope/vim-rails.git', { 'directory': 'rails' }
-      NeoBundle 'vim-scripts/Rainbow-Parenthsis-Bundle.git', { 'directory': 'Rainbow-Parenthsis-Bundle' }
-      NeoBundle 'thinca/vim-ref.git', { 'directory': 'ref' }
-      NeoBundle 'tpope/vim-repeat.git', { 'directory': 'repeat' }
-      NeoBundle 'inkarkat/runVimTests.git', { 'directory': 'runVimTests' }
-      NeoBundle 'tpope/vim-scriptease.git', { 'directory': 'scriptease' }
-      NeoBundle 'xolox/vim-session.git', {
-            \ 'directory': 'session',
-            \ 'augroup': 'PluginSession' }
-      NeoBundle 'blueyed/smarty.vim.git', { 'directory': 'smarty' }
-      NeoBundle 'justinmk/vim-sneak.git', { 'directory': 'sneak' }
-      " NeoBundle 'honza/vim-snippets.git', { 'directory': 'snippets' }
-      NeoBundle 'blueyed/vim-snippets.git', { 'directory': 'snippets' }
-      NeoBundle 'rstacruz/sparkup.git', { 'directory': 'sparkup' }
-      NeoBundle 'tpope/vim-speeddating.git', { 'directory': 'speeddating' }
-      NeoBundle 'AndrewRadev/splitjoin.vim.git', { 'directory': 'splitjoin' }
-      NeoBundle 'mhinz/vim-startify.git', { 'directory': 'startify' }
-      NeoBundle 'chrisbra/SudoEdit.vim.git', { 'directory': 'sudoedit' }
-      NeoBundle 'ervandew/supertab.git', { 'directory': 'supertab' }
-      NeoBundle 'tpope/vim-surround.git', { 'directory': 'surround' }
-      NeoBundle 'kurkale6ka/vim-swap.git', { 'directory': 'swap' }
-      NeoBundle 'scrooloose/syntastic.git', { 'directory': 'syntastic' }
-      NeoBundle 'vim-scripts/SyntaxAttr.vim.git', { 'directory': 'syntaxattr' }
-      NeoBundle 'zaiste/tmux.vim.git', { 'directory': 'syntax-tmux' }
-      NeoBundle 'godlygeek/tabular.git', { 'directory': 'tabular' }
-      NeoBundle 'majutsushi/tagbar.git', { 'directory': 'tagbar' }
-      NeoBundle 'tpope/vim-tbone.git', { 'directory': 'tbone' }
-      NeoBundle 'tomtom/tcomment_vim.git', { 'directory': 'tcomment' }
-      NeoBundle 'kana/vim-textobj-function.git', { 'directory': 'textobj-function' }
-      NeoBundle 'kana/vim-textobj-indent.git', { 'directory': 'textobj-indent' }
-      NeoBundle 'kana/vim-textobj-user.git', { 'directory': 'textobj-user' }
-      NeoBundle 'mattn/vim-textobj-url', { 'directory': 'textobj-url' }
-      NeoBundle 'tomtom/tinykeymap_vim.git', { 'directory': 'tinykeymap' }
-      NeoBundle 'tomtom/tmarks_vim.git', { 'directory': 'tmarks' }
-      NeoBundle 'tomtom/tmru_vim.git', { 'directory': 'tmru', 'depends':
-            \ [['tomtom/tlib_vim.git', { 'directory': 'tlib' }]]}
-      NeoBundle 'blueyed/vim-tmux-navigator.git', { 'directory': 'tmux-navigator' }
-      NeoBundle 'vim-scripts/tracwiki.git', { 'directory': 'tracwiki' }
-      NeoBundle 'tomtom/ttagecho_vim.git', { 'directory': 'ttagecho' }
-      NeoBundle 'SirVer/ultisnips.git', { 'directory': 'ultisnips' }
-      NeoBundle 'tpope/vim-unimpaired.git', { 'directory': 'unimpaired' }
-      NeoBundle 'Shougo/unite-outline.git', { 'directory': 'unite-outline' }
-      NeoBundle 'Shougo/unite.vim.git', { 'directory': 'unite' }
-      NeoBundle 'vim-scripts/vcscommand.vim.git', { 'directory': 'vcscommand' }
-      NeoBundleLazy 'joonty/vdebug.git', {
-            \ 'directory': 'vdebug',
+      MyNeoBundle 'blueyed/nginx.vim'
+      MyNeoBundleLazy 'tyru/open-browser.vim', {
+            \ 'autoload': { 'mappings': '<Plug>(openbrowser' } }
+      MyNeoBundle 'kana/vim-operator-replace'
+      MyNeoBundleNoLazyForDefault 'kana/vim-operator-user'
+      MyNeoBundle 'vim-scripts/pac.vim'
+      MyNeoBundle 'mattn/pastebin-vim'
+      MyNeoBundle 'tpope/vim-pathogen'
+      MyNeoBundle 'shawncplus/phpcomplete.vim'
+      MyNeoBundle '2072/PHP-Indenting-for-VIm', { 'name': 'php-indent' }
+      MyNeoBundle 'greyblake/vim-preview'
+      MyNeoBundleNoLazyForDefault 'tpope/vim-projectionist'
+      MyNeoBundleNoLazyForDefault 'dbakker/vim-projectroot'
+      " MyNeoBundle 'dbakker/vim-projectroot', {
+      "       \ 'autoload': {'commands': 'ProjectRootGuess'}}
+      MyNeoBundle 'fs111/pydoc.vim'
+            \ , {'autoload': {'filetypes': ['python']} }
+      MyNeoBundle 'alfredodeza/pytest.vim'
+      MyNeoBundle '5long/pytest-vim-compiler'
+            \ , {'autoload': {'filetypes': ['python']} }
+      MyNeoBundle 'hynek/vim-python-pep8-indent'
+            \ , {'autoload': {'filetypes': ['python']} }
+      " MyNeoBundle 'Chiel92/vim-autoformat'
+      "       \ , {'autoload': {'filetypes': ['python']} }
+      MyNeoBundleNoLazyForDefault 'tomtom/quickfixsigns_vim'
+      MyNeoBundleNoLazyForDefault 't9md/vim-quickhl'
+      MyNeoBundle 'aaronbieber/vim-quicktask'
+      MyNeoBundle 'tpope/vim-ragtag'
+            \ , {'autoload': {'filetypes': ['html', 'smarty', 'php', 'htmldjango']} }
+      MyNeoBundle 'tpope/vim-rails'
+      MyNeoBundle 'vim-scripts/Rainbow-Parenthsis-Bundle'
+      MyNeoBundle 'thinca/vim-ref'
+      MyNeoBundle 'tpope/vim-repeat'
+      MyNeoBundle 'inkarkat/runVimTests'
+      " MyNeoBundleLazy 'tpope/vim-scriptease', {
+      "       \ 'autoload': {'mappings': 'zS', 'filetypes': 'vim', 'commands': ['Runtime']} }
+      MyNeoBundleNoLazyForDefault 'tpope/vim-scriptease'
+      MyNeoBundle 'xolox/vim-session', {
+            \  'autoload': {'commands': ['SessionOpen', 'OpenSession']}
+            \, 'depends': [['xolox/vim-misc', {'name': 'vim-misc'}]]
+            \, 'augroup': 'PluginSession' }
+      " For PHP:
+      " MyNeoBundle 'blueyed/smarty.vim', {
+      "       \ 'autoload': {'filetypes': 'smarty'}}
+      MyNeoBundleNeverLazy 'justinmk/vim-sneak'
+      MyNeoBundle 'rstacruz/sparkup'
+            \ , {'autoload': {'filetypes': ['html', 'htmldjango', 'smarty']}}
+      MyNeoBundle 'tpope/vim-speeddating'
+      MyNeoBundle 'AndrewRadev/splitjoin.vim'
+      MyNeoBundleNoLazyForDefault 'AndrewRadev/undoquit.vim'
+
+      MyNeoBundleNoLazyForDefault 'EinfachToll/DidYouMean'
+
+      MyNeoBundleNoLazyForDefault 'mhinz/vim-startify'
+
+      " After startify: https://github.com/mhinz/vim-startify/issues/33
+      " NeoBundle does not keep the order in the cache though.. :/
+      MyNeoBundleNoLazyForDefault 'tpope/vim-fugitive'
+            \, {'augroup': 'fugitive'}
+
+      MyNeoBundleNoLazyForDefault 'chrisbra/sudoedit.vim', {
+            \ 'autoload': {'commands': ['SudoWrite', 'SudoRead']} }
+      MyNeoBundleNoLazyForDefault 'ervandew/supertab'
+      MyNeoBundleNoLazyForDefault 'tpope/vim-surround'
+      MyNeoBundle 'kurkale6ka/vim-swap'
+      MyNeoBundleNoLazyForDefault 'scrooloose/syntastic', {
+            \ 'autoload': {'filetypes': ['lua', 'python', 'sh', 'zsh']} }
+      " MyNeoBundleNoLazyForDefault "benekastah/neomake", {
+      "       \ 'autoload': {'filetypes': ['c', 'lua', 'python', 'sh', 'zsh']} }
+      MyNeoBundle 'vim-scripts/syntaxattr.vim'
+
+      if executable("tmux")
+        MyNeoBundle 'Keithbsmiley/tmux.vim', {
+              \ 'name': 'syntax-tmux',
+              \ 'autoload': {'filetypes': ['tmux']} }
+        MyNeoBundleNoLazyForDefault 'blueyed/vim-tmux-navigator'
+        MyNeoBundle 'wellle/tmux-complete.vim'
+      endif
+
+      " Dependency
+      " MyNeoBundle 'godlygeek/tabular'
+      MyNeoBundle 'junegunn/vim-easy-align'
+            \ ,{ 'autoload': {'commands': ['EasyAlign']} }
+
+      " Display registers with " / @ / CTRL-R.
+      MyNeoBundleNoLazyForDefault 'junegunn/vim-peekaboo'
+
+      MyNeoBundle 'majutsushi/tagbar'
+      MyNeoBundle 'tpope/vim-tbone'
+      MyNeoBundleNoLazyForDefault 'tomtom/tcomment_vim'
+
+      " MyNeoBundle 'kana/vim-textobj-user'
+      MyNeoBundleNoLazyForDefault 'kana/vim-textobj-function'
+            \ ,{'depends': 'kana/vim-textobj-user'}
+      MyNeoBundleNoLazyForDefault 'kana/vim-textobj-indent'
+            \ ,{'depends': 'kana/vim-textobj-user'}
+      MyNeoBundleNoLazyForDefault 'mattn/vim-textobj-url'
+            \ ,{'depends': 'kana/vim-textobj-user'}
+      MyNeoBundle 'bps/vim-textobj-python'
+            \ ,{'depends': 'kana/vim-textobj-user',
+            \   'autoload': {'filetypes': 'python'}}
+      MyNeoBundleNoLazyForDefault 'inkarkat/argtextobj.vim', {'depends': ['tpope/vim-repeat', 'vim-scripts/ingo-library']}
+      MyNeoBundleNoLazyForDefault 'vim-scripts/ArgsAndMore', {'depends': ['vim-scripts/ingo-library']}
+      " MyNeoBundle 'kana/vim-textobj-django-template', 'fix'
+      MyNeoBundle 'mjbrownie/django-template-textobjects'
+      MyNeoBundle 'vim-scripts/parameter-text-objects'
+
+      " paulhybryant/vim-textobj-path  " ap/ip (next path w/o basename), aP/iP (prev)
+      " kana/vim-textobj-syntax  " ay/iy
+
+      MyNeoBundle 'tomtom/tinykeymap_vim'
+      MyNeoBundle 'tomtom/tmarks_vim'
+      " Not lazy: needs to collect MRU data.
+      MyNeoBundleNoLazyForDefault 'tomtom/tmru_vim', { 'depends':
+            \ [['tomtom/tlib_vim', { 'directory': 'tlib' }]],
+            \ 'autoload': { 'commands': 'TRecentlyUsedFiles' }}
+      MyNeoBundle 'vim-scripts/tracwiki'
+      MyNeoBundle 'tomtom/ttagecho_vim'
+      " UltiSnips cannot be set as lazy (https://github.com/Shougo/neobundle.vim/issues/335).
+      MyNeoBundleNoLazyForDefault 'SirVer/ultisnips'
+      " MyNeoBundle 'honza/vim-snippets'
+      MyNeoBundleNoLazyForDefault 'blueyed/vim-snippets'
+      MyNeoBundleNeverLazy 'tpope/vim-unimpaired'
+      MyNeoBundle 'Shougo/unite-outline'
+      MyNeoBundleNoLazyForDefault 'Shougo/unite.vim'
+      MyNeoBundle 'vim-scripts/vcscommand.vim'
+      MyNeoBundleLazy 'joonty/vdebug', {
             \ 'autoload': { 'commands': 'VdebugStart' }}
-      NeoBundle 'vim-scripts/ViewOutput.git', { 'directory': 'viewoutput' }
-      NeoBundle 'Shougo/vimfiler.vim.git', { 'directory': 'vimfiler' }
-      NeoBundle 'xolox/vim-misc.git', { 'directory': 'vim-misc' }
+      MyNeoBundle 'vim-scripts/viewoutput'
+      MyNeoBundleNoLazyForDefault 'Shougo/vimfiler.vim'
+      MyNeoBundle 'xolox/vim-misc', { 'name': 'vim-misc' }
+
+      MyNeoBundle 'tpope/vim-capslock'
+
+      MyNeoBundle 'sjl/splice.vim'  " Sophisticated mergetool.
+      " Enhanced omnifunc for ft=vim.
+      MyNeoBundle 'c9s/vimomni.vim'
 
       let vimproc_updcmd = has('win64') ?
             \ 'tools\\update-dll-mingw 64' : 'tools\\update-dll-mingw 32'
-      execute "NeoBundle 'Shougo/vimproc.vim'," . string({
-            \ 'directory': 'vimproc',
+      execute "MyNeoBundle 'Shougo/vimproc.vim'," . string({
             \ 'build' : {
             \     'windows' : vimproc_updcmd,
             \     'cygwin' : 'make -f make_cygwin.mak',
             \     'mac' : 'make -f make_mac.mak',
             \     'unix' : 'make -f make_unix.mak',
             \    },
+            \    'autoload': {'commands': ['VimProcBang', 'VimProcRead'] }
             \ })
 
-      NeoBundle 'inkarkat/VimTAP.git', { 'directory': 'VimTAP' }
-      NeoBundle 'tpope/vim-vinegar.git', { 'directory': 'vinegar' }
-      NeoBundle 'jmcantrell/vim-virtualenv', { 'directory': 'virtualenv' }
-      NeoBundle 'tyru/visualctrlg.vim.git', { 'directory': 'visualctrlg' }
-      NeoBundle 'nelstrom/vim-visual-star-search.git', { 'directory': 'visual-star-search' }
-      NeoBundle 'mattn/webapi-vim.git', { 'directory': 'webapi' }
-      NeoBundle 'gcmt/wildfire.vim.git', { 'directory': 'wildfire' }
-      NeoBundle 'sukima/xmledit.git', { 'directory': 'xmledit' }
+      MyNeoBundle 'inkarkat/VimTAP', { 'name': 'VimTAP' }
+      " Try VimFiler instead; vinegar maps "." (https://github.com/tpope/vim-repeat/issues/19#issuecomment-59454216).
+      " MyNeoBundle 'tpope/vim-vinegar'
+      MyNeoBundle 'jmcantrell/vim-virtualenv'
+            \, { 'autoload': {'commands': 'VirtualEnvActivate'} }
+      MyNeoBundle 'tyru/visualctrlg.vim'
+      MyNeoBundle 'nelstrom/vim-visual-star-search'
+      MyNeoBundle 'mattn/webapi-vim'
+      MyNeoBundle 'gcmt/wildfire.vim'
+      MyNeoBundle 'sukima/xmledit'
       " Expensive on startup, not used much
       " (autoload issue: https://github.com/actionshrimp/vim-xpath/issues/7).
-      NeoBundleLazy 'actionshrimp/vim-xpath.git', {
-            \ 'directory': 'xpath',
+      MyNeoBundleLazy 'actionshrimp/vim-xpath', {
             \ 'autoload': {'commands': ['XPathSearchPrompt']}}
-      NeoBundle 'guns/xterm-color-table.vim.git', { 'directory': 'xterm-color-table' }
-      NeoBundle 'maxbrunsfeld/vim-yankstack.git', { 'directory': 'yankstack' }
+      MyNeoBundle 'guns/xterm-color-table.vim'
+      MyNeoBundleNoLazyForDefault 'maxbrunsfeld/vim-yankstack'
 
-      NeoBundle 'klen/python-mode'
+      MyNeoBundle 'klen/python-mode'
+
+      " MyNeoBundle 'chrisbra/Recover.vim'
+
+      MyNeoBundle 'blueyed/vim-diminactive'
 
       " Previously disabled plugins (pathogen_disabled):
-      " NeoBundle 'Lokaltog/vim-easymotion.git', { 'directory': 'easymotion' }
-      " NeoBundle 'roman/golden-ratio.git', { 'directory': 'golden-ratio' }
-      " NeoBundle 'vim-scripts/YankRing.vim.git', { 'directory': 'yankring' }
-      " NeoBundle 'blueyed/vim-diminactive.git', { 'directory': 'diminactive' }
-      " NeoBundle 'tpope/vim-sleuth.git', { 'directory': 'sleuth' }
-      " NeoBundle 'xolox/vim-notes.git', { 'directory': 'notes' }
-      " NeoBundle 'tomtom/shymenu_vim.git', { 'directory': 'shymenu' }
-      " NeoBundle 'kergoth/vim-hilinks'
 
-      " Obsolete?!
-      " NeoBundle 'ervandew/maximize.git', { 'directory': 'maximize' }
-      " NeoBundle 'blueyed/maximize.git', { 'directory': 'maximize' }
-      " NeoBundle 'MarcWeber/vim-addon-manager.git', { 'directory': 'vim-addon-manager' }
-      " NeoBundle 'MarcWeber/vim-addon-mw-utils.git', { 'directory': 'vim-addon-mw-utils' }
+      MyNeoBundle 'MarcWeber/vim-addon-nix'
+            \, {'name': 'nix', 'autoload': {'filetypes': ['nix']}
+            \, 'depends': [
+            \ ['MarcWeber/vim-addon-mw-utils', { 'directory': 'mw-utils' }],
+            \ ['MarcWeber/vim-addon-actions', { 'directory': 'actions' }],
+            \ ['MarcWeber/vim-addon-completion', { 'directory': 'completion' }],
+            \ ['MarcWeber/vim-addon-goto-thing-at-cursor', { 'directory': 'goto-thing-at-cursor' }],
+            \ ['MarcWeber/vim-addon-errorformats', { 'directory': 'errorformats' }],
+            \ ]}
 
-      " colorschemes.
-      NeoBundle 'vim-scripts/Atom.git', { 'directory': 'colorscheme-atom' }
-      NeoBundle 'chriskempson/base16-vim.git', { 'directory': 'colorscheme-base16' }
-      NeoBundle 'rking/vim-detailed.git', { 'directory': 'colorscheme-detailed' }
-      NeoBundle 'nanotech/jellybeans.vim.git', { 'directory': 'colorscheme-jellybeans' }
-      NeoBundle 'tpope/vim-vividchalk.git', { 'directory': 'colorscheme-vividchalk' }
-      NeoBundle 'nielsmadan/harlequin.git', { 'directory': 'colorscheme-harlequin' }
-      NeoBundle 'gmarik/ingretu.git', { 'directory': 'colorscheme-ingretu' }
-      NeoBundle 'vim-scripts/molokai.git', { 'directory': 'colorscheme-molokai' }
-      NeoBundle 'blueyed/vim-colors-solarized.git', { 'directory': 'colorscheme-solarized' }
-      NeoBundle 'vim-scripts/tir_black.git', { 'directory': 'colorscheme-tir_black' }
-      NeoBundle 'blueyed/xoria256.vim.git', { 'directory': 'colorscheme-xoria256' }
-      NeoBundle 'vim-scripts/xterm16.vim.git', { 'directory': 'colorscheme-xterm16' }
-      NeoBundle 'vim-scripts/Zenburn.git', { 'directory': 'colorscheme-zenburn' }
+      " Colorschemes.
+      " MyNeoBundle 'vim-scripts/Atom',             '', 'colors', { 'name': 'colorscheme-atom' }
+      " MyNeoBundle 'chriskempson/base16-vim',      '', 'colors', { 'name': 'colorscheme-base16' }
+      " MyNeoBundle 'rking/vim-detailed',           '', 'colors', { 'name': 'colorscheme-detailed' }
+      " MyNeoBundle 'nanotech/jellybeans.vim',      '', 'colors', { 'name': 'colorscheme-jellybeans' }
+      " MyNeoBundle 'tpope/vim-vividchalk',         '', 'colors', { 'name': 'colorscheme-vividchalk' }
+      " MyNeoBundle 'nielsmadan/harlequin',         '', 'colors', { 'name': 'colorscheme-harlequin' }
+      " MyNeoBundle 'gmarik/ingretu',               '', 'colors', { 'name': 'colorscheme-ingretu' }
+      " MyNeoBundle 'vim-scripts/molokai',          '', 'colors', { 'name': 'colorscheme-molokai' }
+      " MyNeoBundle 'vim-scripts/tir_black',        '', 'colors', { 'name': 'colorscheme-tir_black' }
+      " MyNeoBundle 'blueyed/xoria256.vim',         '', 'colors', { 'name': 'colorscheme-xoria256' }
+      " MyNeoBundle 'vim-scripts/xterm16.vim',      '', 'colors', { 'name': 'colorscheme-xterm16' }
+      " MyNeoBundle 'vim-scripts/Zenburn',          '', 'colors', { 'name': 'colorscheme-zenburn' }
+      " MyNeoBundle 'whatyouhide/vim-gotham',       '', 'colors', { 'name': 'colorscheme-gotham' }
+
+      " EXPERIMENTAL
+      " MyNeoBundle 'atweiden/vim-betterdigraphs', { 'directory': 'betterdigraphs' }
+      MyNeoBundle 'chrisbra/unicode.vim', { 'type__depth': 1 }
+
+      MyNeoBundleNoLazyForDefault 'repeatable-motions.vim'
+
+      MyNeoBundle 'xolox/vim-colorscheme-switcher'
+
+      MyNeoBundle 't9md/vim-choosewin'
+
+      MyNeoBundleNeverLazy 'junegunn/vim-oblique/', { 'depends':
+            \ [['junegunn/vim-pseudocl']]}
+
+      MyNeoBundle 'Konfekt/fastfold'
+
+      MyNeoBundleNoLazyNotForLight 'junegunn/vader.vim', {
+            \ 'autoload': {'commands': 'Vader'} }
+
+      MyNeoBundleNeverLazy 'idbrii/vim-endoscope'
+      MyNeoBundleNoLazyForDefault 'ryanoasis/vim-webdevicons'
+
+      MyNeoBundle 'mjbrownie/vim-htmldjango_omnicomplete'
+            \ , {'autoload': {'filetypes': ['htmldjango']} }
+
+      MyNeoBundle 'othree/html5.vim'
+            \ , {'autoload': {'filetypes': ['html', 'htmldjango']} }
+
+      MyNeoBundleLazy 'lambdalisue/vim-pyenv'
+            " \ , {'depends': ['blueyed/YouCompleteMe']
+            " \ ,  'autoload': {'filetypes': ['python', 'htmldjango']} }
+
+      " Problems with <a-d> (which is ä), and I prefer <a-hjkl>.
+      " MyNeoBundleNoLazyForDefault 'tpope/vim-rsi'
+
+
+      MyNeoBundleLazy 'chase/vim-ansible-yaml'
+            \ , {'autoload': {'filetypes': ['yaml', 'ansible']} }
+      " MyNeoBundleLazy 'mrk21/yaml-vim'
+      "       \ , {'autoload': {'filetypes': ['yaml', 'ansible']} }
 
       " Manual bundles.
-      let g:neobundle#default_options =
-            \ { 'manual': { 'base': '~/.vim/bundle', 'type': 'nosync' }}
-      NeoBundle 'eclim', '', 'manual'
-      NeoBundle 'zoomwin.vba', '', 'manual'
-      NeoBundleFetch "Shougo/neobundle.vim", {
-            \ 'default': 'manual',
-            \ 'directory': 'neobundle', }
+      MyNeoBundle 'eclim', '', 'manual'
+      MyNeoBundleNoLazyForDefault 'zoomwin', '', 'manual', { 'directory': 'zoomwin.vba' }
 
+      " MyNeoBundle 'neobundle', '', 'manual'
+      " NeoBundleFetch "Shougo/neobundle.vim", {
+      "       \ 'default': 'manual',
+      "       \ 'directory': 'neobundle', }
+
+
+      MyNeoBundleNeverLazy 'blueyed/vim-colors-solarized', '', 'colors', { 'name': 'colorscheme-solarized' }
+      " }}}
       NeoBundleSaveCache
     endif
     call neobundle#end()
@@ -305,7 +488,9 @@ if 1 " has('eval') / `let` may not be available.
     " Use shallow copies by default.
     let g:neobundle#types#git#clone_depth = 10
 
-    " Installation check.
+    " Before NeoBundleCheck.
+    filetype plugin indent on
+
     NeoBundleCheck
 
     filetype plugin indent on
@@ -345,7 +530,6 @@ if 1 " has('eval') / `let` may not be available.
     " TO BE REMOVED"
     let g:pathogen_disabled += [ "shymenu" ]
     let g:pathogen_disabled += [ "easymotion" ]
-    let g:pathogen_disabled += [ "yankstack" ]
     let g:pathogen_disabled += [ 'xpath' ]
     let g:pathogen_disabled += [ 'notes' ]  " XXX: needs writable path, not used currently
     let g:pathogen_disabled += [ "ipython" ]  " Not used, overwrites <C-s> by default

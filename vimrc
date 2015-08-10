@@ -447,7 +447,6 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNoLazyNotForLight 'junegunn/vader.vim', {
             \ 'autoload': {'commands': 'Vader'} }
 
-      MyNeoBundleNeverLazy 'idbrii/vim-endoscope'
       MyNeoBundleNoLazyForDefault 'ryanoasis/vim-webdevicons'
 
       MyNeoBundle 'mjbrownie/vim-htmldjango_omnicomplete'

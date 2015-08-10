@@ -2006,6 +2006,22 @@ for i in range(9)
 endfor
 
 
+fun! MyGetNonDefaultServername()
+  " Not for gvim in general (uses v:servername by default), and the global
+  " server ("G").
+  let sname = v:servername
+  if len(sname)
+    if has('nvim')
+      if sname !~# '^/tmp/nvim'
+        return sname
+      endif
+    elseif sname !~# '\v^GVIM.*' " && sname =~# '\v^G\d*$'
+      return sname
+    endif
+  endif
+  return ''
+endfun
+
 fun! MyGetPrettyFileDir()
   " TODO: use shorten_path / abstract it
   let dir=expand('%:~:h')
@@ -3622,16 +3638,6 @@ execute "set <F10>=\e[21;*~"
 execute "set <F11>=\e[23;*~"
 execute "set <F12>=\e[24;*~"
 " }}}
-
-fun! MyGetNonDefaultServername()
-  " Not for gvim in general (uses v:servername by default), and the global
-  " server ("G").
-  let sname = v:servername
-  if len(sname) && sname =~# '\v^GVIM.*' && sname =~# '\v^G\d*$'
-    return sname
-  endif
-  return ''
-endfun
 
 
 " Change cursor shape for terminal mode. {{{1

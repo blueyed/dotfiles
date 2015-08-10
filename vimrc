@@ -1354,11 +1354,7 @@ if 1 " has('eval')
   endif
 
   fun! ToggleBg()
-    if &bg == 'dark'
-      set bg=light
-    else
-      set bg=dark
-    endif
+    let &bg = &bg == 'dark' ? 'light' : 'dark'
   endfun
   nnoremap <Leader>sb :call ToggleBg()<cr>
 
@@ -1849,17 +1845,10 @@ endfunction
 set guitablabel=%{GuiTabLabel()}
 " }}}
 
-
-" Hide search highlighting
-if has('extra_search')
-  nnoremap <silent> <Leader>h :set hlsearch!<CR>:set hlsearch?<CR>
-  nnoremap <silent> <Leader><C-l> :nohlsearch<CR><C-l>
-  inoremap <silent> <C-l> <C-o>:nohlsearch<bar>redraw<CR>
-endif
-
 " Opens an edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>e
-map <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <Leader>ee :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <Leader>EE :sp <C-R>=expand("%:p:h") . "/" <CR>
 
 " gt: next tab or buffer (source: http://j.mp/dotvimrc)
 "     enhanced to support range (via v:count)
@@ -1870,10 +1859,8 @@ endfun
 fun! MyGotoPrevTabOrBuffer()
   exec (v:count ? v:count : '') . (tabpagenr('$') == 1 ? 'bp' : 'tabprevious')
 endfun
-" nmap <silent> <Plug>NextTabOrBuffer :<C-U>exec (v:count ? v:count : '') . (tabpagenr('$') == 1 ? 'bn' : 'tabnext')<CR>
-" nmap <silent> <Plug>PrevTabOrBuffer :<C-U>exec (v:count ? v:count : '') . (tabpagenr('$') == 1 ? 'bp' : 'tabprevious')<CR>
-nmap <silent> <Plug>NextTabOrBuffer :<C-U>call MyGotoNextTabOrBuffer()<CR>
-nmap <silent> <Plug>PrevTabOrBuffer :<C-U>call MyGotoPrevTabOrBuffer()<CR>
+nnoremap <silent> <Plug>NextTabOrBuffer :<C-U>call MyGotoNextTabOrBuffer()<CR>
+nnoremap <silent> <Plug>PrevTabOrBuffer :<C-U>call MyGotoPrevTabOrBuffer()<CR>
 
 " Ctrl-Space: split into new tab.
 " Disables diff mode, which gets taken over from the old buffer.
@@ -1898,28 +1885,26 @@ map <C-W><C-o> <Nop>
 nmap <A-Del> :tabclose<cr>
 " nmap <C-1> 1gt<cr>
 
+" Prev/next tab.
 nmap <C-PageUp> <Plug>PrevTabOrBuffer
 nmap <C-PageDown> <Plug>NextTabOrBuffer
-
 map <A-,>     <Plug>PrevTabOrBuffer
 map <A-.>     <Plug>NextTabOrBuffer
 map <C-S-Tab> <Plug>PrevTabOrBuffer
 map <C-Tab>   <Plug>NextTabOrBuffer
 
-" Switch to most recently used tab
+" Switch to most recently used tab.
 " Source: http://stackoverflow.com/a/2120168/15690
 fun! MyGotoMRUTab()
   if !exists('g:mrutab')
     let g:mrutab = 1
   endif
+  if tabpagenr('$') == 1
+    echomsg "There is only one tab!"
+    return
+  endif
   if g:mrutab > tabpagenr('$') || g:mrutab == tabpagenr()
-    if g:mrutab > 1
-      " go to the left
-      let g:mrutab = tabpagenr()-1
-    else
-      echomsg "There is only one tab!"
-      return
-    endif
+    let g:mrutab = tabpagenr() > 1 ? tabpagenr()-1 : tabpagenr('$')
   endif
   exe "tabn ".g:mrutab
 endfun
@@ -2046,7 +2031,7 @@ endfun
 " Change to current file's dir
 nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
 
-" yankstack, to be replaced by unite's history/yank {{{1
+" yankstack, see also unite's history/yank {{{1
 if &rtp =~ '\<yankstack\>'
   " Define own map for yankstack, Alt-p/esc-p does not work correctly in term.
   let g:yankstack_map_keys = 0
@@ -2449,27 +2434,24 @@ function! StripWhitespace(line1, line2, ...)
   if exists('*winsaveview')
     let oldview = winsaveview()
   else
-    let old_query = getreg('/')
     let save_cursor = getpos(".")
   endif
-  " let old_linenum = line('.')
   exe 'keepjumps keeppatterns '.a:line1.','.a:line2.'substitute/'.pattern.'//e'
   if exists('oldview')
     if oldview != winsaveview()
+      redraw
       echohl WarningMsg | echomsg 'Trimmed whitespace.' | echohl None
     endif
     call winrestview(oldview)
   else
     call setpos('.', save_cursor)
   endif
-  " call setreg('/', old_query)
-  " keepjumps exe "normal " . old_linenum . "G"
   let &report = s_report
 endfunction
-command! -range=% Untrail keepjumps call StripWhitespace(<line1>,<line2>)
+command! -range=% -nargs=0 -bar Untrail keepjumps call StripWhitespace(<line1>,<line2>)
 " Untrail, for pastes from tmux (containing border).
-command! -range=% UntrailSpecial keepjumps call StripWhitespace(<line1>,<line2>,'[\\]\@<!\s\+│\?$')
-noremap <leader>st :Untrail<CR>
+command! -range=% -nargs=0 -bar UntrailSpecial keepjumps call StripWhitespace(<line1>,<line2>,'[\\]\@<!\s\+│\?$')
+nnoremap <leader>st :Untrail<CR>
 
 " Source/execute current line/selection/operator-pending. {{{
 " This uses a temporary file instead of "exec", which does not handle
@@ -2498,6 +2480,10 @@ endif
 " }}}
 
 
+" Shortcut for <C-r>= in cmdline.
+fun! RR(...)
+  return call(ProjectRootGuess, a:000)
+endfun
 command! RR ProjectRootLCD
 command! RRR ProjectRootCD
 
@@ -2628,9 +2614,10 @@ fun! MyAutoCheckTime()
 endfun
 augroup MyAutoChecktime
   au!
-  au FocusGained,BufEnter,CursorHold * call MyAutoCheckTime()
+  au FocusGained,BufEnter,CursorHold,InsertEnter * call MyAutoCheckTime()
 augroup END
 command! NoAutoChecktime let b:autochecktime=0
+command! ToggleAutoChecktime let b:autochecktime=!get(b:, 'autochecktime', 0) | echom "b:autochecktime:" b:autochecktime
 
 " vcscommand: only used as lib for detection (e.g. with airline). {{{1
 " Setup b:VCSCommandVCSType.
@@ -3086,21 +3073,21 @@ function! WindowIsEmpty()
 endfunction
 
 function! MyEditConfig(path, ...)
-  let cmd = a:0 ? a:1 : 'split'
-  exec (WindowIsEmpty() ? 'e' : cmd) a:path
+  let cmd = a:0 ? a:1 : (WindowIsEmpty() ? 'e' : 'vsplit')
+  exec cmd a:path
 endfunction
 
 " edit vimrc shortcut
-" nnoremap <leader>ec <C-w><C-s><C-l>:exec "e ".resolve($MYVIMRC)<cr>
-nnoremap <leader>ec :let sshm=&shm \| set shm+=A \| call MyEditConfig(resolve($MYVIMRC)) \| let &shm = sshm<cr>
-nnoremap <leader>Ec :let sshm=&shm \| set shm+=A \| call MyEditConfig(resolve($MYVIMRC), 'vsplit') \| let &shm = sshm<cr>
+nnoremap <leader>ec :call MyEditConfig(resolve($MYVIMRC))<cr>
+nnoremap <leader>Ec :call MyEditConfig(resolve($MYVIMRC), 'edit')<cr>
 " edit zshrc shortcut
 nnoremap <leader>ez :call MyEditConfig(resolve("~/.zshrc"))<cr>
-" edit tmux shortcut
-nnoremap <leader>et :call MyEditConfig(resolve("~/.tmux.common.conf"))<cr>
 " edit .lvimrc shortcut (in repository root)
 nnoremap <leader>elv :call MyEditConfig(ProjectRootGuess().'/.lvimrc')<cr>
 nnoremap <leader>em :call MyEditConfig(ProjectRootGuess().'/Makefile')<cr>
+
+nnoremap <leader>et :call MyEditConfig(expand('~/TODO'))<cr>
+nnoremap <leader>ept :call MyEditConfig(ProjectRootGet().'/TODO')<cr>
 
 " Utility functions to create file commands
 " Source: https://github.com/carlhuda/janus/blob/master/gvimrc
@@ -3147,14 +3134,25 @@ endfunction
 nnoremap <Leader>gd :if !&diff \| Gdiff \| else \| call MyCloseDiff() \| endif <cr>
 nnoremap <Leader>gD :call MyCloseDiff()<cr>
 " nnoremap <Leader>gD :Git difftool %
+nnoremap <Leader>gb :Gblame<cr>
+nnoremap <Leader>gl :Glog<cr>
+nnoremap <Leader>gs :Gstatus<cr>
 
 " Shortcuts for committing.
 nnoremap <Leader>gc :Gcommit -v
-command! -nargs=1 Gcm Gcommit -m "<args>"
+command! -nargs=1 Gcm Gcommit -m <q-args>
 " }}}1
 
+" "wincmd p" might not work initially, although there are two windows.
+fun! MyWincmdPrevious()
+  let w = winnr()
+  wincmd p
+  if winnr() == w
+    wincmd w
+  endif
+endfun
 " Diff this window with the previous one.
-command! DiffThese diffthis | wincmd p | diffthis | wincmd p
+command! DiffThese diffthis | call MyWincmdPrevious() | diffthis | wincmd p
 command! DiffOff   Windo diffoff
 
 
@@ -3187,6 +3185,7 @@ function! RedirCommand(cmd, newcmd)
   " NOTE: 'ycmblacklisted' filetype used with YCM blacklist.
   "       Needs patch: https://github.com/Valloric/YouCompleteMe/pull/830
   set nomodified ft=vim.ycmblacklisted
+  norm! gg
 endfunction
 command! -nargs=* -complete=command Redir call RedirCommand(<q-args>, 'tabnew')
 " cnoreabbrev TM TabMessage
@@ -3238,8 +3237,8 @@ if has("folding")
   " let vimsyn_folding='af'       " Vim script
   " let xml_syntax_folding=1      " XML
 
-  set foldlevel=2
-  set foldlevelstart=2
+  set foldlevel=1
+  set foldlevelstart=1
 
   " set foldmethod=indent
   " set foldnestmax=2
@@ -3255,8 +3254,8 @@ if has('eval')
   " Source: http://vim.wikia.com/wiki/Run_a_command_in_multiple_buffers#Restoring_position
   " Like windo but restore the current window.
   function! Windo(command)
-    let curaltwin = winnr('#')
-    let currwin=winnr()
+    let curaltwin = winnr('#') ? winnr('#') : 1
+    let currwin = winnr()
     execute 'windo ' . a:command
     execute curaltwin . 'wincmd w'
     execute currwin . 'wincmd w'
@@ -3265,7 +3264,7 @@ if has('eval')
 
   " Like bufdo but restore the current buffer.
   function! Bufdo(command)
-    let currBuff=bufnr("%")
+    let currBuff = bufnr("%")
     execute 'bufdo ' . a:command
     execute 'buffer ' . currBuff
   endfunction
@@ -3348,14 +3347,14 @@ command! VdebugStart python debugger.run()
 " LocalVimRC {{{
 let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
-let g:localvimrc_debug = 0
+" let g:localvimrc_debug = 1
 let g:localvimrc_persistence_file = g:vimsharedir . '/localvimrc_persistent'
 
 " Helper method for .lvimrc files to finish
 fun! MyLocalVimrcAlreadySourced(...)
   " let sfile = expand(a:sfile)
   let sfile = g:localvimrc_script
-  let guard_key = expand(sfile).getftime(sfile)
+  let guard_key = expand(sfile).'_'.getftime(sfile)
   if exists('b:local_vimrc_sourced')
     if type(b:local_vimrc_sourced) != type({})
       echomsg "warning: b:local_vimrc_sourced is not a dict!"
@@ -3430,27 +3429,33 @@ if has('autocmd')
     " See also ~/.dotfiles/usr/bin/vim-for-git, which uses this setup and
     " additionally splits the window.
     fun! MySetupGitCommitMsg()
+      if bufname("%") == '.git/index'
+        " fugitive :Gstatus
+        return
+      endif
       set foldmethod=syntax foldlevel=1
       set nohlsearch nospell sw=4 scrolloff=0
       silent g/^# \(Changes not staged\|Untracked files\)/norm zc
       normal! zt
       set spell spl=en,de
 
-      " Prefill NeoComplCache (obsolete).
-      if exists(':NeoComplCacheEnable')
+      " Prefill NeoComplCache (obsolete). {{{
+      if s:use_neocomplcache && exists(':NeoComplCacheEnable')
         NeoComplCacheEnable
 
         let l:staged_files = split(system('git diff --name-only --cached'), "\n")
         for l:filename in l:staged_files
           exec 'NeoComplCacheCachingBuffer '.l:filename
         endfor
-      endif
+      endif  "}}}
     endfun
     au FileType gitcommit call MySetupGitCommitMsg()
 
+
+    " Detect indent.
     au FileType mail,make,python let b:no_detect_indent=1
     au BufReadPost * if exists(':DetectIndent') |
-          \ if !exists('b:no_detect_indent') || empty(b:no_detect_indent) |
+          \ if !exists('b:no_detect_indent') || !b:no_detect_indent |
           \   exec 'DetectIndent' |
           \ endif | endif
 
@@ -3477,6 +3482,7 @@ endif " }}}
 
 
 " delimitMate
+let delimitMate_excluded_ft = "unite"
 " let g:delimitMate_balance_matchpairs = 1
 " let g:delimitMate_expand_cr = 1
 " let g:delimitMate_expand_space = 1

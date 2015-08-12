@@ -5,8 +5,6 @@ eval "$sh_setup_x_theme"
 # Unset $MY_X_THEME_VARIANT to make terminals set it up dynamically.
 unset MY_X_THEME_VARIANT
 
-export HAS_SOLARIZED_COLORS=1
-
 # Make Caps-Lock behave as Escape on its own.
 # Source: http://www.reddit.com/r/vim/comments/27nnsz/top_shortcuts_commands_configuration_for_vim/ci30edy
 

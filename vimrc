@@ -2964,7 +2964,15 @@ noremap <Leader>u :GundoToggle<cr>
 nnoremap <silent> <F8> :TagbarToggle<CR>
 nnoremap <silent> <Leader><F8> :TagbarOpenAutoClose<CR>
 
-" NERDTree {{{
+" VimFiler {{{2
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_ignore_filters = ['matcher_ignore_wildignore']
+
+" Netrw {{{2
+" Short-circuit detection, which might be even wrong.
+let g:netrw_browsex_viewer = 'open-in-running-browser'
+
+" NERDTree {{{2
 " Show hidden files *except* the known temp files, system files & VCS files
 let NERDTreeHijackNetrw = 0
 let NERDTreeShowHidden = 1

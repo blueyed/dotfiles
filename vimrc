@@ -1370,29 +1370,61 @@ if 1 " has('eval')
     return g:_MyIsGnomeTerminal
   endfun
 
-  " always light, because of airline theme issue
-  " set bg=light
-  " set fillchars+=stlnc:=
+  " Colorscheme: prefer solarized with 16 colors (special palette).
+  let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
 
-  " set rtp+=~/.vim/neobundles/solarized
+  " Use corresponding theme from $BASE16_SCHEME, if set up in the shell.
+  if len($BASE16_SCHEME)
+    let base16colorspace=256
+    if match($BASE16_SCHEME, '\.dark$') != -1
+      set bg=dark
+    else
+      set bg=light
+    endif
+    let s:use_colorscheme = 'base16-'.substitute($BASE16_SCHEME, '\.\(dark\|light\)$', '', '')
 
-  " Colorscheme: use solarized with 16 colors (special palette),
-  " or xterm16 as fallback (typically for tmux in a linux $TERM).
-  " Set g:solarized_termcolors based on if terminal colors are setup for the 16 colors palette.
-  if $HAS_SOLARIZED_COLORS != 1
-        \ && index(["linux", "fbterm", "screen"], $TERM) != -1
-    let s:use_colorscheme = "xterm16"
-  else
+  elseif has('gui_running')
+    let s:use_colorscheme = "solarized"
+    let g:solarized_termcolors=256
+
+  " HAS_SOLARIZED_COLORS?
+  elseif ((len($DISPLAY) || len($SSH_CLIENT))
+        \ && ($TERM =~ 'rxvt'
+        \     || $KONSOLE_PROFILE_NAME =~ 'Solarized.*'
+        \     || MyIsGnomeTerminal()))
     let s:use_colorscheme = "solarized"
     let g:solarized_termcolors=16
-    " NOTE: using better-whitespace instead
-    let g:solarized_hitrail=0
+  else
+    " Check for dumb terminal.
+    if ($TERM !~ '256color' )
+      let s:use_colorscheme = "default"
+    else
+      let s:use_colorscheme = "solarized"
+      let g:solarized_termcolors=256
+    endif
   endif
-  try
-    exec 'colorscheme' s:use_colorscheme
-  catch
-    echom "Failed to load colorscheme:" v:exception
-  endtry
+
+  " Airline: do not use powerline symbols with linux/screen terminal.
+  " NOTE: xterm-256color gets setup for tmux/screen with $DISPLAY.
+  if (index(["linux", "screen"], $TERM) != -1)
+    let g:airline_powerline_fonts = 0
+  endif
+
+  fun! s:MySetColorscheme()
+    " Set s:use_colorscheme, called through GUIEnter for gvim.
+    try
+      exec 'NeoBundleSource colorscheme-'.s:use_colorscheme
+      exec 'colorscheme' s:use_colorscheme
+    catch
+      echom "Failed to load colorscheme: " v:exception
+    endtry
+  endfun
+
+  if has('gui_running')
+    au GUIEnter * nested call s:MySetColorscheme()
+  else
+    call s:MySetColorscheme()
+  endif
 
   " set rtp+=~/.vim/bundle/xoria256 " colorscheme
   " silent! colorscheme xoria256

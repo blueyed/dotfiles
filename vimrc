@@ -2577,7 +2577,9 @@ fun! MyAutoCheckTime()
 endfun
 augroup MyAutoChecktime
   au!
-  au FocusGained,BufEnter,CursorHold,InsertEnter * call MyAutoCheckTime()
+  " NOTE: nested is required for Neovim to trigger FileChangedShellPost
+  "       autocommand with :checktime.
+  au FocusGained,BufEnter,CursorHold,InsertEnter * nested call MyAutoCheckTime()
 augroup END
 command! NoAutoChecktime let b:autochecktime=0
 command! ToggleAutoChecktime let b:autochecktime=!get(b:, 'autochecktime', 0) | echom "b:autochecktime:" b:autochecktime

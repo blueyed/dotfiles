@@ -568,6 +568,8 @@ if 1  " has('eval'), and can create the dir dynamically.
   set backup          " enable backup (default off), if 'backupdir' can be created dynamically.
 endif
 
+set noautoread  " Enabled by default in Neovim; I like to get notified/confirm it.
+
 set nowrap
 
 set autoindent    " always set autoindenting on (fallback after 'indentexpr')

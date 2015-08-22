@@ -1,7 +1,6 @@
 INSTALL_FILES := ackrc agignore aptitude/config autojump \
 	$(wildcard bazaar/plugins/*) \
-	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) $(wildcard byobu/*) \
-	byobu/.screenrc byobu/.tmux.conf \
+	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
 	hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc \
@@ -25,6 +24,7 @@ install: install_files_before_sm init_submodules install_files_after_sm
 # Migrate existing dotfiles setup
 migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.20
 migrate: .stamps/neobundle.1
+migrate: .stamps/remove-byobu
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -53,6 +53,10 @@ migrate: .stamps/neobundle.1
 	@echo 'cd vim/bundle; for i in $$(git ls-files -o); do echo $$i; ( test -f $$i && (git diff --exit-code;) || ( cd $$i && git diff --exit-code; ) ) || break; done'
 	@echo To delete all untracked bundles:
 	@echo 'rm $$(git ls-files -o vim/bundle) -r'
+	touch $@
+.stamps/remove-byobu:
+	@echo "== byobu has been removed =="
+	@echo "You should 'rm ~/.byobu -rf' manually."
 	touch $@
 
 # Target to install a copy of .dotfiles, where Git is not available

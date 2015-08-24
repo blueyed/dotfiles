@@ -21,7 +21,7 @@ while [[ $1 == -* ]] ; do
 			printf '  -c      call `git checkout -p` on files.\n'
 			return 0
 			;;
-		(*) printf "Unkown option: '%s'\n" "$1" ; return 1 ;;
+		(*) printf "Warning: unkown option: '%s'. Use -- to pass options to git.\n" "$1" ; return 1 ;;
 	esac
 	shift
 done

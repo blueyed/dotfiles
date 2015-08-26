@@ -1,10 +1,14 @@
 #!/bin/sh
 
+# slock is called via /lib/systemd/system-sleep/10lockscreen.
+# TODO: via systemd user file/service?!
+# Required when only suspending, e.g. closing lid!
+
 # close stdin
 exec <&-
 
 ACTION=$(printf 'suspend|hybrid-sleep|hibernate|reboot|shutdown|switch-user|logout|lock' \
-  | rofi -dmenu -sep '|' -p "How do you want to quit? ")
+  | rofi -width -40 -dmenu -sep '|' -p "How do you want to quit? ")
 
 if [ -n "${ACTION}" ];then
   case $ACTION in
@@ -13,12 +17,15 @@ if [ -n "${ACTION}" ];then
       dm-tool switch-to-greeter
       # for gdm: gdmflexiserver --startnew
       ;;
-    hybrid-sleep) systemctl hybrid-sleep ;;
+    hybrid-sleep)
+      /usr/bin/slock &
+      systemctl hybrid-sleep ;;
     suspend)
+      /usr/bin/slock &
       systemctl suspend
-      /usr/bin/slock
       ;;
-    hibernate)    systemctl hibernate ;;
+    hibernate)
+      systemctl hibernate ;;
     reboot)
       zenity --question --text "Are you sure?" \
         && systemctl reboot ;;

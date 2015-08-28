@@ -1391,7 +1391,8 @@ if 1 " has('eval')
 
   " HAS_SOLARIZED_COLORS?
   elseif ((len($DISPLAY) || len($SSH_CLIENT))
-        \ && ($TERM =~ 'rxvt'
+        \ && (len($TMUX)
+        \     || $TERM =~ 'rxvt'
         \     || $KONSOLE_PROFILE_NAME =~ 'Solarized.*'
         \     || MyIsGnomeTerminal()))
     let s:use_colorscheme = "solarized"

@@ -19,10 +19,21 @@ X_THEME_VARIANT_CONFIG_FILE=~/.config/x-theme-variant
 # Init once and export the value.
 # This gets used in Vim to auto-set the background, too.
 
-if [ "$1" = "-d" ]; then
-  DEBUG=1
+while [ "${1#-*}" != "$1" ]; do
+  case "$1" in
+    -d ) DEBUG=1 ;;
+    -f ) FORCE=1 ;;
+    -q ) # Query/info.
+      echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
+      echo "Theme in config: $(cat $X_THEME_VARIANT_CONFIG_FILE)."
+      echo "Use 'auto', 'dark' or 'light' to change it."
+      return 0
+      ;;
+    *) echo "Unknown option: $1"; return 1; ;;
+  esac
   shift
-fi
+done
+
 debug() {
   if [ -n "$DEBUG" ]; then
     echo "$(date +%FT%T) [sh-setup-x-theme] $@" >&2
@@ -33,15 +44,8 @@ debug() {
 debug "RUN: $0 $@"
 variant=$1
 
-# Query/info.
-if [ x"$variant" = "x-q" ]; then
-  echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
-  echo "Theme in config: $(cat $X_THEME_VARIANT_CONFIG_FILE)."
-  echo "Use 'auto', 'dark' or 'light' to change it."
-  return 0
-
 # No argument provided: read config/env.
-elif [ -z "$variant" ]; then
+if [ -z "$variant" ]; then
   if [ -f $X_THEME_VARIANT_CONFIG_FILE ]; then
     variant=$(cat $X_THEME_VARIANT_CONFIG_FILE)
     debug "variant from cfg: $variant"
@@ -53,7 +57,8 @@ elif [ -z "$variant" ]; then
   fi
 
 else
-  debug "variant from arg: $variant"
+  FORCE=1
+  debug "(forced) variant from arg: $variant"
 
   # Save given value.
   case $variant in
@@ -93,7 +98,7 @@ if [ -n "$DISPLAY" ] && [ "$USER" != "root" ]; then
   # Set to "auto" by default in ~/.Xresources.
   cur_xrdb_theme="$(xrdb -query|sed -n -E -e '/mythemevariant:\t/ {s/.*:\t//p;q}')"
   debug "cur_xrdb_theme=$cur_xrdb_theme"
-  if [ "$cur_xrdb_theme" != "$variant" ]; then
+  if [ "$FORCE" = 1 ] || [ "$cur_xrdb_theme" != "$variant" ]; then
     if [ "$variant" = dark ]; then
       xrdb -DSOLARIZED_DARK -merge ~/.Xresources
 
@@ -113,6 +118,10 @@ if [ -n "$DISPLAY" ] && [ "$USER" != "root" ]; then
         # [ -n "$TMUX" ] && echo "printf '\033\\'"
       fi
     fi
+
+    debug "Reloading rofi."
+    pkill -HUP rofi || true
+
     echo "mythemevariant: $variant" | xrdb -merge
     echo "Changed X/xrdb theme variant to $variant." >&2
   fi
@@ -127,7 +136,7 @@ else
 fi
 
 # Setup dircolors once.
-if [ "$DIRCOLORS_SETUP" != "$DIRCOLORS_FILE" ]; then
+if [ "$FORCE" = 1 ] || [ "$DIRCOLORS_SETUP" != "$DIRCOLORS_FILE" ]; then
   debug "Setting up DIRCOLORS_FILE=$DIRCOLORS_FILE"
   debug "DIRCOLORS_SETUP=$DIRCOLORS_SETUP"
   if [ -n "$DIRCOLORS_SETUP" ]; then

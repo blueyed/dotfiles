@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Get/print the daytime period ("Night", "Day), possibly from redshift
-# ("Night" / "Day" / "Transition").
+# ("Night" / "Daytime" / "Transition").
 #
 # This defaults to the geoclue provider and falls back to lat/lon (via config
 # file). The result is cached for 10 minutes.

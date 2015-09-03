@@ -1330,6 +1330,12 @@ if 1 " has('eval')
     let variant = a:0 ? a:1 : ""
     if len(variant) && variant != "auto"
       let bg = variant
+    elseif len($TMUX)
+      if system('tmux show-env MY_X_THEME_VARIANT') == "MY_X_THEME_VARIANT=light\n"
+        let bg = 'light'
+      else
+        let bg = 'dark'
+      endif
     else
       " let daytime = system('get-daytime-period')
       let daytime_file = expand('/tmp/redshift-period')

@@ -18,6 +18,11 @@ __pycache__/
 .tmontmp/
 .testmondata
 
+.cache
+.coverage*/
+
+.tox/
+
 # IPython notebooks.
 *.ipynb
 

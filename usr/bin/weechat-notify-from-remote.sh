@@ -95,12 +95,10 @@ trap _trap 0 2 3 15
 # NOTE: sleep in 1 second steps to allow the process to be killed (via trap) when logging out.
 # This is required for it to be restarted anew on re-login for the new gnome-keyring-daemon.
 my_sleep() {
-  set -x
-  i=$(expr $i + 1)
+  i=$(expr $1 + 1)
   while i=$(expr $i - 1); do
     sleep 1
   done
-  set +x
 }
 
 export AUTOSSH_DEBUG=1

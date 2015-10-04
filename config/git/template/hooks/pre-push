@@ -57,18 +57,21 @@ while read local_ref local_sha remote_ref remote_sha; do
 
   # Check for the bad log pattern.
   log_cmd="git log --grep $BAD_LOG_PATTERN --color=always $log_arg"
-  log="$($log_cmd)"
+  log="$($log_cmd 2>&1)"
   log_ret=$?
   if [ "$log_ret" != 0 ]; then
-    echo "ERROR: git-log failed (non-fast-forward / forced push?)"
-    echo "  cmd: $log_cmd"
+    echo 'ERROR (pre-push hook)!' >&2
+    echo 'git-log failed (non-fast-forward / forced push?)' >&2
+    echo "cmd: $log_cmd" >&2
+    echo "log: $log" >&2
     ret=1
   fi
   if [ -n "$log" ]; then
-    echo "ERROR (pre-push): there are commits with a bad pattern ($BAD_LOG_PATTERN)!"
-    echo "       local_ref: $local_ref => remote_ref: $remote_ref"
-    debug "git-log argument: $log_arg"
-    echo "$log" | sed 's/^/  /'
+    echo 'ERROR (pre-push hook)!' >&2
+    echo "There are commits with a bad pattern ($BAD_LOG_PATTERN)!" >&2
+    echo "        local_ref: $local_ref => remote_ref: $remote_ref" >&2
+    debug "git-log argument: $log_arg" >&2
+    echo "$log" | sed 's/^/  /' >&2
     ret=1
   fi
 done

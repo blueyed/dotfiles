@@ -1903,6 +1903,7 @@ fun! MyGetNonDefaultServername()
   if len(sname)
     if has('nvim')
       if sname !~# '^/tmp/nvim'
+        let sname = substitute(fnamemodify(v:servername, ':t:r'), '^nvim-', '', '')
         return sname
       endif
     elseif sname !~# '\v^GVIM.*' " && sname =~# '\v^G\d*$'

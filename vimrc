@@ -1915,8 +1915,14 @@ endfun
 
 fun! MyGetSessionName()
   " Use / auto-set g:MySessionName
-  if (!exists("g:MySessionName") || !len(g:MySessionName)) && exists('v:this_session')
-    let g:MySessionName = fnamemodify(v:this_session, ':t:r')
+  if !exists("g:MySessionName")
+    if len(get(v:, 'this_session'))
+      let g:MySessionName = fnamemodify(v:this_session, ':t:r')
+    elseif len($TERM_INSTANCE_NAME)
+      let g:MySessionName = substitute($TERM_INSTANCE_NAME, '^vim-', '', '')
+    else
+      let g:MySessionName = ''
+    end
   endif
   return g:MySessionName
 endfun

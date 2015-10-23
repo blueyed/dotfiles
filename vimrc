@@ -1985,17 +1985,6 @@ fun! MySetupTitleString()
     endif
   endif
 
-  " Make Vim set the window title according to &titlestring.
-  if !has('gui_running') && empty(&t_ts)
-    if len($TMUX)
-      let &t_ts = "\e]2;"
-      let &t_fs = "\007"
-    elseif &term =~ "^screen.*"
-      let &t_ts="\ek"
-      let &t_fs="\e\\"
-    endif
-  endif
-
   " Set icon text according to &titlestring (used for minimized windows).
   let &iconstring = '(v) '.&titlestring
 endfun
@@ -2005,6 +1994,17 @@ augroup vimrc_title
   " XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
   autocmd BufEnter * call MySetupTitleString()
 augroup END
+
+" Make Vim set the window title according to &titlestring.
+if !has('gui_running') && empty(&t_ts)
+  if len($TMUX)
+    let &t_ts = "\e]2;"
+    let &t_fs = "\007"
+  elseif &term =~ "^screen.*"
+    let &t_ts="\ek"
+    let &t_fs="\e\\"
+  endif
+endif
 
 
 fun! MySetSessionName(name)

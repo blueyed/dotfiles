@@ -1,0 +1,52 @@
+#!/bin/sh
+export MOSH_TITLE_NOPREFIX=1
+
+export AUTOSSH_DEBUG=1
+export AUTOSSH_LOGFILE=/tmp/autossh-wchat.log
+
+if command -v envoy 2>&1 >/dev/null; then
+  eval "$(envoy -p)"
+fi
+
+# set -x
+# exec 2>/tmp/debug.log
+
+REMOTE="$(dotfiles-decrypt U2FsdGVkX1+Ov6RrOd4LbIh/x30bcWksTykyxtuDo/YiNJIHwD+qUObkQooofxJZ)"
+if [ -z "$REMOTE" ]; then
+  echo "Could not decrypt remote." >&2
+  exit 1
+fi
+REMOTE_CMD='~/bin/weechat'
+
+# NOTE: I have DESKTOP_SESSION=awesome-gnome-dev for awesome (set via xsession desktop file).
+if [ "$TERM" != linux ] && [ -n "$DESKTOP_SESSION" ] && [ $DESKTOP_SESSION = ${DESKTOP_SESSION#awesome*} ]; then
+  if pgrep -f $REMOTE_CMD; then
+    if [ "$DESKTOP_SESSION" = 'i3' ]; then
+      i3-msg '[title="weechat:0"] focus'
+    else
+      wmctrl -a 'weechat:0'
+    fi
+    exit
+  fi
+fi
+
+# Ask for key, if there is none in the keyring (uses ssh-askpass-gnome).
+if ! ssh-add -l > /dev/null 2>&1; then
+  ssh-add
+fi
+
+# NOTE: mosh and urxvt have problems with pasting special unicode symbols, e.g. 🐍 (<0001f40d>).
+
+# Start new instance.
+# if command -v mosh >/dev/null 2>&1; then
+# 	c="mosh --ssh='ssh -AX -tt' "$REMOTE" -- sh -c $REMOTE_CMD"
+# else
+c="autossh -AX -t "$REMOTE" $REMOTE_CMD"
+# fi
+
+if [ -z "$TERM" ]; then
+  urxvt -n weechat -icon /usr/share/icons/./Neu/scalable/apps/internet-group-chat.svg \
+    -e sh -c "$c"
+else
+  sh -c "$c"
+fi

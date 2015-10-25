@@ -1,1 +1,0 @@
-oh-my-zsh/zlogin

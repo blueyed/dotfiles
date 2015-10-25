@@ -84,7 +84,7 @@ case $variant in
     elif [ -n "$dt_period" ]; then
       variant=dark
     else
-      echo "get-daytime-period failed."
+      echo "get-daytime-period failed." >&2
     fi
     debug "=> variant: $variant"
     ;;

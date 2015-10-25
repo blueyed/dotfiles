@@ -3,16 +3,16 @@
 # Get/print the daytime period ("Night", "Day), possibly from redshift
 # ("Night" / "Daytime" / "Transition").
 #
-# This defaults to the geoclue provider and falls back to lat/lon (via config
-# file). The result is cached for 10 minutes.
+# This uses DEFAULT_LATLON by default, because the geoclue provider is too
+# fragile.  The result is cached for 10 minutes.
 
 is_remote() {
   [ -n "$SSH_CLIENT" ] && return
   # Container in OpenVZ?
   [ -r /proc/user_beancounters ] && ! [ -d /proc/bc ]
 }
-
 is_remote && USE_REDSHIFT=0 || USE_REDSHIFT=1
+
 # Do not use geoclue by default, too slow and fragile.
 # TODO: provide a method to easily update the latlonfile.
 USE_GEOCLUE=0
@@ -25,7 +25,6 @@ if [ "$USE_REDSHIFT" = 1 ] && ! hash redshift 2> /dev/null; then
 fi
 
 cachefile=/tmp/redshift-period
-latlonfile=~/.config/redshift-latlon-default
 ok_to_cache=1
 
 get_period_by_hour() {
@@ -67,11 +66,14 @@ if [ "$USE_GEOCLUE" = 1 ]; then
 fi
 
 if [ -z "$period" ]; then
-  if [ ! -e $latlonfile ]; then
-    echo "ERROR: latlonfile ($latlonfile) does not exist." >&2
+  # Default lat/lon when geoclue is not used.
+  DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX1/NlLsWEdS8MY8mX9OfGm1wVjRO1EvpjjIXPyxP4wrZx3EqFSIna4Gl)"
+
+  if [ -z "$DEFAULT_LATLON" ]; then
+    echo "ERROR: $(basename $0): DEFAULT_LATLON is not defined." >&2
     exit 1
   fi
-  period=$(redshift -l $(cat $latlonfile) -p | grep "^Period")
+  period=$(redshift -l "$DEFAULT_LATLON" -p | grep "^Period")
 fi
 
 if [ -z "$period" ]; then

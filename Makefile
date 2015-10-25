@@ -1,4 +1,4 @@
-INSTALL_FILES := ackrc agignore aptitude/config autojump \
+INSTALL_FILES := ackrc agignore aptitude/config \
 	$(wildcard bazaar/plugins/*) \
 	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
@@ -25,6 +25,7 @@ install: install_files_before_sm init_submodules install_files_after_sm
 migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.20
 migrate: .stamps/neobundle.1
 migrate: .stamps/remove-byobu
+migrate: .stamps/remove-autojump
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -57,6 +58,10 @@ migrate: .stamps/remove-byobu
 .stamps/remove-byobu:
 	@echo "== byobu has been removed =="
 	@echo "You should 'rm ~/.byobu -rf' manually."
+	touch $@
+.stamps/remove-autojump:
+	@echo "== autojump has been removed =="
+	@echo "You should 'rm ~/.autojump ~/.local/share/autojump -rf' manually."
 	touch $@
 
 # Target to install a copy of .dotfiles, where Git is not available

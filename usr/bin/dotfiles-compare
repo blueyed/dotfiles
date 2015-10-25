@@ -17,7 +17,7 @@ done
 
 # dirs
 for i in ~/.*(/) ~/*(/); do
-	if [[ ${i:t} == "autojump" ]] || [[ ${i:t} == ".config" ]]; then
+	if [[ ${i:t} == ".config" ]]; then
 		continue
 	fi
 

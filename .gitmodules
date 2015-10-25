@@ -2,10 +2,6 @@
 	path = oh-my-zsh
 	url = git://github.com/blueyed/oh-my-zsh.git
 	ignore = untracked
-[submodule "autojump"]
-	path = autojump
-	url = git://github.com/joelthelion/autojump.git
-	ignore = untracked
 [submodule "lib/LS_COLORS"]
 	path = lib/LS_COLORS
 	url = git://github.com/trapd00r/LS_COLORS.git

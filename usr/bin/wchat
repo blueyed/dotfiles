@@ -41,13 +41,17 @@ fi
 # if command -v mosh >/dev/null 2>&1; then
 # 	c="mosh --ssh='ssh -AX -tt' "$REMOTE" -- sh -c $REMOTE_CMD"
 # else
-c="ssh -AX -t $REMOTE $REMOTE_CMD"
+c="ssh -AX -tt $REMOTE '$REMOTE_CMD'"
 if command -v autossh >/dev/null; then
+  # This is required to be set with Arch's / upstream(?) autossh.  Disable it for now.
+  # Debian/Ubuntu has a patch in that area, which seems to make this optional.
+  export AUTOSSH_PORT=0
   c="auto$c"
 fi
 # fi
 
-if [ -z "$TERM" ]; then
+# If not running in a terminal, or for TERM=dumb (with awesome's run prompt in Arch Linux).
+if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
   urxvt -n weechat -icon /usr/share/icons/./Neu/scalable/apps/internet-group-chat.svg \
     -e sh -c "$c"
 else

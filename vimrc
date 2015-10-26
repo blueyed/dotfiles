@@ -1497,6 +1497,7 @@ if has("autocmd") " Autocommands {{{1
     let &shm=sshm
 
     call AutojumpLastPosition()
+    unlet! b:git_dir
     call fugitive#detect(resolvedfile)
 
     if &modifiable

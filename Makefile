@@ -6,7 +6,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	pentadactylrc railsrc \
 	sackrc screenrc screenrc.common subversion/servers \
 	terminfo tigrc tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
-	xsessionrc \
+	xprofile \
 	config/mc/ini \
 	config/gnome-session/sessions \
 	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
@@ -26,6 +26,7 @@ migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_r
 migrate: .stamps/neobundle.1
 migrate: .stamps/remove-byobu
 migrate: .stamps/remove-autojump
+migrate: .stamps/rename-xsessionrc-xprofile
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:
@@ -62,6 +63,10 @@ migrate: .stamps/remove-autojump
 .stamps/remove-autojump:
 	@echo "== autojump has been removed =="
 	@echo "You should 'rm ~/.autojump ~/.local/share/autojump -rf' manually."
+	touch $@
+.stamps/remove-autojump:
+	@echo "== .xsessionrc has been moved to .xprofile =="
+	@echo "You should 'rm -i ~/.xsessionrc manually."
 	touch $@
 
 # Target to install a copy of .dotfiles, where Git is not available

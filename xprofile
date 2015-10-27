@@ -1,3 +1,5 @@
+# Setup user profile for X sessions.
+
 # Setup X theme variant (light/dark).
 sh_setup_x_theme="$(~/.dotfiles/usr/bin/sh-setup-x-theme "")"
 eval "$sh_setup_x_theme"
@@ -11,3 +13,5 @@ unset MY_X_THEME_VARIANT
 # xcape -e 'Caps_Lock=Escape'
 # xcape -e 'Shift_L=Escape;Control_L=Control_L|O'
 xcape -e 'Caps_Lock=Escape;Control_L=Control_L|O'
+
+# vim:ft=sh

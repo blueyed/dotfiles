@@ -6,20 +6,24 @@
 # When used as default browser, it will prefer a running instance of Chrome
 # instead of launching Firefox (default).
 
-browsers="firefox chromium google-chrome-stable google-chrome /opt/google/chrome/chrome"
 default=firefox
+browsers="$default chromium google-chrome-stable google-chrome /opt/google/chrome/chrome"
 
 for browser in $browsers; do
   if pgrep -f -n $browser > /dev/null ; then
     if [ "$browser" = firefox ]; then
       # Indicate to awesome that the client window should get raised and jumped to.
-      # echo $(pgrep -fn firefox) > /tmp/.awesome-raise-next-client
+      echo "Firefox $(date +%s)" > /tmp/.awesome-raise-next-client
 
-      # continue any stopped processed (sigstop-if-not-focused)
+      # Continue any stopped processed (via sigstop-if-not-focused).
       pkill -CONT firefox
     fi
-    exec $browser "$@"
-    exit
+    $browser "$@" &
+
+    if [ -n "$DESKTOP_STARTUP_ID" ] && type -p awesome-client >/dev/null; then
+      echo "awesome.emit_signal('spawn::completed', {id='$DESKTOP_STARTUP_ID'})" | awesome-client
+    fi
+    exit 0
   fi
 done
 

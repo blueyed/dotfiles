@@ -1,37 +1,10 @@
-# ~/.profile: executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
-# exists.
-# see /usr/share/doc/bash/examples/startup-files for examples.
-# the files are located in the bash-doc package.
+# ~/.profile: sourced by login shells and display managers.
 
-# This gets executed for i3wm, via gnome-session.
-
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-#umask 022
-
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-      . "$HOME/.bashrc"
-    fi
-fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-# Add ~/.dotfiles/usr/bin
-if [ -d "$HOME/.dotfiles/usr/bin" ] ; then
-    PATH="$HOME/.dotfiles/usr/bin:$PATH"
-fi
-
+# Adjust PATH.
 # For pipsi:
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
+[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
+[ -d "$HOME/.dotfiles/usr/bin" ] && PATH="$HOME/.dotfiles/usr/bin:$PATH"
+[ -d "$HOME/bin" ] && PATH="$HOME/bin:$PATH"
 
 # Setup minimal pyenv environemt, to make it available for e.g. firefox started from awesome, calling gvim.
 # Also done in ~/.zshenv.
@@ -51,6 +24,23 @@ fi
 
 # Enable core files (if apport ignores the crash, e.g. for Vim).
 # 1048576 blocks =~ 512mb
-ulimit -c 1048576
+# NOTE: controlled via /etc/security/limits.conf ?! (2015-05-05).
+# ulimit -c 1048576
 
-if [ -e /home/daniel/.nix-profile/etc/profile.d/nix.sh ]; then . /home/daniel/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+# Disable XON/XOFF flow control; this is required to make C-s work in Vim.
+# NOTE: also in ~/.zshrc, to fix display issues during Vim startup (with
+# subshell/system call).
+stty -ixon 2>/dev/null
+
+# Nix/NixOS.
+# Ref: https://github.com/NixOS/nixpkgs/issues/6698
+# export GTK_PATH="$GTK_PATH:$HOME/.nix-profile/lib/gtk-2.0:/usr/lib/gtk-2.0"
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+
+# For bash as a login-shell, also source ~/.bashrc (skipped then).
+if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then
+  . "$HOME/.bashrc"
+fi
+
+# vim: ft=sh

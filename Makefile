@@ -1,3 +1,9 @@
+# Settings for debugging.
+DRYRUN?=0
+DRYRUN_COND:=$(if $(DRYRUN),echo DRY: ,)
+DEBUG=
+VERBOSE=1
+
 INSTALL_FILES := ackrc agignore aptitude/config \
 	$(wildcard bazaar/plugins/*) \
 	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) \
@@ -11,7 +17,8 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	config/gnome-session/sessions \
 	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
 	$(wildcard local/share/applications/*) \
-	nvim nvimrc
+	nvim nvimrc \
+	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc
@@ -89,18 +96,31 @@ sync_submodules:
 
 ALL_FILES := $(INSTALL_FILES) $(INSTALL_FILES_AFTER_SM)
 
+# Add dirs additionally with trailing slash removed.
+ALL_FILES := $(sort $(ALL_FILES) $(patsubst %/,%,$(ALL_FILES)))
+
 .PHONY: $(ALL_FILES)
 
 install_files_before_sm: $(addprefix ~/.,$(INSTALL_FILES))
 install_files_after_sm: $(addprefix ~/.,$(INSTALL_FILES_AFTER_SM))
 
+define func-install
+$(if $(DEBUG),,@){ test -h $(1) && test -e $(1) && $(if $(VERBOSE),echo "Already installed: $(1)",); } \
+		|| { test -f $(1) && echo "Skipping existing target (file): $(1)"; } \
+		|| { test -d $(1) && echo "Skipping existing target (dir): $(1)"; } \
+		|| { test ! -e "$(2)" && echo "Target does not exist: $(2)" ; } \
+		|| { $(DRYRUN_COND) mkdir -p $(shell dirname $(1)) \
+			&& $(DRYRUN_COND) ln -sfn --relative $(2) $(1) \
+			&& echo "Installed symlink: $(1)" ; }
+endef
+
 # install_files handler: test for (existing) symlinks, skipping existing files/dirs.
-~/.% ~/.local/share/%: %
-	@{ test -h $@ && test -e $@; } \
-		|| { test -f $@ && echo "Skipping existing target (file): $@"; } \
-		|| { test -d $@ && echo "Skipping existing target (dir): $@"; } \
-		|| { test ! -e "${CURDIR}/$<" && echo "Target does not exist: ${CURDIR}/$<" ; } \
-		|| { mkdir -p $(shell dirname $@) && ln -sfn ${CURDIR}/$< $@ && echo "Installed symlink: $@" ; }
+~/.%: %
+	$(call func-install,$@,${CURDIR}/$<)
+
+# Target from the source files.
+$(ALL_FILES):
+	$(call func-install,~/.$@,$@)
 
 diff_files: $(ALL_FILES)
 	@for i in $^ ; do \

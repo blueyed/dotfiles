@@ -8,9 +8,12 @@ vim/.netrwhist
 vim/.VimballRecord
 vim/bundle/_tplugin.vim
 vim/neobundles/
+# Neovim.
+vim/shada
 # ignore for now, gets handled locally:
 vim/spell
 vim/undo
+vim/view
 tags
 __pycache__
 *.pyc

@@ -65,7 +65,7 @@ migrate: .stamps/rename-xsessionrc-xprofile
 	@echo "== autojump has been removed =="
 	@echo "You should 'rm ~/.autojump ~/.local/share/autojump -rf' manually."
 	touch $@
-.stamps/remove-autojump:
+.stamps/rename-xsessionrc-xprofile:
 	@echo "== .xsessionrc has been moved to .xprofile =="
 	@echo "You should 'rm -i ~/.xsessionrc manually."
 	touch $@

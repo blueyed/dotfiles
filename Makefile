@@ -10,7 +10,8 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	config/mc/ini \
 	config/gnome-session/sessions \
 	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
-	$(wildcard local/share/applications/*)
+	$(wildcard local/share/applications/*) \
+	nvim nvimrc
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc

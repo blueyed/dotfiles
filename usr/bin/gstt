@@ -30,15 +30,16 @@ gstt() {
 	for line in ${(f)"$(git status --short "$@")"}; do
 		st=$line[1,2] ; fname=$line[4,-1]
 		# echo -E $line | read -r st fname
-		if [ -e $fname ]; then
+
+		if [ -e $fname ] || [ -h $fname ]; then
 			# TODO: quoting
 			# stat: invalid option -- 'v'
 			# Try 'stat --help' for more information.
 			#  ?? -v
 			echo "${$(stat -c %y -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
 		else
-			# deleted
-			echo "                    $st $fname"
+			# unknown/deleted: use git-log for timestamp.
+			echo "${$(git log -1 --pretty=format:%cd --date='format:%Y-%m-%d %H:%M:%S' -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
 		fi
 	done | sort -r
 }

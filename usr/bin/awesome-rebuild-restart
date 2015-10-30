@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -ex
+
+# Prefer using PKGBUILD/makepkg on Arch Linux.
+if [ -d ~/builds/awesome-git ]; then
+  cd ~/builds/awesome-git
+  makepkg -srie
+
+else
+  cd ~/src/awesome
+
+  # Handle migrations of Lua files to modules.
+  sudo rm -r .build-lenny.thequod.de-x86_64-linux-gnu-4.9.2/lib/beautiful* || true
+  sudo rm -r .build-lenny.thequod.de-x86_64-linux-gnu-4.9.2/lib/naughty* || true
+  sudo rm -r /usr/local/share/awesome/lib/beautiful* || true
+  sudo rm -r /usr/local/share/awesome/lib/naughty* || true
+
+  sudo make install
+fi
+
+awesome-restart

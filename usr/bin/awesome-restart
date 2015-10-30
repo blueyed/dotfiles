@@ -1,0 +1,15 @@
+#!/bin/sh
+
+session_pid=$(pgrep --oldest session-run-awesome.sh)
+echo "Signaling session (USR1), PID=${session_pid}."
+if [ -n "$session_pid" ]; then
+  kill -USR1 "$session_pid"
+fi
+
+awesome_pid=$(pgrep --oldest --exact awesome)
+echo "TERMinating awesome: PID=${awesome_pid}."
+if [ -n "$awesome_pid" ]; then
+  kill -TERM "$awesome_pid"
+else
+  echo "No running instance.  Session runner might be sleeping?!"
+fi

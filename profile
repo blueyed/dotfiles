@@ -19,6 +19,8 @@ if [ -d ~/.pyenv ]; then
     if [ -n "$commands[pyenv]" ] ; then
       eval "$($PYENV_ROOT/bin/pyenv init -)"
     fi
+    # Unset PYENV_SHELL=lightdm-session.  It will use $SHELL then by default.
+    unset PYENV_SHELL
   fi
 fi
 

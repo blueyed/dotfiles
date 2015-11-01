@@ -39,7 +39,7 @@ gstt() {
 			echo "${$(stat -c %y -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
 		else
 			# unknown/deleted: use git-log for timestamp.
-			echo "${$(git log -1 --pretty=format:%cd --date='format:%Y-%m-%d %H:%M:%S' -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
+			echo "${$(git log -1 --pretty=format:%cd --date=iso -- ${(q-)fname})[1,19]} $st ${(q-)fname}"
 		fi
 	done | sort -r
 }

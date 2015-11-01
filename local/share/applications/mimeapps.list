@@ -1,0 +1,6 @@
+[Default Applications]
+x-scheme-handler/http=open-in-running-browser.desktop
+x-scheme-handler/https=open-in-running-browser.desktop
+text/html=open-in-running-browser.desktop
+x-scheme-handler/about=open-in-running-browser.desktop
+x-scheme-handler/unknown=open-in-running-browser.desktop

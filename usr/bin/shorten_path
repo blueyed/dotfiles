@@ -4,11 +4,10 @@
 # maintained in ~/.dotfiles/oh-my-zsh/lib/hash_dirs.
 # This also replaces $HOME with ~.
 #
-# This is used from vimrc.
+# This is used from vimrc for ShortenPath.
 
 # Plain sh would be ~4x faster on startup, but with cat/sed etc similar slow/fast,
 # and needs a cache file.
-#!/bin/sh
 
 # Self-tests: run with '--test'. {{{
 tests() {
@@ -56,8 +55,10 @@ if [ -n "$2" ]; then
   cd "$2"
 fi
 
-source ~/.dotfiles/oh-my-zsh/lib/hash_dirs.zsh
-test -f ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh && source ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh
+test -f ~/.dotfiles/oh-my-zsh/lib/hash_dirs.zsh && \
+  source ~/.dotfiles/oh-my-zsh/lib/hash_dirs.zsh
+test -f ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh && \
+  source ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh
 
 # dir=${path:h:a}
 
@@ -71,4 +72,3 @@ fi
 pwd_short=${(D)PWD}/
 path_short=${(D)abs_path}
 printf ${path_short#$pwd_short}
-exit

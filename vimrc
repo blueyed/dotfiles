@@ -1646,7 +1646,19 @@ fun! ShortenPath(path, ...)
   let base = a:0 ? a:1 : ""
   let cache_key = base . ":" . a:path
   if ! exists('s:_cache_shorten_path[cache_key]')
-    let s:_cache_shorten_path[cache_key] = system('shorten_path '.shellescape(a:path).' '.shellescape(base))
+    try
+      let tmpfile = tempname()
+      let s:_cache_shorten_path[cache_key] = system('shorten_path '
+            \ .shellescape(a:path).' '.shellescape(base).' 2>'.tmpfile)
+      if v:shell_error
+        echohl WarningMsg
+        echom "There was a problem running shorten_path: "
+              \ . join(readfile(tmpfile), "\n")
+        echohl None
+      endif
+    finally
+      call delete(tmpfile)
+    endtry
   endif
   return s:_cache_shorten_path[cache_key]
 endfun

@@ -3658,16 +3658,66 @@ endfunc
 
 
 
-" NeoVim {{{
-" Use the Python 2 version YCM was built with.
-" Defining it also skips auto-detecting it (~/Vcs/neovim/runtime/autoload/remote/host.vim)
-if filereadable($PYTHON_YCM)
-  let g:python_host_prog=$PYTHON_YCM
-endif
+" Python setup for NeoVim. {{{
+" Defining it also skips auto-detecting it.
+if has("nvim")
+  " Arch Linux, with python-neovim packages.
+  if len(glob('/usr/lib/python2*/site-packages/neovim/__init__.py', 1))
+    let g:python_host_prog="/usr/bin/python2"
+  endif
+  if len(glob('/usr/lib/python3*/site-packages/neovim/__init__.py', 1))
+    let g:python3_host_prog="/usr/bin/python3"
+  endif
 
-" Avoid loading python3 host.
-let g:UltiSnipsUsePythonVersion = 2
-" }}}
+  fun! s:get_python_from_pyenv(ver)
+    if !len($PYENV_ROOT)
+      return
+    endif
+
+    " XXX: Rather slow.
+    " let ret=system('pyenv which python'.a:ver)
+    " if !v:shell_error && len(ret)
+    "   return ret
+    " endif
+
+    " XXX: should be natural sort and/or look for */lib/python3.5/site-packages/neovim/__init__.py.
+    let files = sort(glob($PYENV_ROOT."/versions/".a:ver.".*/bin/python", 1, 1), "n")
+    if len(files)
+      return files[-1]
+    endif
+    echohl WarningMsg | echomsg "Could not find Python" a:ver "through pyenv!" | echohl None
+  endfun
+
+  if !exists('g:python3_host_prog')
+    " let g:python3_host_prog = "python3"
+    let g:python3_host_prog=s:get_python_from_pyenv(3)
+    if !len('g:python3_host_prog')
+      echohl WarningMsg | echomsg "Could not find python3 for g:python3_host_prog!" | echohl None
+    endif
+  endif
+
+  if !exists('g:python_host_prog')
+    " Use the Python 2 version YCM was built with.
+    if len($PYTHON_YCM) && filereadable($PYTHON_YCM)
+      let g:python_host_prog=$PYTHON_YCM
+
+    " Look for installed Python 2 with pyenv.
+    else
+      let g:python_host_prog=s:get_python_from_pyenv(2)
+    endif
+
+    if !len('g:python_host_prog')
+      echohl WarningMsg | echomsg "Could not find python2 for g:python_host_prog!" | echohl None
+    endif
+  endif
+
+  " Avoid loading python3 host: YCM uses Python2 anyway, so prefer it for
+  " UltiSnips, too.
+  if s:use_ycm && has('nvim') && len(get(g:, 'python_host_prog', ''))
+    let g:UltiSnipsUsePythonVersion = 2
+  endif
+endif  " }}}
+
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local

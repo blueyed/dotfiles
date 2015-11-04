@@ -1506,7 +1506,7 @@ if has("autocmd") " Autocommands {{{1
       echomsg 'Resolved symlink: =>' resolvedfile
     endif
   endfunction
-  command! FollowSymlink call MyFollowSymlink()
+  command! -bar FollowSymlink call MyFollowSymlink()
   command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
   au BufReadPost * nested call MyFollowSymlink(expand('%'))
 
@@ -2477,6 +2477,9 @@ fun! RR(...)
 endfun
 command! RR ProjectRootLCD
 command! RRR ProjectRootCD
+
+" Follow symlink and lcd to root.
+nnoremap <Leader>fr :FollowSymlink <bar> ProjectRootLCD<CR>
 
 " Toggle pattern (typically a char) at the end of line(s). {{{2
 function! MyToggleLastChar(pat)

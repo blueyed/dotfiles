@@ -4,12 +4,14 @@
 dpi=$1
 
 # Build xsettingsd.local
-grep -v '^# ' ~/.xsettingsd > ~/.xsettingsd.local
+if [ -f ~/.xsettingsd ]; then
+    grep -v '^# ' ~/.xsettingsd > ~/.xsettingsd.local
+fi
 
 if [ -z "$dpi" ]; then
     dpi="$(xdpyinfo | awk  '$1 ~ /resolution:/ { print $2 }' | sed 's/x.*//')"
 fi
-echo Xft/DPI $(( $dpi * 1024 )) >> ~/.xsettingsd.local
+echo "Xft/DPI $(( $dpi * 1024 ))" >> ~/.xsettingsd.local
 # echo Gdk/UnscaledDPI $(( $dpi * 1024 )) >> ~/.xsettingsd.local
 
 # Signal xsettingsd
@@ -21,4 +23,4 @@ else
 fi
 
 # Also use xrdb for very old stuff (you know, LibreOffice)
-echo Xft*dpi: $dpi | xrdb -merge
+echo "Xft*dpi: $dpi" | xrdb -merge

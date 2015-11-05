@@ -25,7 +25,8 @@ log() {
 log "Starting... PID: $$"
 
 # Wrap with flock/lockfile
-lockfile=/run/lock/weechat-notify-from-remote.lock
+lockfile=/run/user/$UID/lock/weechat-notify-from-remote.lock
+mkdir -p "$(dirname $lockfile)"
 (flock -n 9 || {
   msg="Running already ($lockfile). Aborting."
   echo $msg
@@ -59,7 +60,7 @@ export XAUTHORITY=/home/$X_USER/.Xauthority
 # User and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
-ssh_extra_config=($(dotfiles-decrypt 'U2FsdGVkX1831ASVSASVEdbccoXHM4T9QzI2Jk0KGvimOGjCKkN90lE2v61SrfCVNNwdQ9Lcr2kKl8k2PUS3lA==')) # remote port forwarding etc
+ssh_extra_config=($(dotfiles-decrypt 'U2FsdGVkX19ZWeHNCQIoWDJge5iF0DvZ3mFKfSsTuKI=')) # remote port forwarding etc
 
 # Make autossh aware of port-forwarding failures, requires AUTOSSH_GATETIME=0.
 # TODO: would be nice to handle missing ssh-agent better (in case you abort the dialog multiple times).
@@ -108,6 +109,7 @@ export AUTOSSH_POLL=600
 export AUTOSSH_PIDFILE=/tmp/weechat-notify-from-remote.autossh.$$.pid
 export AUTOSSH_MAXSTART=1
 export AUTOSSH_GATETIME=0  # for "-o ExitOnForwardFailure=yes"
+export AUTOSSH_PORT=0
 # NOTE: -F required for autossh, otherwise it exits immediately
 tail_cmd="tail -n0 -F .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
 # '-t'/'-tt' is required for ssh killing its child process.

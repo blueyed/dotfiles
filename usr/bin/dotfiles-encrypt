@@ -13,7 +13,7 @@ if ! [ -f $PASSWDFILE ]; then
   PASSWDFILE="$tempfile"
 fi
 
-if [ x$# = x0 ]; then
+if [ x$# = x0 ] && [ -t 0 ]; then
   printf "Input: "
   read input
 else

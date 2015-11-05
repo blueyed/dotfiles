@@ -20,7 +20,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	nvim nvimrc \
 	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
 
-REMOVED_FILES:=pastebinit.xml
+REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc

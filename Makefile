@@ -8,7 +8,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	$(wildcard bazaar/plugins/*) \
 	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
-	hgrc irbrc oh-my-zsh pastebinit.xml pbuilderrc pdbrc pentadactyl \
+	hgrc irbrc oh-my-zsh pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc \
 	sackrc screenrc screenrc.common subversion/servers \
 	terminfo tigrc tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
@@ -19,6 +19,8 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	$(wildcard local/share/applications/*) \
 	nvim nvimrc \
 	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
+
+REMOVED_FILES:=pastebinit.xml
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc
@@ -35,6 +37,15 @@ migrate: .stamps/neobundle.1
 migrate: .stamps/remove-byobu
 migrate: .stamps/remove-autojump
 migrate: .stamps/rename-xsessionrc-xprofile
+migrate: check_removed_files
+check_removed_files:
+	@for i in $(REMOVED_FILES); do \
+		target=~/.$$i; \
+		if [ -L $$target ] && ! [ -f $$target ]; then \
+			echo "NOTE: found obsolete/removed file (dangling symlink): $$target"; \
+		fi \
+	done
+
 .stamps:
 	mkdir -p .stamps
 .stamps/migrate_byobu.2:

@@ -5,6 +5,8 @@
 # This also replaces $HOME with ~.
 #
 # This is used from vimrc for ShortenPath.
+#
+# TODO: relative to $cdpath?!  (see also vim-flagship by tpope)
 
 # Plain sh would be ~4x faster on startup, but with cat/sed etc similar slow/fast,
 # and needs a cache file.

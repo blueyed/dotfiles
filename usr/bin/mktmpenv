@@ -1,4 +1,11 @@
-#!/bin/sh -e
+#!/bin/sh
+
+set -e
+# set -x
+
+# Make sure pyenv and pyenv-virtualenv is setup.
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 if [ -n "$1" ]; then
   pyenv_version="$1"
@@ -17,7 +24,8 @@ echo
 echo "Entering a new shell session with virtualenv '${venv_name}' (${pyenv_version})."
 echo "It will be removed when exiting (ctrl+d or 'exit')."
 
-export PYENV_VERSION="${venv_name}"
+# export PYENV_DEBUG=1
+pyenv activate "$venv_name"
 $SHELL
 
 echo "Destroying temporary virtualenv '${venv_name}'."

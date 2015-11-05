@@ -8,16 +8,21 @@ if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
     basename=$1
   else
-    basename=radioeins
+    basename=radioparadise
   fi
 fi
 
+player="mpg123 --control"
+player_pl="mpg123 --control -@"
+
 case $basename in
+  radioparadise)
+    $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u ;;
   fluxfm )
-    mpg123 --control http://www.fluxfm.de/stream-berlin
-    ;;
+    $player http://www.fluxfm.de/stream-berlin ;;
   radioeins )
-    mpg123 --control -@ http://www.radioeins.de/live.m3u
-    ;;
-  *) echo "Unknown station: $basename"; exit 64
+    $player_pl http://www.radioeins.de/live.m3u ;;
+  *)
+    echo "Unknown station: $basename"
+    exit 64
 esac

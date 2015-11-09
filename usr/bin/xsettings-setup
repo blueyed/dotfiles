@@ -6,6 +6,8 @@ dpi=$1
 # Build xsettingsd.local
 if [ -f ~/.xsettingsd ]; then
     grep -v '^# ' ~/.xsettingsd > ~/.xsettingsd.local
+else
+    > ~/.xsettingsd.local
 fi
 
 if [ -z "$dpi" ]; then

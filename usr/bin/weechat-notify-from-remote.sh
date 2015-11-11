@@ -60,7 +60,7 @@ export XAUTHORITY=/home/$X_USER/.Xauthority
 # User and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
-ssh_extra_config=($(dotfiles-decrypt 'U2FsdGVkX19ZWeHNCQIoWDJge5iF0DvZ3mFKfSsTuKI=')) # remote port forwarding etc
+ssh_extra_config=($(dotfiles-decrypt 'U2FsdGVkX1/b6mo1MxltGbfTDs1xWhXRZEoLa/yx3iI2MaanXf0aKkwrGa0epC8ybDgU03Qc4JjXHz/6Q4U/ZA==')) # remote port forwarding etc
 
 # Make autossh aware of port-forwarding failures, requires AUTOSSH_GATETIME=0.
 # TODO: would be nice to handle missing ssh-agent better (in case you abort the dialog multiple times).

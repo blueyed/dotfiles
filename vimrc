@@ -413,6 +413,9 @@ if 1 " has('eval') / `let` may not be available.
             \ ['MarcWeber/vim-addon-errorformats', { 'directory': 'errorformats' }],
             \ ]}
 
+      MyNeoBundleLazy 'szw/vim-maximizer'
+            \ , {'autoload': {'commands': 'MaximizerToggle'}}
+
       " Colorschemes.
       " MyNeoBundle 'vim-scripts/Atom',             '', 'colors', { 'name': 'colorscheme-atom' }
       " MyNeoBundle 'chriskempson/base16-vim',      '', 'colors', { 'name': 'colorscheme-base16' }
@@ -3103,6 +3106,11 @@ nnoremap <leader>ept :call MyEditConfig(ProjectRootGet().'/TODO')<cr>
 " Open URL
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
+
+" Remap CTRL-W_ using vim-maximizer (smarter and toggles).
+nnoremap <silent><c-w>_ :MaximizerToggle<CR>
+vnoremap <silent><F3> :MaximizerToggle<CR>gv
+inoremap <silent><F3> <C-o>:MaximizerToggle<CR>
 
 
 " vimdiff current vs git head (fugitive extension) {{{2

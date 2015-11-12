@@ -469,7 +469,6 @@ if 1 " has('eval') / `let` may not be available.
 
       " Manual bundles.
       MyNeoBundle 'eclim', '', 'manual'
-      MyNeoBundleNoLazyForDefault 'zoomwin', '', 'manual', { 'directory': 'zoomwin.vba' }
 
       " MyNeoBundle 'neobundle', '', 'manual'
       " NeoBundleFetch "Shougo/neobundle.vim", {
@@ -3105,9 +3104,6 @@ nnoremap <leader>ept :call MyEditConfig(ProjectRootGet().'/TODO')<cr>
 nmap <leader>gw <Plug>(openbrowser-smart-search)
 vmap <leader>gw <Plug>(openbrowser-smart-search)
 
-" Remap CTRL-W_ using maximize.vim (smarter and toggles).
-" NOTE: using `Ctrl-W o` currently mainly (via ZoomWin).
-" map <c-w>_ :MaximizeWindow<cr>
 
 " vimdiff current vs git head (fugitive extension) {{{2
 " Close any corresponding fugitive diff buffer.

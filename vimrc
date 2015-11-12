@@ -1585,6 +1585,8 @@ if has("autocmd") " Autocommands {{{1
   au FileType c call Select_c_style()
   au FileType make setlocal noexpandtab
 
+  " Disable highlighting of markdownError (Ref: https://github.com/tpope/vim-markdown/issues/79).
+  autocmd FileType markdown hi link markdownError NONE
   augroup END
 
   " Trailing whitespace highlighting {{{2

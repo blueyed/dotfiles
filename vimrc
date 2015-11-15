@@ -1,5 +1,7 @@
 set nocompatible " This must be first, because it changes other options as a side effect.
 
+scriptencoding utf-8
+
 " Profiling. {{{
 if 1
 fun! ProfileStart()

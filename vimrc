@@ -1773,14 +1773,21 @@ endfun
 " it (ref: https://github.com/bling/vim-airline/issues/658#issuecomment-64650886). {{{
 if &rtp =~ '\<airline\>'
   " NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
+  fun! s:my_airline_clear_cache_file()
+    if exists('b:my_airline_file_cache')
+          \ && (!exists('b:my_airline_file_cache_key') || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
+      let b:my_airline_file_cache_key = bufname('%').&modified.&ft
+      unlet! b:my_airline_file_cache
+    endif
+  endfun
   augroup vimrc_airline
     au!
-    au BufWritePost,BufEnter,CursorHold,InsertLeave,TextChanged,TextChangedI,FileChangedShellPost *
-          \ if exists('b:my_airline_file_cache')
-          \ && (!exists('b:my_airline_file_cache_key') || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
-          \ | let b:my_airline_file_cache_key = bufname('%').&modified.&ft
-          \ | unlet! b:my_airline_file_cache
-          \ | endif
+    " Invalidate cache on certain events.  TextChanged* might not exist in older Vim.
+    let s:autocmd = 'BufWritePost,BufEnter,CursorHold,InsertLeave,FileChangedShellPost'
+    if exists('#TextChanded')
+      let s:autocmd .= ",TextChanged,TextChangedI"
+    endif
+    exec 'au' s:autocmd '* call s:my_airline_clear_cache_file()'
   augroup END
   fun! ShortenFilenameForAirline()
     if exists('b:my_airline_file_cache')

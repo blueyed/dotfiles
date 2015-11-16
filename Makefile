@@ -17,7 +17,6 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	config/gnome-session/sessions \
 	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
 	$(wildcard local/share/applications/*) \
-	nvim nvimrc \
 	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
 
 REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf

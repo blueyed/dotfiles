@@ -104,6 +104,9 @@ if 1 " has('eval') / `let` may not be available.
       let g:neobundle#cache_file = s:vim_cache . '/neobundle.cache'
     endif
 
+    " Before NeoBundleCheck.
+    filetype plugin indent on
+
     if neobundle#load_cache($MYVIMRC)
       " NeoBundles list - here be dragons! {{{
       fun! MyNeoBundleWrapper(cmd_args, default, light)
@@ -489,9 +492,6 @@ if 1 " has('eval') / `let` may not be available.
 
     " Use shallow copies by default.
     let g:neobundle#types#git#clone_depth = 10
-
-    " Before NeoBundleCheck.
-    filetype plugin indent on
 
     NeoBundleCheck
 
@@ -1281,8 +1281,6 @@ if has("user_commands")
   " endfunction
   " au VimEnter * call AirlineInit()
 
-  filetype plugin indent on
-
   " jedi-vim (besides YCM with jedi library) {{{1
   " let g:jedi#force_py_version = 3
   let g:jedi#auto_vim_configuration = 0
@@ -1441,12 +1439,6 @@ endif
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd") " Autocommands {{{1
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
-
   " Put these in an autocmd group, so that we can delete them easily.
   augroup vimrcEx
   au!

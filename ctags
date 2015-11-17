@@ -1,0 +1,19 @@
+--fields=+l
+--c-kinds=+p
+--c++-kinds=+p
+--python-kinds=-iv
+--langmap=php:.engine.inc.module.theme.install.php.php3.php4.php5.phtml
+--langmap=sh:+(zshrc).zsh-theme
+--langmap=vim:+.vader
+--exclude=.tox
+--exclude=build
+--languages=-json
+
+# Look for shebangs/modelines.
+--guess-language-eagerly
+
+# Nix; source: https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/misc/ctags/wrapped.nix
+--langdef=NIX
+--langmap=NIX:.nix
+--regex-NIX=/(\S+)\s*=.*:/\1/f/
+--regex-NIX=/^\s*(\S+)\s*=/\1/v/

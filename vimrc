@@ -909,20 +909,24 @@ if 1 " has('eval') / `let` may not be available.
   "       \ "type":  "style",
   "       \ "regex": '\m\[C03\d\d\]',
   "       \ "file":  ['\m^/usr/include/', '\m\c\.h$'] }
-  let g:syntastic_quiet_messages = { "level": [], 'type': ['style'] }
+  let g:syntastic_quiet_messages = { "level": [], "type": ["style"] }
 
-  fun! SyntasticToggleQuiet(k, v)
-    let idx = index(g:syntastic_quiet_messages[a:k], a:v)
+  fun! SyntasticToggleQuiet(k, v, scope)
+    let varname = a:scope."syntastic_quiet_messages"
+    if !exists(varname) | exec 'let '.varname.' = { "level": [], "type": ["style"] }' | endif
+    exec 'let idx = index('.varname.'[a:k], a:v)'
     if idx == -1
-      call add(g:syntastic_quiet_messages[a:k], a:v)
+      exec 'call add('.varname.'[a:k], a:v)'
       echom 'Syntastic: '.a:k.':'.a:v.' disabled (filtered).'
     else
-      call remove(g:syntastic_quiet_messages[a:k], idx)
+      exec 'call remove('.varname.'[a:k], idx)'
       echom 'Syntastic: '.a:k.':'.a:v.' enabled (not filtered).'
     endif
   endfun
-  command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings')
-  command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style')
+  command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings', "g:")
+  command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style', "g:")
+  command! SyntasticToggleWarningsBuffer call SyntasticToggleQuiet('level', 'warnings', "b:")
+  command! SyntasticToggleStyleBuffer    call SyntasticToggleQuiet('type', 'style', "b:")
 
   fun! MySyntasticCheckAll()
     let save = g:syntastic_quiet_messages

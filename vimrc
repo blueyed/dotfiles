@@ -898,9 +898,7 @@ if 1 " has('eval') / `let` may not be available.
   let g:syntastic_error_symbol='✗'
   let g:syntastic_warning_symbol='⚠'
   let g:syntastic_aggregate_errors = 0
-  " let g:syntastic_python_python_exe = 'python3'
-  " let g:syntastic_python_checkers = ['pyflakes', 'flake8', 'pep8', 'pylint', 'python']
-  let g:syntastic_python_checkers = ['python', 'frosted', 'flake8']
+  let g:syntastic_python_checkers = ['python', 'frosted', 'flake8', 'pep8']
 
   " let g:syntastic_php_checkers = ['php']
   let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight

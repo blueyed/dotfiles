@@ -73,4 +73,5 @@ fi
 
 pwd_short=${(D)PWD}/
 path_short=${(D)abs_path}
-printf ${path_short#$pwd_short}
+# NOTE: "(Q)" is required to remove escaping of e.g. "[" from the name.
+printf "${(Q)${path_short#$pwd_short}}"

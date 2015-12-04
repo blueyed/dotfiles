@@ -203,7 +203,6 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'zhaocai/GoldenView.Vim'
       MyNeoBundle 'google/maktaba'
       MyNeoBundle 'blueyed/grep.vim'
-      MyNeoBundle 'sjl/gundo.vim'
       MyNeoBundle 'mbbill/undotree', {
             \ 'autoload': {'command_prefix': 'Undotree'}}
       MyNeoBundle 'tpope/vim-haml'
@@ -2944,11 +2943,10 @@ fun! MyF5()
   if &diff
     diffupdate
   else
-    GundoToggle
+    e
   endif
 endfun
 noremap <F5> :call MyF5()<cr>
-noremap <Leader>u :GundoToggle<cr>
 " noremap <F11> :YRShow<cr>
 " if has('gui_running')
 "   map <silent> <F11> :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>

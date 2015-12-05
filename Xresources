@@ -1,5 +1,31 @@
 ! Xft.dpi: 93
 
+! Used in ~/.dotfiles/usr/bin/sh-setup-x-theme, and the solarized theme for
+! awesomeWM.
+! Not set by default, otherwise it would get reset with automatic sourcing of
+! the file, e.g. through /etc/lightdm/Xsession.
+! mythemevariant: dark/light
+
+! Solarized colorscheme variants. {{{
+! No default, otherwise this overrides ~/.xprofile (with LightDM on Arch).
+#if defined(SOLARIZED_LIGHT) || defined(SOLARIZED_DARK)
+#ifdef SOLARIZED_DARK
+#include ".dotfiles/lib/base16/base16-solarized.dark.256.xresources"
+#endif
+#ifdef SOLARIZED_LIGHT
+#include ".dotfiles/lib/base16/base16-solarized.light.256.xresources"
+#endif
+
+! Switch between light/dark!
+! (not in there: fadeColor, pointerColorBackground)
+URxvt.keysym.M-C-8: command:\033]11;#fdf6e3\007\033]10;#657b83\007\033]12;#586e75\007\033]13;#586e75\007\033]708;#fdf6e3\007
+URxvt.keysym.M-C-9: command:\033]11;#002b36\007\033]10;#839496\007\033]12;#93a1a1\007\033]13;#93a1a1\007\033]708;#002b36\007
+#endif
+
+! URxvt*keysym.Mod4-i: command:\033]49;[100]#1D1F21\007
+! URxvt*keysym.Mod4-I: command:\033]49;[70]#1D1F21\007
+! }}}
+
 ! source: https://wiki.archlinux.de/title/Urxvt#Konfiguration
 URxvt.saveLines: 8192
 URxvt.scrollBar: false
@@ -79,43 +105,6 @@ URxvt.cutchars: "()*,<>[]{}|«»"
 ! URxvt.color7:       #e1dddd
 ! URxvt.color15:      #e1dddd
 ! }}}
-
-! Solarized colorscheme: light by default, gets adjusted via zsh theme.
-
-#if !defined(SOLARIZED_LIGHT) && !defined(SOLARIZED_DARK)
-#define SOLARIZED_LIGHT
-#elif defined(SOLARIZED_LIGHT) && defined(SOLARIZED_DARK)
-#undef SOLARIZED_DARK
-#endif
-
-#ifdef SOLARIZED_DARK
-#include ".dotfiles/lib/solarized-xresources/Xresources.dark"
-#else
-#include ".dotfiles/lib/solarized-xresources/Xresources.light"
-#endif
-
-! light
-*solarizedlight.background:            S_base3
-*solarizedlight.borderColor:           S_base3
-*solarizedlight.foreground:            S_base00
-*solarizedlight.fadeColor:             S_base3
-*solarizedlight.cursorColor:           S_base01
-*solarizedlight.pointerColorBackground:S_base1
-*solarizedlight.pointerColorForeground:S_base01
-
-! dark
-*solarizeddark.background:            S_base03
-*solarizeddark.borderColor:           S_base03
-*solarizeddark.foreground:            S_base0
-*solarizeddark.fadeColor:             S_base03
-*solarizeddark.cursorColor:           S_base1
-*solarizeddark.pointerColorBackground:S_base01
-*solarizeddark.pointerColorForeground:S_base1
-
-! Switch between light/dark!
-! (not in there: fadeColor, pointerColorBackground)
-URxvt.keysym.M-C-0: command:\033]11;S_base3\007\033]10;S_base00\007\033]12;S_base01\007\033]13;S_base01\007\033]708;S_base3\007
-URxvt.keysym.M-C-9: command:\033]11;S_base03\007\033]10;S_base0\007\033]12;S_base1\007\033]13;S_base1\007\033]708;S_base03\007
 
 
 ! Hack to act more like XTerm.

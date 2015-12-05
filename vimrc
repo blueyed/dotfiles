@@ -1381,6 +1381,7 @@ if 1 " has('eval')
   let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
 
   " Use corresponding theme from $BASE16_SCHEME, if set up in the shell.
+  " BASE16_SCHEME should be in sudoer's env_keep for "sudo vi".
   if len($BASE16_SCHEME)
     let base16colorspace=256
     if $BASE16_SCHEME =~ '^solarized'
@@ -1395,14 +1396,6 @@ if 1 " has('eval')
     let s:use_colorscheme = "solarized"
     let g:solarized_termcolors=256
 
-  " HAS_SOLARIZED_COLORS?
-  elseif ((len($DISPLAY) || len($SSH_CLIENT))
-        \ && (len($TMUX)
-        \     || $TERM =~ 'rxvt'
-        \     || $KONSOLE_PROFILE_NAME =~ 'Solarized.*'
-        \     || MyIsGnomeTerminal()))
-    let s:use_colorscheme = "solarized"
-    let g:solarized_termcolors=16
   else
     " Check for dumb terminal.
     if ($TERM !~ '256color' )

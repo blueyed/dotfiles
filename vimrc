@@ -1358,9 +1358,6 @@ if 1 " has('eval')
     endif
   endfun
   command! Autobg call SetBgAccordingToShell()
-  if has('vim_starting')
-    call SetBgAccordingToShell($MY_X_THEME_VARIANT)
-  endif
 
   fun! ToggleBg()
     let &bg = &bg == 'dark' ? 'light' : 'dark'
@@ -1386,12 +1383,13 @@ if 1 " has('eval')
   " Use corresponding theme from $BASE16_SCHEME, if set up in the shell.
   if len($BASE16_SCHEME)
     let base16colorspace=256
-    if match($BASE16_SCHEME, '\.dark$') != -1
-      set bg=dark
+    if $BASE16_SCHEME =~ '^solarized'
+      let s:use_colorscheme = 'solarized'
+      let g:solarized_base16=1
+      let g:airline_theme = 'base16'
     else
-      set bg=light
+      let s:use_colorscheme = 'base16-'.substitute($BASE16_SCHEME, '\.\(dark\|light\)$', '', '')
     endif
-    let s:use_colorscheme = 'base16-'.substitute($BASE16_SCHEME, '\.\(dark\|light\)$', '', '')
 
   elseif has('gui_running')
     let s:use_colorscheme = "solarized"
@@ -1430,6 +1428,10 @@ if 1 " has('eval')
       echom "Failed to load colorscheme: " v:exception
     endtry
   endfun
+
+  if has('vim_starting')
+    call SetBgAccordingToShell($MY_X_THEME_VARIANT)
+  endif
 
   if has('gui_running')
     au GUIEnter * nested call s:MySetColorscheme()

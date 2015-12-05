@@ -159,3 +159,21 @@ if [ -n "$TMUX" ]; then
     "set-environment MY_X_THEME_VARIANT $variant; \
       source-file ~/.tmux.conf; display 'Reloaded tmux.'" >/dev/null
 fi
+
+if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_SCHEME" ]; then
+  # Setup base16-shell.
+  BASE16_SHELL_DIR=~/.dotfiles/lib/base16/base16-shell
+  if [ -d "$BASE16_SHELL_DIR" ]; then
+    echo "export BASE16_SCHEME=solarized.$variant"
+    base16_scheme_file=$BASE16_SHELL_DIR/base16-solarized.${variant}.sh
+    [[ -s $base16_scheme_file ]] && echo "source $base16_scheme_file" || {
+      echo "$base16_scheme_file does not exist." >&2
+    }
+  fi
+
+  if [ -n "$MY_X_THEME_VARIANT" ]; then
+    # Reload ZSH theme conditionally.
+    echo "sh-setup-x-theme: reloading zsh.." >&2
+    echo "command -v reloadzsh > /dev/null && reloadzsh"
+  fi
+fi

@@ -16,23 +16,9 @@
 
 X_THEME_VARIANT_CONFIG_FILE=~/.config/x-theme-variant
 
-# Init once and export the value.
-# This gets used in Vim to auto-set the background, too.
-
-while [ "${1#-*}" != "$1" ]; do
-  case "$1" in
-    -d ) DEBUG=1 ;;
-    -f ) FORCE=1 ;;
-    -q ) # Query/info.
-      echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
-      echo "Theme in config: $(cat $X_THEME_VARIANT_CONFIG_FILE)."
-      echo "Use 'auto', 'dark' or 'light' to change it."
-      return 0
-      ;;
-    *) echo "Unknown option: $1"; return 1; ;;
-  esac
-  shift
-done
+# set -x
+# date >>/tmp/debug-sh-setup-x-theme.log
+# exec 2>>/tmp/debug-sh-setup-x-theme.log
 
 debug() {
   if [ -n "$DEBUG" ]; then
@@ -41,78 +27,125 @@ debug() {
   # echo "$(date +%FT%T) [sh-setup-x-theme:$$:$(ps -o cmd= $$)] $@" >> /tmp/debug-sh-setup-x-theme.log
 }
 
+variant_from_config() {
+  if [ -f $X_THEME_VARIANT_CONFIG_FILE ]; then
+    variant=$(cat $X_THEME_VARIANT_CONFIG_FILE)
+    debug "variant from cfg: $variant"
+  else
+    debug "Config file ($X_THEME_VARIANT_CONFIG_FILE) does not exist."
+  fi
+  if [ -z "$variant" ]; then
+      variant=auto
+      debug "variant from fallback: $variant"
+  fi
+  echo "$variant"
+}
+
+# Init once and export the value.
+# This gets used in Vim to auto-set the background, too.
+
+# Handle options, in this case it does not / should not get sourced.
+while [ "${1#-*}" != "$1" ]; do
+  case "$1" in
+    -d ) DEBUG=1 ;;
+    -f ) FORCE=1 ;;
+    -s ) SHELL_ONLY=1 ;;
+    -q ) # Query/info.
+      echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
+      echo "BASE16_SCHEME: $BASE16_SCHEME."
+      echo "Theme in config: $(variant_from_config)."
+      echo "Use 'auto', 'dark' or 'light' to change it."
+      exit
+      ;;
+    *) echo "Unknown option: $1"; exit 1; ;;
+  esac
+  shift
+done
+
 debug "RUN: $0 $@"
 variant=$1
 
 # No argument provided: read config/env.
 if [ -z "$variant" ]; then
-  if [ -f $X_THEME_VARIANT_CONFIG_FILE ]; then
-    variant=$(cat $X_THEME_VARIANT_CONFIG_FILE)
-    debug "variant from cfg: $variant"
-  fi
-  if [ -z "$variant" ]; then
-      variant=auto
-      debug "variant from fallback: $variant"
-    # fi
-  fi
+  variant=$(variant_from_config)
 
 else
   FORCE=1
   debug "(forced) variant from arg: $variant"
 
-  # Save given value.
-  case $variant in
-    auto)
-      if [ -f "$X_THEME_VARIANT_CONFIG_FILE" ]; then
-        rm "$X_THEME_VARIANT_CONFIG_FILE"
-      fi
-      ;;
-    light|dark)
-      echo $1 > "$X_THEME_VARIANT_CONFIG_FILE"
-      echo "Saved variant=$1." >&2 ;;
-    * ) echo "Invalid variant: $variant" >&2; return 64
-  esac
+  if [ "$SHELL_ONLY" != 1 ]; then
+    # Save given value.
+    case $variant in
+      auto)
+        if [ -f "$X_THEME_VARIANT_CONFIG_FILE" ]; then
+          rm "$X_THEME_VARIANT_CONFIG_FILE"
+        fi
+        ;;
+      light|dark)
+        echo $1 > "$X_THEME_VARIANT_CONFIG_FILE"
+        echo "Saved variant=$1." >&2 ;;
+      * ) echo "Invalid variant: $variant" >&2; exit 64
+    esac
+  fi
 fi
 
 # Get auto-theme from get-daytime-period for "auto",
 # and validate value.
 case $variant in
   auto)
-    dt_period="$(get-daytime-period)"
+    dt_period="$(~/.dotfiles/usr/bin/get-daytime-period)"
     if [ "$dt_period" = 'Daytime' ]; then
       variant=light
     elif [ -n "$dt_period" ]; then
       variant=dark
     else
-      echo "get-daytime-period failed." >&2
+      echo "get-daytime-period failed.  Using 'dark' variant." >&2
+      variant=dark
     fi
     debug "=> variant: $variant"
     ;;
   light|dark ) ;;
-  * ) echo "Invalid variant: $variant" >&2; return 64
+  * ) echo "Invalid variant: $variant" >&2; exit 64
 esac
 
 
-if [ -n "$DISPLAY" ] && [ "$USER" != "root" ]; then
+# curbg="$(xrdb -query|sed -n -e '/^\*background:/ {p;q}' | tr -d '[:space:]' | cut -f2 -d:)"
+# if [[ $curbg == '#fdf6e3' ]]; then
+#   if [[ $variant == "dark" ]]; then
+#     # xrdb -DSOLARIZED_DARK ~/.Xresources
+#     xrdb -merge ~/.dotfiles/lib/solarized-xresources/Xresources.dark
+#     changed_xrdb=1
+#   fi
+# elif [[ $variant == "light" ]]; then
+#   # xrdb -DSOLARIZED_LIGHT ~/.Xresources
+#   xrdb -merge ~/.dotfiles/lib/solarized-xresources/Xresources.light
+#   changed_xrdb=1
+# fi
+
+
+if [ -n "$DISPLAY" ] && [ "$USER" != "root" ] && [ "$SHELL_ONLY" != 1 ] \
+  && hash xrdb 2>/dev/null; then
   # Query "mythemevariant" resource, used to hold the current state.
-  # Set to "auto" by default in ~/.Xresources.
+  # Unset by default in ~/.Xresources.
   cur_xrdb_theme="$(xrdb -query|sed -n -E -e '/mythemevariant:\t/ {s/.*:\t//p;q}')"
   debug "cur_xrdb_theme=$cur_xrdb_theme"
   if [ "$FORCE" = 1 ] || [ "$cur_xrdb_theme" != "$variant" ]; then
     if [ "$variant" = dark ]; then
-      xrdb -DSOLARIZED_DARK -merge ~/.Xresources
+      xrdb -DSOLARIZED_DARK -I$HOME -merge ~/.Xresources
 
       # Send escape codes for urxvt to change colors.
       if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
+        # XXX: does not work on first "try".
         # [ -n "$TMUX" ] && echo "printf '\033Ptmux;\033'"
         echo "printf '\033]11;#002b36\007\033]10;#839496\007\033]12;#93a1a1\007\033]13;#93a1a1\007\033]708;#002b36\007'"
         # [ -n "$TMUX" ] && echo "printf '\033\\'"
       fi
     elif [ "$variant" = light ]; then
-      xrdb -DSOLARIZED_LIGHT -merge ~/.Xresources
+      xrdb -DSOLARIZED_LIGHT -I$HOME -merge ~/.Xresources
 
       # Send escape codes for urxvt to change colors.
       if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
+        # XXX: does not work on first "try".
         # [ -n "$TMUX" ] && echo "printf '\033Ptmux;\033'"
         echo "printf '\033]11;#fdf6e3\007\033]10;#657b83\007\033]12;#586e75\007\033]13;#586e75\007\033]708;#fdf6e3\007'"
         # [ -n "$TMUX" ] && echo "printf '\033\\'"
@@ -154,10 +187,10 @@ fi
 echo "export MY_X_THEME_VARIANT=$variant;"
 
 # Update tmux env.
-if [ -n "$TMUX" ]; then
+if [ -n "$TMUX" ] && [ "$SHELL_ONLY" != 1 ]; then
   tmux if "[ \"\$(tmux show-env MY_X_THEME_VARIANT)\" != 'MY_X_THEME_VARIANT=$variant' ]" \
     "set-environment MY_X_THEME_VARIANT $variant; \
-      source-file ~/.tmux.conf; display 'Reloaded tmux.'" >/dev/null
+      source-file ~/.tmux.conf; display 'Reloaded tmux for $variant theme variant.'" >/dev/null
 fi
 
 if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_SCHEME" ]; then
@@ -177,3 +210,87 @@ if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_SCHEME" ]; then
     echo "command -v reloadzsh > /dev/null && reloadzsh"
   fi
 fi
+
+    # # Setup/change xrdb / gnome-terminal profile. {{{
+    # if [[ "$MY_X_THEME_VARIANT" != "$variant" ]]; then
+    #     if [[ -n $commands[xrdb] ]]; then
+    #         local curbg changed_xrdb
+    #         cur_xrdb_theme="$(xrdb -query|sed -n -E -e '/mythemevariant:\t/ {s/.*:\t//p;q}')"
+    #
+    #         if [[ $cur_xrdb_theme != $variant ]]; then
+    #             if [[ $variant == dark ]]; then
+    #                 xrdb -DSOLARIZED_DARK ~/.Xresources
+    #             else
+    #                 xrdb -DSOLARIZED_LIGHT ~/.Xresources
+    #             fi
+    #         fi
+    #         # curbg="$(xrdb -query|sed -n -e '/^\*background:/ {p;q}' | tr -d '[:space:]' | cut -f2 -d:)"
+    #         # if [[ $curbg == '#fdf6e3' ]]; then
+    #         #     if [[ $variant == "dark" ]]; then
+    #         #         # xrdb -DSOLARIZED_DARK ~/.Xresources
+    #         #         xrdb -merge ~/.dotfiles/lib/solarized-xresources/Xresources.dark
+    #         #         changed_xrdb=1
+    #         #     fi
+    #         # elif [[ $variant == "light" ]]; then
+    #         #     # xrdb -DSOLARIZED_LIGHT ~/.Xresources
+    #         #     xrdb -merge ~/.dotfiles/lib/solarized-xresources/Xresources.light
+    #         #     changed_xrdb=1
+    #         # fi
+    #
+    #         if [[ $changed_xrdb == 1 ]]; then
+    #             echo "Changed xrdb theme to $variant (curbg: $curbg; variant=$variant)."
+    #         fi
+    #     fi
+    #     if is_gnome_terminal; then
+    #         local wanted_gnome_terminal_profile="Solarized-$variant"
+    #         # local id_light=e6e34acf-124a-43bd-ad32-46fb0765ad76
+    #         # local id_dark=b1dcc9dd-5262-4d8d-a863-c897e6d979b9
+    #
+    #         local default_profile_id=${$(dconf read /org/gnome/terminal/legacy/profiles:/default)//\'/}
+    #         # echo "default_profile_id:$default_profile_id"
+    #         local default_profile_name=${$(dconf read /org/gnome/terminal/legacy/profiles:/":"$default_profile_id/visible-name)//\'/}
+    #         # echo "default_profile_name:$default_profile_name"
+    #
+    #         # local -h cur_profile=$(gconftool-2 --get /apps/gnome-terminal/global/default_profile)
+    #         if [[ $default_profile_name != $wanted_gnome_terminal_profile ]]; then
+    #             # Get ID of wanted profile.
+    #
+    #             wanted_gnome_terminal_profile_id=$(
+    #                 dconf dump "/org/gnome/terminal/legacy/profiles:/" \
+    #                 | grep -P "^(visible-name='$wanted_gnome_terminal_profile'|\[:)" \
+    #                 | grep '^visible-name' -B1 | head -n1 \
+    #                 | sed -e 's/^\[://' -e 's/]$//')
+    #
+    #             echo "Changing gnome-terminal default profile to: $wanted_gnome_terminal_profile ($wanted_gnome_terminal_profile_id)."
+    #             # gconftool-2 --set --type string /apps/gnome-terminal/global/default_profile $gnome_terminal_profile
+    #             dconf write /org/gnome/terminal/legacy/profiles:/default "'$wanted_gnome_terminal_profile_id'"
+    #         fi
+    #     fi
+    # fi  # }}}
+
+    # Could adjust current urxvt; but this can be done using ctrl-alt-9/0.
+    # # URxvt.keysym.M-C-0: command:\033]11;S_base3\007\033]10;S_base00\007\033]12;S_base01\007\033]13;S_base01\007\033]708;S_base3\007
+    # # URxvt.keysym.M-C-9: command:\033]11;S_base03\007\033]10;S_base0\007\033]12;S_base1\007\033]13;S_base1\007\033]708;S_base03\007
+    # my-send-term-escape '\e]11; \007'
+
+    # my-send-term-escape() {
+    #     # Wrap escape code for tmux.
+    #     [[ -n $TMUX ]] && printf '\ePtmux;\e'
+    #
+    #     echo -ne $1
+    #
+    #     # End escape code wrapping for tmux.
+    #     [[ -n $TMUX ]] && printf '\e\\'
+    # }
+
+
+# # Init once and export the value.
+# # This gets used in Vim to auto-set the background, too.
+# if [ -z "$MY_X_THEME_VARIANT" ]; then
+#     if [ -f "$X_THEME_VARIANT_CONFIG_FILE" ]; then
+#         MY_X_THEME_VARIANT=$(<$X_THEME_VARIANT_CONFIG_FILE)
+#     else
+#         MY_X_THEME_VARIANT=auto
+#     fi
+#     theme_variant $MY_X_THEME_VARIANT
+# fi

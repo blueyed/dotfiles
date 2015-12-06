@@ -52,7 +52,7 @@ while [ "${1#-*}" != "$1" ]; do
     -s ) SHELL_ONLY=1 ;;
     -q ) # Query/info.
       echo "Current theme variant: MY_X_THEME_VARIANT=$MY_X_THEME_VARIANT."
-      echo "BASE16_SCHEME: $BASE16_SCHEME."
+      echo "BASE16_THEME: $BASE16_THEME."
       echo "Theme in config: $(variant_from_config)."
       echo "Use 'auto', 'dark' or 'light' to change it."
       exit
@@ -193,14 +193,14 @@ if [ -n "$TMUX" ] && [ "$SHELL_ONLY" != 1 ]; then
       source-file ~/.tmux.conf; display 'Reloaded tmux for $variant theme variant.'" >/dev/null
 fi
 
-if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_SCHEME" ]; then
+if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_THEME" ]; then
   # Setup base16-shell.
   if [ "${TERM%%-*}" = 'linux' ]; then
     echo "Skipping base16-shell with TERM=linux." >&2
   else
     BASE16_SHELL_DIR=~/.dotfiles/lib/base16/base16-shell
     if [ -d "$BASE16_SHELL_DIR" ]; then
-      echo "export BASE16_SCHEME=solarized.$variant"
+      echo "export BASE16_THEME=solarized.$variant"
       base16_scheme_file=$BASE16_SHELL_DIR/base16-solarized.${variant}.sh
       [[ -s $base16_scheme_file ]] && echo "source $base16_scheme_file" || {
         echo "$base16_scheme_file does not exist." >&2

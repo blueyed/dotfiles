@@ -1635,22 +1635,24 @@ endif " has("autocmd") }}}
 " Shorten a given (absolute) file path, via external `shorten_path` script.
 " This mainly shortens entries from Zsh's `hash -d` list.
 let s:_cache_shorten_path = {}
+let s:_has_functional_shorten_path = 1
 fun! ShortenPath(path, ...)
-  if ! len(a:path)
-    return ''
+  if ! len(a:path) || ! s:_has_functional_shorten_path
+    return a:path
   endif
   let base = a:0 ? a:1 : ""
   let cache_key = base . ":" . a:path
   if ! exists('s:_cache_shorten_path[cache_key]')
     try
       let tmpfile = tempname()
-      let s:_cache_shorten_path[cache_key] = system('shorten_path '
+      let s:_cache_shorten_path[cache_key] = system('$HOME/.dotfiles/usr/bin/shorten_path '
             \ .shellescape(a:path).' '.shellescape(base).' 2>'.tmpfile)
       if v:shell_error
         echohl WarningMsg
         echom "There was a problem running shorten_path: "
               \ . join(readfile(tmpfile), "\n")
         echohl None
+        let s:_has_functional_shorten_path = 0
       endif
     finally
       call delete(tmpfile)

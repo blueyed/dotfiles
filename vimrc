@@ -81,7 +81,7 @@ if 1 " has('eval') / `let` may not be available.
 
 
     let s:cache_key = '_rc'.g:MyRcProfile.'_tmux'.executable("tmux")
-          \ .'_deoplete'.s:use_deoplete
+          \ .'_deoplete'.get(s:, 'use_deoplete', 0)
           \ .'_nvim'.has('nvim')
 
     let s:neobundle_default_cache_file = neobundle#commands#get_default_cache_file()

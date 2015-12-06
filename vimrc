@@ -80,7 +80,9 @@ if 1 " has('eval') / `let` may not be available.
           \ 'colors': { 'script_type' : 'colors' } }
 
 
-    let s:cache_key = '_' . g:MyRcProfile . '_' . executable("tmux")
+    let s:cache_key = '_rc'.g:MyRcProfile.'_tmux'.executable("tmux")
+          \ .'_deoplete'.s:use_deoplete
+          \ .'_nvim'.has('nvim')
 
     let s:neobundle_default_cache_file = neobundle#commands#get_default_cache_file()
     let g:neobundle#cache_file = s:neobundle_default_cache_file . s:cache_key

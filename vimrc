@@ -2,6 +2,9 @@ set nocompatible " This must be first, because it changes other options as a sid
 
 scriptencoding utf-8
 
+" A bit faster than $SHELL (zsh).
+set shell=/bin/sh
+
 " Profiling. {{{
 if 1
 fun! ProfileStart()

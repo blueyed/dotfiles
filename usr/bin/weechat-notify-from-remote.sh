@@ -8,8 +8,6 @@
 # No SIGHUP then.
 exec <&-
 
-zmodload zsh/datetime
-
 # Setup logging
 logfile=/tmp/weechat-notify-from-remote.sh.log
 touch $logfile
@@ -44,13 +42,13 @@ mkdir -p "$(dirname $lockfile)"
 
 # Copy/duplicate stdout/stderr into logfile when running in a terminal
 # (descriptor 1 (stdout) is opened on a terminal).
-if [[ -t 1 ]]; then
-  exec >  >(tee -a $logfile)
-  exec 2> >(tee -a $logfile >&2)
-else
+# if [[ -t 1 ]]; then
+#   exec >  >(tee -a $logfile)
+#   exec 2> >(tee -a $logfile >&2)
+# else
   exec >>  $logfile
   exec 2>> $logfile
-fi
+# fi
 
 # Sound to play on highlight
 sound_message=
@@ -68,11 +66,11 @@ fi
 # User and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
 internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
-ssh_extra_config=($(dotfiles-decrypt 'U2FsdGVkX1/b6mo1MxltGbfTDs1xWhXRZEoLa/yx3iI2MaanXf0aKkwrGa0epC8ybDgU03Qc4JjXHz/6Q4U/ZA==')) # remote port forwarding etc
+ssh_extra_config="$(dotfiles-decrypt 'U2FsdGVkX1/b6mo1MxltGbfTDs1xWhXRZEoLa/yx3iI2MaanXf0aKkwrGa0epC8ybDgU03Qc4JjXHz/6Q4U/ZA==')"  # remote port forwarding etc
 
 # Make autossh aware of port-forwarding failures, requires AUTOSSH_GATETIME=0.
 # TODO: would be nice to handle missing ssh-agent better (in case you abort the dialog multiple times).
-ssh_extra_config+=(-o ExitOnForwardFailure=yes -o IdentitiesOnly=yes)
+ssh_extra_config="$ssh_extra_config -o ExitOnForwardFailure=yes -o IdentitiesOnly=yes"
 
 # # this might be used to override $autossh_weechat_port
 # test -f ~/.dotfiles/dotfilesrc && source ~/.dotfiles/dotfilesrc
@@ -153,7 +151,7 @@ while true ; do
 
       # Ignore Twitter rebooting its service, which would re-display the last X
       # Twitter highlights again.
-      ts_this_read=$EPOCHSECONDS
+      ts_this_read=$(date +%s)
       if (( ts_this_read - ts_last_read <= 5 )); then
         if [ "$channel" = "bitlbee.#twitter_blueyed" ]; then
           notify-send "weechat-notify: ignoring twitter reboot"

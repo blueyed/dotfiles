@@ -1,8 +1,4 @@
-#!/usr/bin/zsh
-#   NB: zsh is used for "$=" mainly, where `eval` failed to work with `trap`
-#       (quoting).
-#   TODO: use $call_cmd (as array for execution)
-#
+#!/bin/sh
 # Connect remotely (via SSH) to a host running weechat and tail-f/read the
 # logfile containing any highlights.
 # For any new highlights/mentions a notification gets displayed (locally).
@@ -24,8 +20,20 @@ log() {
 
 log "Starting... PID: $$"
 
+if [ -z "$DISPLAY" ]; then
+  # Grab the display and xauthority cookie.
+  w=$(w -h -s | grep ':[0-9]\W' | head -1 | tr -s ' ')
+  export DISPLAY=$(echo $w | cut -d\  -f2)
+  X_USER=$(echo $w | cut -d\  -f1)
+  export XAUTHORITY=/home/$X_USER/.Xauthority
+fi
+if [ -z "$DISPLAY" ]; then
+  echo "No DISPLAY available.  Aborting." >&2
+  exit 1
+fi
+
 # Wrap with flock/lockfile
-lockfile=/run/user/$UID/lock/weechat-notify-from-remote.lock
+lockfile=/run/user/$UID/lock/weechat-notify-from-remote.$DISPLAY.lock
 mkdir -p "$(dirname $lockfile)"
 (flock -n 9 || {
   msg="Running already ($lockfile). Aborting."
@@ -45,17 +53,17 @@ else
 fi
 
 # Sound to play on highlight
-sound_message=/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg
-
-# Export information required to play sound (via alsa/pulseaudio)
-# export DISPLAY=:0
-# export XAUTHORITY=/home/daniel/.Xauthority
-
-# Grab the display and xauthority cookie.
-w=$(w -h -s | grep ':[0-9]\W' | head -1 | tr -s ' ')
-export DISPLAY=$(echo $w | cut -d\  -f2)
-X_USER=$(echo $w | cut -d\  -f1)
-export XAUTHORITY=/home/$X_USER/.Xauthority
+sound_message=
+for f in /usr/share/sounds/freedesktop/stereo/message-new-instant.oga \
+    /usr/share/sounds/ubuntu/stereo/message-new-instant.ogg; do
+  if [ -f "$f" ]; then
+    sound_message="$f"
+    break
+  fi
+done
+if [ -z "$sound_message" ]; then
+  echo "No sound file found!" >&2
+fi
 
 # User and hosts information, encrypted.
 userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
@@ -113,7 +121,7 @@ export AUTOSSH_PORT=0
 # NOTE: -F required for autossh, otherwise it exits immediately
 tail_cmd="tail -n0 -F .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
 # '-t'/'-tt' is required for ssh killing its child process.
-call_cmd=(envoy-exec autossh -tt $ssh_extra_config $userhost -- ssh -t $internalhost $tail_cmd)
+call_cmd="envoy-exec autossh -tt $ssh_extra_config $userhost -- ssh -t $internalhost $tail_cmd"
 # NOTE: "kill -9" might be necessary if ssh aborts because of ExitOnForwardFailure
 #       and autossh has not setup its signal handler in that case (reported as bug).
 kill_cmd_eval='test -f $AUTOSSH_PIDFILE \
@@ -157,23 +165,18 @@ while true ; do
       log "             $date $time $number $channel $nick $delim"
       log "             $message"
 
-      # Export DBUS_SESSION_BUS_ADDRESS environment variable for notify-send,
-      # based on the gnome-session PID for the current user (newest).
-      pid_gnome_session=$(pgrep -u $UID -n gnome-session)
-      export DBUS_SESSION_BUS_ADDRESS="$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/${pid_gnome_session}/environ|cut -d= -f2-)"
-
       # Notification.
       title="weechat: ${nick} @ ${channel}"
       body="$message"
       notify-send --category=im.received -t 0 "$title" "$body" &>>$logfile
 
       # Sound: only once per 5 seconds.
-      # if [[ -n "$sound_message" ]] && (( ts_this_read - ts_last_read > 5 )); then
-      #   if command -v play >/dev/null 2>&1 ; then
-      #     log "Playing sound: $sound_message"
-      #     play -q "$sound_message" &
-      #   fi
-      # fi
+      if [[ -n "$sound_message" ]] && (( ts_this_read - ts_last_read > 5 )); then
+        if command -v play >/dev/null 2>&1 ; then
+          log "Playing sound: $sound_message"
+          play -q "$sound_message" &
+        fi
+      fi
 
       sleep_failure=5
       ts_last_read=$ts_this_read

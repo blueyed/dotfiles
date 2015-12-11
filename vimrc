@@ -1789,7 +1789,7 @@ if &rtp =~ '\<airline\>'
     au!
     " Invalidate cache on certain events.  TextChanged* might not exist in older Vim.
     let s:autocmd = 'BufWritePost,BufEnter,CursorHold,InsertLeave,FileChangedShellPost'
-    if exists('#TextChanded')
+    if exists('##TextChanged')
       let s:autocmd .= ",TextChanged,TextChangedI"
     endif
     exec 'au' s:autocmd '* call s:my_airline_clear_cache_file()'

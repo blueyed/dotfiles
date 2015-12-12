@@ -349,10 +349,8 @@ if 1 " has('eval') / `let` may not be available.
 
       MyNeoBundle 'tomtom/tinykeymap_vim'
       MyNeoBundle 'tomtom/tmarks_vim'
-      " Not lazy: needs to collect MRU data.
       MyNeoBundleNoLazyForDefault 'tomtom/tmru_vim', { 'depends':
-            \ [['tomtom/tlib_vim', { 'directory': 'tlib' }]],
-            \ 'autoload': { 'commands': 'TRecentlyUsedFiles' }}
+            \ [['tomtom/tlib_vim', { 'directory': 'tlib' }]]}
       MyNeoBundle 'vim-scripts/tracwiki'
       MyNeoBundle 'tomtom/ttagecho_vim'
       " UltiSnips cannot be set as lazy (https://github.com/Shougo/neobundle.vim/issues/335).

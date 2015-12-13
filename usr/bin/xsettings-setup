@@ -12,6 +12,8 @@ fi
 
 if [ -z "$dpi" ]; then
     dpi="$(xdpyinfo | awk  '$1 ~ /resolution:/ { print $2 }' | sed 's/x.*//')"
+else
+    xrandr --dpi "$dpi"
 fi
 echo "Xft/DPI $(( $dpi * 1024 ))" >> ~/.xsettingsd.local
 # echo Gdk/UnscaledDPI $(( $dpi * 1024 )) >> ~/.xsettingsd.local
@@ -24,5 +26,8 @@ else
     kill -HUP $pid
 fi
 
-# Also use xrdb for very old stuff (you know, LibreOffice)
+# Used by rofi (https://github.com/DaveDavenport/rofi/issues/254#issuecomment-154360839).
+echo "*.dpi: $dpi" | xrdb -merge
+
+# Used by awesome, gets written from /etc/X11/xinit/xinitrc.d/xft-settings.sh.
 echo "Xft*dpi: $dpi" | xrdb -merge

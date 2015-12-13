@@ -1,4 +1,6 @@
-! Xft.dpi: 93
+! NOTE: Xft.dpi is set via ~/.dotfiles/usr/bin/xsettings-setup
+Xft*antialias:        True
+Xft*hinting:          Full
 
 ! Used in ~/.dotfiles/usr/bin/sh-setup-x-theme, and the solarized theme for
 ! awesomeWM.
@@ -16,8 +18,30 @@
 #include ".dotfiles/lib/base16/base16-solarized.light.256.xresources"
 #endif
 
+! XXX: obsolete with base16 / needs adjustment?!
+! light
+*solarizedlight.background:            #fdf6e3
+*solarizedlight.borderColor:           #fdf6e3
+*solarizedlight.foreground:            #657b83
+*solarizedlight.fadeColor:             #fdf6e3
+*solarizedlight.cursorColor:           #586e75
+*solarizedlight.pointerColorBackground:#93a1a1
+*solarizedlight.pointerColorForeground:#586e75
+
+! XXX: obsolete with base16 / needs adjustment?!
+! dark
+*solarizeddark.background:            #002b36
+*solarizeddark.borderColor:           #002b36
+*solarizeddark.foreground:            #839496
+*solarizeddark.fadeColor:             #002b36
+*solarizeddark.cursorColor:           #93a1a1
+*solarizeddark.pointerColorBackground:#586e75
+*solarizeddark.pointerColorForeground:#93a1a1
+
 ! Switch between light/dark!
 ! (not in there: fadeColor, pointerColorBackground)
+! TODO: change MY_X_THEME_VARIANT / dircolors?!
+!       See ~/bin/query-urxvt and ~/bin/xterm-bg, and ~df/usr/bin/sh-setup-x-theme.
 URxvt.keysym.M-C-8: command:\033]11;#fdf6e3\007\033]10;#657b83\007\033]12;#586e75\007\033]13;#586e75\007\033]708;#fdf6e3\007
 URxvt.keysym.M-C-9: command:\033]11;#002b36\007\033]10;#839496\007\033]12;#93a1a1\007\033]13;#93a1a1\007\033]708;#002b36\007
 #endif
@@ -27,41 +51,77 @@ URxvt.keysym.M-C-9: command:\033]11;#002b36\007\033]10;#839496\007\033]12;#93a1a
 ! }}}
 
 ! source: https://wiki.archlinux.de/title/Urxvt#Konfiguration
-URxvt.saveLines: 8192
-URxvt.scrollBar: false
-! URxvt.foreground: white
-! URxvt.background: black
+! limited to 64k?!  (per man page, for most machines)
+! TODO: set/increase on compile-time?!
+URxvt.saveLines: 81920
+URxvt.scrollBar: true
+! Scrollbar style - rxvt (default), plain (most compact), next, or xterm.
+URxvt.scrollstyle: rxvt
+URxvt.scrollBar_right: true
+URxvt.scrollBar_floating: true
+! Set scrollColor to bg color of current theme variant bg color.
+#ifdef SOLARIZED_DARK
+URxvt.scrollColor: #002b36
+#else
+URxvt.scrollColor: #fdf6e3
+#endif
+
 URxvt.jumpScroll: true
 URxvt.skipScroll: true
 
-URxvt.font: terminus-14,xft:DejaVu Sans Mono:size=12:antialias=true
-! URxvt.font: xft:DejaVu Sans Mono:size=10:antialias=true
-! URxvt.font: -*-terminus-medium-*-*-*-14-120-*-*-*-*-*-*
-! URxvt.font: xft:Inconsolata:style=Medium:pixelsize=14:antialias=true
-! URxvt.font: xft:DejaVu Sans Mono:size=10:style=Book
-! URxvt.font: terminus-14,\
-!     -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1, \
-!     [codeset=JISX0208]xft:Kochi Gothic:antialias=false, \
-!     xft:Code2000:antialias=false
+! Disable scrollback in secondary screen (https://wiki.archlinux.org/index.php/rxvt-unicode#Scrollback_buffer_in_secondary_screen).
+! NOTE: touchpad scrolling in "less" still does not work, but in gnome-terminal.
+! NOTE: using vtwheel extension for mouse/touchpad-scrolling.
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
 
-! From author:
-! URxvt.font:             9x15,\
-!                            -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1,\
-!                            -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1, \
-!                            [codeset=JISX0208]xft:Kochi Gothic, \
-!                            xft:Bitstream Vera Sans Mono:autohint=true, \
-!                            xft:Code2000:antialias=false
-! URxvt.boldFont:         -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso8859-15
-! URxvt.italicFont:       xft:Bitstream Vera Sans Mono:italic:autohint=true
-! URxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
-  urxvt.boldItalicFont:   xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
-! URxvt*letterSpace: -1
+! Do not scroll with output.
+URxvt.scrollTtyOutput: false
+! Scroll in relation to buffer (with mouse scroll or Shift+Page Up).
+URxvt.scrollWithBuffer: true
+! scroll back to the bottom on keypress
+URxvt.scrollTtyKeypress: true
 
-xft:Code2000:antialias=false
+URxvt.iconFile: /usr/share/icons/gnome/32x32/apps/gnome-terminal.png
 
-URxvt.perl-ext-common: default,matcher
-! URxvt.perl-ext-common: default,matcher,tabbed
-URxvt.urlLauncher: x-www-browser
+! NOTE: proper font/glyph handling needs patched urxvt, see also:
+! http://lists.schmorp.de/pipermail/rxvt-unicode/2014q4/002042.html
+
+! Optimized for x220
+! URxvt.font: xft:Ubuntu Mono derivative Powerline Plus Nerd File Types:size=9.14,xft:monospace,xft:Symbola
+URxvt.font: xft:Ubuntu Mono derivative Powerline Plus Nerd File Types Mono Plus Pomicons:size=8,xft:monospace,xft:Symbola
+
+URxvt*letterSpace: -1
+
+URxvt.perl-ext-common: default,-matcher,urxvt-perls/url-select,urxvt-perls/keyboard-select,urxvt-font-size/font-size,bell-command
+
+! font-size: https://github.com/majutsushi/urxvt-font-size
+URxvt.keysym.C-A-plus:    perl:font-size:increase
+URxvt.keysym.C-A-minus:   perl:font-size:decrease
+URxvt.keysym.C-A-0:       perl:font-size:reset
+
+! url-select:
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-select.launcher: open-in-running-browser
+! NOTE: might slow down urxvt a lot, e.g. for `ag` with long lines.
+! URxvt.url-select.underline: true
+URxvt.url-select.underline: false
+URxvt.url-select.button: 2
+
+! https://github.com/muennich/urxvt-perls/issues/34
+URxvt.matcher.pattern.0: (?:https?:/ /|ftp:/ /|news:/ /|mailto:|file:/ /|\\bwww\\.) [\\w\\-\\@;\\/?:&=%\\$.+!*\\x27,~#]* ( \\([\\w\\-\\@;\\/?:&=%\\$.+!*\\x27,~#]*\\) | [\\w\\-\\@;\\/?:&=%\\$+*~])+
+URxvt.matcher.pattern.1: [a-f0-9]{7,10}\\.\\.[a-f0-9]{7,10}
+
+! keyboard-select:
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
+! XXX: resource marked as deprecated, but is required to remove the default keysym!
+URxvt.searchable-scrollback: C-M-r
+! Should be:
+URxvt.keysym.M-s: builtin:
+URxvt.keysym.C-M-r: searchable-scrollback:start
+URxvt.keysym.C-M-s: perl:keyboard-select:search
+
+URxvt.urlLauncher: open-in-running-browser
 URxvt.matcher.button: 2
 URxvt.tabbed.saveLines: 1000
 URxvt.tabbed.scrollBar: false
@@ -70,45 +130,62 @@ URxvt.tabbed.tabbar-bg: 0
 URxvt.tabbed.tab-fg: 0
 URxvt.tabbed.tab-bg: 1
 URxvt.tabbed.secondaryScroll: true
-! URxvt.tabbed.font: xft:Bitstream Vera Sans Mono:pixelsize=12
-! URxvt*transparent: false
-! URxvt*shading: 70
-! urxvt*font:        -dec-terminal-medium-r-normal--14-140-75-75-c-80-iso8859-*
-! urxvt*boldFont:    -dec-terminal-bold-r-normal--14-140-75-75-c-80-iso8859-*
 
-! mine
-! URxvt.antialias:true
-URxvt.geometry: 80x32
-URxvt.fading: 25
+! 84 columns: 2 terminals next to each other on the x220 screen.
+URxvt.geometry: 84x32
+! Do not fade inactive windows, controlled by awesome (opacity module).
+URxvt.fading: 0
 URxvt.urgentOnBell:true
+! NOTE: disables audible bell, not working properly through pulseaudio though (XBell).
 URxvt.visualBell:true
 
+! Workaround for http://askubuntu.com/questions/546569/pulseaudio-does-not-ring-bell-through-xbell-function-urxvt
+! URxvt.bell-command: xkbbell
+
 URxvt.cutchars: "()*,<>[]{}|«»"
-
-! "pretty girl" {{{
-! URxvt.cursorColor:  #dc74d1
-! URxvt.pointerColor: #dc74d1
-! URxvt.background:   #0e0e0e
-! URxvt.foreground:   #4ad5e1
-! URxvt.color0:       #000000
-! URxvt.color8:       #8b8f93
-! URxvt.color1:       #dc74d1
-! URxvt.color9:       #dc74d1
-! URxvt.color2:       #0eb8c7
-! URxvt.color10:      #0eb8c7
-! URxvt.color3:       #dfe37e
-! URxvt.color11:      #dfe37e
-! URxvt.color5:       #9e88f0
-! URxvt.color13:      #9e88f0
-! URxvt.color6:       #73f7ff
-! URxvt.color14:      #73f7ff
-! URxvt.color7:       #e1dddd
-! URxvt.color15:      #e1dddd
-! }}}
-
 
 ! Hack to act more like XTerm.
 ! Source: http://www.netswarm.net/misc/urxvt-xtermcompat.txt
 ! Fix Shift/Control/Meta with function and insert keys.
 ! S-F1 is normally sent as F11-F20, and S-F11+S-F12 being extra strange.
 #include ".dotfiles/Xresources.d/urxvt-xtermcompat.txt"
+
+
+! xterm {{{
+xterm*faceName: xft:Ubuntu Mono derivative Powerline Plus Nerd File Types Mono Plus Pomicons:size=8
+xterm*renderFont: true
+xterm*termName: xterm-256color
+xterm*geometry: 80x25
+xterm*dynamicColors: true
+xterm*utf8: 2
+! use utf8 (query/set):
+xterm*titleModes: 12
+xterm*eightBitInput: true
+xterm*saveLines: 512
+xterm*scrollKey: true
+xterm*scrollTtyOutput: false
+xterm*scrollBar: true
+xterm*rightScrollBar: true
+xterm*jumpScroll: true
+xterm*multiScroll: true
+xterm*toolBar: true
+
+! For tmux set-clipboard.
+! xterm*disallowedWindowOps: 20,21,SetXprop
+! }}}
+
+
+! ! rofi {{{
+! rofi.modi:                 combi,calc:qalc -t,window,run
+! rofi.combi-modi:           window,run
+rofi.key-window:           mod1-F1
+rofi.key-run:              mod1-F2
+! rofi.glob:              true
+! rofi.width:                80
+! rofi.key-combi:          mod1-F3
+!! Fix for Solarized, via theme file/#define.
+! rofi.bg-active:         #002b36
+! rofi.bg-urgent:         #002b36
+! }}}
+
+*TkTheme: clearlooks

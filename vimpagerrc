@@ -1,4 +1,0 @@
-" vi:ft=vimrc
-set noloadplugins
-colorscheme desert256
-set ignorecase smartcase

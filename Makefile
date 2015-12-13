@@ -12,7 +12,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	hgrc irbrc oh-my-zsh pbuilderrc pdbrc pentadactyl \
 	pentadactylrc railsrc \
 	sackrc screenrc screenrc.common subversion/servers \
-	terminfo tigrc tmux.conf tmux.common.conf vim vimrc vimpagerrc Xresources \
+	terminfo tigrc tmux.conf tmux.common.conf vim vimrc Xresources \
 	xprofile \
 	config/mc/ini \
 	config/gnome-session/sessions \
@@ -20,7 +20,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	$(wildcard local/share/applications/*) \
 	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
 
-REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf
+REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf vimpagerrc
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc
@@ -32,7 +32,7 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.21
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.22
 migrate: .stamps/neobundle.1
 migrate: .stamps/remove-byobu
 migrate: .stamps/remove-autojump
@@ -59,8 +59,8 @@ check_removed_files:
 		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
 	done
 	touch $@
-.stamps/submodules_rm.21:
-	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox config/awesome/awpomodoro vim/bundle/isort vim/bundle/targets lib/legit lib/base16/base16-gnome-terminal"; \
+.stamps/submodules_rm.22:
+	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox config/awesome/awpomodoro vim/bundle/isort vim/bundle/targets lib/legit lib/base16/base16-gnome-terminal lib/vimpager"; \
 	for i in $$rm_bundles; do \
 		[ ! -d "$$i" ] || [ ! -e "$$i/.git" ] && continue ; \
 		( cd $$i && gst=$$(git status --short --untracked-files=normal 2>&1) && [ "$$gst" = "" ] || { echo "Repo not clean ($$i): $$gst" ; false ; } ; ) \

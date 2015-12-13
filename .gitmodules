@@ -5,9 +5,6 @@
 [submodule "lib/LS_COLORS"]
 	path = lib/LS_COLORS
 	url = git://github.com/trapd00r/LS_COLORS.git
-[submodule "lib/vimpager"]
-	path = lib/vimpager
-	url = git://github.com/rkitover/vimpager.git
 [submodule "lib/zsh-completions"]
 	path = lib/zsh-completions
 	url = git://github.com/zsh-users/zsh-completions.git

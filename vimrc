@@ -3009,8 +3009,6 @@ nnoremap <Up> gk
 imap <C-BS> <C-W>
 imap <C-Del> <C-O>dw
 imap <C-S-Del> <C-O>dW
-nmap <C-Del> dw
-nmap <C-S-Del> dWa
 
 " Map delete to 'delete to black hole register' (experimental, might use
 " `d` instead)

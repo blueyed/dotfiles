@@ -2155,7 +2155,7 @@ fun! MySetDefaultNumberSettings()
     setl number
   elseif &buftype ==# "nofile" ||bufname("%") =~ '^__' || &ft == "help"
     setl nonumber
-  elseif &columns > 90
+  elseif winwidth(".") > 90
     set number
   else
     set nonumber
@@ -2164,7 +2164,7 @@ endfun
 " No relative numbers with quickfix and other special windows like __TMRU__.
 augroup vimrc_number_setup
   au!
-  au VimResized,FileType * call MySetDefaultNumberSettings()
+  au VimResized,FileType,BufWinEnter * call MySetDefaultNumberSettings()
   au CmdwinEnter * setl number norelativenumber
 augroup END
 let &showbreak = '↪ '

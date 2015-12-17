@@ -73,4 +73,3 @@ call SetupPhpHelp()
 
 " EXPERIMENTAL
 setlocal iskeyword+=$
-

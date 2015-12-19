@@ -1544,6 +1544,9 @@ if has("autocmd") " Autocommands {{{1
   " Expand tabs for Debian changelog. This is probably not the correct way.
   au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
 
+  " Ignore certain files with vim-stay.
+  au BufNewFile,BufRead */.git/addp-hunk-edit.diff let b:stay_ignore = 1
+
   " Python
   " irrelevant, using python-pep8-indent
   " let g:pyindent_continue = '&sw * 1'

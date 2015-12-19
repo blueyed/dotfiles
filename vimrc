@@ -1491,7 +1491,6 @@ if has("autocmd") " Autocommands {{{1
     exec 'file ' . resolvedfile
     let &shm=sshm
 
-    call AutojumpLastPosition()
     unlet! b:git_dir
     call fugitive#detect(resolvedfile)
 
@@ -1504,26 +1503,6 @@ if has("autocmd") " Autocommands {{{1
   command! -bar FollowSymlink call MyFollowSymlink()
   command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
   au BufReadPost * nested call MyFollowSymlink(expand('%'))
-
-  " Jump to last known cursor position on BufReadPost {{{
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  " NOTE: read viminfo/marks, but removed: causes issues with jumplist sync
-  " across Vim instances
-    " \   rviminfo |
-  " NOTE: removed for SVN commit messages: && fnamemodify(bufname('%'), ':t') != 'svn-commit.tmp'
-  " ref: :h last-position-jump
-  fun! AutojumpLastPosition()
-    if ! exists('b:autojumped_init')
-      let b:autojumped_init = 1
-      if &ft != 'gitcommit' && &ft != 'diff' && ! &diff && line("'\"") <= line("$") && line("'\"") > 0
-        " NOTE: `zv` is ignored with foldlevel in modeline.
-        exe 'normal! g`"zv'
-      endif
-    endif
-  endfun
-  au BufReadPost * call AutojumpLastPosition()
-  " }}}
 
   " Automatically load .vimrc source when saved
   au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
@@ -3735,5 +3714,4 @@ endif
 
 
 " Local file settings. {{{1
-" NOTE: no foldlevel=1, to make `zv` from AutojumpLastPosition work.
-" vim: fdm=marker
+" vim: fdm=marker foldlevel=0

@@ -1542,7 +1542,7 @@ if has("autocmd") " Autocommands {{{1
   au BufReadPost fugitive://* set bufhidden=delete
 
   " Expand tabs for Debian changelog. This is probably not the correct way.
-  au BufNewFile,BufRead debian/changelog,changelog.dch set expandtab
+  au BufNewFile,BufRead */debian/changelog,changelog.dch set expandtab
 
   " Ignore certain files with vim-stay.
   au BufNewFile,BufRead */.git/addp-hunk-edit.diff let b:stay_ignore = 1

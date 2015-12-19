@@ -7,9 +7,10 @@ autocmd!
 map , <Leader>
 set urlseparator='\|'
 " set guioptions+=N
-set gui=menu,tabs,navigation
+set gui=nomenu,tabs,navigation
 
-set tabnumbers
+" Currently broken.
+" set tabnumbers
 
 set! browser.dom.window.dump.enabled=true
 set! devtools.errorconsole.enabled=true
@@ -20,8 +21,7 @@ set activate-=links
 " search shortcuts (without completion)
 command! -nargs=* gg open google <args>
 map s :gg<Space>
-nmap s :gg<Space>
-vmap s :gg<Space>
+map S :tab gg<Space>
 
 
 " bypass ctrl-tab (ref: http://code.google.com/p/dactyl/issues/detail?id=171)
@@ -53,9 +53,6 @@ au LocationChange www.heise.de set previouspattern='^Neuere$',^<<$ nextpattern='
 " forum.xda-developers.com
 au LocationChange ://[^]+/showthread\.php\? set previouspattern='^<$'
 au LocationChange ://[^]+/showthread\.php\? set nextpattern='^>$'
-
-" XXX: something likge that (google for it)
-" autocmd LocationChange .* js modes.passAllKeys = /google\.com/.test(buffer.URL)
 " group default
 
 set popups=tab,resized
@@ -81,39 +78,64 @@ EOF
 " mnemonic: Go and yank.
 map <silent> gy :js shortenURLBitLy(buffer.URL)<cr>
 
-
-" Toggle hostname: append or remove '.localdomain' suffix
+" Toggle hosts / urls: handle special cases, and fallback to appending or
+" removing '.localdomain' suffix.
 " This is meant to easily switch between local/development and live
 " environment.
 javascript <<EOF
-function toggleDevLiveHost() {
+function parseQueryString() {
+	var qd = {};
+	content.location.search.substr(1).split("&").forEach(function(item) {
+			var s = item.split("="),
+					k = s[0],
+					v = s[1] && decodeURIComponent(s[1]);
+			(k in qd) ? qd[k].push(v) : qd[k] = [v]
+	})
+	return qd
+}
+function toggleHosts() {
 	// NOTE: <John-Galt> blueyed: let uri = buffer.uri.clone(); uri.host = whatever; uri.spec
 
 	// first check custom maps of hostnames to toggle
+	let cb_handle_q_arg = function(url, lhs, rhs) {
+		// return url.replace(lhs, rhs).replace(/[&?](?!q=[&?])*/, '');
+		let qd = parseQueryString();
+		return url.replace(lhs, rhs).replace(/[&?].*/, '?q=' + qd["q"]);
+	}
 	let customtoggle = {
-		'www.betterplace.org': 'www.bp42.com',
+		'de.wikipedia.org': 'en.wikipedia.org',
+		'en.wikipedia.org': 'de.wikipedia.org',
+		// Toggle between DuckDuckGo and Googgle.
+		// map 'https://duckduckgo.com/?q=foo+bar'
+		//  to 'https://www.google.com/search?q=foo+bar'
+		'://duckduckgo.com/': {'rhs': '://www.google.com/search', 'cb': cb_handle_q_arg},
+		'://www.google.com/search': {'rhs': '://duckduckgo.com/', 'cb': cb_handle_q_arg},
+		'://www.google.de/search': {'rhs': '://duckduckgo.com/', 'cb': cb_handle_q_arg},
 	}
 	let curhost = content.location.host;
 	let cururl = buffer.URL;
-	for( var i in customtoggle ) {
-		if( curhost === i ) {
-			return String.replace(cururl, i, customtoggle[i]);
-		}
-		if( curhost === customtoggle[i] ) {
-			return String.replace(cururl, customtoggle[i], i);
+	console.log(curhost);
+
+	for( var lhs in customtoggle ) {
+		let rhs = customtoggle[lhs];
+		if( cururl.indexOf(lhs) != -1 ) {
+			if( typeof(rhs) == 'string' ) {
+				return String.replace(cururl, lhs, rhs);
+			}
+			return rhs.cb(cururl, lhs, rhs.rhs);
 		}
 	}
 
-	// then prepend/remove suffix
+	// Fallthrough: prepend/remove suffix.
 	let suffix = '.localdomain';
 	if( curhost.indexOf(suffix, curhost.length - suffix.length) !== -1 ) {
 		return String.replace(cururl, suffix, '');
 	}
-	// append suffix
+	// Append/inject suffix.
 	return String.replace(cururl, /(\.\w{2,4})([\/:])/, "$1"+suffix+"$2");
 }
 EOF
-map gz :js liberator.open(toggleDevLiveHost())<cr>
+map gz :js liberator.open(toggleHosts())<cr>
 
 
 " Firefox Sync: connect+sync on startup, sync on exit (does not appear to work)
@@ -125,7 +147,7 @@ map gz :js liberator.open(toggleDevLiveHost())<cr>
 
 " Setup colors(cheme)
 " colorscheme solarized-light
-" colorscheme solarized
+colorscheme solarized
 
 " Pimp colors/layout
 hi -append Hint font-size:10px !important;font-weight:normal !important;background:#fff !important;border:1px solid red !important;color:#000 !important;font-family:"DejaVu Sans Mono", monospace !important; padding:1px 3px !important;
@@ -177,6 +199,10 @@ nmap e :js liberator.open("http://reddit.com/submit?url=" + encodeURIComponent(b
 " XXX: content.wrappedJSObject.frames["inner_toolbar"] ...
 "autocmd PageLoad ^http://www.reddit.com/tb/.* js content.window.frames[1].window.frames[1].focus()
 
+" Does not work for pages that use Javascript to focus an input box, e.g.
+" Groupon.
+set focuscontent
+
 " command to replace all image links with the actual image (most useful with post-a-picture threads)
 " based on some snippet from reddit, but adopted for Vimperator; add allFrames and maxHeight handling
 command! inlineimages js (function($) {orig$=$; $.each(buffer.allFrames, function(){win=this.wrappedJSObject; $=function(sel){return orig$(sel, win.document)} ; win.document.ondragstart=function(){return false};dst=function(e){return (p=Math.pow)(p(e.clientX-(rc=e.target.getBoundingClientRect()).left,2)+p(e.clientY-rc.top,2),.5)};$("[href~=imgur]").not($(t="[href$=jpeg],[href$=gif],[href$=png],[href$=jpg]")).each(function(){this.href+='.jpg'});void($(t).not(".EGraw").attr({'class':'EGraw',target:'blank'}).each(function(){$(this).append($('<span />').toggle(function(e){$(this).html(' [-]').next().show();return false},function(e){$(this).html(' [+]').next().hide();return false}).click()).append($('<img>').attr({src:this.href,style:'display:block;max-width:500px;max-height:500px',title:'Drag to resize'}).mousedown(function(e){(t=this.wrappedJSObject).iw=t.width;t.d=dst(e);t.dr=false;t.style.maxHeight="none";e.preventDefault();}).mousemove(function(e){if((t=this.wrappedJSObject).d){t.style.maxWidth=t.style.width=((dst(e))*t.iw/t.d)+"px";t.dr=true}}).mouseout(f=function(e){(t=this.wrappedJSObject).d=false;if(t.dr)return false}).click(f))}))})})(content.wrappedJSObject.$ || $);
@@ -189,9 +215,6 @@ map <Leader>l :to http://dict.leo.org/ende?lp=ende&search=
 " String.replace is a workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=633830
 map gp :js liberator.open( String.replace(buffer.URL, /(\.\w{2,4})\//, "$1.nyud.net/") )<cr>
 
-" Clear mapping for Ubiquity
-map <C-k> <Nop>
-
 " NoScript popup
 map <Leader>n :noscript popup<cr>
 
@@ -200,7 +223,8 @@ nmap <Leader>p :emenu View.Sidebar.Pocket<cr>
 
 " Quickmarks (for `go` and `gn`)
 silent qmark 0 hahler.de
-silent qmark c http://www.google.com/calendar
+silent qmark a https://www.google.com/contacts
+silent qmark c https://www.google.com/calendar
 silent qmark f facebook.com
 silent qmark g https://groups.google.com/forum/#!myforums
 silent qmark h heise.de
@@ -208,7 +232,8 @@ silent qmark m https://mail.google.com/mail
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark p https://www.producteev.com/dashboard.php
 silent qmark r reddit.com
-silent qmark t twitter.com
+silent qmark t https://twitter.com
+silent qmark z https://github.com/notifications
 
 " Use buffer.URL for yanking (encoded spaces).
 " (not required for Pentadactyl, see http://code.google.com/p/vimperator-labs/issues/detail?id=797).
@@ -236,7 +261,7 @@ EOM
 
 " Initially done via autocmd (see above), then rewritten based on [1] and adopted for Vimperator.
 " 1: http://ingo-karkat.de/blog/2012/05/22/Pentadactyl%20set%20filetype%20in%20external%20Vim%20editor%20based%20on%20URL.html
-set editor='gvim -f'
+set editor='vim-in-term'
 javascript <<EOF
 // Get options for `editor`.
 // These get used with `set ` prepended and passed to `editor` via `-c`.
@@ -261,27 +286,31 @@ function editExternallyGetOptions() {
 		return "ft=mediawiki spell";
 	if (path.match(/\/phpmyadmin\//))
 		return 'ft=html spell';
-	if (buffer.URL.match(/^https?:\/\/.*trac.*\/wiki\//))
+	if (host == 'code.djangoproject.com')
 		return 'ft=tracwiki';
+	if (buffer.URL.match(/^https?:\/\/.*trac.*\/wiki\//))
+		return 'sw=4 ft=tracwiki';
 	return 'spell';
 }
 function editExternallyWithOptions() {
-    var edopts = editExternallyGetOptions();
+	var edopts = editExternallyGetOptions();
 	var save_editor = options["editor"];
 	options["editor"] = options["editor"] + ' -c "set ' + edopts.replace(/"/g, '\\"') + '"';
 	// alert(options['editor']);
-    editor.editFieldExternally();
+	editor.editFieldExternally();
 	options["editor"] = save_editor;
 }
 // Overwrite Ctrl-I input mapping.
 mappings.addUserMap([modes.INSERT], ["<c-i>"], "Launch the external editor.", editExternallyWithOptions);
+// Alternative mapping in case <C-i> is taken, e.g. in reddit/stackoverflow comments.
+mappings.addUserMap([modes.INSERT], ["<f4>"], "Launch the external editor.", editExternallyWithOptions);
 EOF
 " }}}1
 
 " Bypassing keys. {{{1
 javascript <<EOF
 function myPassAllKeys(buffer) {
-	if( /(groups|mail|plus)\.google\.[a-z]+\//.test(buffer.URL) ) {
+	if( /(groups|mail|plus|docs)\.google\.[a-z]+\//.test(buffer.URL) ) {
 		return true;
 	}
 	return false;
@@ -291,7 +320,7 @@ autocmd LocationChange .* js modes.passAllKeys = myPassAllKeys(buffer)
 " }}}1
 
 " use homerow for hintkeys; see also https://code.google.com/p/dactyl/issues/detail?id=167
-set hintchars=asdfgöälkjh
+" set hintchars=asdfgöälkjh
 
 " add suggestion,history to completion list
 " set complete=search,location,file,suggestion
@@ -311,11 +340,12 @@ nnoremap j 5j
 nnoremap k 5k
 nnoremap l 5l
 nnoremap h 5h
+" Use Ctrl-d/u instead?!
+nnoremap J 20j
+nnoremap K 20k
 nnoremap <silent> zt :topselect<CR>
 nnoremap <silent> zb :bottomselect<CR>
 nnoremap <silent> zc :removeselect<CR>
-
-"loadplugins
 
 " tab-options plugin:
 "set tabclose=opener,previous,left,right
@@ -348,8 +378,12 @@ map j <Down>
 map k <Up>
 
 " Edit ~/.vimperatorrc in global gvim server instance.
-map <leader>ec :silent !gv ~/.dotfiles/vimperatorrc<cr>
+map <leader>ec :silent !vim-in-term ~/.dotfiles/vimperatorrc &<cr>
 
-source! ~/.pentadactylrc.local
+" Toggle colorscheme.
+au ColorScheme .* -javascript curtheme = args.name
+map <leader>sc :execute "colorscheme " + ((typeof(curtheme) !== 'undefined' && curtheme == "solarized_light") ? "solarized_dark" : "solarized_light" )<cr>
+
+source! ~/.vimperatorrc.local
 
 " vim: set ft=pentadactyl.vim fdm=marker:

@@ -2041,9 +2041,10 @@ xmap S <Plug>Sneak_S
 omap s <Plug>Sneak_s
 omap S <Plug>Sneak_S
 
-let g:sneak#streak=1
-" g:sneak#target_labels = "asdfghjkl;qwertyuiopzxcvbnm/ASDFGHJKL:QWERTYUIOPZXCVBNM?"
-let g:sneak#target_labels = "asdfghjklöä"
+" Use streak mode, also for Sneak_f/Sneak_t.
+let g:sneak#streak=2
+let g:sneak#s_next = 1  " clever-s
+let g:sneak#target_labels = "sfjktunbqz/SFKGHLTUNBRMQZ?"
 
 " Replace 'f' with inclusive 1-char Sneak.
 nmap f <Plug>Sneak_f

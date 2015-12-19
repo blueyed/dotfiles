@@ -791,6 +791,12 @@ endif
 nmap <space> <Leader>
 vmap <space> <Leader>
 
+" Repeat last f/t in opposite direction.
+if &rtp =~ '\<sneak\>'
+  nmap <Leader>; <Plug>SneakPrevious
+else
+  nnoremap <Leader>; ,
+endif
 
 nnoremap <Leader><c-l> :redraw!<cr>
 " Optimize mappings on German keyboard layout. {{{
@@ -1155,8 +1161,6 @@ if 1 " has('eval') / `let` may not be available.
   " github-issues
   " Trigger API request(s) only when completion is used/invoked.
   let g:gissues_lazy_load = 1
-
-  " inoremap <expr> <tab>  pumvisible() ? "\<C-n>" : "\<tab>"
 
   " Add tags from $VIRTUAL_ENV
   if $VIRTUAL_ENV != ""

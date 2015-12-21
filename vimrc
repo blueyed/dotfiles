@@ -1778,7 +1778,8 @@ if &rtp =~ '\<airline\>'
   " NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
   fun! s:my_airline_clear_cache_file()
     if exists('b:my_airline_file_cache')
-          \ && (!exists('b:my_airline_file_cache_key') || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
+          \ && (!exists('b:my_airline_file_cache_key')
+          \    || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
       let b:my_airline_file_cache_key = bufname('%').&modified.&ft
       unlet! b:my_airline_file_cache
     endif

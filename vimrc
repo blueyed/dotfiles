@@ -548,7 +548,9 @@ endif
 
 " Settings {{{1
 set hidden
-set encoding=utf8
+if &encoding != 'utf-8'  " Skip this on resourcing with Neovim (E905).
+  set encoding=utf-8
+endif
 " Prefer unix fileformat
 " set fileformat=unix
 set fileformats=unix,dos

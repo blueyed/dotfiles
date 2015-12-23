@@ -101,7 +101,8 @@ if 1 " has('eval') / `let` may not be available.
     " This works around cache issues (different paths) when using it through a
     " (read-only) bind mount.
     " Ref: https://github.com/Shougo/neobundle.vim/issues/377
-    if !filewritable(neobundle#commands#get_cache_file())
+    if !filewritable(g:neobundle#cache_file)
+          \ && !filewritable(fnamemodify(g:neobundle#cache_file, ':h'))
       let s:vim_cache = '/tmp/.vim-cache-' . $USER
       if !isdirectory(s:vim_cache)
         call mkdir(s:vim_cache, "", 0700)

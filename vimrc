@@ -110,9 +110,6 @@ if 1 " has('eval') / `let` may not be available.
       let g:neobundle#cache_file = s:vim_cache . '/neobundle.cache'
     endif
 
-    " Before NeoBundleCheck.
-    filetype plugin indent on
-
     if neobundle#load_cache($MYVIMRC)
       " NeoBundles list - here be dragons! {{{
       fun! MyNeoBundleWrapper(cmd_args, default, light)
@@ -493,12 +490,12 @@ if 1 " has('eval') / `let` may not be available.
     endif
     call neobundle#end()
 
+    filetype plugin indent on
+
     " Use shallow copies by default.
     let g:neobundle#types#git#clone_depth = 10
 
     NeoBundleCheck
-
-    filetype plugin indent on
 
     if !has('vim_starting')
       " Call on_source hook when reloading .vimrc.

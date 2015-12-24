@@ -148,8 +148,7 @@
 
 [push]
 	# "simple" not available with Git 1.7.10 (Debian stable), "current" is similar.
-	# default = simple
-	default = current
+	default = simple
 [interactive]
 	singlekey = true
 

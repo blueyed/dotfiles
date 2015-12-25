@@ -1,12 +1,18 @@
 #!/bin/sh
 
-session_pid=$(pgrep --oldest session-run-awesome.sh)
-echo "Signaling session (USR1), PID=${session_pid}."
+session_pid="$MY_SESSION_RUN_PID"
 if [ -n "$session_pid" ]; then
-  kill -USR1 "$session_pid"
+  echo "Using PID from MY_SESSION_RUN_PID."
+else
+  # session_pid=$(pgrep --oldest -f '/bin/(bash|sh) .*/session-run-awesome.sh')
+  echo "MY_SESSION_RUN_PID is not set. Aborting!" >&2
+  exit 1
 fi
 
-awesome_pid=$(pgrep --oldest --exact awesome)
+echo "Signalling session (USR1), PID=${session_pid}."
+kill -USR1 "$session_pid"
+
+awesome_pid=$(pgrep --pgroup $MY_SESSION_RUN_PID --exact awesome)
 echo "TERMinating awesome: PID=${awesome_pid}."
 if [ -n "$awesome_pid" ]; then
   kill -TERM "$awesome_pid"

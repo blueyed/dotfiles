@@ -27,14 +27,11 @@ if [ -n "${ACTION}" ];then
     hibernate)
       systemctl hibernate ;;
     reboot)
-      zenity --question --text "Are you sure?" \
-        && systemctl reboot ;;
+      zenity --question --text "Are you sure?" && systemctl reboot ;;
     shutdown)
-      zenity --question --text "Are you sure?" \
-        && systemctl poweroff ;;
+      zenity --question --text "Are you sure?" && systemctl poweroff ;;
     logout)
-      zenity --question --text "Are you sure?" \
-        && gnome-session-quit --logout --no-prompt ;;
+      zenity --question --text "Are you sure?" && awesome-logout ;;
     lock) slock ;;
   esac
 fi

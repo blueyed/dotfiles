@@ -18,18 +18,6 @@ if [ -z "$REMOTE" ]; then
 fi
 REMOTE_CMD='~/bin/weechat'
 
-# Look for and switch to existing instance, when not running from awesome, where I use raise-or-exec.
-if [ "$TERM" != linux ] && [ -n "$DESKTOP_SESSION" ] && ! pgrep -u $UID awesome; then
-  if pgrep -f $REMOTE_CMD; then
-    if [ "$DESKTOP_SESSION" = 'i3' ]; then
-      i3-msg '[title="weechat:0"] focus'
-    else
-      wmctrl -a 'weechat:0'
-    fi
-    exit
-  fi
-fi
-
 # Ask for key, if there is none in the keyring (uses ssh-askpass-gnome).
 if ! ssh-add -l > /dev/null 2>&1; then
   ssh-add

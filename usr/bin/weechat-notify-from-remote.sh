@@ -119,7 +119,7 @@ export AUTOSSH_PORT=0
 # NOTE: -F required for autossh, otherwise it exits immediately
 tail_cmd="tail -n0 -F .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
 # '-t'/'-tt' is required for ssh killing its child process.
-call_cmd="envoy-exec autossh -tt $ssh_extra_config $userhost -- ssh -t $internalhost $tail_cmd"
+call_cmd="autossh -tt $ssh_extra_config $userhost -- ssh -t $internalhost $tail_cmd"
 # NOTE: "kill -9" might be necessary if ssh aborts because of ExitOnForwardFailure
 #       and autossh has not setup its signal handler in that case (reported as bug).
 kill_cmd_eval='test -f $AUTOSSH_PIDFILE \

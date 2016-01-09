@@ -77,38 +77,36 @@ if 1 " has('eval') / `let` may not be available.
   endif
 
   if s:use_neobundle  " {{{
+    filetype off
+
     let g:neobundle#enable_name_conversion = 1  " Use normalized names.
     let g:neobundle#default_options = {
           \ 'manual': { 'base': '~/.vim/bundle', 'type': 'nosync' },
           \ 'colors': { 'script_type' : 'colors' } }
 
+    " Cache file: use it from tmp/tmpfs. {{{
+    " This helps in case the default location might not be writable (r/o
+    " bind-mount), and should be good for performance in general (apart from
+    " the first run after reboot).
+    let s:vim_cache = '/tmp/vim-cache-' . $USER
+    if !isdirectory(s:vim_cache)
+      call mkdir(s:vim_cache, "", 0700)
+    endif
 
     let s:cache_key = '_rc'.g:MyRcProfile.'_tmux'.executable("tmux")
           \ .'_deoplete'.get(s:, 'use_deoplete', 0)
           \ .'_nvim'.has('nvim')
-
+    " Remove any previous cache files.
     let s:neobundle_default_cache_file = neobundle#commands#get_default_cache_file()
     let g:neobundle#cache_file = s:neobundle_default_cache_file . s:cache_key
-    " Remove any previous cache file.
     if filereadable(s:neobundle_default_cache_file)
       call delete(s:neobundle_default_cache_file)
     endif
-
-    filetype off
-
-    " If the NeoBundle cache is not writable, fall back to using a separate
-    " cache in /tmp.
-    " This works around cache issues (different paths) when using it through a
-    " (read-only) bind mount.
-    " Ref: https://github.com/Shougo/neobundle.vim/issues/377
-    if !filewritable(g:neobundle#cache_file)
-          \ && !filewritable(fnamemodify(g:neobundle#cache_file, ':h'))
-      let s:vim_cache = '/tmp/.vim-cache-' . $USER
-      if !isdirectory(s:vim_cache)
-        call mkdir(s:vim_cache, "", 0700)
-      endif
-      let g:neobundle#cache_file = s:vim_cache . '/neobundle.cache'
+    if filereadable(g:neobundle#cache_file)
+      call delete(g:neobundle#cache_file)
     endif
+    let g:neobundle#cache_file = s:vim_cache.'/neobundle.cache'.s:cache_key
+    " }}}
 
     if neobundle#load_cache($MYVIMRC)
       " NeoBundles list - here be dragons! {{{

@@ -193,7 +193,8 @@ if [ -n "$TMUX" ] && [ "$SHELL_ONLY" != 1 ]; then
       source-file ~/.tmux.conf; display 'Reloaded tmux for $variant theme variant.'" >/dev/null
 fi
 
-if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_THEME" ]; then
+if [ "$MY_X_THEME_VARIANT" != "$variant" ] \
+  || [ "${BASE16_THEME##*.}" != "$variant" ]; then
   # Setup base16-shell.
   if [ "${TERM%%-*}" = 'linux' ]; then
     echo "Skipping base16-shell with TERM=linux." >&2
@@ -211,6 +212,17 @@ if [ "$MY_X_THEME_VARIANT" != "$variant" ] || [ -z "$BASE16_THEME" ]; then
       # Reload ZSH theme conditionally.
       echo "sh-setup-x-theme: reloading zsh.." >&2
       echo "command -v reloadzsh > /dev/null && reloadzsh"
+    fi
+
+    if hash fzf >/dev/null; then
+      if [[ -z "$_FZF_DEFAULT_OPTS_BASE" ]]; then
+        echo 'export _FZF_DEFAULT_OPTS_BASE=$FZF_DEFAULT_OPTS'
+      fi
+      if [[ $variant == "light" ]]; then
+        echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:21'"
+      else
+        echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:18'"
+      fi
     fi
   fi
 fi

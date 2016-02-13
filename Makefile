@@ -1,5 +1,5 @@
 # Settings for debugging.
-DRYRUN?=0
+DRYRUN?=
 DRYRUN_COND:=$(if $(DRYRUN),echo DRY: ,)
 DEBUG=
 VERBOSE=1
@@ -10,7 +10,7 @@ INSTALL_FILES := ackrc agignore aptitude/config \
 	ctags \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
 	hgrc irbrc oh-my-zsh pbuilderrc pdbrc pentadactyl \
-	pentadactylrc railsrc \
+	pentadactylrc profile railsrc \
 	sackrc screenrc screenrc.common subversion/servers \
 	terminfo tigrc tmux.conf vim vimrc Xresources \
 	xprofile \

@@ -126,10 +126,7 @@ $(if $(DEBUG),,@){ test -h $(1) && test -e $(1) && $(if $(VERBOSE),echo "Already
 endef
 
 # install_files handler: test for (existing) symlinks, skipping existing files/dirs.
-~/.%: %
-	$(call func-install,$@,${CURDIR}/$<)
-
-# Target from the source files.
+~/.%: % ;
 $(ALL_FILES):
 	$(call func-install,~/.$@,$@)
 

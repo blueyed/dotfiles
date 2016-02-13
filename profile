@@ -39,6 +39,15 @@ stty -ixon 2>/dev/null
 # export GTK_PATH="$GTK_PATH:$HOME/.nix-profile/lib/gtk-2.0:/usr/lib/gtk-2.0"
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
+# Update/set tty information for gpg-agent.
+# It only gets updated through ~/.zshrc in case $GPG_TTY is set.
+# This should not get done for gnupg before 2.1 and/or on remote systems?!
+export GNUPGHOME=${GNUPGHOME:-$HOME/.gnupg}
+if test -f $GNUPGHOME/gpg-agent.conf && command -v gpg-connect-agent >/dev/null; then
+  export GPG_TTY=$(tty)
+  export SSH_AUTH_SOCK=$GNUPGHOME/S.gpg-agent.ssh
+  gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null
+fi
 
 # For bash as a login-shell, also source ~/.bashrc (skipped then).
 if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then

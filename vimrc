@@ -1385,16 +1385,16 @@ if 1 " has('eval')
   " Colorscheme: prefer solarized with 16 colors (special palette).
   let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
 
-  " Use corresponding theme from $BASE16_SCHEME, if set up in the shell.
-  " BASE16_SCHEME should be in sudoer's env_keep for "sudo vi".
-  if len($BASE16_SCHEME)
+  " Use corresponding theme from $BASE16_THEME, if set up in the shell.
+  " BASE16_THEME should be in sudoer's env_keep for "sudo vi".
+  if len($BASE16_THEME)
     let base16colorspace=256
-    if $BASE16_SCHEME =~ '^solarized'
+    if $BASE16_THEME =~ '^solarized'
       let s:use_colorscheme = 'solarized'
       let g:solarized_base16=1
       let g:airline_theme = 'base16'
     else
-      let s:use_colorscheme = 'base16-'.substitute($BASE16_SCHEME, '\.\(dark\|light\)$', '', '')
+      let s:use_colorscheme = 'base16-'.substitute($BASE16_THEME, '\.\(dark\|light\)$', '', '')
     endif
 
   elseif has('gui_running')

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Run pytest-watch and add pass/fail handlers, which check for and make use of
+# an existing tmux pane.  It falls back to using notify-send.
+
+# A wrapper script for a project could look like this:
+#
+#     #!/bin/sh
+#     # Change to file's parent dir (POSIXly).
+#     cd -P -- "$(dirname -- "$0")/.."
+#     exec ptw-watch-tests source-dir -vv "$@"
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <watch-dir> [pytest-src] [pytest-opts]"
+  exit 64
+fi
+
+watch_src="$1"; shift
+if [ -n "$1" ] && [ -e "$1" ]; then
+  runner_src="$1"; shift
+fi
+[ -z "$runner_src" ] && runner_src="$watch_src"
+
+# Get the current window-status-style option from tmux (window or global).
+TMUX_FG_DEFAULT=$(a=$(tmux show -w window-status-style | cut -f2 -d\ ); \
+       [ -n "$a" ] && echo $a || tmux show -wg window-status-style | cut -f2 -d\ )
+# Remove ",italics" which I am currently using for any running command via
+# preexec.
+TMUX_FG_DEFAULT=${TMUX_FG_DEFAULT%,italics}
+
+template_set_tmux_style='test -n "$TMUX_PANE" && { \
+  tmux set-window-option -q -t "$TMUX_PANE" window-status-style "%s"; } \
+  || notify-send "%s"'
+
+ptw "$watch_src" \
+  --beforerun "$(printf "$template_set_tmux_style" $TMUX_FG_DEFAULT,italics ''); \
+    childs=\"\$(ps -o pid= --ppid \$PPID | grep -v \$$)\"; \
+    test -n \"\$childs\" && echo \"Killing childs: \$childs.\" \
+    && kill -INT \$childs;" \
+  --onpass "$(printf "$template_set_tmux_style" fg=green 'Tests passed.')" \
+  --onfail "$(printf "$template_set_tmux_style" fg=red 'Tests failed.')" \
+  --onsigint "$(printf "$template_set_tmux_style" fg=red 'Tests interrupted.')" \
+  --onexit "test -n '$TMUX_PANE' && tmux set-window-option -u -q \
+          -t '$TMUX_PANE' window-status-style" \
+  ${TMUX:+--nobeep } \
+  -- "$runner_src" -v -ra "$@"

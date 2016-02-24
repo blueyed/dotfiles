@@ -152,9 +152,6 @@ if [ -n "$DISPLAY" ] && [ "$USER" != "root" ] && [ "$SHELL_ONLY" != 1 ] \
       fi
     fi
 
-    debug "Reloading rofi."
-    pkill -HUP rofi || true
-
     echo "mythemevariant: $variant" | xrdb -merge
     echo "Changed X/xrdb theme variant to $variant." >&2
   fi

@@ -175,17 +175,4 @@ xterm*toolBar: true
 ! }}}
 
 
-! ! rofi {{{
-! rofi.modi:                 combi,calc:qalc -t,window,run
-! rofi.combi-modi:           window,run
-rofi.key-window:           mod1-F1
-rofi.key-run:              mod1-F2
-! rofi.glob:              true
-! rofi.width:                80
-! rofi.key-combi:          mod1-F3
-!! Fix for Solarized, via theme file/#define.
-! rofi.bg-active:         #002b36
-! rofi.bg-urgent:         #002b36
-! }}}
-
 *TkTheme: clearlooks

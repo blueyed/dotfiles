@@ -21,6 +21,7 @@
 	count = shortlog -sn
 	d = diff
 	dc = diff --cached
+	dd = !git difftool --no-prompt --tool=my-icdiff
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
 	# lll = log --pretty=format:'%C(yellow bold)commit %H%Creset %C(yellow)tree %T%Creset%nAuthor: %an <%ae>%nDate:   %ad%n%n%w(76,4,4)%s%n%n%-b%n' --graph --decorate --submodule=log
@@ -108,6 +109,8 @@
 	# tool = bc3
 	tool = vimdiff
 	mnemonicprefix = true
+[difftool "my-icdiff"]
+	cmd = icdiff --line-numbers --head 5000 "$LOCAL" "$REMOTE"
 [difftool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE
 [difftool]
@@ -168,8 +171,15 @@
 	pushInsteadOf = git://github.com/
 	pushInsteadOf = https://github.com/
 
-; [pager]
-; 	status = true
+[pager]
+	dd = true
+	icdiff = true
+  status = true
+
+	# EXPERIMENTAL
+	diff = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
+	log = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
+	show = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
 
 # vim: ft=gitconfig
 [sendemail]

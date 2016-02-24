@@ -106,8 +106,8 @@
 # [pager]
 # 	blame = less -S --no-init --quit-if-one-screen
 [diff]
-	# tool = bc3
 	tool = vimdiff
+	guitool = bc3
 	mnemonicprefix = true
 [difftool "my-icdiff"]
 	cmd = icdiff --line-numbers --head 5000 "$LOCAL" "$REMOTE"

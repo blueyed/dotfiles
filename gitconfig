@@ -1,26 +1,15 @@
+# vim: ft=gitconfig
 [user]
 	name = Daniel Hahler
 	email = git@thequod.de
 [init]
 	templatedir = ~/.config/git/template
 [alias]
-	a = add
-	ae = add -e
+	# NOTE: I am using full aliases for most of this, e.g. "ga" for "git add".
 	amend = commit --amend -v
 	# use "aliases" instead of "alias", which is used by hub; ref: https://github.com/defunkt/hub/issues/303
-	aliases = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/'
-	c = commit -v
-	ci = commit -v
-	ca = commit -v -a
-	co = checkout
-	cob = checkout -b
-	com = checkout master
+	aliases = !git config --get-regexp '^alias\\.' | sed -e 's/^alias\\.//' -e 's/ /	/' | sort
 	cp = cherry-pick
-	b = branch
-	ba = branch -a
-	count = shortlog -sn
-	d = diff
-	dc = diff --cached
 	dd = !git difftool --no-prompt --tool=my-icdiff
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
@@ -28,10 +17,11 @@
 	l = log --abbrev-commit --graph --decorate --submodule=log
 	# Source: https://coderwall.com/p/euwpig
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
-	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	ls = log --pretty=format:"%C(yellow)%h\\ %Cgreen%cd%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+	ll = log --pretty=format:"%C(yellow)%h\\ %Cgreen%cd%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative --numstat
 	l1 = !git ll -1
 	m = merge
+	mf = merge --ff-only
 	ma = merge --abort
 	mm = merge --no-edit
 	mmm = merge -X theirs --no-edit
@@ -42,26 +32,20 @@
 	rbc = rebase --continue
 	rbi = rebase --interactive
 	rbs = rebase --skip
-	rl = reflog --pretty=reflog
+	rl = reflog @{now}
+	rlf = reflog --pretty=reflog
 	s = status
 	st = status
 	sm = submodule
 	sta = stash --keep-index
 	sts = stash show -p
 	stp = stash pop
+	stl = stash list --format=\"%gd: %ci - %gs\"
 	g = log -p
 	p = push
 	tree = log --graph --decorate --pretty=oneline --abbrev-commit
 	up = !git fetch && git rebase
 	showtrackedignored = ! cd \"${GIT_PREFIX}\" && untracked_list=$(git rev-parse --git-dir)/ignored-untracked.txt && git ls-files -o -i --exclude-standard >\"${untracked_list}\" && GIT_INDEX_FILE=\"\" git ls-files -o -i --exclude-standard | grep -Fvxf \"${untracked_list}\" && rm -rf \"${untracked_list}\"
-	switch = !legit switch \"$@\"
-	branches = !legit branches
-	sprout = !legit sprout \"$@\"
-	unpublish = !legit unpublish \"$@\"
-	harvest = !legit harvest \"$@\"
-	sync = !legit sync \"$@\"
-	publish = !legit publish \"$@\"
-	graft = !legit graft \"$@\"
 	# Diff stash with working tree.
 	# This is used to decide, if a stash can be savely dropped.
 	stash-diff = !zsh -c 'bcompare =(git stash show -p --no-prefix) =(git diff --no-prefix)'
@@ -93,18 +77,17 @@
 [core]
 	attributesfile = ~/.gitattributes.global
 	excludesfile = ~/.gitignore.global
+	# See also GIT_EDITOR.
 	editor = vim
 	# use default..
 	# whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol,blank-at-eol
-	; buggy(?) with Git 1.7.1 on CentOS 6.0 for submodules, see commit message.
-	; autocrlf = input
+
 	# -F: --quit-if-one-screen: Quit if entire file fits on first screen.
 	# -X: --no-init: Don't use termcap init/deinit strings.
-	pager = less --no-init --quit-if-one-screen -+S
+	# pager = less --no-init --quit-if-one-screen -+S
+	pager = less -S --no-init --quit-if-one-screen
 	# -+F/-+X to override LESS selectively?! (http://stackoverflow.com/a/18781512/15690)
 	# pager = less -+F -+X
-# [pager]
-# 	blame = less -S --no-init --quit-if-one-screen
 [diff]
 	tool = vimdiff
 	guitool = bc3
@@ -116,7 +99,7 @@
 [difftool]
 	prompt = false
 [merge]
-	tool = bc3
+	tool = vimdiff
 	# http://sjl.bitbucket.org/splice.vim/
 	# tool = splice
 	stat = true
@@ -144,7 +127,7 @@
 #	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 
 [pretty]
-	# reflog, with relative date:
+	# reflog, with relative date (but for commits, not reflog entries!):
 	; reflog = %C(auto)%h %<|(17)%gd %<|(30)%C(blue)%cr%C(reset) %s
 	reflog = %C(auto)%h %<|(17)%gd %<|(31)%C(blue)%cr%C(reset) %gs (%s)
 	; reflog = %C(auto)%h %<|(17)%gd %C(blue)%ci%C(reset) %s
@@ -153,6 +136,7 @@
 	# "simple" not available with Git 1.7.10 (Debian stable), "current" is similar.
 	default = simple
 [interactive]
+	# Requires perl-term-readkey (Arch) / libterm-readkey-perl (Debian).
 	singlekey = true
 
 [url "git@github.com:"]
@@ -181,9 +165,19 @@
 	log = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
 	show = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
 
-# vim: ft=gitconfig
 [sendemail]
 	confirm = always
 [rerere]
-	autoupdate = true
 	enabled = true
+
+[rebase]
+	autosquash = 1
+
+[grep]
+	patternType = perl
+	lineNumber = true
+
+# TODO: should be set for Tk/tcl globally probably?!
+[gui]
+	fontui = -family \"Liberation Sans\" -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+	fontdiff = -family \"Liberation Mono\" -size 8 -weight normal -slant roman -underline 0 -overstrike 0

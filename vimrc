@@ -3649,6 +3649,23 @@ endfunc
 " }}}
 
 
+" Automatic swapfile handling.
+augroup VimrcSwapfileHandling
+  au!
+  au SwapExists * call MyHandleSwapfile(expand('<afile>:p'))
+augroup END
+fun! MyHandleSwapfile(filename)
+  " If swapfile is older than file itself, just get rid of it.
+  if getftime(v:swapname) < getftime(a:filename)
+    call MyWarningMsg('Old swapfile detected, and deleted.')
+    call delete(v:swapname)
+    let v:swapchoice = 'e'
+  else
+    call MyWarningMsg('Swapfile detected, opening read-only.')
+    let v:swapchoice = 'o'
+  endif
+endfun
+
 
 " Python setup for NeoVim. {{{
 " Defining it also skips auto-detecting it.

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Start a timer.
+
+timeout=$1
+shift
+
+[ -t 1 ] && feedback_cmd=echo || feedback_cmd=notify-send
+
+(
+  sleep $timeout
+  zenity --info --title "Timeout after $timeout seconds" --text="${@:-Timeout!}"
+) &!
+$feedback_cmd "Timer started (${timeout}s). PID: $!"

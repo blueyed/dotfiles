@@ -62,15 +62,6 @@ my_sleep() {
   done
 }
 
-export AUTOSSH_DEBUG=1
-# export AUTOSSH_LOGFILE=$logfile
-export AUTOSSH_FIRST_POLL=300
-export AUTOSSH_POLL=600
-export AUTOSSH_PIDFILE=/tmp/weechat-notify-from-remote.autossh.$$.pid
-export AUTOSSH_MAXSTART=1
-export AUTOSSH_GATETIME=0  # for "-o ExitOnForwardFailure=yes"
-export AUTOSSH_PORT=0
-
 # Test for network.
 while true; do
   if ping -q -c1 -w2 heise.de; then
@@ -80,7 +71,6 @@ while true; do
   my_sleep 10
 done
 
-# NOTE: -F required for autossh, otherwise it exits immediately
 tail_cmd="tail -n0 -F .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
 # '-t'/'-tt' is required for ssh killing its child process.
 # Not anymore with cat-trick (http://unix.stackexchange.com/questions/40023/get-ssh-to-forward-signals/196657#196657).
@@ -127,8 +117,6 @@ while true ; do
       ts_last_read=$ts_this_read
     done
   }
-
-  # break  # trust autossh to only exit with SIGTERM etc.
 
   log "Sleeping $sleep_failure seconds after read/ssh failure..."
   my_sleep $sleep_failure

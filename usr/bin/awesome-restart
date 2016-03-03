@@ -1,21 +1,30 @@
 #!/bin/sh
 
-session_pid="$MY_SESSION_RUN_PID"
-if [ -n "$session_pid" ]; then
-  echo "Using PID from MY_SESSION_RUN_PID."
-else
-  # session_pid=$(pgrep --oldest -f '/bin/(bash|sh) .*/session-run-awesome.sh')
-  echo "MY_SESSION_RUN_PID is not set. Aborting!" >&2
-  exit 1
-fi
+# Restart awesome by signalling the session runner to restart it.
+# This loads a new binary.
+# The session runner is ./usr/bin/session-run-awesome.sh.
 
-echo "Signalling session (USR1), PID=${session_pid}."
+awesome_pid=
+for p in $(pgrep awesome); do
+  if grep -q "^DISPLAY=$DISPLAY" /proc/$p/environ; then
+    echo "Found pid $p for DISPLAY=$DISPLAY."
+    awesome_pid=$p
+    break
+  fi
+done
+[ -z "$awesome_pid" ] && {
+  echo "No awesome found for DISPLAY=$DISPLAY." >&2
+  exit 1
+}
+
+session_pid=$(ps -o ppid= $awesome_pid)
+[ -z "$session_pid" ] && {
+  echo "No session PID found for pid $awesome_pid (DISPLAY=$DISPLAY)." >&2
+  exit 1
+}
+
+# echo "Signalling session (USR1), pid=${session_pid}."
 kill -USR1 "$session_pid"
 
-awesome_pid=$(pgrep --pgroup $MY_SESSION_RUN_PID --exact awesome)
-echo "TERMinating awesome: PID=${awesome_pid}."
-if [ -n "$awesome_pid" ]; then
-  kill -TERM "$awesome_pid"
-else
-  echo "No running instance.  Session runner might be sleeping?!"
-fi
+# echo "Sending TERM to awesome: pid=${awesome_pid}."
+kill -TERM "$awesome_pid"

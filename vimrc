@@ -829,8 +829,23 @@ sunmap g`
 
 
 " Quit with Q, exit with C-q.
-nnoremap Q :confirm q<cr>
-nnoremap <C-Q> :confirm qall<cr>
+" (go to tab on the left).
+fun! MyQuitWindow()
+  let t = tabpagenr()
+  let nb_tabs = tabpagenr('$')
+  let was_last_tab = t == nb_tabs
+
+  if &ft != 'qf'
+    lclose
+  endif
+  confirm q
+
+  if ! was_last_tab && nb_tabs != tabpagenr('$') && tabpagenr() > 1
+    tabprevious
+  endif
+endfun
+nnoremap <silent> Q :call MyQuitWindow()<cr>
+nnoremap <silent> <C-Q> :confirm qall<cr>
 
 " Use just "q" in special buffers.
 if has('autocmd')

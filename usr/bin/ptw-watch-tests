@@ -10,16 +10,28 @@
 #     cd -P -- "$(dirname -- "$0")/.."
 #     exec ptw-watch-tests source-dir -vv "$@"
 
-if [ -z "$1" ]; then
-  echo "Usage: $0 <watch-dir> [pytest-src] [pytest-opts]"
+usage() {
+  echo "Usage: $0 <watch-dir> [run-dir] [pytest-opts]"
   exit 64
+}
+
+if [ -z "$1" ]; then
+  usage
 fi
 
 watch_src="$1"; shift
-if [ -n "$1" ] && [ -e "$1" ]; then
-  runner_src="$1"; shift
+if ! [ -d "$watch_src" ]; then
+  usage
 fi
-[ -z "$runner_src" ] && runner_src="$watch_src"
+
+# Default to $watch_src when there are no pytest args.
+# This speeds up collecting tests.
+if [ -z "$1" ]; then
+  runner_src=$watch_src
+else
+  runner_src=
+fi
+
 
 # Get the current window-status-style option from tmux (window or global).
 TMUX_FG_DEFAULT=$(a=$(tmux show -w window-status-style | cut -f2 -d\ ); \
@@ -43,4 +55,4 @@ ptw "$watch_src" \
   --onexit "test -n '$TMUX_PANE' && tmux set-window-option -u -q \
           -t '$TMUX_PANE' window-status-style" \
   ${TMUX:+--nobeep } \
-  -- "$runner_src" -v -ra "$@"
+  -- $runner_src -v -ra "$@"

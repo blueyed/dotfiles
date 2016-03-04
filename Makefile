@@ -4,10 +4,8 @@ DRYRUN_COND:=$(if $(DRYRUN),echo DRY: ,)
 DEBUG=
 VERBOSE=1
 
-INSTALL_FILES := ackrc agignore aptitude/config \
-	$(wildcard bazaar/plugins/*) \
-	$(filter-out bazaar/plugins,$(wildcard bazaar/*)) \
-	ctags \
+INSTALL_FILES := ackrc agignore aptitude/config ctags \
+	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
 	hgrc irbrc oh-my-zsh pbuilderrc pdbrc pentadactyl \
 	pentadactylrc profile railsrc \

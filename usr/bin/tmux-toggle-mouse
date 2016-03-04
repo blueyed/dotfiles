@@ -7,6 +7,8 @@ if [ -z "$TMUX" ]; then
   exit 1
 fi
 
+if [ x"$1" == "x-q" ]; then QUIET=1; shift; else QUIET=0; fi
+
 if tmux show -g -w | grep -q mode-mouse; then
   setting=mode-mouse
 else
@@ -16,7 +18,7 @@ fi
 if [ -n "$1" ]; then
   new="$1"
 else
-  if [ $setting = mode-mouse ]; then
+  if [ $setting = "mode-mouse" ]; then
     old="$(tmux show -g -w | grep mode-mouse | cut -d' ' -f2)"
   else
     old="$(tmux show -g | grep mouse | head -n 1 | cut -d' ' -f2)"
@@ -28,8 +30,11 @@ if [ "$setting" = "mode-mouse" ]; then
   tmux set -g mode-mouse $new \;\
     set -g mouse-resize-pane $new \;\
     set -g mouse-select-pane $new \;\
-    set -g mouse-select-window $new \;\
-    display "mouse: $new"
+    set -g mouse-select-window $new
 else
-  tmux set -g mouse $new \; display "mouse: $new"
+  tmux set -g mouse $new
+fi
+
+if [ "$QUIET" = 0 ]; then
+  tmux display "mouse: $new"
 fi

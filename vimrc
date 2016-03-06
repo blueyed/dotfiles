@@ -2047,26 +2047,41 @@ endif
 " 1}}}
 
 " Automatic line numbers {{{
-" au BufReadPost * if &bt == "quickfix" || ! exists('+relativenumber') | set number | else | set relativenumber | endif | call SetNumberWidth()
 " NOTE: relativenumber might slow Vim down: https://code.google.com/p/vim/issues/detail?id=311
 set norelativenumber
-fun! MySetDefaultNumberSettings()
-  if &ft =~# 'qf\|cram\|vader'
+fun! MyAutoSetNumberSettings(...)
+  if get(w:, 'my_default_number_manually_set')
+    return
+  endif
+  let s:my_auto_number_ignore_OptionSet = 1
+  if a:0
+    exec 'setl' a:1
+  elseif &ft =~# 'qf\|cram\|vader'
     setl number
   elseif &buftype ==# "nofile" ||bufname("%") =~ '^__' || &ft == "help"
     setl nonumber
   elseif winwidth(".") > 90
-    set number
+    setl number
   else
-    set nonumber
+    setl nonumber
+  endif
+  unlet s:my_auto_number_ignore_OptionSet
+endfun
+fun! MySetDefaultNumberSettingsSet()
+  if !exists('s:my_auto_number_ignore_OptionSet')
+    " echom "Manually set:" expand("<amatch>").":" v:option_old "=>" v:option_new
+    let w:my_auto_number_manually_set = 1
   endif
 endfun
-" No relative numbers with quickfix and other special windows like __TMRU__.
 augroup vimrc_number_setup
   au!
-  au VimResized,FileType,BufWinEnter * call MySetDefaultNumberSettings()
-  au CmdwinEnter * setl number norelativenumber
+  au VimResized,FileType,BufWinEnter * call MyAutoSetNumberSettings()
+  if exists('##OptionSet')
+    au OptionSet number,relativenumber call MySetDefaultNumberSettingsSet()
+  endif
+  au CmdwinEnter * call MyAutoSetNumberSettings('number norelativenumber')
 augroup END
+
 let &showbreak = '↪ '
 set cpoptions+=n  " Use line column for wrapped text / &showbreak.
 function! CycleLineNr()

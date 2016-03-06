@@ -2,13 +2,24 @@
 #
 # Lock the desktop / screen.
 
-macos_lock_tool="/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession"
-if [ -f "$macos_lock_tool" ]; then
-  "$macos_lock_tool" -suspend
-elif [ "$DESKTOP_SESSION" == "ubuntu"] && [ -f /usr/bin/gnome-screensaver-command ]; then
-  /usr/bin/gnome-screensaver-command -l
+if hash i3lock >/dev/null; then
+  i3lock --no-unlock-indicator --show-failed-attempts --ignore-empty-password --dpms
 else
-  echo "Error: no usable tool found to lock the screen."
-  exit 1
+
+  macos_lock_tool="/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession"
+  if [ -f "$macos_lock_tool" ]; then
+    "$macos_lock_tool" -suspend
+
+  elif [ -f /usr/bin/slock ]; then
+    xset dpms force off
+    /usr/bin/slock
+
+  # NOTE: requires gnome-settings-daemon to turn off the screen!
+  elif [ -f /usr/bin/gnome-screensaver-command ]; then
+    /usr/bin/gnome-screensaver-command -l
+
+  else
+    echo "Error: no usable tool found to lock the screen."
+    exit 1
+  fi
 fi
-  

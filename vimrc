@@ -1107,45 +1107,56 @@ if ! isdirectory(expand(&backupdir))
 endif
 
 if 1
-  let vimcachedir=expand('~/.cache/vim')
-  " XXX: not really a cache (https://github.com/tomtom/tmru_vim/issues/22)
-  let g:tlib_cache = vimcachedir . '/tlib'
-  " TODO: cleanup
-  let g:Powerline_cache_dir = vimcachedir . '/powerline'
+  let s:xdg_cache_home = $XDG_CACHE_HOME
+  if !len(s:xdg_cache_home)
+    let s:xdg_cache_home = expand('~/.cache')
+  endif
+  let s:vimcachedir = s:xdg_cache_home . '/vim'
+  let g:tlib_cache = s:vimcachedir . '/tlib'
 
-  let vimconfigdir=expand('~/.config/vim')
-  let g:session_directory = vimconfigdir . '/sessions'
+  let s:xdg_config_home = $XDG_CONFIG_HOME
+  if !len(s:xdg_config_home)
+    let s:xdg_config_home = expand('~/.config')
+  endif
+  let s:vimconfigdir = s:xdg_config_home . '/vim'
+  let g:session_directory = s:vimconfigdir . '/sessions'
 
-  let vimsharedir = expand('~/.local/share/vim')
-  let g:yankring_history_dir = vimsharedir
+  let g:startify_session_dir = g:session_directory
+  let g:startify_change_to_dir = 0
+
+  let s:xdg_data_home = $XDG_DATA_HOME
+  if !len(s:xdg_data_home)
+    let s:xdg_data_home = expand('~/.local/share')
+  endif
+  let s:vimsharedir = s:xdg_data_home . '/vim'
+
+  let g:yankring_history_dir = s:vimsharedir
   let g:yankring_max_history = 500
   " let g:yankring_min_element_length = 2 " more that 1 breaks e.g. `xp`
   " Move yankring history from old location, if any..
   let s:old_yankring = expand('~/yankring_history_v2.txt')
   if filereadable(s:old_yankring)
-    execute '!mv -i '.s:old_yankring.' '.vimsharedir
+    execute '!mv -i '.s:old_yankring.' '.s:vimsharedir
   endif
 
-  " transfer any old tmru files to new location
-  let g:tlib_persistent = vimsharedir
-  let s:old_tmru_files = expand('~/.cache/vim/tlib/tmru/files')
-  let s:new_tmru_files = vimsharedir.'/tmru/files'
-  let s:new_tmru_files_dir = fnamemodify(s:new_tmru_files, ':h')
-  if ! isdirectory(s:new_tmru_files_dir)
-    call mkdir(s:new_tmru_files_dir, 'p', 0700)
+  " Transfer any old (default) tmru files db to new (default) location.
+  let g:tlib_persistent = s:vimsharedir
+  let s:old_tmru_file = expand('~/.cache/vim/tlib/tmru/files')
+  let s:global_tmru_file = s:vimsharedir.'/tmru/files'
+  let s:new_tmru_file_dir = fnamemodify(s:global_tmru_file, ':h')
+  if ! isdirectory(s:new_tmru_file_dir)
+    call mkdir(s:new_tmru_file_dir, 'p', 0700)
   endif
-  if filereadable(s:old_tmru_files)
-    execute '!mv -i '.shellescape(s:old_tmru_files).' '.shellescape(s:new_tmru_files)
+  if filereadable(s:old_tmru_file)
+    execute '!mv -i '.shellescape(s:old_tmru_file).' '.shellescape(s:global_tmru_file)
     " execute '!rm -r '.shellescape(g:tlib_cache)
   endif
-
-  let g:tmru_file = s:new_tmru_files
 end
 
-let s:check_create_dirs = [vimcachedir, g:tlib_cache, g:Powerline_cache_dir, vimconfigdir, g:session_directory, vimsharedir, &directory]
+let s:check_create_dirs = [s:vimcachedir, g:tlib_cache, s:vimconfigdir, g:session_directory, s:vimsharedir, &directory]
 
 if has('persistent_undo')
-  let &undodir = vimsharedir . '/undo'
+  let &undodir = s:vimsharedir . '/undo'
   set undofile
   call add(s:check_create_dirs, &undodir)
 endif
@@ -1825,13 +1836,13 @@ endfun
 
 fun! MyGetSessionName()
   " Use / auto-set g:MySessionName
-  if !exists("g:MySessionName")
-    if len(get(v:, 'this_session'))
+  if !len(get(g:, "MySessionName", ""))
+    if len(v:this_session)
       let g:MySessionName = fnamemodify(v:this_session, ':t:r')
     elseif len($TERM_INSTANCE_NAME)
       let g:MySessionName = substitute($TERM_INSTANCE_NAME, '^vim-', '', '')
     else
-      let g:MySessionName = ''
+      return ''
     end
   endif
   return g:MySessionName
@@ -1861,6 +1872,10 @@ fun! MySetupTitleString()
   let &titlestring .= substitute(
         \ ShortenFilenameWithSuffix('%', 15).' ('.ShortenPath(getcwd()).')',
         \ '%', '%%', 'g')
+
+  if len(s:my_context)
+    let &titlestring .= ' {'.s:my_context.'}'
+  endif
 
   " Easier to type/find than the unicode symbol prefix.
   let &titlestring .= ' - vim'
@@ -3248,8 +3263,8 @@ command! VdebugStart python debugger.run()
 " LocalVimRC {{{
 let g:localvimrc_sandbox = 0 " allow to adjust/set &path
 let g:localvimrc_persistent = 1 " 0=no, 1=uppercase, 2=always
-" let g:localvimrc_debug = 1
-let g:localvimrc_persistence_file = g:vimsharedir . '/localvimrc_persistent'
+" let g:localvimrc_debug = 3
+let g:localvimrc_persistence_file = s:vimsharedir . '/localvimrc_persistent'
 
 " Helper method for .lvimrc files to finish
 fun! MyLocalVimrcAlreadySourced(...)
@@ -3275,29 +3290,83 @@ endfun
 " vim-session / session.vim {{{
 " Do not autoload/autosave 'default' session
 " let g:session_autoload = 'no'
-" let g:session_autosave = 'no'
+let g:session_autosave = "yes"
 let g:session_default_name = ''
 let g:session_command_aliases = 1
 let g:session_persist_globals = [
+      \ '&sessionoptions',
       \ 'g:tmru_file',
+      \ 'g:neomru#file_mru_path',
+      \ 'g:neomru#directory_mru_path',
       \ 'g:session_autosave',
       \ 'g:MySessionName']
 " call add(g:session_persist_globals, 'g:session_autoload')
+if has('nvim')
+  call add(g:session_persist_globals, '&shada')
+endif
 let g:session_persist_colors = 0
 
-" fun! MyOnVimEnter()
-"   let sname = v:servername
-"   if ! MyIsGlobalVimServer()
-"     " TODO: use another viminfo file (via 'n' option).
-"
-"     " Use existing tmru_file (gets remembered across sessions).
-"     if v:servername && filereadable(g:tmru_file.'_'.v:servername)
-"       let g:tmru_file = g:tmru_file . '_' . sname
-"     endif
-"   endif
-"     if v:servername && filereadable(g:tmru_file.'_'.v:servername)
-" endfun
-" au VimEnter * call MyOnVimEnter()
+
+let s:my_context = ''
+fun! MySetContextVars(...)
+  let context = a:0 ? a:1 : ''
+  if len(context)
+    if &verbose | echom "Setting context:" context | endif
+    let suffix = '_' . context
+  else
+    let suffix = ''
+  endif
+
+  " Use separate MRU files store.
+  let g:tmru_file = s:global_tmru_file . suffix
+  let g:neomru#file_mru_path = s:vimsharedir . '/neomru/file' . suffix
+  let g:neomru#directory_mru_path = s:vimsharedir . '/neomru/dir' . suffix
+
+  " Use a separate shada file per session, derived from the main/current one.
+  if has('shada') && len(suffix) && &shada !~ ',n'
+    let shada_file = s:xdg_data_home.'/nvim/shada/session-'.fnamemodify(context, ':t').'.shada'
+    let &shada .= ',n'.shada_file
+    if !filereadable(shada_file)
+      wshada
+      rshada
+    endif
+  endif
+  let s:my_context = context
+endfun
+
+" Wrapper for .lvimrc files.
+fun! MySetContextFromLvimrc(context)
+  if !g:localvimrc_sourced_once && !len(s:my_context)
+    let lvimrc_dir = fnamemodify(g:localvimrc_script, ':p:h')
+    if getcwd()[0:len(lvimrc_dir)-1] == lvimrc_dir
+      call MySetContextVars(a:context)
+    endif
+  endif
+endfun
+
+" Setup session options. This is meant to be called once per created session.
+" The vars then get stored in the session itself.
+fun! MySetupSessionOptions()
+  if len(get(g:, 'MySessionName', ''))
+    call MyWarningMsg('MySetupSessionOptions: session is already configured'
+          \ .' (g:MySessionName: '.g:MySessionName.').')
+    return
+  endif
+
+  let sess_name = MyGetSessionName()
+  if !len(sess_name)
+    call MyWarningMsg('MySetupSessionOptions: this does not appear to be a session.')
+    return
+  endif
+
+  call MySetContextVars(sess_name)
+endfun
+
+augroup VimrcSetupContext
+  au!
+  " Check for already set context (might come from .lvimrc).
+  au VimEnter * if !len(s:my_context) | call MySetContextVars() | endif
+augroup END
 " }}}
 
 " xmledit: do not enable for HTML (default)

@@ -150,6 +150,7 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNoLazyForDefault 'ervandew/ag'
       MyNeoBundleNoLazyForDefault 'gabesoft/vim-ags'
       MyNeoBundleNoLazyForDefault 'blueyed/vim-airline'
+      MyNeoBundleNoLazyForDefault 'vim-airline/vim-airline-themes'
       MyNeoBundle 'vim-scripts/bufexplorer.zip', { 'name': 'bufexplorer' }
       MyNeoBundleNoLazyForDefault 'blueyed/bufkill.vim'
       MyNeoBundle 'vim-scripts/cmdline-completion', {
@@ -1305,14 +1306,15 @@ if 1 " has('eval')
   " Use corresponding theme from $BASE16_THEME, if set up in the shell.
   " BASE16_THEME should be in sudoer's env_keep for "sudo vi".
   if len($BASE16_THEME)
-    let base16colorspace=256
+    let base16colorspace=&t_Co
     if $BASE16_THEME =~ '^solarized'
       let s:use_colorscheme = 'solarized'
       let g:solarized_base16=1
-      let g:airline_theme = 'base16'
+      let g:airline_theme = 'solarized'
     else
       let s:use_colorscheme = 'base16-'.substitute($BASE16_THEME, '\.\(dark\|light\)$', '', '')
     endif
+    let g:solarized_termtrans=1
 
   elseif has('gui_running')
     let s:use_colorscheme = "solarized"

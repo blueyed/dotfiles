@@ -42,11 +42,8 @@ if 1 " has('eval') / `let` may not be available.
   endtry
   let s:use_pathogen = !s:use_neobundle
 
-  " Use NeoComplCache, if YouCompleteMe is not available (needs compilation). {{{
   let s:has_ycm = len(glob(s:bundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
   let s:use_ycm = s:has_ycm
-  let s:use_neocomplcache = ! s:use_ycm
-  " }}}
 
   " Light(er) setup?
   if exists('MyRcProfile')
@@ -137,8 +134,6 @@ if 1 " has('eval') / `let` may not be available.
               \ 'augroup': 'youcompletemeStart',
               \ 'autoload': { 'filetypes': ['c', 'vim'], 'commands': 'YcmCompleter' }
               \ }
-      else
-        MyNeoBundle 'Shougo/neocomplcache', { 'directory': 'neocomplcache' }
       endif
 
       MyNeoBundleLazy 'davidhalter/jedi-vim', '', {
@@ -511,9 +506,6 @@ if 1 " has('eval') / `let` may not be available.
     else
       " call add(g:pathogen_disabled, 'supertab')
     endif
-    if ! s:use_neocomplcache
-      call add(g:pathogen_disabled, 'neocomplcache')
-    endif
 
     let g:pathogen_disabled += [ "space" ]
     " nmap <unique> <Space> <Plug>SmartspaceNext
@@ -536,10 +528,6 @@ if 1 " has('eval') / `let` may not be available.
 
     call pathogen#infect()
   endif
-
-  " Use neocomplcache only, if it could be loaded/exists.
-  let s:use_neocomplcache = s:use_neocomplcache
-        \ && &rtp =~ '\<neocomplcache\>'
 endif
 
 " Settings {{{1
@@ -1005,69 +993,6 @@ if 1 " has('eval') / `let` may not be available.
   " Call bcompare with current and alternate file.
   command! BC call system('bcompare '.shellescape(expand('%')).' '.shellescape(expand('#')).'&')
 
-  if s:use_neocomplcache
-  " neocomplcache {{{
-    let g:neocomplcache_cursor_hold_i_time = 300 " default
-    let g:neocomplcache_enable_at_startup = 1
-    let g:neocomplcache_enable_camel_case_completion = 1
-    let g:neocomplcache_enable_cursor_hold_i = 1
-    " let g:neocomplcache_enable_debug = 1
-    let g:neocomplcache_enable_ignore_case = 0
-    let g:neocomplcache_enable_smart_case = 1
-    let g:neocomplcache_enable_underbar_completion = 1
-    let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-    let g:neocomplcache_min_syntax_length = 3
-
-    " Define dictionary.
-    " let g:neocomplcache_dictionary_filetype_lists = {
-    "     \ 'default' : '',
-    "     \ 'vimshell' : $HOME.'/.vimshell_hist',
-    "     \ 'scheme' : $HOME.'/.gosh_completions'
-    "     \ }
-
-    " Plugin key-mappings.
-    " imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-    " smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-    " inoremap <expr><C-g>     neocomplcache#undo_completion()
-    " inoremap <expr><C-l>     neocomplcache#complete_common_string()
-
-    " if exists(':<Plug>DiscretionaryEnd') " needs to come after pathogen
-      function! s:my_cr_function()
-        return pumvisible() ? neocomplcache#close_popup() : "\<CR>\<Plug>DiscretionaryEnd"
-      endfunction
-    " else
-      " function! s:my_cr_function()
-      "   return pumvisible() ? neocomplcache#close_popup() : "\<CR>"
-      " endfunction
-    " endif
-    " imap <expr><silent> <CR> <SID>my_cr_function()
-
-    " inoremap <CR> <C-R>=neocomplcache#smart_close_popup()<CR>
-
-    " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-    " <C-h>, <BS>: close popup and delete backword char.
-    inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-    inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-    " interferes with i_CTRL-Y (copy char above)
-    " inoremap <expr><C-y>  neocomplcache#close_popup()
-    " used by sparkup / not necessary:
-    " inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
-    " let g:neocomplcache_enable_insert_char_pre=1
-
-    " Force overwriting completefunc set by eclim
-    let g:neocomplcache_force_overwrite_completefunc = 1
-
-    " Enable heavy omni completion.
-    if !exists('g:neocomplcache_omni_patterns')
-      let g:neocomplcache_omni_patterns = {}
-    endif
-    let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-    let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-    let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-    let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-  endif " }}}
-
 
   " YouCompleteMe {{{
   " This needs to be the Python that YCM was built against.  (set in ~/.zshrc.local).
@@ -1218,7 +1143,6 @@ if 1
   let vimcachedir=expand('~/.cache/vim')
   " XXX: not really a cache (https://github.com/tomtom/tmru_vim/issues/22)
   let g:tlib_cache = vimcachedir . '/tlib'
-  let g:neocomplcache_temporary_dir = vimcachedir . '/neocomplcache'
   " TODO: cleanup
   let g:Powerline_cache_dir = vimcachedir . '/powerline'
 
@@ -1251,7 +1175,7 @@ if 1
   let g:tmru_file = s:new_tmru_files
 end
 
-let s:check_create_dirs = [vimcachedir, g:tlib_cache, g:neocomplcache_temporary_dir, g:Powerline_cache_dir, vimconfigdir, g:session_directory, vimsharedir, &directory]
+let s:check_create_dirs = [vimcachedir, g:tlib_cache, g:Powerline_cache_dir, vimconfigdir, g:session_directory, vimsharedir, &directory]
 
 if has('persistent_undo')
   let &undodir = vimsharedir . '/undo'
@@ -2691,7 +2615,7 @@ map <leader>tb :CommandTBuffer<CR>
 " }}}
 
 " Setup completefunc / base completion. {{{
-" (used by neocomplcache and as fallback (manual)).
+" (used as fallback (manual)).
 " au FileType python set completefunc=eclim#python#complete#CodeComplete
 if !s:use_ycm && has("autocmd") && exists("+omnifunc")
   augroup vimrc_base_omnifunc
@@ -3448,16 +3372,6 @@ if has('autocmd')
       silent g/^# \(Changes not staged\|Untracked files\)/norm zc
       normal! zt
       set spell spl=en,de
-
-      " Prefill NeoComplCache (obsolete). {{{
-      if s:use_neocomplcache && exists(':NeoComplCacheEnable')
-        NeoComplCacheEnable
-
-        let l:staged_files = split(system('git diff --name-only --cached'), "\n")
-        for l:filename in l:staged_files
-          exec 'NeoComplCacheCachingBuffer '.l:filename
-        endfor
-      endif  "}}}
     endfun
     au FileType gitcommit call MySetupGitCommitMsg()
 
@@ -3505,23 +3419,6 @@ let delimitMate_excluded_ft = "unite"
 
 
 if has('vim_starting') " only do this on startup, not when reloading .vimrc
-  " neocomplcache
-  if s:use_neocomplcache
-    " Define keyword.
-    call neocomplcache#disable_default_dictionary('g:neocomplcache_keyword_patterns')
-    let g:neocomplcache_keyword_patterns = {
-      \ 'default': '\k\+'
-      \ }
-    " let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-    " let g:neocomplcache_keyword_patterns['default'] = '\k\+' " default
-    " let g:neocomplcache_keyword_patterns['vim'] = '\k\+' " default
-    " let g:neocomplcache_keyword_patterns['vim'] = '\k\+' " default
-
-    " ref: https://github.com/Shougo/neocomplcache/issues/269
-    call neocomplcache#disable_default_dictionary('g:neocomplcache_same_filetype_lists')
-    let g:neocomplcache_same_filetype_lists = { '_': '_' }
-  endif
-
   " Don't move when you use *
   " nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
 endif

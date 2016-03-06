@@ -30,4 +30,4 @@ fi
 echo "*.dpi: $dpi" | xrdb -merge
 
 # Used by awesome, gets written from /etc/X11/xinit/xinitrc.d/xft-settings.sh.
-echo "Xft*dpi: $dpi" | xrdb -merge
+echo "Xft.dpi: $dpi" | xrdb -merge

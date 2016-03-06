@@ -1785,6 +1785,7 @@ map <A-.>     <Plug>NextTabOrBuffer
 map <C-S-Tab> <Plug>PrevTabOrBuffer
 map <C-Tab>   <Plug>NextTabOrBuffer
 
+
 " Switch to most recently used tab.
 " Source: http://stackoverflow.com/a/2120168/15690
 fun! MyGotoMRUTab()
@@ -1802,10 +1803,9 @@ fun! MyGotoMRUTab()
 endfun
 " Overrides Vim's gh command (start select-mode, but I don't use that).
 " It can be simulated using v<C-g> also.
-nnoremap gh  :call MyGotoMRUTab()<CR>
+nnoremap <silent> gh  :call MyGotoMRUTab()<CR>
 " nnoremap °  :call MyGotoMRUTab()<CR>
 " nnoremap <C-^>  :call MyGotoMRUTab()<CR>
-" nnoremap <tab><tab> :call MyGotoMRUTab()<CR>
 augroup MyTL
   au!
   au TabLeave * let g:mrutab = tabpagenr()
@@ -1908,7 +1908,7 @@ endfun
 augroup vimrc_title
   au!
   " XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
-  autocmd BufEnter * call MySetupTitleString()
+  autocmd BufEnter,BufWritePost,TextChanged * call MySetupTitleString()
 augroup END
 
 " Make Vim set the window title according to &titlestring.
@@ -1934,21 +1934,16 @@ endfun
 " cmap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
 
 " Change to current file's dir
-nmap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
+nnoremap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
 
 " yankstack, see also unite's history/yank {{{1
 if &rtp =~ '\<yankstack\>'
-  " Define own map for yankstack, Alt-p/esc-p does not work correctly in term.
-  let g:yankstack_map_keys = 0
-  " Setup yankstack to make yank/paste related mappings work.
-  " þ => altgr-p
+  " Do not map s/S (used by vim-sneak).
+  " let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
+  let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 'x', 'X', 'y', 'Y']
+
+  " Setup yankstack now to make yank/paste related mappings work.
   call yankstack#setup()
-  nmap þ <Plug>yankstack_substitute_older_paste
-  xmap þ <Plug>yankstack_substitute_older_paste
-  imap þ <Plug>yankstack_substitute_older_paste
-  nmap þ <Plug>yankstack_substitute_newer_paste
-  xmap þ <Plug>yankstack_substitute_newer_paste
-  imap þ <Plug>yankstack_substitute_newer_paste
 endif
 
 
@@ -2018,9 +2013,6 @@ vmap P p :call setreg('"', getreg('0')) <CR>
 " text is lost and it only works for putting the current register.
 "vnoremap p "_dp
 
-" Press ^F from insert mode to insert the current file name
-imap <C-F> <C-R>=expand("%")<CR>
-
 " imap <C-L> <Space>=><Space>
 
 " Toggle settings, mnemonic "set paste", "set color", ..
@@ -2031,9 +2023,6 @@ nnoremap <leader>sq :QuickfixsignsToggle<cr>
 nnoremap <leader>si :IndentGuidesToggle<cr>
 " Toggle mouse.
 nnoremap <leader>sm :exec 'set mouse='.(&mouse == 'a' ? '' : 'a')<cr>:set mouse?<cr>
-
-" let g:colorizer_fgcontrast=-1
-let g:colorizer_startup = 0
 
 " OLD: Ack/Ag setup, handled via ag plugin {{{
 " Use Ack instead of Grep when available
@@ -2137,10 +2126,9 @@ nnoremap coa :call ToggleLineNr()<cr>
 nnoremap cov :set <C-R>=empty(&virtualedit) ? 'virtualedit=all' : 'virtualedit='<CR><CR>
 "}}}
 
-" Tab completion options
-" (only complete to the longest unambiguous match, and show a menu)
-" set completeopt=longest,menu
-set completeopt=longest,menuone
+" Completion options.
+" Do not use longest, but make Ctrl-P work directly.
+set completeopt=menuone
 " set completeopt+=preview  " experimental
 set wildmode=list:longest,list:full
 " set complete+=kspell " complete from spell checking
@@ -2163,6 +2151,7 @@ ino jk <esc>l
 " cno jk <c-c>
 ino kj <esc>
 " cno kj <c-c>
+ino jh <esc>
 
 " Improve the Esc key: good for `i`, does not work for `a`.
 " Source: http://vim.wikia.com/wiki/Avoid_the_escape_key#Improving_the_Esc_key
@@ -2248,45 +2237,7 @@ command! FoldParagraphs call FoldParagraphs()
 " }}}
 
 " Sort Python imports.
-command! -range=% Isort :<line1>,<line2>! isort --lines 79 -
-
-" Paste register `reg`, while remembering current state of &paste
-function! MyPasteRegister(reg, mode)
-  let at_end_of_line = (col(".") >= col("$")-1)
-  echomsg "DEBUG" col(".") "/" col("$") "/ eol? " at_end_of_line
-
-  let pastecmd = 'P'
-  if a:mode == 'i'
-    if at_end_of_line
-      normal l
-      let pastecmd = 'p'
-    endif
-  endif
-  " if at_end_of_line && a:mode == 'i'
-  " if a:mode == 'i'
-  "   let pastecmd = 'p'
-  " else
-  "   let pastecmd = 'P'
-  " endif
-  exec 'normal "' . a:reg . pastecmd
-  " go to end of paste and right
-  normal ']l
-  " if a:mode == 'i'
-  "   if at_end_of_line
-  "     " like ":normal A"
-  "     return "startinsert!"
-  "   else
-  "     " like ":normal i"
-  "     return "startinsert"
-  "   endif
-  " endif
-  return '' " not relevant for a:mode=='n'
-endfunction
-" deactivated: using regular/unimpaired pasting; avoid Leader map in insert mode
-" imap <Leader>v  <C-O>:call MyPasteRegister("+", "i")<CR>
-" imap <Leader>V  <C-O>:call MyPasteRegister("*", 'i')<CR>
-" nmap <Leader>v       :call MyPasteRegister("+", 'n')<CR>
-" nmap <Leader>V       :call MyPasteRegister("*", 'n')<CR>
+command! -range=% -nargs=* Isort :<line1>,<line2>! isort --lines 79 <args> -
 
 " Map S-Insert to insert the "*" register literally.
 if has('gui')
@@ -2299,15 +2250,6 @@ endif
 
 " swap previously selected text with currently selected one (via http://vim.wikia.com/wiki/Swapping_characters,_words_and_lines#Visual-mode_swapping)
 vnoremap <C-X> <Esc>`.``gvP``P
-
-" Sudo write
-" Using SudoEdit instead (https://github.com/chrisbra/SudoEdit.vim)
-" if executable('sudo') && executable('tee')
-"   command! SUwrite
-"         \ execute 'w !sudo tee % > /dev/null' |
-"         \ setlocal nomodified
-" endif
-
 
 " Easy indentation in visual mode
 " This keeps the visual selection active after indenting.
@@ -2322,14 +2264,6 @@ nnoremap <expr> <leader>gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 " nnoremap gV `[v`]
 nmap gV <leader>gp
 
-
-" Syntax Checking entire file (Python)
-" Usage: :make (check file)
-" :clist (view list of errors)
-" :cn, :cp (move around list of errors)
-" NOTE: should be provided by checksyntax plugin
-" au BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"
-" au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 if 1 " has('eval') {{{1
 " Strip trailing whitespace {{{2
@@ -2363,7 +2297,6 @@ nnoremap <leader>st :Untrail<CR>
 " This uses a temporary file instead of "exec", which does not handle
 " statements after "endfunction".
 fun! SourceViaFile() range
-  echom "first/last" a:firstline a:lastline
   let tmpfile = tempname()
   exe a:firstline.",".a:lastline."w ".tmpfile
   exe "source" tmpfile
@@ -2394,7 +2327,16 @@ command! RR ProjectRootLCD
 command! RRR ProjectRootCD
 
 " Follow symlink and lcd to root.
-nnoremap <Leader>fr :FollowSymlink <bar> ProjectRootLCD<CR>
+fun! MyLCDToProjectRoot()
+  let oldcwd = getcwd()
+  FollowSymlink
+  ProjectRootLCD
+  if oldcwd != getcwd()
+    echom "lcd:" oldcwd "=>" getcwd()
+  endif
+endfun
+nnoremap <silent> <Leader>fr :call MyLCDToProjectRoot()<cr>
+
 
 " Toggle pattern (typically a char) at the end of line(s). {{{2
 function! MyToggleLastChar(pat)
@@ -2429,7 +2371,7 @@ fun! MyToggleSpellLang()
   endif
   echo "Set spl to ".&spl
 endfun
-noremap <Leader>sts :call MyToggleSpellLang()<cr>
+nnoremap <Leader>ss :call MyToggleSpellLang()<cr>
 
 " Grep in the current (potential unsaved) buffer {{{2
 " NOTE: obsolete with Unite.
@@ -2555,15 +2497,12 @@ endif
 " do not pick last item automatically (non-global: g:tmru_world.tlib_pick_last_item)
 let g:tlib_pick_last_item = 1
 let g:tlib_inputlist_match = 'cnf'
-let g:tmruSize = 500
+let g:tmruSize = 2000
+let g:tmru_resolve_method = ''  " empty: ask, 'read' or 'write'.
 let g:tlib#cache#purge_days = 365
-" let g:tmru#display_relative_filename = 1 " default: 0
-" let g:tlib#input#format_filename = 'r' " default: 'l', required for
-" display_relative_filename
 let g:tmru_world = {}
 let g:tmru_world.cache_var = 'g:tmru_cache'
 let g:tmru#drop = 0 " do not `:drop` to files in existing windows. XXX: should use/follow &switchbuf maybe?! XXX: not documented
-let g:tmru_sessions = 9 " disable
 
 " Easytags
 let g:easytags_on_cursorhold = 0 " disturbing, at least on work machine
@@ -2708,11 +2647,6 @@ endif
 
 let g:LustyExplorerSuppressRubyWarning = 1 " suppress warning when vim-ruby is not installed
 
-" use for encryption:
-" openssl enc -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd > 1
-" openssl enc -d -aes-256-cbc -a -salt -pass file:/home/daniel/.dotfiles/.passwd < 1
-let g:pastebin_api_dev_key = '95d8fa0dd25e7f8b924dd8103af42218'
-
 let g:EclimLargeFileEnabled = 0
 let g:EclimCompletionMethod = 'completefunc' " Default, picked up via SuperTab.
 " let g:EclimLogLevel = 6
@@ -2825,10 +2759,10 @@ endif " 1}}} eval guard
 
 " Mappings {{{1
 " Save.
-nnoremap <C-s>     :up<CR>
-inoremap <C-s>     <Esc>:up<CR>
+nnoremap <C-s> :up<CR>:if &diff \| diffupdate \| endif<cr>
+imap <C-s>     <Esc><C-s>
 
-" swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U)
+" Swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U).
 nnoremap <C-z> <C-y>
 nnoremap <C-y> <C-z>
 " map! <C-Z> <C-O>:stop<C-M>
@@ -2839,20 +2773,20 @@ nnoremap <C-y> <C-z>
 " defined in php-doc.vim
 " nnoremap <Leader>d :call PhpDocSingle()<CR>
 
-noremap <Leader>n :NERDTree<space>
-noremap <Leader>n. :execute "NERDTree ".expand("%:p:h")<cr>
-noremap <Leader>nb :NERDTreeFromBookmark<space>
-noremap <Leader>nn :NERDTreeToggle<cr>
-noremap <Leader>no :NERDTreeToggle<space>
-noremap <Leader>nf :NERDTreeFind<cr>
-noremap <Leader>nc :NERDTreeClose<cr>
-noremap <S-F1> :tab<Space>:help<Space>
+nnoremap <Leader>n :NERDTree<space>
+nnoremap <Leader>n. :execute "NERDTree ".expand("%:p:h")<cr>
+nnoremap <Leader>nb :NERDTreeFromBookmark<space>
+nnoremap <Leader>nn :NERDTreeToggle<cr>
+nnoremap <Leader>no :NERDTreeToggle<space>
+nnoremap <Leader>nf :NERDTreeFind<cr>
+nnoremap <Leader>nc :NERDTreeClose<cr>
+nnoremap <S-F1> :tab<Space>:help<Space>
 " ':tag {ident}' - difficult on german keyboard layout and not working in gvim/win32
-noremap <F2> g<C-]>
+nnoremap <F2> g<C-]>
 " expand abbr (insert mode and command line)
 noremap! <F2> <C-]>
-noremap <F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
-noremap <S-F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
+nnoremap <F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = []<cr>:endif<cr>:TRecentlyUsedFiles<cr>
+nnoremap <S-F3> :if exists('g:tmru#world')<cr>:let g:tmru#world.restore_from_cache = ['filter']<cr>:endif<cr>:TRecentlyUsedFiles<cr>
 " XXX: mapping does not work (autoclose?!)
 " noremap <F3> :CtrlPMRUFiles
 fun! MyF5()
@@ -3217,17 +3151,16 @@ inoreabbr cdata <![CDATA[]]><Left><Left><Left>
 inoreabbr sg  Sehr geehrte Damen und Herren,<cr>
 inoreabbr sgh Sehr geehrter Herr<space>
 inoreabbr sgf Sehr geehrte Frau<space>
-inoreabbr mfg Mit freundlichen Grüßen,<cr><C-g>u<C-r>=g:my_full_name<cr>
+inoreabbr mfg Mit freundlichen Grüßen<cr><C-g>u<C-r>=g:my_full_name<cr>
 inoreabbr LG Liebe Grüße,<cr>Daniel.
 inoreabbr VG Viele Grüße,<cr>Daniel.
 " iabbr sig -- <cr><C-r>=readfile(expand('~/.mail-signature'))
-" ellipsis
-inoreabbr ... …
 " sign "checkmark"
 inoreabbr scm ✓
 " date timestamp.
-inoreabbr <expr> dts strftime('%a, %d %b %Y %H:%M:%S %z')
-inoreabbr <expr> ds strftime('%a, %d %b %Y')
+inoreabbr <expr> _dts strftime('%a, %d %b %Y %H:%M:%S %z')
+inoreabbr <expr> _ds strftime('%a, %d %b %Y')
+inoreabbr <expr> _dt strftime('%Y-%m-%d')
 " date timestamp with fold markers.
 inoreabbr dtsf <C-r>=strftime('%a, %d %b %Y %H:%M:%S %z')<cr><space>{{{<cr><cr>}}}<up>
 " German/styled quotes.
@@ -3240,6 +3173,7 @@ inoreabbr <silent> _- –<space>
 " TODO: merge with &suffixes?!
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
+set wildignore+=*.mp4,*.pdf
 set wildignore+=*.sw?
 set wildignore+=*.pyc
 set wildignore+=__pycache__
@@ -3249,12 +3183,13 @@ endif
 
 " allow for tab-completion in vim, but ignore them with command-t
 let g:CommandTWildIgnore=&wildignore
-      \ .',htdocs/asset/**'
-      \ .',htdocs/media/**'
-      \ .',**/static/_build/**'
-      \ .',**/node_modules/**'
-      \ .',**/cache/**'
-      \ .',**/build/**'
+      \ .',htdocs/asset/*'
+      \ .',htdocs/media/*'
+      \ .',**/static/_build/*'
+      \ .',**/node_modules/*'
+      \ .',**/build/*'
+      \ .',**/cache/*'
+      \ .',**/.tox/*'
       " \ .',**/bower_components/*'
 
 let g:vdebug_keymap = {
@@ -3394,7 +3329,7 @@ if has('autocmd')
       endif
       set foldmethod=syntax foldlevel=1
       set nohlsearch nospell sw=4 scrolloff=0
-      silent g/^# \(Changes not staged\|Untracked files\)/norm zc
+      silent! g/^# \(Changes not staged\|Untracked files\|Changes to be committed\|Changes not staged for commit\)/norm zc
       normal! zt
       set spell spl=en,de
     endfun
@@ -3664,11 +3599,16 @@ if has("nvim")
   endif
 endif  " }}}
 
+" Patch: https://code.google.com/p/vim/issues/detail?id=319
+if exists('+belloff')
+  set belloff+=showmatch
+endif
+
+
 " Local config (if any). {{{1
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
 
 
-" Local file settings. {{{1
 " vim: fdm=marker foldlevel=0

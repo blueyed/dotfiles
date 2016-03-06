@@ -11,13 +11,14 @@ xprop=$(xprop -id $windowid _NET_WM_PID WM_CLASS WM_NAME WM_WINDOW_ROLE WM_TRANS
 # Get interesting props from awesome-client.
 if hash awesome-client >/dev/null; then
   awesome_info=$(cat <<EOF |
-    for _,c in ipairs(client.get()) do
+    for idx,c in ipairs(client.get()) do
       if c.window == $windowid then
         local r = ""
         for _,p in pairs({"border_width", "type", "border_color", "urgent",
-            "window", "floating"}) do
+            "window", "floating", "transient_for"}) do
           r = r .. p .. ": " .. tostring(c[p]) .. "\n"
         end
+        r = r .. "client.get idx: " .. tostring(idx) .. "\n"
         return "\n" .. r .. "\n"
       end
     end

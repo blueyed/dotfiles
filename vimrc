@@ -504,6 +504,8 @@ endif
 " set fileformat=unix
 set fileformats=unix,dos
 
+set noequalalways  " do not auto-resize windows when opening/closing them!
+
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
 set confirm " ask for confirmation by default (instead of silently failing)
 set nosplitright splitbelow

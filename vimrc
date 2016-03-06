@@ -3310,19 +3310,6 @@ let g:html_indent_inctags = "body,html,head,p,tbody"
 let g:html_indent_autotags = "br,input,img"
 
 
-" better-whitespace: disable by default.
-" TODO: DisableWhitespace is buggy across buffers?!
-if &rtp =~ '\<better-whitespace\>'
-  let g:better_whitespace_enabled = 0
-  nmap <Leader>sw :ToggleWhitespace<cr>
-  augroup MyBetterWhitespace
-    au!
-    au FileType * if &buftype == 'nofile' | exec 'DisableWhitespace' | endif
-    au FileType diff,gitcommit DisableWhitespace
-  augroup END
-endif
-
-
 " Setup late autocommands {{{
 if has('autocmd')
   augroup vimrc_late

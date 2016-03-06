@@ -25,7 +25,7 @@ echo "Entering a new shell session with virtualenv '${venv_name}' (${pyenv_versi
 echo "It will be removed when exiting (ctrl+d or 'exit')."
 
 # export PYENV_DEBUG=1
-pyenv activate "$venv_name"
+pyenv activate --force "$venv_name"
 $SHELL
 
 echo "Destroying temporary virtualenv '${venv_name}'."

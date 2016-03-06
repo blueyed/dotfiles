@@ -13,27 +13,34 @@ if ! [ -f $PASSWDFILE ]; then
   PASSWDFILE="$tempfile"
 fi
 
-if [ x$# = x0 ] && [ -t 0 ]; then
-  printf "Input: "
-  read input
+basename=$(basename $0)
+
+if [ "$basename" = "dotfiles-decrypt-verify" ]; then
+  # Test if decryption works properly.
+  dotfiles-decrypt "U2FsdGVkX1+T+vo4rP6Ah5NQz/DJjBhsIYiHKb6S2+k="
+  exit
+fi
+
+if [ x$# = x0 ]; then
+  input=
+  if [ -t 0 ]; then
+    printf "Input: "
+    read input
+  fi
 else
   input="$@"
 fi
 
-basename=$(basename $0)
-
-dotfiles_decrypt() {
-    echo "$input" | openssl enc -d -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE"
-}
-
 case $basename in
   dotfiles-encrypt)
-    echo "$input" | openssl enc -aes-256-cbc -a -A -salt -pass file:"$PASSWDFILE" ;;
+    cmd="openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE" ;;
   dotfiles-decrypt)
-    dotfiles_decrypt "$input" ;;
-
-  # test if decryption works properly:
-  dotfiles-decrypt-verify)
-    dotfiles_decrypt "U2FsdGVkX1/X+Wc1BfXHegcNhZx3c+0JHJgCfZwmI37JyrmQibztEjHs9xpuY64rt2gGmA7ibHdlLjniv0PlGw1Dnypbi/L3pgyDSksYVQhNPerpNBTWgy5YF9N1QTyy" > /dev/null ;;
-
+    cmd="openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE -d" ;;
+  *) echo "Unhandled basename: $basename." >&2; exit 64 ;;
 esac
+
+if [ -n "$input" ]; then
+  echo "$input" | $cmd
+else
+  $cmd
+fi

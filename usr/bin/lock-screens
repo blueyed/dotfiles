@@ -1,0 +1,33 @@
+#!/bin/bash
+# Lock all X displays and unlock them when one gets unlocked.
+
+# Get DISPLAY from "environ" of all processes.
+displays=$(grep -ahoz '^DISPLAY=.*$' /proc/*/environ 2>/dev/null \
+  | sort -u | cut -f2 -d=)
+
+pids=
+for d in $displays; do
+  DISPLAY=$d slock &
+  echo "Locked $d: PID $!."
+  pids="$pids $!"
+done
+
+# Wait for first successful job to finish.
+# This should not exit / continue in case slock exits with 1, because it's
+# running already.
+# NOTE: "wait -n" is a bashism.
+ret=
+while [[ "$ret" != 0 ]]; do
+  wait -n
+  ret=$?
+  if [[ "$ret" = 127 ]]; then
+    break
+  fi
+done
+
+echo "Unlocking: killing $pids"
+for pid in $pids; do
+  kill -0 $pid 2>/dev/null && kill $pid
+done
+
+exit 0

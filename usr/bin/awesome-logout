@@ -1,15 +1,9 @@
 #!/bin/sh
 
-if ! zenity --question --text "Logout?"; then
-  exit
+if [ "$1" != '--force' ]; then
+  if ! zenity --question --text "Logout?"; then
+    exit
+  fi
 fi
 
-if [ -n "$MY_SESSION_RUN_PID" ]; then
-  notify-send "Killing PID $MY_SESSION_RUN_PID."
-  # Make sure it's not STOPped (X "freeze" issue, related to envoy/gpg-agent?!).
-  kill -CONT $MY_SESSION_RUN_PID
-  kill $MY_SESSION_RUN_PID
-else
-  echo "MY_SESSION_RUN_PID not set!" >&2
-  notify-send "MY_SESSION_RUN_PID not set!"
-fi
+echo 'awesome.quit()' | awesome-client

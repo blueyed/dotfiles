@@ -34,13 +34,11 @@ if 1 " has('eval') / `let` may not be available.
     call neobundle#begin(s:bundles_path)
     let s:use_neobundle = 1
   catch
-    echom "NeoBundle not found, falling back to Pathogen!"
+    echom "NeoBundle not found!"
     echom "Error:" v:exception
-    set rtp+=~/.vim/bundle/pathogen
     let s:use_neobundle = 0
     let s:bundles_path = expand('~/.vim/bundles')
   endtry
-  let s:use_pathogen = !s:use_neobundle
 
   let s:has_ycm = len(glob(s:bundles_path.'/YouCompleteMe/third_party/ycmd/ycm_core.*'))
   let s:use_ycm = s:has_ycm
@@ -235,7 +233,6 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNoLazyForDefault 'kana/vim-operator-user'
       MyNeoBundle 'vim-scripts/pac.vim'
       MyNeoBundle 'mattn/pastebin-vim'
-      MyNeoBundle 'tpope/vim-pathogen'
       MyNeoBundle 'shawncplus/phpcomplete.vim'
       MyNeoBundle '2072/PHP-Indenting-for-VIm', { 'name': 'php-indent' }
       MyNeoBundle 'greyblake/vim-preview'
@@ -399,7 +396,7 @@ if 1 " has('eval') / `let` may not be available.
 
       MyNeoBundle 'blueyed/vim-diminactive'
 
-      " Previously disabled plugins (pathogen_disabled):
+      " Previously disabled plugins:
 
       MyNeoBundle 'MarcWeber/vim-addon-nix'
             \, {'name': 'nix', 'autoload': {'filetypes': ['nix']}
@@ -495,38 +492,6 @@ if 1 " has('eval') / `let` may not be available.
       call neobundle#call_hook('on_source')
     endif
 
-  elseif s:use_pathogen
-    set rtp+=~/.vim/bundle/pathogen
-    filetype off
-
-    let g:pathogen_disabled = [ 'golden-ratio', 'yankring' ]
-
-    if ! s:use_ycm
-      call add(g:pathogen_disabled, 'YouCompleteMe')
-    else
-      " call add(g:pathogen_disabled, 'supertab')
-    endif
-
-    let g:pathogen_disabled += [ "space" ]
-    " nmap <unique> <Space> <Plug>SmartspaceNext
-    " nmap <unique> <S-Space> <Plug>SmartspacePrev
-
-    " Requires python
-    if ! has('python') && ! has('python3')
-      let g:pathogen_disabled += [ "jedi" ]
-      let g:pathogen_disabled += [ "github-issues" ]
-      let g:pathogen_disabled += [ "ultisnips" ]
-      let g:pathogen_disabled += [ "xpath" ]
-    endif
-
-    " TO BE REMOVED"
-    let g:pathogen_disabled += [ "shymenu" ]
-    let g:pathogen_disabled += [ "easymotion" ]
-    let g:pathogen_disabled += [ 'xpath' ]
-    let g:pathogen_disabled += [ 'notes' ]  " XXX: needs writable path, not used currently
-    let g:pathogen_disabled += [ "ipython" ]  " Not used, overwrites <C-s> by default
-
-    call pathogen#infect()
   endif
 endif
 

@@ -6,7 +6,6 @@ VERBOSE=1
 
 INSTALL_FILES := ackrc agignore aptitude/config ctags \
 	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
-	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
 	hgrc irbrc oh-my-zsh pbuilderrc pdbrc pentadactyl \
 	pentadactylrc profile railsrc \
 	sackrc screenrc screenrc.common subversion/servers \

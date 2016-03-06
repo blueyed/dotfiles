@@ -791,7 +791,7 @@ fun! MyQuitWindow()
   let nb_tabs = tabpagenr('$')
   let was_last_tab = t == nb_tabs
 
-  if &ft != 'qf'
+  if &ft != 'qf' && getcmdwintype() == ''
     lclose
   endif
   confirm q

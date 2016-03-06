@@ -1854,36 +1854,36 @@ set title
 
 " Setup titlestring on BufEnter, when v:servername is available.
 fun! MySetupTitleString()
-  let &titlestring = '✐ '
+  let title = '✐ '
 
   let session_name = MyGetSessionName()
   if len(session_name)
-    let &titlestring .= '['.session_name.'] '
+    let title .= '['.session_name.'] '
   else
     " Add non-default servername to titlestring.
     let sname = MyGetNonDefaultServername()
     if len(sname)
-      let &titlestring .= '['.sname.'] '
+      let title .= '['.sname.'] '
     endif
   endif
 
   " Call the function and use its result, rather than including it.
   " (for performance reasons).
-  let &titlestring .= substitute(
+  let title .= substitute(
         \ ShortenFilenameWithSuffix('%', 15).' ('.ShortenPath(getcwd()).')',
         \ '%', '%%', 'g')
 
   if len(s:my_context)
-    let &titlestring .= ' {'.s:my_context.'}'
+    let title .= ' {'.s:my_context.'}'
   endif
 
   " Easier to type/find than the unicode symbol prefix.
-  let &titlestring .= ' - vim'
+  let title .= ' - vim'
 
   " Append $_TERM_TITLE_SUFFIX (e.g. user@host) to title (set via zsh, used
   " with SSH).
   if len($_TERM_TITLE_SUFFIX)
-    let &titlestring .= $_TERM_TITLE_SUFFIX
+    let title .= $_TERM_TITLE_SUFFIX
   endif
 
   " Setup tmux window name, see ~/.dotfiles/oh-my-zsh/lib/termsupport.zsh.
@@ -1898,6 +1898,8 @@ fun! MySetupTitleString()
       call system('tmux rename-window -t '.$TMUX_PANE.' 0')
     endif
   endif
+
+  let &titlestring = title
 
   " Set icon text according to &titlestring (used for minimized windows).
   let &iconstring = '(v) '.&titlestring

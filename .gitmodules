@@ -17,9 +17,6 @@
 [submodule "lib/zsh-syntax-highlighting"]
 	path = lib/zsh-syntax-highlighting
 	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
-[submodule "lib/powerline"]
-	path = lib/powerline
-	url = git://github.com/Lokaltog/powerline.git
 [submodule "lib/mc-solarized"]
 	path = lib/mc-solarized
 	url = git://github.com/peel/mc.git

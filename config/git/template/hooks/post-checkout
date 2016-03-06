@@ -9,6 +9,18 @@ if [ "$3" = 0 ]; then
   exit
 fi
 
-git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)"
+# Special template/display for "pip" cloning/checking out a VCS URL.
+if [ $(ps -p $(ps -p $PPID -o ppid=) -o comm=) = 'pip' ]; then
+  # Get "git" command from 2nd "args" entry of git parent process.
+  mode=$(ps -f -p $PPID -o args= | cut -f2 -d\ )
+  if [ $mode = checkout ]; then  # "checkout" might follow "clone".
+    git --no-pager log -1 --pretty=format:"%C(green) checkout: $(basename $PWD): %C(blue)%s%C(reset) (%cr, %h, %cN)"
+  else
+    git --no-pager log -1 --pretty=format:"%C(green)pip-$mode: $(basename $PWD): %C(blue)%s%C(reset) (%cr, %h, %cN)"
+  fi
+
+else
+  git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)"
+fi
 # Note: --no-pager does not add a newline.
 echo

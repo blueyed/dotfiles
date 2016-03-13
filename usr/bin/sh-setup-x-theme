@@ -186,13 +186,17 @@ echo "export MY_X_THEME_VARIANT=$variant;"
 
 # Update tmux env.
 if [ -n "$TMUX" ] && [ "$SHELL_ONLY" != 1 ]; then
+  debug "Updating tmux env.."
   COLORS=$(tput colors)
   debug "Colors: $COLORS"
   if [ "$COLORS" -lt 16 ]; then
-    echo "# SKIP: not enough colors ($COLORS are available (via 'tput colors'); TERM=$TERM)."
-  elif [ "$(tmux show-env MY_X_THEME_VARIANT)" != "MY_X_THEME_VARIANT=$variant" ]; then
-    echo "tmux set-environment MY_X_THEME_VARIANT $variant; \
-      source-file ~/.tmux.conf; display 'Reloaded tmux for $variant theme variant.'" #>/dev/null
+    debug "SKIP: not enough colors ($COLORS are available (via 'tput colors'); TERM=$TERM)."
+
+  elif [ -n "$_tmux_conf" ] \
+      && [ "$(tmux show-env MY_X_THEME_VARIANT 2>/dev/null)" != "MY_X_THEME_VARIANT=$variant" ]; then
+    echo "tmux set-environment MY_X_THEME_VARIANT $variant \; \
+      source-file $_tmux_conf \; \
+      display 'Reloaded tmux for $variant theme variant.'"
   fi
 fi
 

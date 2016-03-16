@@ -1287,19 +1287,6 @@ if 1 " has('eval')
   endfun
   nnoremap <Leader>sb :call ToggleBg()<cr>
 
-  " Detect gnome-terminal. This is kind of obsolete with urxvt being the
-  " default terminal now.
-  fun! MyIsGnomeTerminal()
-    if !exists('g:_MyIsGnomeTerminal')
-      if len($COLORTERM)
-        let g:_MyIsGnomeTerminal = ($COLORTERM == 'gnome-terminal')
-      else
-        let g:_MyIsGnomeTerminal = len(system('pstree -A -s $$ | grep -- -gnome-terminal-')) > 0
-      endif
-    endif
-    return g:_MyIsGnomeTerminal
-  endfun
-
   " Colorscheme: prefer solarized with 16 colors (special palette).
   let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
 
@@ -3496,7 +3483,7 @@ if !has('nvim') && exists('&t_SI')
     let &t_EI = "\<Esc>]50;CursorShape=0;BlinkingCursorEnabled=1\x7"
     let &t_SI = "\<Esc>]50;CursorShape=1;BlinkingCursorEnabled=1\x7"
   elseif &t_Co > 1 && $TERM != "linux"
-    " Fallback (e.g. for gnome-terminal): change only the color of the cursor.
+    " Fallback: change only the color of the cursor.
     let &t_SI = "\<Esc>]12;#0087ff\x7"
     let &t_EI = "\<Esc>]12;#5f8700\x7"
   endif

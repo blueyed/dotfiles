@@ -1,22 +1,26 @@
-set nocompatible " This must be first, because it changes other options as a side effect.
-
 scriptencoding utf-8
 
-" A bit faster than $SHELL (zsh).
-set shell=/bin/sh
+" " A bit faster than $SHELL (zsh), but also used for ':term'.
+" set shell=/bin/sh
 
 " Profiling. {{{
-if 1
-fun! ProfileStart()
-  let profile_file = '/tmp/vim.'.getpid().'.profile.txt'
-  echom "Profiling into" profile_file
+if 0
+" Start profiling. Optional arg: logfile path.
+fun! ProfileStart(...)
+  if a:0 && a:1 != 1
+    let profile_file = a:1
+  else
+    let profile_file = '/tmp/vim.'.getpid().'.profile.txt'
+    echom "Profiling into" profile_file
+  endif
   exec 'profile start '.profile_file
   profile! file **
   profile  func *
 endfun
-if get(g:, 'profile')
-  call ProfileStart()
+if len(get(g:, 'profile', ''))
+  call ProfileStart(g:profile)
 endif
+call ProfileStart()
 endif
 " }}}
 

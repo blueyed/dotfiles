@@ -1,0 +1,4 @@
+#!/bin/sh
+
+windowid=${1:-$(get-xwindow-id)}
+xprop -id "$windowid" _NET_WM_PID | cut -d\  -f3

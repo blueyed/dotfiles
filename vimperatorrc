@@ -29,6 +29,9 @@ map S :tab gg<Space>
 " nmap <C-Tab> <Pass>
 " nmap <C-S-Tab> <Pass>
 
+nnoremap <A-,> <C-S-Tab>
+nnoremap <A-.> <C-Tab>
+
 " command to clear history
 " command! clearhist sanitize commandline
 
@@ -225,13 +228,13 @@ nmap <Leader>p :emenu View.Sidebar.Pocket<cr>
 silent qmark 0 hahler.de
 silent qmark a https://www.google.com/contacts
 silent qmark c https://www.google.com/calendar
-silent qmark f facebook.com
+silent qmark f https://facebook.com
 silent qmark g https://groups.google.com/forum/#!myforums
-silent qmark h heise.de
+silent qmark h https://heise.de
 silent qmark m https://mail.google.com/mail
 silent qmark n https://www.google.de/reader/view | www.reddit.com | https://twitter.com
 silent qmark p https://www.producteev.com/dashboard.php
-silent qmark r reddit.com
+silent qmark r https://reddit.com
 silent qmark t https://twitter.com
 silent qmark z https://github.com/notifications
 
@@ -346,6 +349,9 @@ nnoremap K 20k
 nnoremap <silent> zt :topselect<CR>
 nnoremap <silent> zb :bottomselect<CR>
 nnoremap <silent> zc :removeselect<CR>
+
+nnoremap h H
+nnoremap l L
 
 " tab-options plugin:
 "set tabclose=opener,previous,left,right

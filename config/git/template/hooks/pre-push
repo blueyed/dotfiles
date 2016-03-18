@@ -20,6 +20,7 @@ CHECK_REMOTE_HEADS='^(master|develop|production|staging)$'
 
 # The log pattern to check.
 # (a regular expression for "git grep")
+# TODO: `git log --pretty=format:%s | grep -Eq '^(fixup|squash)'` seems to be better?!
 BAD_LOG_PATTERN='^(fixup!|squash!)'
 
 # Uncomment for debugging.

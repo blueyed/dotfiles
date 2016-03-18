@@ -6,16 +6,16 @@ basename=${0##*/}
 
 if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
-    basename=$1
+    name=$1
   else
-    basename=radioparadise
+    name=radioparadise
   fi
 fi
 
 player="mpg123 --control"
 player_pl="mpg123 --control -@"
 
-case $basename in
+case $name in
   radioparadise)
     $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u ;;
   fluxfm )
@@ -23,6 +23,7 @@ case $basename in
   radioeins )
     $player_pl http://www.radioeins.de/live.m3u ;;
   *)
-    echo "Unknown station: $basename"
+    echo "Unknown station: $name"
+    $player "$name"
     exit 64
 esac

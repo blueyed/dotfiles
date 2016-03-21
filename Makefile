@@ -15,7 +15,7 @@ INSTALL_FILES := ackrc agignore aptitude/config ctags \
 	config/gnome-session/sessions \
 	$(filter-out config/mc config/gnome-session, $(wildcard config/*)) \
 	$(wildcard local/share/applications/*) \
-	$(patsubst %/,%,sort $(dir $(wildcard urxvt/ext/*/)))
+	$(patsubst %/,%,$(sort $(dir $(wildcard urxvt/ext/*/))))
 
 REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf vimpagerrc
 

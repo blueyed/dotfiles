@@ -3177,17 +3177,14 @@ inoreabbr <silent> _' ‚‘<Left>
 inoreabbr <silent> _- –<space>
 "}}}
 
-" ignore certain files for completion (used also by Command-T)
-" TODO: merge with &suffixes?!
+" Ignore certain files for completion (used also by Command-T).
+" NOTE: different from suffixes: those get lower prio, but are not ignored!
 set wildignore+=*.o,*.obj,.git,.svn
 set wildignore+=*.png,*.jpg,*.jpeg,*.gif,*.mp3
 set wildignore+=*.mp4,*.pdf
 set wildignore+=*.sw?
 set wildignore+=*.pyc
-set wildignore+=__pycache__
-if has('wildignorecase') " not on MacOS
-  set wildignorecase
-endif
+set wildignore+=*/__pycache__/*
 
 " allow for tab-completion in vim, but ignore them with command-t
 let g:CommandTWildIgnore=&wildignore

@@ -19,8 +19,16 @@ for b in $bgs; do
 	fi
 	for c in {0..7}; do
 		[[ $b != "-" ]] && print -n "\x1b[$((b+40))m"
-		print -n "\x1b[$((c+30))m"   ${(l.$((COLUMNS/2-1)).)${color[$((c+30))]}}
-		print -n "\x1b[$((c+30));1m" ${(r.$((COLUMNS/2-1)).)${color[$((c+30))]}}
+		print -n "\x1b[$((c+30))m"   ${(l.$((COLUMNS/2-1)).):-"$c:${color[$((c+30))]}"}
+		print -n "\x1b[$((c+30));1m" ${(r.$((COLUMNS/2-1)).):-"$((c+8)):${color[$((c+30))]}"}
+		print -P %{${reset_color}%}
+	done
+
+	echo "== EXTENDED (base16) =="
+	for c in {8..19}; do
+		[[ $b != "-" ]] && print -n "\x1b[$((b+40))m"
+		print -n "\x1b[$((c+30))m"   ${(l.$((COLUMNS/2-1)).):-"$c:${color[$((c+30))]}"}
+		print -n "\x1b[$((c+30));1m" ${(r.$((COLUMNS/2-1)).):-"$((c+8)):${color[$((c+30))]}"}
 		print -P %{${reset_color}%}
 	done
 done

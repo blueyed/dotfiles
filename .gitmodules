@@ -65,3 +65,6 @@
 [submodule "lib/tmux-colors-solarized"]
 	path = lib/tmux-colors-solarized
 	url = git://github.com/seebi/tmux-colors-solarized.git
+[submodule "lib/diff-so-fancy"]
+	path = lib/diff-so-fancy
+	url = https://github.com/so-fancy/diff-so-fancy.git

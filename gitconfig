@@ -167,10 +167,9 @@
 	icdiff = true
   status = true
 
-	# EXPERIMENTAL
-	diff = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
-	log = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
-	show = /usr/share/git/diff-highlight/diff-highlight | $(git config core.pager)
+	diff = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
+	log = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
+	show = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 
 [sendemail]
 	confirm = always

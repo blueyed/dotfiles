@@ -435,8 +435,6 @@ if 1 " has('eval') / `let` may not be available.
       " MyNeoBundle 'atweiden/vim-betterdigraphs', { 'directory': 'betterdigraphs' }
       MyNeoBundle 'chrisbra/unicode.vim', { 'type__depth': 1 }
 
-      MyNeoBundleNoLazyForDefault 'repeatable-motions.vim'
-
       MyNeoBundle 'xolox/vim-colorscheme-switcher'
 
       MyNeoBundle 't9md/vim-choosewin'

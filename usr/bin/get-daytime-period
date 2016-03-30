@@ -7,7 +7,7 @@
 # fragile.  The result is cached for 10 minutes.
 
 is_remote() {
-  [ -n "$SSH_CLIENT" ] && return
+  [ -n "$SSH_CONNECTION" ] && return
   # Container in OpenVZ?
   [ -r /proc/user_beancounters ] && ! [ -d /proc/bc ]
 }

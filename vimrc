@@ -2767,7 +2767,7 @@ endif " 1}}} eval guard
 
 " Mappings {{{1
 " Save.
-nnoremap <C-s> :up<CR>:if &diff \| diffupdate \| endif<cr>
+nnoremap <silent> <C-s> :up<CR>:if &diff \| diffupdate \| endif<cr>
 imap <C-s>     <Esc><C-s>
 
 " Swap n_CTRL-Z and n_CTRL-Y (qwertz layout; CTRL-Z should be next to CTRL-U).

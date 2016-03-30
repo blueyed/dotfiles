@@ -210,7 +210,7 @@ if [ "$MY_X_THEME_VARIANT" != "$variant" ] \
     if [ -d "$BASE16_SHELL_DIR" ]; then
       echo "export BASE16_THEME=solarized.$variant"
       base16_scheme_file=$BASE16_SHELL_DIR/base16-solarized.${variant}.sh
-      [[ -s $base16_scheme_file ]] && echo "source $base16_scheme_file" || {
+      [ -s $base16_scheme_file ] && echo "source $base16_scheme_file" || {
         echo "$base16_scheme_file does not exist." >&2
       }
     fi
@@ -222,10 +222,10 @@ if [ "$MY_X_THEME_VARIANT" != "$variant" ] \
     fi
 
     if hash fzf >/dev/null; then
-      if [[ -z "$_FZF_DEFAULT_OPTS_BASE" ]]; then
+      if [ -z "$_FZF_DEFAULT_OPTS_BASE" ]; then
         echo 'export _FZF_DEFAULT_OPTS_BASE=$FZF_DEFAULT_OPTS'
       fi
-      if [[ $variant == "light" ]]; then
+      if [ $variant = "light" ]; then
         echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:21'"
       else
         echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:18'"

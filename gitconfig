@@ -168,7 +168,6 @@
   status = true
 
 	diff = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
-	log = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 	show = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 
 [sendemail]

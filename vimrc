@@ -1534,22 +1534,31 @@ fun! ShortenPath(path, ...)
     return a:path
   endif
   let base = a:0 ? a:1 : ""
-  let cache_key = base . ":" . a:path
+  let annotate = a:0 > 1 ? a:2 : 0
+  let cache_key = base . ":" . a:path . ":" . annotate
   if ! exists('s:_cache_shorten_path[cache_key]')
-    try
-      let tmpfile = tempname()
-      let s:_cache_shorten_path[cache_key] = system('$HOME/.dotfiles/usr/bin/shorten_path '
-            \ .shellescape(a:path).' '.shellescape(base).' 2>'.tmpfile)
-      if v:shell_error
-        echohl WarningMsg
-        echom "There was a problem running shorten_path: "
-              \ . join(readfile(tmpfile), "\n")
-        echohl None
+    let shorten_path = executable('shorten_path')
+          \ ? 'shorten_path'
+          \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
+          \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
+          \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
+    if annotate
+      let shorten_path .= ' -a'
+    endif
+    let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
+    let s:_cache_shorten_path[cache_key] = system(cmd)
+    if v:shell_error
+      try
+        let tmpfile = tempname()
+        call system(cmd.' 2>'.tmpfile)
+        call MyWarningMsg("There was a problem running shorten_path: "
+              \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')')
         let s:_has_functional_shorten_path = 0
-      endif
-    finally
-      call delete(tmpfile)
-    endtry
+        return a:path
+      finally
+        call delete(tmpfile)
+      endtry
+    endif
   endif
   return s:_cache_shorten_path[cache_key]
 endfun
@@ -1604,7 +1613,7 @@ function! ShortenFilename(...)  " {{{
   " Make path relative first, which might not work with the result from
   " `shorten_path`.
   let rel_path = fnamemodify(bufname, ":.")
-  let bufname = ShortenPath(rel_path, getcwd())
+  let bufname = ShortenPath(rel_path, getcwd(), 1)
   " }}}
 
   " Loop over all segments/parts, to mark symlinks.
@@ -1636,14 +1645,6 @@ function! ShortenFilename(...)  " {{{
         endfor
       else
         let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
-      endif
-    endif
-    " Add indicator if this part of the filename is a symlink.
-    if getftype(wholepath) == "link"
-      if parts[i][0] == s:PS
-        let parts[i] = parts[i][0] . '↬ ' . parts[i][1:]
-      else
-        let parts[i] = '↬ ' . parts[i]
       endif
     endif
     let i += 1

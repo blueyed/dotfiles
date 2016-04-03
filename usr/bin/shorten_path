@@ -18,6 +18,7 @@ tests() {
   set -x -e
   cd ~
   [[ $(shorten_path .dotfiles/vimrc) == '~df/vimrc' ]]
+  [[ $(shorten_path -a .vimrc) == '↬.vimrc' ]]
 
   cd .dotfiles
   [[ $(shorten_path ~/.dotfiles/vimrc) == 'vimrc' ]]
@@ -52,6 +53,12 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+if [ x"$1" = "x-a" ]; then
+  annotate=1; shift
+else
+  annotate=0
+fi
+
 path="$1"
 if [ -n "$2" ]; then
   cd "$2"
@@ -72,6 +79,24 @@ if [[ $path = ../* ]] && [[ $abs_path != $PWD/* ]]; then
 fi
 
 pwd_short=${(D)PWD}/
-path_short=${(D)abs_path}
 # NOTE: "(Q)" is required to remove escaping of e.g. "[" from the name.
-printf "${(Q)${path_short#$pwd_short}}"
+path_short=${(Q)${(D)abs_path}#$pwd_short}
+if [ "$annotate" = 1 ]; then
+  # Annotate symlinks.
+  path=
+  for i in ${(s:/:)path_short}; do
+    if [ -n "$path" ]; then
+      path="$path/$i"
+      printf "/"
+    else
+      path="$i"
+    fi
+    if [[ -h $~path ]]; then
+      printf "↬$i"
+    else
+      printf $i
+    fi
+  done
+else
+  printf "$path_short"
+fi

@@ -1,10 +1,32 @@
 #!/bin/sh
+# Automatically use a firefox/thunderbird profile based on $MY_X_SESSION_NAME.
 
 # See also ./thunderbird.
 
 # XXX: get $program bin from after removing ourself from PATH.
-program=firefox
-profile_root=~/.mozilla/$program/
+program=$(basename $0)
+
+if [ "$program" = thunderbird ]; then
+  profile_root=~/.$program/
+  # Start thunderbird with German date format.
+  # 'en_DK' would allow for ISO 8601 format.
+  # See: http://kb.mozillazine.org/Date_display_format#Configuring_the_date.2Ftime_system_settings_on_your_computer
+  export LC_TIME=de_DE.UTF-8
+  [ "$LC_ALL" != "$LC_TIME" ] && unset LC_ALL
+elif [ "$program" = firefox ]; then
+  profile_root=~/.mozilla/$program/
+else
+  echo "$0: unexpected program basename: $program" >&2
+fi
+
+auto_use_profile=1
+for i; do
+  case $i in
+    -P|--profile|--ProfileManager)
+      auto_use_profile=0
+      break ;;
+  esac
+done
 
 start_profile() {
   profile_dir="$(find $profile_root -name "*.$1")"
@@ -17,11 +39,13 @@ start_profile() {
   fi
 }
 
-session_name=$MY_X_SESSION_NAME
-if [ -n "$session_name" ]; then
-  start_profile $session_name "$@"
-  if [ "$session_name" = personal ]; then
-    start_profile private "$@"
+if [ "$auto_use_profile" = 1 ]; then
+  session_name=$MY_X_SESSION_NAME
+  if [ -n "$session_name" ]; then
+    start_profile $session_name "$@"
+    if [ "$session_name" = personal ]; then
+      start_profile private "$@"
+    fi
   fi
 fi
 exec /usr/bin/$program "$@"

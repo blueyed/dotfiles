@@ -12,7 +12,7 @@
 # and needs a cache file.
 
 # Self-tests: run with '--test'. {{{
-tests() {
+if [ x$1 = 'x--test' ]; then
   hash -d df=~/.dotfiles
 
   set -x -e
@@ -28,23 +28,38 @@ tests() {
   [[ $(shorten_path ~/.dotfiles/foo/bar) == 'foo/bar' ]]
   [[ $(shorten_path foo/bar) == 'foo/bar' ]]
   [[ $(shorten_path ../.dotfiles/foo/bar) == 'foo/bar' ]]
+  [[ $(shorten_path -a ../.dotfiles/foo/bar) == 'foo/bar' ]]
 
   # With "base" dir.
   cd ~
   [[ $(shorten_path .dotfiles/vimrc $PWD) == '~df/vimrc' ]]
   [[ $(shorten_path vimrc .dotfiles) == 'vimrc' ]]
   [[ $(shorten_path ~/.dotfiles/vimrc /) == '~df/vimrc' ]]
+  [[ $(shorten_path -a ~/.dotfiles/vimrc /) == '~df/vimrc' ]]
 
   cd .dotfiles
   [[ $(shorten_path ../.vimrc) == '../.vimrc' ]]
   [[ $(shorten_path ../non-existent) == '../non-existent' ]]
 
+  # Tests in temp dir.
+  tmpdir="$(mktemp -d)"
+  trap 'test -d "$tmpdir" && rm -rf "$tmpdir"' 0
+  cd $tmpdir
+  touch foo
+  ln -s foo bar
+  [[ $(shorten_path -a foo) == 'foo' ]]
+  [[ $(shorten_path -a bar) == '↬bar' ]]
+  [[ $(shorten_path -a $tmpdir) == "$tmpdir" ]]
+  [[ $(shorten_path -a $tmpdir/bar ~) == "$tmpdir/↬bar" ]]
+
+  # Canonical path (removing empty segments).
+  [[ $(shorten_path .dotfiles//vimrc ~) == '~df/vimrc' ]]
+  [[ $(shorten_path -a $tmpdir//bar ~) == "$tmpdir/↬bar" ]]
+  [[ $(shorten_path -a ./bar) == '↬bar' ]]
+
   set +x
   time ( for i in {1..200}; do shorten_path foo; done )
-}
-if [ x$1 = 'x--test' ]; then
-  tests
-  return
+  exit
 fi
 # }}}
 
@@ -84,17 +99,24 @@ path_short=${(Q)${(D)abs_path}#$pwd_short}
 if [ "$annotate" = 1 ]; then
   # Annotate symlinks.
   path=
-  for i in ${(s:/:)path_short}; do
-    if [ -n "$path" ]; then
-      path="$path/$i"
-      printf "/"
-    else
-      path="$i"
+  for i in "${(s:/:)path_short}"; do
+    if [[ -z "$i" ]]; then
+      if [[ -z "$path" ]]; then
+        path="/"
+      fi
+      continue
     fi
+    if [[ -n "$path" ]]; then
+      if [[ "$path" != "/" ]]; then
+        path="$path/"
+      fi
+      printf "/"
+    fi
+    path="$path$i"
     if [[ -h $~path ]]; then
       printf "↬$i"
     else
-      printf $i
+      printf "$i"
     fi
   done
 else

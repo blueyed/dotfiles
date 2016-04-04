@@ -18,5 +18,3 @@ else
 
   sudo make install
 fi
-
-awesome-restart

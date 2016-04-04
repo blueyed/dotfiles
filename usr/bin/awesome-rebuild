@@ -5,7 +5,15 @@ set -ex
 # Prefer using PKGBUILD/makepkg on Arch Linux.
 if [ -d ~/builds/awesome-git ]; then
   cd ~/builds/awesome-git
-  makepkg -srie
+
+  cur_version=$(pacman -Qi awesome-git|grep -E 'Version|Build Date')
+  PKGEXT=.tar makepkg -srief
+  new_version=$(pacman -Qi awesome-git|grep -E 'Version|Build Date')
+
+  if [ "$new_version" = "$cur_version" ]; then
+    echo "Version has not changed."
+    exit 1
+  fi
 
 else
   cd ~/src/awesome

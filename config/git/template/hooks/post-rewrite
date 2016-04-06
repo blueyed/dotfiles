@@ -1,0 +1,4 @@
+#!/bin/sh
+if [ "$1" = "rebase" ]; then
+  exec .git/hooks/post-merge
+fi

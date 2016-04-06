@@ -27,7 +27,7 @@ fi
 # Default to $watch_src when there are no pytest args.
 # This speeds up collecting tests.
 if [ -z "$1" ]; then
-  runner_src=$watch_src
+  runner_src="$watch_src"
 else
   runner_src=
 fi
@@ -35,24 +35,40 @@ fi
 
 # Get the current window-status-style option from tmux (window or global).
 TMUX_FG_DEFAULT=$(a=$(tmux show -w window-status-style | cut -f2 -d\ ); \
-       [ -n "$a" ] && echo $a || tmux show -wg window-status-style | cut -f2 -d\ )
+       [ -n "$a" ] && echo "$a" || tmux show -wg window-status-style | cut -f2 -d\ )
 # Remove ",italics" which I am currently using for any running command via
 # preexec.
 TMUX_FG_DEFAULT=${TMUX_FG_DEFAULT%,italics}
 
+# Template for printf.
+# shellcheck disable=SC2016,SC1004
 template_set_tmux_style='test -n "$TMUX_PANE" && { \
   tmux set-window-option -q -t "$TMUX_PANE" window-status-style "%s"; } \
-  || notify-send "%s"'
+  ; { msg="%s"; test -n "$msg" && notify-send "$msg"; }'
+
+# Create a script to be executed via --afterrun.
+# This is required to get the exit code.
+afterrun_script="$(mktemp)"
+chmod +x "$afterrun_script"
+cat > "$afterrun_script" <<EOF
+echo AFTER: \$@
+if [ "\$1" = 0 ]; then
+  $(printf "$template_set_tmux_style" fg=green 'Tests passed.')
+elif [ "\$1" = 5 ]; then
+  $(printf "$template_set_tmux_style" fg=green 'No tests collected.')
+elif [ "\$1" = 2 ]; then
+  $(printf "$template_set_tmux_style" fg=red 'Tests interrupted.')
+else
+  $(printf "$template_set_tmux_style" fg=red 'Tests failed.')
+fi
+EOF
+
+trap "echo CLEANUP; rm '$afterrun_script'" 0
 
 ptw "$watch_src" \
-  --beforerun "$(printf "$template_set_tmux_style" $TMUX_FG_DEFAULT,italics ''); \
-    childs=\"\$(ps -o pid= --ppid \$PPID | grep -v \$$)\"; \
-    test -n \"\$childs\" && echo \"Killing childs: \$childs.\" \
-    && kill -INT \$childs;" \
-  --onpass "$(printf "$template_set_tmux_style" fg=green 'Tests passed.')" \
-  --onfail "$(printf "$template_set_tmux_style" fg=red 'Tests failed.')" \
-  --onsigint "$(printf "$template_set_tmux_style" fg=red 'Tests interrupted.')" \
-  --onexit "test -n '$TMUX_PANE' && tmux set-window-option -u -q \
+  --beforerun "$(printf "$template_set_tmux_style" "$TMUX_FG_DEFAULT,italics" '')" \
+  --afterrun "$afterrun_script" \
+  --onexit "echo ONEXIT; test -n '$TMUX_PANE' && tmux set-window-option -u -q \
           -t '$TMUX_PANE' window-status-style" \
-  ${TMUX:+--nobeep } \
+  ${TMUX:+--nobeep} \
   -- $runner_src -v -ra "$@"

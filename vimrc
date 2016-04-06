@@ -221,7 +221,6 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'raymond-w-ko/vim-lua-indent', {
             \ 'autoload': {'filetypes': 'lua'}}
 
-      MyNeoBundle 'vim-scripts/luarefvim'
       MyNeoBundleNoLazyForDefault 'sjbach/lusty'
       MyNeoBundle 'vim-scripts/mail.tgz', { 'name': 'mail', 'directory': 'mail_tgz' }
       MyNeoBundle 'tpope/vim-markdown'

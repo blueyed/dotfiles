@@ -4,7 +4,7 @@
 # See also ./thunderbird.
 
 # XXX: get $program bin from after removing ourself from PATH.
-program=$(basename $0)
+program="$(basename "$0")"
 
 if [ "$program" = thunderbird ]; then
   profile_root=~/.$program/
@@ -15,6 +15,12 @@ if [ "$program" = thunderbird ]; then
   [ "$LC_ALL" != "$LC_TIME" ] && unset LC_ALL
 elif [ "$program" = firefox ]; then
   profile_root=~/.mozilla/$program/
+
+  # Indicate to awesome that the client window should get raised and jumped to.
+  echo "Firefox $(date +%s)" > /tmp/.awesome-raise-next-client
+
+  # # Continue any stopped processed (via sigstop-if-not-focused).
+  # pkill -CONT firefox
 else
   echo "$0: unexpected program basename: $program" >&2
 fi
@@ -29,23 +35,23 @@ for i; do
 done
 
 start_profile() {
-  profile_dir="$(find $profile_root -name "*.$1")"
+  profile_dir="$(find "$profile_root" -name "*.$1")"
   shift
   if [ -z "$profile_dir" ]; then
     echo "Could not find profile dir for $session_name." >&2
     return 1
   else
-    exec /usr/bin/$program --profile $profile_dir "$@"
+    exec "/usr/bin/$program" --profile "$profile_dir" "$@"
   fi
 }
 
 if [ "$auto_use_profile" = 1 ]; then
   session_name=$MY_X_SESSION_NAME
   if [ -n "$session_name" ]; then
-    start_profile $session_name "$@"
+    start_profile "$session_name" "$@"
     if [ "$session_name" = personal ]; then
       start_profile private "$@"
     fi
   fi
 fi
-exec /usr/bin/$program "$@"
+exec "/usr/bin/$program" "$@"

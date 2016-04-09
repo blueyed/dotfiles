@@ -2304,7 +2304,7 @@ nnoremap <leader>st :Untrail<CR>
 " statements after "endfunction".
 fun! SourceViaFile() range
   let tmpfile = tempname()
-  exe a:firstline.",".a:lastline."w ".tmpfile
+  call writefile(getbufline(bufnr('%'), a:firstline, a:lastline), tmpfile)
   exe "source" tmpfile
   if &verbose
     echom "Sourced ".(a:lastline - a:firstline + 1)." lines."

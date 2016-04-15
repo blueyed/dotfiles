@@ -22,7 +22,7 @@ X_THEME_VARIANT_CONFIG_FILE=~/.config/x-theme-variant
 
 debug() {
   if [ -n "$DEBUG" ]; then
-    echo "$(date +%FT%T) [sh-setup-x-theme] $@" >&2
+    echo "$(date +%FT%T) [sh-setup-x-theme] $*" >&2
   fi
   # echo "$(date +%FT%T) [sh-setup-x-theme:$$:$(ps -o cmd= $$)] $@" >> /tmp/debug-sh-setup-x-theme.log
 }
@@ -62,7 +62,7 @@ while [ "${1#-*}" != "$1" ]; do
   shift
 done
 
-debug "RUN: $0 $@"
+debug "RUN: $0 $*"
 variant=$1
 debug "Requested variant: $variant"
 
@@ -83,7 +83,7 @@ else
         fi
         ;;
       light|dark)
-        echo $1 > "$X_THEME_VARIANT_CONFIG_FILE"
+        echo "$1" > "$X_THEME_VARIANT_CONFIG_FILE"
         echo "Saved variant=$1." >&2 ;;
       * ) echo "Invalid variant: $variant" >&2; exit 64
     esac
@@ -132,7 +132,7 @@ if [ -n "$DISPLAY" ] && [ "$USER" != "root" ] && [ "$SHELL_ONLY" != 1 ] \
   debug "cur_xrdb_theme=$cur_xrdb_theme"
   if [ "$FORCE" = 1 ] || [ "$cur_xrdb_theme" != "$variant" ]; then
     if [ "$variant" = dark ]; then
-      xrdb -DSOLARIZED_DARK -I$HOME -merge ~/.Xresources
+      xrdb -DSOLARIZED_DARK -I"$HOME" -merge ~/.Xresources
 
       # Send escape codes for urxvt to change colors.
       if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
@@ -142,7 +142,7 @@ if [ -n "$DISPLAY" ] && [ "$USER" != "root" ] && [ "$SHELL_ONLY" != 1 ] \
         # [ -n "$TMUX" ] && echo "printf '\033\\'"
       fi
     elif [ "$variant" = light ]; then
-      xrdb -DSOLARIZED_LIGHT -I$HOME -merge ~/.Xresources
+      xrdb -DSOLARIZED_LIGHT -I"$HOME" -merge ~/.Xresources
 
       # Send escape codes for urxvt to change colors.
       if [ "${TERM#rxvt}" != "$TERM" ] || [ "${COLORTERM#rxvt}" != "$COLORTERM" ]; then
@@ -173,7 +173,7 @@ if [ "$FORCE" = 1 ] || [ "$DIRCOLORS_SETUP" != "$DIRCOLORS_FILE" ]; then
   if [ -n "$DIRCOLORS_SETUP" ]; then
     debug "Adjusting dircolors for variant=$variant."
   else
-    debug "TODO: dircolors only during .xresources ($(basename $0))."
+    debug "TODO: dircolors only during .xresources ($(basename "$0"))."
   fi
 
   # debug "running: dircolors -b $DIRCOLORS_FILE"
@@ -223,7 +223,8 @@ if [ "$MY_X_THEME_VARIANT" != "$variant" ] \
 
     if hash fzf >/dev/null; then
       if [ -z "$_FZF_DEFAULT_OPTS_BASE" ]; then
-        echo 'export _FZF_DEFAULT_OPTS_BASE=$FZF_DEFAULT_OPTS'
+        # shellcheck disable=SC2016
+        echo 'export _FZF_DEFAULT_OPTS_BASE="$FZF_DEFAULT_OPTS"'
       fi
       if [ $variant = "light" ]; then
         echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:21'"

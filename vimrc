@@ -2153,7 +2153,12 @@ set wildmode=list:longest,list:full
 
 " Maps for jk and kj to act as Esc (idempotent in normal mode).
 " NOTE: jk moves to the right after Esc, leaving the cursor at the current position.
-ino jk <esc>l
+fun! MyRightWithoutError()
+  if col(".") < len(getline("."))
+    normal! l
+  endif
+endfun
+inoremap <silent> jk <esc>:call MyRightWithoutError()<cr>
 " cno jk <c-c>
 ino kj <esc>
 " cno kj <c-c>

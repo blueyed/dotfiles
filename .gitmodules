@@ -26,9 +26,6 @@
 [submodule "lib/base16/base16-shell"]
 	path = lib/base16/base16-shell
 	url = git://github.com/chriskempson/base16-shell.git
-[submodule "lib/sack"]
-	path = lib/sack
-	url = git://github.com/sampson-chen/sack.git
 [submodule "lib/awesome/awesome-revelation"]
 	path = config/awesome/revelation
 	url = git://github.com/guotsuan/awesome-revelation.git

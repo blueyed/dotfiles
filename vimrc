@@ -156,7 +156,7 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNoLazyForDefault 'blueyed/vim-airline'
       MyNeoBundleNoLazyForDefault 'vim-airline/vim-airline-themes'
       MyNeoBundle 'vim-scripts/bufexplorer.zip', { 'name': 'bufexplorer' }
-      MyNeoBundleNoLazyForDefault 'blueyed/bufkill.vim'
+      MyNeoBundleNoLazyForDefault 'qpkorr/vim-bufkill'
       MyNeoBundle 'vim-scripts/cmdline-completion', {
             \ 'autoload': {'mappings': [['c', '<Plug>CmdlineCompletion']]}}
       MyNeoBundle 'kchmck/vim-coffee-script'
@@ -182,6 +182,7 @@ if 1 " has('eval') / `let` may not be available.
       " MyNeoBundleNoLazyForDefault 'raymond-w-ko/detectindent'
       MyNeoBundleNoLazyForDefault 'roryokane/detectindent'
       MyNeoBundleNoLazyForDefault 'tpope/vim-dispatch'
+      MyNeoBundleNoLazyForDefault 'radenling/vim-dispatch-neovim'
       MyNeoBundle 'jmcomets/vim-pony', { 'directory': 'django-pony' }
       MyNeoBundle 'xolox/vim-easytags', {
             \ 'autoload': { 'commands': ['UpdateTags'] },
@@ -191,6 +192,7 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'int3/vim-extradite'
       MyNeoBundle 'jmcantrell/vim-fatrat'
       MyNeoBundleNoLazyForDefault 'kopischke/vim-fetch'
+      MyNeoBundleNoLazyForDefault 'kopischke/vim-stay'
       MyNeoBundle 'thinca/vim-fontzoom'
       MyNeoBundleNoLazyForDefault 'idanarye/vim-merginal'
       MyNeoBundle 'mkomitee/vim-gf-python'
@@ -199,7 +201,6 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'jaxbot/github-issues.vim'
       MyNeoBundle 'gregsexton/gitv'
       MyNeoBundleNeverLazy 'jamessan/vim-gnupg'
-      MyNeoBundle 'zhaocai/GoldenView.Vim'
       MyNeoBundle 'google/maktaba'
       MyNeoBundle 'blueyed/grep.vim'
       MyNeoBundle 'mbbill/undotree', {
@@ -221,7 +222,9 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'raymond-w-ko/vim-lua-indent', {
             \ 'autoload': {'filetypes': 'lua'}}
 
-      MyNeoBundleNoLazyForDefault 'sjbach/lusty'
+      if has('ruby')
+        MyNeoBundleNoLazyForDefault 'sjbach/lusty'
+      endif
       MyNeoBundle 'vim-scripts/mail.tgz', { 'name': 'mail', 'directory': 'mail_tgz' }
       MyNeoBundle 'tpope/vim-markdown'
       MyNeoBundle 'nelstrom/vim-markdown-folding'
@@ -304,19 +307,20 @@ if 1 " has('eval') / `let` may not be available.
         MyNeoBundle 'Keithbsmiley/tmux.vim', {
               \ 'name': 'syntax-tmux',
               \ 'autoload': {'filetypes': ['tmux']} }
-        MyNeoBundleNoLazyForDefault 'blueyed/vim-tmux-navigator'
         MyNeoBundle 'wellle/tmux-complete.vim'
+        if len($TMUX)
+          MyNeoBundleNoLazyForDefault 'blueyed/vim-tmux-navigator'
+          MyNeoBundleNoLazyForDefault 'tmux-plugins/vim-tmux-focus-events'
+        endif
       endif
 
       " Dependency
       " MyNeoBundle 'godlygeek/tabular'
       MyNeoBundle 'junegunn/vim-easy-align'
-            \ ,{ 'autoload': {'commands': ['EasyAlign']} }
-
-      " Display registers with " / @ / CTRL-R.
-      MyNeoBundleNoLazyForDefault 'junegunn/vim-peekaboo'
+            \ ,{ 'autoload': {'commands': ['EasyAlign', 'LiveEasyAlign']} }
 
       MyNeoBundle 'majutsushi/tagbar'
+            \ ,{ 'autoload': {'commands': ['TagbarToggle']} }
       MyNeoBundle 'tpope/vim-tbone'
       MyNeoBundleNoLazyForDefault 'tomtom/tcomment_vim'
 
@@ -330,10 +334,13 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundle 'bps/vim-textobj-python'
             \ ,{'depends': 'kana/vim-textobj-user',
             \   'autoload': {'filetypes': 'python'}}
-      MyNeoBundleNoLazyForDefault 'inkarkat/argtextobj.vim', {'depends': ['tpope/vim-repeat', 'vim-scripts/ingo-library']}
-      MyNeoBundleNoLazyForDefault 'vim-scripts/ArgsAndMore', {'depends': ['vim-scripts/ingo-library']}
+      MyNeoBundleNoLazyForDefault 'inkarkat/argtextobj.vim',
+            \ {'depends': ['tpope/vim-repeat', 'vim-scripts/ingo-library']}
+      MyNeoBundleNoLazyForDefault 'vim-scripts/ArgsAndMore',
+            \ {'depends': ['vim-scripts/ingo-library']}
       " MyNeoBundle 'kana/vim-textobj-django-template', 'fix'
       MyNeoBundle 'mjbrownie/django-template-textobjects'
+            \ , {'autoload': {'filetypes': ['htmldjango']} }
       MyNeoBundle 'vim-scripts/parameter-text-objects'
 
       " paulhybryant/vim-textobj-path  " ap/ip (next path w/o basename), aP/iP (prev)
@@ -365,18 +372,6 @@ if 1 " has('eval') / `let` may not be available.
       " Enhanced omnifunc for ft=vim.
       MyNeoBundle 'c9s/vimomni.vim'
 
-      let vimproc_updcmd = has('win64') ?
-            \ 'tools\\update-dll-mingw 64' : 'tools\\update-dll-mingw 32'
-      execute "MyNeoBundle 'Shougo/vimproc.vim'," . string({
-            \ 'build' : {
-            \     'windows' : vimproc_updcmd,
-            \     'cygwin' : 'make -f make_cygwin.mak',
-            \     'mac' : 'make -f make_mac.mak',
-            \     'unix' : 'make -f make_unix.mak',
-            \    },
-            \    'autoload': {'commands': ['VimProcBang', 'VimProcRead'] }
-            \ })
-
       MyNeoBundle 'inkarkat/VimTAP', { 'name': 'VimTAP' }
       " Try VimFiler instead; vinegar maps "." (https://github.com/tpope/vim-repeat/issues/19#issuecomment-59454216).
       " MyNeoBundle 'tpope/vim-vinegar'
@@ -398,7 +393,8 @@ if 1 " has('eval') / `let` may not be available.
 
       " MyNeoBundle 'chrisbra/Recover.vim'
 
-      MyNeoBundle 'blueyed/vim-diminactive'
+      MyNeoBundleNoLazyForDefault 'blueyed/vim-diminactive'
+      MyNeoBundleNoLazyForDefault 'blueyed/vim-smartinclude'
 
       " Previously disabled plugins:
 
@@ -417,7 +413,7 @@ if 1 " has('eval') / `let` may not be available.
 
       " Colorschemes.
       " MyNeoBundle 'vim-scripts/Atom',             '', 'colors', { 'name': 'colorscheme-atom' }
-      " MyNeoBundle 'chriskempson/base16-vim',      '', 'colors', { 'name': 'colorscheme-base16' }
+      MyNeoBundleNeverLazy 'chriskempson/base16-vim', '', 'colors', { 'name': 'colorscheme-base16' }
       " MyNeoBundle 'rking/vim-detailed',           '', 'colors', { 'name': 'colorscheme-detailed' }
       " MyNeoBundle 'nanotech/jellybeans.vim',      '', 'colors', { 'name': 'colorscheme-jellybeans' }
       " MyNeoBundle 'tpope/vim-vividchalk',         '', 'colors', { 'name': 'colorscheme-vividchalk' }
@@ -441,7 +437,7 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNeverLazy 'junegunn/vim-oblique/', { 'depends':
             \ [['junegunn/vim-pseudocl']]}
 
-      MyNeoBundle 'Konfekt/fastfold'
+      MyNeoBundleNoLazyForDefault 'Konfekt/fastfold'
 
       MyNeoBundleNoLazyNotForLight 'junegunn/vader.vim', {
             \ 'autoload': {'commands': 'Vader'} }
@@ -461,6 +457,7 @@ if 1 " has('eval') / `let` may not be available.
       " Problems with <a-d> (which is ä), and I prefer <a-hjkl>.
       " MyNeoBundleNoLazyForDefault 'tpope/vim-rsi'
 
+      MyNeoBundleNoLazyForDefault 'junegunn/fzf.vim'
 
       MyNeoBundleLazy 'chase/vim-ansible-yaml'
             \ , {'autoload': {'filetypes': ['yaml', 'ansible']} }

@@ -815,6 +815,33 @@ if 1 " has('eval') / `let` may not be available.
   " Close preview and quickfix windows.
   nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 
+  " fzf.vim {{{
+  " Insert mode completion
+  imap <Leader><c-x><c-k> <plug>(fzf-complete-word)
+  imap <Leader><c-x><c-f> <plug>(fzf-complete-path)
+  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+  imap <Leader><c-x><c-l> <plug>(fzf-complete-line)
+
+  let g:fzf_command_prefix = 'FZF'
+  let g:fzf_layout = { 'window': 'execute (tabpagenr()-1)."tabnew"' }
+
+  " TODO: see /home/daniel/.dotfiles/vim/neobundles/fzf/plugin/fzf.vim
+  " let g:fzf_nvim_statusline = 0
+  function! s:fzf_statusline()
+    let bg_dim =  &bg == 'dark' ? 18 : 21
+    exec 'highlight fzf1 ctermfg=1 ctermbg='.bg_dim
+    exec 'highlight fzf2 ctermfg=2 ctermbg='.bg_dim
+    exec 'highlight fzf3 ctermfg=7 ctermbg='.bg_dim
+    setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+  endfunction
+
+  augroup vimrc_fzf
+    au!
+    autocmd FileType fzf let b:noquickfixsigns = 1
+    autocmd User FzfStatusLine call <SID>fzf_statusline()
+  augroup END
+  " }}}
+
   let g:my_full_name = "Daniel Hahler"
   let g:snips_author = g:my_full_name
 
@@ -2044,7 +2071,9 @@ fun! MyAutoSetNumberSettings(...)
     exec 'setl' a:1
   elseif &ft =~# 'qf\|cram\|vader'
     setl number
-  elseif &buftype ==# "nofile" ||bufname("%") =~ '^__' || &ft == "help"
+  elseif index(['nofile', 'terminal'], &buftype) != -1
+        \ || index(['help', 'fugitiveblame', 'fzf'], &ft) != -1
+        \ || bufname("%") =~ '^__'
     setl nonumber
   elseif winwidth(".") > 90
     setl number

@@ -24,16 +24,25 @@ if ! [ -d "$watch_src" ]; then
   usage
 fi
 
-# Default to $watch_src when there are no pytest args.
-# This speeds up collecting tests.
-if [ -z "$1" ]; then
-  runner_src="$watch_src"
-else
-  runner_src=
+ptw_args=
+pytest_args=
+had_dashdash=0
+for i; do
+  if [ "x$i" = "x--" ]; then
+    had_dashdash=1
+  elif [ "$had_dashdash" = 1 ]; then
+    pytest_args="$pytest_args $i"
+  else
+    ptw_args="$ptw_args $i"
+  fi
+done
+if [ "$had_dashdash" = 0 ]; then
+  pytest_args="$ptw_args"
+  ptw_args=
 fi
 
-
 # Get the current window-status-style option from tmux (window or global).
+# shellcheck disable=SC2015
 TMUX_FG_DEFAULT=$(a=$(tmux show -w window-status-style | cut -f2 -d\ ); \
        [ -n "$a" ] && echo "$a" || tmux show -wg window-status-style | cut -f2 -d\ )
 # Remove ",italics" which I am currently using for any running command via
@@ -51,7 +60,6 @@ template_set_tmux_style='test -n "$TMUX_PANE" && { \
 afterrun_script="$(mktemp)"
 chmod +x "$afterrun_script"
 cat > "$afterrun_script" <<EOF
-echo AFTER: \$@
 if [ "\$1" = 0 ]; then
   $(printf "$template_set_tmux_style" fg=green 'Tests passed.')
 elif [ "\$1" = 5 ]; then
@@ -63,12 +71,15 @@ else
 fi
 EOF
 
-trap "echo CLEANUP; rm '$afterrun_script'" 0
+# shellcheck disable=SC2064
+trap "rm '$afterrun_script'" 0
 
-ptw "$watch_src" \
+# Change to watch-dir to work around https://github.com/joeyespo/pytest-watch/issues/53.
+cd "$watch_src" || exit
+ptw $ptw_args \
   --beforerun "$(printf "$template_set_tmux_style" "$TMUX_FG_DEFAULT,italics" '')" \
   --afterrun "$afterrun_script" \
   --onexit "echo ONEXIT; test -n '$TMUX_PANE' && tmux set-window-option -u -q \
           -t '$TMUX_PANE' window-status-style" \
-  ${TMUX:+--nobeep} \
-  -- $runner_src -v -ra "$@"
+  ${TMUX:+--nobeep } \
+  -- -v -ra $pytest_args

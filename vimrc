@@ -533,11 +533,13 @@ set autoindent    " always set autoindenting on (fallback after 'indentexpr')
 
 set numberwidth=1  " Initial default, gets adjusted dynamically.
 
+" Formatting {{{
 set tabstop=2
 set shiftwidth=2
 set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
 set expandtab
-set iskeyword+=-
+" }}}
+
 if has('autocmd')
   augroup vimrc_iskeyword
     au!

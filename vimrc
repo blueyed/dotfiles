@@ -864,6 +864,37 @@ if 1 " has('eval') / `let` may not be available.
     tnoremap <C-j> <C-\><C-n><C-w>j
     tnoremap <C-k> <C-\><C-n><C-w>k
     tnoremap <C-l> <C-\><C-n><C-w>l
+
+    " Exit.
+    tnoremap <Esc> <C-\><C-n>
+
+    " <c-space> does not work (https://github.com/neovim/neovim/issues/3101).
+    tnoremap <C-@> <C-\><C-n>:tab sp<cr>:startinsert<cr>
+
+    let g:terminal_scrollback_buffer_size = 100000  " current max
+
+    nnoremap <Leader>cx :sp \| :term p --testmon<cr>
+    nnoremap <Leader>cX :sp \| :term p -k
+
+    " Add :Term equivalent to :term, but with ":new" instead of ":enew".
+    fun! <SID>SplitTerm(...) abort
+      let cmd = ['zsh', '-i']
+      if a:0
+        let cmd += ['-c', join(a:000)]
+      endif
+      new
+      call termopen(cmd)
+      startinsert
+    endfun
+    com! -nargs=* -complete=shellcmd Term call <SID>SplitTerm(<f-args>)
+
+    " Open term in current file's dir.
+    nnoremap <Leader>gt :sp \| exe 'lcd' expand('%:p:h') \| :term<cr>
+
+    augroup vimrc_term
+      au!
+      autocmd! BufEnter term://* startinsert
+    augroup END
   endif
 
   let g:my_full_name = "Daniel Hahler"

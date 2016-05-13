@@ -171,7 +171,7 @@ fi
 echo "export MY_X_THEME_VARIANT=$variant;"
 
 # Configure colors for fzf.
-if hash fzf >/dev/null; then
+if hash fzf 2>/dev/null; then
   if [ -z "$_FZF_DEFAULT_OPTS_BASE" ]; then
     echo "export _FZF_DEFAULT_OPTS_BASE=\"\$FZF_DEFAULT_OPTS\""
   fi

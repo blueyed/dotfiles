@@ -307,11 +307,9 @@ if 1 " has('eval') / `let` may not be available.
         MyNeoBundle 'Keithbsmiley/tmux.vim', {
               \ 'name': 'syntax-tmux',
               \ 'autoload': {'filetypes': ['tmux']} }
-        MyNeoBundle 'wellle/tmux-complete.vim'
-        if len($TMUX)
-          MyNeoBundleNoLazyForDefault 'blueyed/vim-tmux-navigator'
-          MyNeoBundleNoLazyForDefault 'tmux-plugins/vim-tmux-focus-events'
-        endif
+        MyNeoBundleNoLazyForDefault 'blueyed/vim-tmux-navigator'
+        MyNeoBundleNoLazyForDefault 'tmux-plugins/vim-tmux-focus-events'
+        MyNeoBundleNoLazyForDefault 'wellle/tmux-complete.vim'
       endif
 
       " Dependency
@@ -843,6 +841,30 @@ if 1 " has('eval') / `let` may not be available.
     autocmd User FzfStatusLine call <SID>fzf_statusline()
   augroup END
   " }}}
+
+  let tmux_navigator_no_mappings = 1
+  if has('vim_starting')
+    if &rtp =~ '\<tmux-navigator\>'
+      nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+      nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+      nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+      nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+      " nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
+    else
+      nnoremap <C-h> <c-w>h
+      nnoremap <C-j> <c-w>j
+      nnoremap <C-k> <c-w>k
+      nnoremap <C-l> <c-w>l
+      " nnoremap <C-\> <c-w>j
+    endif
+  endif
+
+  if exists(':tnoremap') && has('vim_starting')  " Neovim
+    tnoremap <C-h> <C-\><C-n><C-w>h
+    tnoremap <C-j> <C-\><C-n><C-w>j
+    tnoremap <C-k> <C-\><C-n><C-w>k
+    tnoremap <C-l> <C-\><C-n><C-w>l
+  endif
 
   let g:my_full_name = "Daniel Hahler"
   let g:snips_author = g:my_full_name

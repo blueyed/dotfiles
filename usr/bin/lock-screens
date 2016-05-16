@@ -2,11 +2,16 @@
 # Lock all X displays and unlock them when one gets unlocked.
 
 # Get DISPLAY from "environ" of all processes.
+# NOTE: since grep 2.25 -oz will output null bytes instead of newlines.
 displays=$(grep -ahoz '^DISPLAY=.*$' /proc/*/environ 2>/dev/null \
-  | sort -u | cut -f2 -d=)
+  | tr '\000' '\n' | sort -u | cut -f2 -d=)
+
+# Include current DISPLAY always.
+displays="$DISPLAY
+$displays"
 
 pids=
-for d in $displays; do
+for d in $(echo "$displays" | sort -u); do
   DISPLAY=$d slock &
   echo "Locked $d: PID $!."
   pids="$pids $!"
@@ -27,7 +32,7 @@ done
 
 echo "Unlocking: killing $pids"
 for pid in $pids; do
-  kill -0 $pid 2>/dev/null && kill $pid
+  kill -0 "$pid" 2>/dev/null && kill "$pid"
 done
 
 exit 0

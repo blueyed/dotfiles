@@ -1046,7 +1046,11 @@ if 1 " has('eval') / `let` may not be available.
   com! NeomakeEnableBuffer let b:neomake_disabled=0
   nnoremap <Leader>cc :Neomake<CR>
   " Ref: https://github.com/neomake/neomake/issues/405
+  let g:neomake_check_on_wq = 0
   fun! NeomakeCheck(fname)
+    if !get(g:, 'neomake_check_on_wq', 0) && get(w:, 'neomake_quitting_win', 0)
+      return
+    endif
     if bufnr(a:fname) != bufnr('%')
       " Not invoked for the current buffer.  This happens for ':w /tmp/foo'.
       return
@@ -1074,7 +1078,7 @@ if 1 " has('eval') / `let` may not be available.
   augroup neomake_check
     au!
     autocmd BufWritePost * call NeomakeCheck(expand('<afile>'))
-    autocmd QuitPre * let g:neomake_verbose = 0
+    autocmd QuitPre * if winnr('$') == 1 | let w:neomake_quitting_win = 1 | endif
   augroup END
   " }}}
 

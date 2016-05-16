@@ -297,10 +297,8 @@ if 1 " has('eval') / `let` may not be available.
       MyNeoBundleNoLazyForDefault 'ervandew/supertab'
       MyNeoBundleNoLazyForDefault 'tpope/vim-surround'
       MyNeoBundle 'kurkale6ka/vim-swap'
-      MyNeoBundleNoLazyForDefault 'scrooloose/syntastic', {
-            \ 'autoload': {'filetypes': ['lua', 'python', 'sh', 'zsh']} }
-      " MyNeoBundleNoLazyForDefault "benekastah/neomake", {
-      "       \ 'autoload': {'filetypes': ['c', 'lua', 'python', 'sh', 'zsh']} }
+
+      MyNeoBundleNoLazyForDefault "neomake/neomake"
       MyNeoBundle 'vim-scripts/syntaxattr.vim'
 
       if executable("tmux")
@@ -1013,6 +1011,73 @@ if 1 " has('eval') / `let` may not be available.
   endfunction
   command! SyntasticDisableToggle call SyntasticDisableToggle()
 
+  " Neomake {{{
+  let g:neomake_open_list = 2
+  let g:neomake_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
+
+  " let g:neomake_serialize = 1
+  " let g:neomake_serialize_abort_on_error = 1
+
+  " vint needs to be configured to be more silent!
+  " - Make the scope explicit like `l:bt`
+  " let g:neomake_vim_enabled_makers = []
+  let g:neomake_c_enabled_makers = []
+
+  " let g:neomake_verbose = 3
+  fun! NeomakeToggleBuffer()
+    let b:neomake_disabled = !get(b:, 'neomake_disabled')
+    echom 'Neomake:' (b:neomake_disabled ? 'disabled.' : 'enabled.')
+    if b:neomake_disabled
+      call neomake#signs#ResetFile(bufnr("%"))
+      call neomake#signs#CleanAllOldSigns('file')
+    endif
+  endfun
+  com! NeomakeToggleBuffer call NeomakeToggleBuffer()
+
+  fun! NeomakeToggle()
+    let g:neomake_disabled = !get(g:, 'neomake_disabled')
+    echom g:neomake_disabled ? 'Disabled.' : 'Enabled.'
+  endfun
+
+  com! NeomakeToggle call NeomakeToggle()
+  com! NeomakeDisable let g:neomake_disabled=1
+  com! NeomakeDisableBuffer let b:neomake_disabled=1
+  com! NeomakeEnable let g:neomake_disabled=0
+  com! NeomakeEnableBuffer let b:neomake_disabled=0
+  nnoremap <Leader>cc :Neomake<CR>
+  " Ref: https://github.com/neomake/neomake/issues/405
+  fun! NeomakeCheck(fname)
+    if bufnr(a:fname) != bufnr('%')
+      " Not invoked for the current buffer.  This happens for ':w /tmp/foo'.
+      return
+    endif
+    if get(b:, 'neomake_disabled', get(g:, 'neomake_disabled', 0))
+      return
+    endif
+
+    let s:windows_before = [tabpagenr(), winnr('$')]
+    fun! s:callback(result)
+      " { 'status': <exit status of maker>,
+      " \ 'name': <maker name>,
+      " \ 'has_next': <true if another maker follows, false otherwise> }
+      " unsilent echom "callback" string(a:result)
+      " if a:result.status != 0
+        if exists('*airline#update_statusline')
+              \ && s:windows_before != [tabpagenr(), winnr('$')]
+          " echom "UPDATE"
+          call airline#update_statusline()
+        endif
+      " endif
+    endfun
+    call neomake#Make(1, [], function('s:callback'))
+  endfun
+  augroup neomake_check
+    au!
+    autocmd BufWritePost * call NeomakeCheck(expand('<afile>'))
+    autocmd QuitPre * let g:neomake_verbose = 0
+  augroup END
+  " }}}
+
   " gist-vim {{{2
   let g:gist_detect_filetype = 1
   " }}}
@@ -1260,6 +1325,7 @@ if has("user_commands")
   " Themes
   " Airline:
   let g:airline#extensions#disable_rtp_load = 1
+  let g:airline_extensions_add = ['neomake']
   let g:airline_powerline_fonts = 1
   " to test
   let g:airline#extensions#branch#use_vcscommand = 1
@@ -3627,6 +3693,7 @@ fun! MyHandleSwapfile(filename)
   endif
 endfun
 
+let g:quickfixsign_protect_sign_rx = '^neomake_'
 
 " Python setup for NeoVim. {{{
 " Defining it also skips auto-detecting it.

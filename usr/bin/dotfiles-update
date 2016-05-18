@@ -3,5 +3,5 @@
 set -e
 
 cd ~/.dotfiles
-~/.dotfiles/usr/bin/gup
+git -c rebase.autoStash=true pull --rebase
 make

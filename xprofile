@@ -1,7 +1,6 @@
 # Setup user profile for X sessions.
 
-# `tty` gives "not a tty" at this point (so we cannot really update).
-unset GPG_TTY
+# `tty` gives "not a tty" at this point (so we cannot update GPG_TTY).
 gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null
 
 # Setup X theme variant (light/dark).

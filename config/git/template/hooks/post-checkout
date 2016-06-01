@@ -5,40 +5,31 @@
 # new_head=$2
 # changing_branch=$3
 
+[ -t 1 ] || exit 0
+
 is_clone=0
 if [ "$3" = 1 ]; then
   if [ "$1" = "0000000000000000000000000000000000000000" ]; then
-    is_clone=1
-    prog="$(ps -p $(ps -p "$PPID" -o ppid=) -o comm=)"
-    # if [ "${PWD#/tmp/pacaurtmp}" != "$PWD" ]; then
-    if [ "$prog" = "pacaur" ]; then
+    # shellcheck disable=SC2009
+    if ps -s "$(ps -o sess:1= -p $$)" -o comm= | grep -qE '^(pacaur)'; then
       exit
     fi
+    is_clone=1
   fi
-else
-  # Checking out a file.
-  .git/hooks/ctags post-checkout &
-  exit
 fi
 
 # Special template/display for "pip" cloning/checking out a VCS URL.
-if [ -z "$prog" ]; then
-  prog="$(ps -p $(ps -p "$PPID" -o ppid=) -o comm=)"
-fi
-if [ "$prog" = 'pip' ]; then
-  # Get "git" command from 2nd "args" entry of git parent process.
-  # TODO: move to clone block above?  / use is_clone flag for pip.
-  mode=$(ps -f -p $PPID -o args= | cut -f2 -d\ )
-  if [ "$mode" = checkout ]; then  # "checkout" might follow "clone".
-    git --no-pager log -1 --pretty=format:"%C(green) checkout: $(basename "$PWD"): %C(blue)%s%C(reset) (%cr, %h, %cN)"
+if [ -n "$PIP_EXISTS_ACTION" ]; then
+  [ "$is_clone" = 1 ] && pip_mode=clone || pip_mode=checkout
+  if [ "$pip_mode" = checkout ]; then
+    git --no-pager log -1 --pretty=format:"%C(green) checkout: $(git remote get-url origin)%n%C(blue) - %s%C(reset) (%cr, %h, %cN)" >&2
   else
-    git --no-pager log -1 --pretty=format:"%C(green)pip-$mode: $(basename "$PWD"): %C(blue)%s%C(reset) (%cr, %h, %cN)"
+    git --no-pager log -1 --pretty=format:"%C(green)pip-$pip_mode: $(git remote get-url origin)%n%C(blue) - %s%C(reset) (%cr, %h, %cN)" >&2
   fi
 
 else
-  git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)"
+  git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)" >&2
   .git/hooks/ctags post-checkout &
 fi
 # Note: --no-pager does not add a newline.
 echo
-

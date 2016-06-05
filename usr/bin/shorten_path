@@ -17,9 +17,8 @@ if [ x$1 = 'x--test' ]; then
 
   set -x -e
 
-  [[ $(shorten_path .) == '' ]]
-
   cd ~
+  [[ $(shorten_path .) == '~' ]]
   [[ $(shorten_path .dotfiles/vimrc) == '~df/vimrc' ]]
   [[ $(shorten_path -a .vimrc) == '↬.vimrc' ]]
 
@@ -52,8 +51,8 @@ if [ x$1 = 'x--test' ]; then
   ln -s foo bar
   [[ $(shorten_path -a foo) == 'foo' ]]
   [[ $(shorten_path -a bar) == '↬bar' ]]
-  [[ $(shorten_path -a $tmpdir) == "" ]]
-  [[ $(shorten_path -a . /) == "" ]]
+  [[ $(shorten_path -a $tmpdir) == "$tmpdir" ]]
+  [[ $(shorten_path -a . /) == "/" ]]
   [[ $(shorten_path -a $tmpdir /) == "$tmpdir" ]]
   [[ $(shorten_path -a $tmpdir/bar ~) == "$tmpdir/↬bar" ]]
 
@@ -84,9 +83,6 @@ if [ -n "$2" ]; then
   cd "$2" || exit
 fi
 abs_path=${path:a}
-if [[ "$abs_path" == "$PWD" ]]; then
-  return
-fi
 
 # Keep relative dirs, which are not going back to below base/$PWD.
 if [[ $path = ../* ]] && [[ $abs_path != $PWD/* ]]; then
@@ -102,7 +98,7 @@ test -f ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh && \
 pwd_short=${(D)PWD}/
 # NOTE: "(Q)" is required to remove escaping of e.g. "[" from the name.
 path_short=${(Q)${(D)abs_path}#$pwd_short}
-if [ "$annotate" = 1 ]; then
+if [ "$annotate" = 1 ] && [ "$path_short" != "/" ]; then
   # Annotate symlinks.
   path=
   for i in "${(s:/:)path_short}"; do

@@ -18,7 +18,7 @@ for b in $bgs; do
 		echo "bg: $b"
 	fi
 	for c in {0..7}; do
-		[[ $b != "-" ]] && print -n "\x1b[$((b+40))m"
+		[[ $b != "-" ]] && tput setab $b
 		print -n "\x1b[$((c+30))m"   ${(l.$((COLUMNS/2-1)).):-"$c:${color[$((c+30))]}"}
 		print -n "\x1b[$((c+30));1m" ${(r.$((COLUMNS/2-1)).):-"$((c+8)):${color[$((c+30))]}"}
 		print -P %{${reset_color}%}
@@ -26,7 +26,7 @@ for b in $bgs; do
 
 	echo "== EXTENDED (base16) =="
 	for c in {16..18}; do
-		[[ $b != "-" ]] && print -n "\x1b[$((b+40))m"
+		[[ $b != "-" ]] && tput setab $b
 		tput setaf $c
 		print -n " ${(l.$((COLUMNS/2-1)).):-"$c:base16-$c"} "
 		tput setaf $((c+3))

@@ -4,7 +4,6 @@ scriptencoding utf-8
 " set shell=/bin/sh
 
 " Profiling. {{{
-if 0
 " Start profiling. Optional arg: logfile path.
 fun! ProfileStart(...)
   if a:0 && a:1 != 1
@@ -12,6 +11,7 @@ fun! ProfileStart(...)
   else
     let profile_file = '/tmp/vim.'.getpid().'.profile.txt'
     echom "Profiling into" profile_file
+    let @* = profile_file
   endif
   exec 'profile start '.profile_file
   profile! file **
@@ -20,6 +20,7 @@ endfun
 if len(get(g:, 'profile', ''))
   call ProfileStart(g:profile)
 endif
+if 0
 call ProfileStart()
 endif
 " }}}

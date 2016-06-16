@@ -19,6 +19,8 @@ if [ x$1 = 'x--test' ]; then
 
   cd ~
   [[ $(shorten_path .) == '~' ]]
+  [[ $(shorten_path ~/.dotfiles/vimrc) == '~df/vimrc' ]]
+  [[ $(shorten_path '~/.dotfiles/vimrc') == '~/.dotfiles/vimrc' ]]
   [[ $(shorten_path .dotfiles/vimrc) == '~df/vimrc' ]]
   [[ $(shorten_path -a .vimrc) == '↬.vimrc' ]]
 
@@ -78,15 +80,15 @@ else
   annotate=0
 fi
 
-path="$1"
+p=$1
 if [ -n "$2" ]; then
   cd "$2" || exit
 fi
-abs_path=${path:a}
+abs_path=${p:a}
 
 # Keep relative dirs, which are not going back to below base/$PWD.
-if [[ $path = ../* ]] && [[ $abs_path != $PWD/* ]]; then
-  printf $path
+if [[ $p = ../* ]] && [[ $abs_path != $PWD/* ]]; then
+  printf $p
   return
 fi
 
@@ -100,22 +102,22 @@ pwd_short=${(D)PWD}/
 path_short=${(Q)${(D)abs_path}#$pwd_short}
 if [ "$annotate" = 1 ] && [ "$path_short" != "/" ]; then
   # Annotate symlinks.
-  path=
+  p=
   for i in "${(s:/:)path_short}"; do
     if [[ -z "$i" ]]; then
-      if [[ -z "$path" ]]; then
-        path="/"
+      if [[ -z "$p" ]]; then
+        p="/"
       fi
       continue
     fi
-    if [[ -n "$path" ]]; then
-      if [[ "$path" != "/" ]]; then
-        path="$path/"
+    if [[ -n "$p" ]]; then
+      if [[ "$p" != "/" ]]; then
+        p="$p/"
       fi
       printf "/"
     fi
-    path="$path$i"
-    if [[ -h $~path ]]; then
+    p="$p$i"
+    if [[ -h $~p ]]; then
       printf "↬$i"
     else
       printf "$i"

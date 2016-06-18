@@ -1,8 +1,5 @@
 scriptencoding utf-8
 
-" " A bit faster than $SHELL (zsh), but also used for ':term'.
-" set shell=/bin/sh
-
 " Profiling. {{{
 " Start profiling. Optional arg: logfile path.
 fun! ProfileStart(...)
@@ -93,9 +90,13 @@ if 1 " has('eval') / `let` may not be available.
       call mkdir(s:vim_cache, "", 0700)
     endif
 
+    " NOTE: helptags will still be rebuild always / not cached.
+    " Would require to overwrite neobundle#get_rtp_dir.
+    " https://github.com/Shougo/neobundle.vim/issues/504.
     let s:cache_key = '_rc'.g:MyRcProfile.'_tmux'.executable("tmux")
           \ .'_deoplete'.get(s:, 'use_deoplete', 0)
           \ .'_nvim'.has('nvim')
+          \ .'_ruby'.has('ruby')
     " Remove any previous cache files.
     let s:neobundle_default_cache_file = neobundle#commands#get_default_cache_file()
     let g:neobundle#cache_file = s:neobundle_default_cache_file . s:cache_key
@@ -462,7 +463,8 @@ if 1 " has('eval') / `let` may not be available.
       "       \ , {'autoload': {'filetypes': ['yaml', 'ansible']} }
 
       " Manual bundles.
-      MyNeoBundle 'eclim', '', 'manual'
+      MyNeoBundleLazy 'eclim', '', 'manual'
+            " \ , {'autoload': {'filetypes': ['htmldjango']} }
 
       " MyNeoBundle 'neobundle', '', 'manual'
       " NeoBundleFetch "Shougo/neobundle.vim", {
@@ -470,7 +472,7 @@ if 1 " has('eval') / `let` may not be available.
       "       \ 'directory': 'neobundle', }
 
 
-      MyNeoBundleNeverLazy 'blueyed/vim-colors-solarized', '', 'colors', { 'name': 'colorscheme-solarized' }
+      MyNeoBundleNeverLazy 'blueyed/vim-colors-solarized', { 'name': 'colorscheme-solarized' }
       " }}}
       NeoBundleSaveCache
     endif
@@ -482,6 +484,14 @@ if 1 " has('eval') / `let` may not be available.
     let g:neobundle#types#git#clone_depth = 10
 
     NeoBundleCheck
+
+    " Setup a command alias, source: http://stackoverflow.com/a/3879737/15690
+    fun! SetupCommandAlias(from, to)
+      exec 'cnoreabbrev <expr> '.a:from
+            \ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
+            \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+    endfun
+    call SetupCommandAlias('NBS', 'NeoBundleSource')
 
     if !has('vim_starting')
       " Call on_source hook when reloading .vimrc.
@@ -525,13 +535,21 @@ endif
 set noautoread  " Enabled by default in Neovim; I like to get notified/confirm it.
 
 set nowrap
+if has("virtualedit")
+  set virtualedit+=block
+endif
 
 set autoindent    " always set autoindenting on (fallback after 'indentexpr')
 
 set numberwidth=1  " Initial default, gets adjusted dynamically.
 
 " Formatting {{{
-set tabstop=2
+set tabstop=8
+augroup vimrc_indent
+  au!
+  au FileType make setlocal ts=2
+augroup END
+
 set shiftwidth=2
 set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
 set expandtab
@@ -547,17 +565,21 @@ if has('autocmd')
 
   augroup VimrcColorColumn
     au!
-    au ColorScheme * if expand("<amatch>") == "solarized" | set colorcolumn=78 | else | set colorcolumn= | endif
+    au ColorScheme * if expand('<amatch>') == 'solarized'
+          \ | set colorcolumn=80 | else | set colorcolumn= | endif
   augroup END
 endif
 
 set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file
 
 set laststatus=2  " Always display the statusline
-set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+set noshowmode  " Should be indicated by statusline (color), and would remove any echom output (e.g. current tag).
 
 " use short timeout after Escape sequence in terminal mode (for keycodes)
 set ttimeoutlen=10
+set timeoutlen=2000
+
+set updatetime=750  " Used for CursorHold and writing swap files.
 
 " Format options {{{2
 set formatoptions+=r " Insert comment leader after hitting <Enter>
@@ -577,8 +599,9 @@ endif
 
 if exists('+breakindent')
   set breakindent
-  " set breakindentopt=min:20,shift:2,sbr
+  set breakindentopt=min:20,shift:0,sbr
 endif
+set linebreak  " Wrap only at chars in 'breakat'.
 
 set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
@@ -586,9 +609,15 @@ set guioptions-=e  " Same tabline as with terminal (allows for setting colors).
 set guioptions-=m  " no menu with gvim
 set guioptions-=a  " do not mess with X selection when visual selecting text.
 set guioptions+=A  " make modeless selections available in the X clipboard.
+set guioptions+=c  " Use console dialogs instead of popup dialogs for simple choices.
 
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 set viminfo+=! " keep global uppercase variables. Used by localvimrc.
+
+if has('shada')
+  " Bump ' to 1000 (from 100) for v:oldfiles.
+  set shada=!,'1000,<50,s10,h,%,r/mnt/
+endif
 
 set selectmode=
 set mousemodel=popup " extend/popup/pupup_setpos
@@ -626,12 +655,20 @@ set matchtime=3
 set sessionoptions+=unix,slash " for unix/windows compatibility
 set nostartofline " do not go to start of line automatically when moving
 
+" Use both , and Space as leader.
+if 1  " has('eval')
+  let mapleader = ","
+endif
+" But not for imap!
+nmap <space> <Leader>
+vmap <space> <Leader>
+
 " scrolloff: number of lines visible above/below the cursor.
 " Special handling for &bt!="" and &diff.
 set scrolloff=3
 if has('autocmd')
   fun! MyAutoScrollOff() " {{{
-    if exists('g:no_auto_scrolloff')
+    if exists('b:no_auto_scrolloff')
       return
     endif
     if &ft == 'help'
@@ -655,6 +692,20 @@ if has('autocmd')
       au TermOpen * set sidescrolloff=0 scrolloff=0
     endif
   augroup END
+
+  " Toggle auto-scrolloff handling.
+  fun! MyAutoScrollOffToggle()
+    if exists('b:no_auto_scrolloff')
+      unlet b:no_auto_scrolloff
+      call MyAutoScrollOff()
+      echom "auto-scrolloff: enabled"
+    else
+      let b:no_auto_scrolloff=1
+      let &scrolloff=3
+      echom "auto-scrolloff: disabled"
+    endif
+  endfun
+  nnoremap <leader>so :call MyAutoScrollOffToggle()<cr>
 endif " }}}
 
 set sidescroll=1
@@ -669,6 +720,11 @@ set suffixes+=.pyc
 " case only matters with mixed case expressions
 set ignorecase smartcase
 set smarttab
+" NOTE: ignorecase also affects ":tj"/":tselect"!
+" https://github.com/vim/vim/issues/712
+if exists('+tagcase')
+  set tagcase=match
+endif
 
 set lazyredraw  " No redraws in macros.
 
@@ -734,14 +790,6 @@ endif
 
 " Generic mappings. {{{
 
-" Use both , and Space as leader.
-if 1  " has('eval')
-  let mapleader = ","
-endif
-" Not for imap!
-nmap <space> <Leader>
-vmap <space> <Leader>
-
 " Repeat last f/t in opposite direction.
 if &rtp =~ '\<sneak\>'
   nmap <Leader>; <Plug>SneakPrevious
@@ -780,6 +828,44 @@ noremap g` g'
 sunmap g`
 " }}}
 
+" Maps to unimpaired mappings by context: diff, loclist or qflist.
+" Falls back to "a" for args.
+fun! MySetupUnimpairedShortcut()
+  if &diff
+    let m = 'c'
+  elseif len(getloclist(0))
+    let m = 'l'
+  elseif len(getqflist())
+    let m = 'q'
+  else
+    let m = 'a'
+  endif
+  if get(b:, '_mysetupunimpairedmaps', '') == m
+    return
+  endif
+  let b:_mysetupunimpairedmaps = m
+
+  " Backward.
+  exec 'nmap <buffer> üü ['.m
+  exec 'nmap <buffer> +ü ['.m
+  exec 'nmap <buffer> <Leader>ü ['.m
+  exec 'nmap <buffer> <A-ü> ['.m
+
+  " Forward.
+  exec 'nmap <buffer> ++ ]'.m
+  exec 'nmap <buffer> ü+ ]'.m
+  exec 'nmap <buffer> <Leader>+ ]'.m
+  exec 'nmap <buffer> <A-+> ]'.m
+
+  " AltGr-o and AltGr-p
+  exec 'nmap <buffer> ø ['.m
+  exec 'nmap <buffer> þ ]'.m
+endfun
+augroup vimrc_setupunimpaired
+  au!
+  au BufEnter,VimEnter * call MySetupUnimpairedShortcut()
+augroup END
+
 
 " Quit with Q, exit with C-q.
 " (go to tab on the left).
@@ -791,7 +877,17 @@ fun! MyQuitWindow()
   if &ft != 'qf' && getcmdwintype() == ''
     lclose
   endif
-  confirm q
+  " Turn off diff mode for all other windows.
+  if &diff
+    WindoNodelay diffoff
+  endif
+
+  if &bt == 'terminal'
+    " 'confirm' does not work: https://github.com/neovim/neovim/issues/4651
+    bd!
+  else
+    confirm q
+  endif
 
   if ! was_last_tab && nb_tabs != tabpagenr('$') && tabpagenr() > 1
     tabprevious
@@ -808,6 +904,9 @@ if has('autocmd')
   augroup END
 endif
 " }}}
+
+" Align/tabularize text.
+vmap <Enter> <Plug>(EasyAlign)
 
 
 if 1 " has('eval') / `let` may not be available.
@@ -834,9 +933,15 @@ if 1 " has('eval') / `let` may not be available.
     setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
   endfunction
 
+  augroup vimrc_quickfixsigns
+    au!
+    autocmd FileType help,fzf,ref-* let b:noquickfixsigns = 1
+    if exists('##TermOpen')
+      autocmd TermOpen * let b:noquickfixsigns = 1
+    endif
+  augroup END
   augroup vimrc_fzf
     au!
-    autocmd FileType fzf let b:noquickfixsigns = 1
     autocmd User FzfStatusLine call <SID>fzf_statusline()
   augroup END
   " }}}
@@ -859,10 +964,6 @@ if 1 " has('eval') / `let` may not be available.
   endif
 
   if exists(':tnoremap') && has('vim_starting')  " Neovim
-    tnoremap <C-h> <C-\><C-n><C-w>h
-    tnoremap <C-j> <C-\><C-n><C-w>j
-    tnoremap <C-k> <C-\><C-n><C-w>k
-    tnoremap <C-l> <C-\><C-n><C-w>l
 
     " Exit.
     tnoremap <Esc> <C-\><C-n>
@@ -889,22 +990,17 @@ if 1 " has('eval') / `let` may not be available.
 
     " Open term in current file's dir.
     nnoremap <Leader>gt :sp \| exe 'lcd' expand('%:p:h') \| :term<cr>
-
-    augroup vimrc_term
-      au!
-      autocmd! BufEnter term://* startinsert
-    augroup END
   endif
 
   let g:my_full_name = "Daniel Hahler"
   let g:snips_author = g:my_full_name
 
-  " TAB is used by YouCompleteMe/SuperTab.
+  " TAB is used for general completion.
   let g:UltiSnipsExpandTrigger="<c-j>"
   let g:UltiSnipsJumpForwardTrigger="<c-j>"
   let g:UltiSnipsJumpBackwardTrigger="<c-k>"
   let g:UltiSnipsListSnippets = "<c-b>"
-  let g:UltiSnipsEditSplit='vsplit'
+  let g:UltiSnipsEditSplit='context'
 
   " let g:UltiSnips.always_use_first_snippet = 1
   augroup UltiSnipsConfig
@@ -1019,10 +1115,15 @@ if 1 " has('eval') / `let` may not be available.
   " let g:neomake_serialize = 1
   " let g:neomake_serialize_abort_on_error = 1
 
-  " vint needs to be configured to be more silent!
-  " - Make the scope explicit like `l:bt`
   " let g:neomake_vim_enabled_makers = []
   let g:neomake_c_enabled_makers = []
+  augroup vimrc_neomake
+    au!
+    au BufReadPost ~/.dotfiles/vimrc let b:neomake_disabled = 1
+  augroup END
+
+  " shellcheck: ignore "Can't follow non-constant source."
+  let $SHELLCHECK_OPTS='-e SC1090'
 
   " let g:neomake_verbose = 3
   fun! NeomakeToggleBuffer()
@@ -1389,7 +1490,9 @@ endif
 " Also switch on highlighting the last used search pattern.
 " if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
 if (&t_Co > 2 || has("gui_running"))
-  syntax on " after 'filetype plugin indent on' (ref:
+  if !exists("syntax_on")
+    syntax on " after 'filetype plugin indent on' (?!), but not on reload.
+  endif
   set nohlsearch
 
   " Improved syntax handling of TODO etc.
@@ -1408,11 +1511,9 @@ if 1 " has('eval')
     if len(variant) && variant != "auto"
       let bg = variant
     elseif len($TMUX)
-      if system('tmux show-env MY_X_THEME_VARIANT') == "MY_X_THEME_VARIANT=light\n"
-        let bg = 'light'
-      else
-        let bg = 'dark'
-      endif
+      let bg = system('tmux show-env MY_X_THEME_VARIANT') == "MY_X_THEME_VARIANT=light\n" ? 'light' : 'dark'
+    elseif len($MY_X_THEME_VARIANT)
+      let bg = $MY_X_THEME_VARIANT
     else
       " let daytime = system('get-daytime-period')
       let daytime_file = expand('/tmp/redshift-period')
@@ -1429,9 +1530,11 @@ if 1 " has('eval')
     endif
     if bg != &bg
       let &bg = bg
+      let $FZF_DEFAULT_OPTS = '--color 16,bg+:' . (bg == 'dark' ? '18' : '21')
+      doautocmd <nomodeline> ColorScheme
     endif
   endfun
-  command! Autobg call SetBgAccordingToShell()
+  command! -nargs=? Autobg call SetBgAccordingToShell(<q-args>)
 
   fun! ToggleBg()
     let &bg = &bg == 'dark' ? 'light' : 'dark'
@@ -1440,6 +1543,7 @@ if 1 " has('eval')
 
   " Colorscheme: prefer solarized with 16 colors (special palette).
   let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
+  let g:solarized_menu=0
 
   " Use corresponding theme from $BASE16_THEME, if set up in the shell.
   " BASE16_THEME should be in sudoer's env_keep for "sudo vi".

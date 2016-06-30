@@ -47,7 +47,14 @@ if [ -f ~/.gnupg/gpg-agent.conf ]; then
   if grep -q '^enable-ssh-support' ~/.gnupg/gpg-agent.conf; then
     unset SSH_AGENT_PID
     if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
-      export SSH_AUTH_SOCK="$HOME/.gnupg/S.gpg-agent.ssh"
+      for i in "/var/run/user/$(id -u)/gnupg/S.gpg-agent.ssh" \
+          "$HOME/.gnupg/S.gpg-agent.ssh"; do
+        if [ -e "$i" ]; then
+          export SSH_AUTH_SOCK="$i"
+          break
+        fi
+      done
+      unset i
     fi
   fi
 fi

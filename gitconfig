@@ -14,6 +14,8 @@
 	dsf = !git diff --color $@ | diff-so-fancy
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
+	# Used (verbatim/resolved) for internal dirty status in shell theme (✗).
+	ls-untracked = ls-files --other --directory --exclude-standard
 	m = merge
 	mf = merge --ff-only
 	ma = merge --abort
@@ -35,7 +37,6 @@
 	sts = stash show -p
 	stp = stash pop
 	stl = stash list --format=\"%gd: %ci - %gs\"
-	p = push
 	up = !git fetch && git rebase
 	showtrackedignored = ! cd \"${GIT_PREFIX}\" && untracked_list=$(git rev-parse --git-dir)/ignored-untracked.txt && git ls-files -o -i --exclude-standard >\"${untracked_list}\" && GIT_INDEX_FILE=\"\" git ls-files -o -i --exclude-standard | grep -Fvxf \"${untracked_list}\" && rm -rf \"${untracked_list}\"
 	# Diff stash with working tree.
@@ -63,13 +64,40 @@
 	status = auto
 	branch = auto
 	ui = true
+[color "branch"]
+	current = green
+	# current = yellow reverse
+	local = normal
+	remote = blue
+[color "decorate"]
+	# bold green by default.
+	branch = green
+	# bold red by default.
+	remoteBranch = bold green
+	# default: bold yellow.
+	# tag = green
+	# default: bold magenta.
+	# stash = red
+	# default: bold cyan.
+	# HEAD = green bold
+	# default: bold blue.
+	# grafted =
 [color "diff"]
+	meta = yellow bold
+	commit = green bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
 	whitespace = red reverse
 [color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
+	# oldNormal = red bold
+	# oldHighlight = red bold 52
+	# newNormal = green bold
+	# newHighlight = green bold 22
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
 
 [core]
 	attributesfile = ~/.gitattributes.global
@@ -89,12 +117,16 @@
 	tool = vimdiff
 	guitool = bc3
 	mnemonicprefix = true
+	compactionHeuristic = true
 [difftool "my-icdiff"]
 	cmd = icdiff --line-numbers --head 5000 "$LOCAL" "$REMOTE"
 [difftool "bc3"]
 	cmd = bcompare $LOCAL $REMOTE
 [difftool]
 	prompt = false
+[difftool "vimdiff"]
+	path = nvim
+
 [merge]
 	tool = vimdiff
 	# http://sjl.bitbucket.org/splice.vim/
@@ -121,6 +153,10 @@
 [treediff "bc3"]
 	cmd = bcompare
 
+[log]
+	abbrevCommit = true
+	decorate = short
+
 [pretty]
 	# reflog, with relative date (but for commits, not reflog entries!):
 	reflog = %C(auto)%h %<|(17)%gd %<|(31)%C(blue)%cr%C(reset) %gs (%s)
@@ -128,6 +164,7 @@
 [push]
 	# "simple" not available with Git 1.7.10 (Debian stable), "current" is similar.
 	default = simple
+
 [interactive]
 	# Requires perl-term-readkey (Arch) / libterm-readkey-perl (Debian).
 	singlekey = true
@@ -148,6 +185,11 @@
 	pushInsteadOf = git://github.com/
 	pushInsteadOf = https://github.com/
 
+[diff-so-fancy]
+	# changeHunkIndicators = false
+	stripLeadingSymbols = false
+	markEmptyLines = false
+
 [pager]
 	dd = true
 	dsf = true
@@ -155,10 +197,13 @@
   status = true
 
 	diff = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
+	# No --quit-if-one-screen for log, useful with pacaur and in general.
+	log = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager | sed 's/--quit-if-one-screen//')
 	show = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 
 [sendemail]
 	confirm = always
+
 [rerere]
 	enabled = true
 

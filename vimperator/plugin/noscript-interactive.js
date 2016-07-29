@@ -1,4 +1,25 @@
 /**
+ * Copyright (c) 2008 - 2011 by Eric Van Dewoestine
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ *
  * Integration plugin for noscript extension
  *
  * Usage:
@@ -20,11 +41,7 @@
  *
  * Tested against NoScript 1.8.6
  *
- * @author Eric Van Dewoestine (ervandew@gmail.com)
  * @version 0.4
- *
- * First two versions written by Martin Stubenschrott, but now maintained by
- * Eric.  Please direct all correspondence regarding this plugin to Eric.
  */
 
 /**
@@ -125,18 +142,20 @@ function NoscriptVimperator() {
       var commands = [];
       for (var name in nsv){
         if (name.indexOf('_') !== 0 && nsv.hasOwnProperty(name)){
-          commands.push(name);
+          commands.push([name,""]);
         }
       }
-      context.completions = [[c, ''] for each (c in commands)];
+      return [0,commands];
     }
   };
 }
 
-var nsv = NoscriptVimperator();
+if (typeof(noscriptOverlay) != 'undefined'){
+  var nsv = NoscriptVimperator();
 
-commands.addUserCommand(["nosc[ript]"],
-  "Execute noscript commands",
-  function(args) { nsv._execute(args); },
-  { argCount: '1', completer: nsv._completer }
-);
+  commands.addUserCommand(["nosc[ript]"],
+    "Execute noscript commands",
+    function(args) { nsv._execute(args); },
+    { completer: nsv._completer }
+  );
+}

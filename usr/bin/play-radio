@@ -3,7 +3,6 @@
 unset http_proxy
 
 basename=${0##*/}
-
 if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
     name=$1
@@ -12,18 +11,28 @@ if [ "$basename" = "play-radio" ]; then
   fi
 fi
 
-player="mpg123 --control"
-player_pl="mpg123 --control -@"
+player="mpg123 --timeout 30 --control"
+player_pl="mpg123 --timeout 30 --control -@"
+
+# shellcheck disable=SC2064
+trap "pkill -P $$" 0
 
 case $name in
   radioparadise)
-    $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u ;;
+    $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u & ;;
   fluxfm )
-    $player http://www.fluxfm.de/stream-berlin ;;
+    $player http://www.fluxfm.de/stream-berlin & ;;
   radioeins )
-    $player_pl http://www.radioeins.de/live.m3u ;;
+    $player_pl http://www.radioeins.de/live.m3u & ;;
+  groovesalad)
+    $player_pl http://somafm.com/groovesalad.pls & ;;
   *)
-    echo "Unknown station: $name"
-    $player "$name"
-    exit 64
+    if [ "$name#.pls" = "$name" ]; then
+      $player "$name" &
+    else
+      $player_pl "$name" &
+    fi
 esac
+
+# Wait for child process (to make SIGTERM work with dash).
+wait $!

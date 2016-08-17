@@ -41,9 +41,6 @@
 [submodule "config/awesome/vicious"]
 	path = config/awesome/vicious
 	url = http://git.sysphere.org/vicious
-[submodule "lib/docker-zsh-completion"]
-	path = lib/docker-zsh-completion
-	url = git://github.com/felixr/docker-zsh-completion.git
 [submodule "vim/bundle/neobundle"]
 	path = vim/bundle/neobundle
 	url = git://github.com/Shougo/neobundle.vim.git

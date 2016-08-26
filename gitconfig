@@ -197,8 +197,7 @@
   status = true
 
 	diff = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
-	# No --quit-if-one-screen for log, useful with pacaur and in general.
-	log = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager | sed 's/--quit-if-one-screen//')
+	log = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 	show = ~/.dotfiles/lib/diff-so-fancy/diff-so-fancy | $(git config core.pager)
 
 [sendemail]

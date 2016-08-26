@@ -1,23 +1,16 @@
-bazaar/plugins/*/.bzr
-byobu/color
-vimperator/info
-vimperator/plugins.OUT/
 pentadactyl/info
-pentadactyl/plugins.OUT/
+vimperator/info
+
+# Neovim/Vim
 vim/.netrwhist
-vim/.VimballRecord
-vim/bundle/_tplugin.vim
 vim/neobundles/
-# Neovim.
-vim/shada
-# ignore for now, gets handled locally:
 vim/spell
 vim/undo
 vim/view
-tags
-__pycache__
-*.pyc
-*.swp
+# Neovim.
+vim/shada
+
+# Password and Makefile stamps
 .passwd
 .stamps
 
@@ -28,5 +21,3 @@ zshrc.local
 
 # Build dir, used for tests.
 build
-
-usr/share/man/index.db

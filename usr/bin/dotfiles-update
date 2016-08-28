@@ -4,4 +4,11 @@ set -e
 
 cd ~/.dotfiles
 git -c rebase.autoStash=true pull --rebase
+
+# git-pull (2.9.3) exits with 0 even when there are conflicts from applying the autostash!
+if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+  echo "There are conflicted files.  Aborting."
+  exit 1
+fi
+
 make

@@ -1,29 +1,29 @@
 scriptencoding utf-8
 
-" Profiling. {{{
-" Start profiling. Optional arg: logfile path.
-fun! ProfileStart(...)
-  if a:0 && a:1 != 1
-    let profile_file = a:1
-  else
-    let profile_file = '/tmp/vim.'.getpid().'.profile.txt'
-    echom "Profiling into" profile_file
-    let @* = profile_file
-  endif
-  exec 'profile start '.profile_file
-  profile! file **
-  profile  func *
-endfun
-if len(get(g:, 'profile', ''))
-  call ProfileStart(g:profile)
-endif
-if 0
-call ProfileStart()
-endif
-" }}}
-
 
 if 1 " has('eval') / `let` may not be available.
+  " Profiling. {{{
+  " Start profiling. Optional arg: logfile path.
+  fun! ProfileStart(...)
+    if a:0 && a:1 != 1
+      let profile_file = a:1
+    else
+      let profile_file = '/tmp/vim.'.getpid().'.'.reltimestr(reltime())[-4:].'profile.txt'
+      echom "Profiling into" profile_file
+      let @* = profile_file
+    endif
+    exec 'profile start '.profile_file
+    profile! file **
+    profile  func *
+  endfun
+  if len(get(g:, 'profile', ''))
+    call ProfileStart(g:profile)
+  endif
+  if 0
+  call ProfileStart()
+  endif
+  " }}}
+
   fun! MyWarningMsg(msg)
     redraw
     echohl WarningMsg | echom a:msg | echohl None
@@ -545,17 +545,17 @@ set numberwidth=1  " Initial default, gets adjusted dynamically.
 
 " Formatting {{{
 set tabstop=8
-augroup vimrc_indent
-  au!
-  au FileType make setlocal ts=2
-augroup END
-
 set shiftwidth=2
 set noshiftround  " for `>`/`<` not behaving like i_CTRL-T/-D
 set expandtab
 " }}}
 
 if has('autocmd')
+  augroup vimrc_indent
+    au!
+    au FileType make setlocal ts=2
+  augroup END
+
   augroup vimrc_iskeyword
     au!
     " Remove '-' and ':' from keyword characters (to highlight e.g. 'width:…' and 'font-size:foo' correctly)
@@ -828,17 +828,23 @@ noremap g` g'
 sunmap g`
 " }}}
 
+" Align/tabularize text.
+vmap <Enter> <Plug>(EasyAlign)
+
+if 1 " has('eval') / `let` may not be available.
 " Maps to unimpaired mappings by context: diff, loclist or qflist.
 " Falls back to "a" for args.
 fun! MySetupUnimpairedShortcut()
   if &diff
     let m = 'c'
-  elseif len(getloclist(0))
-    let m = 'l'
+    " diff-obtain and goto next.
+    nmap dn do+c
   elseif len(getqflist())
     let m = 'q'
+  elseif len(getloclist(0))
+    let m = 'l'
   else
-    let m = 'a'
+    let m = 'n'
   endif
   if get(b:, '_mysetupunimpairedmaps', '') == m
     return
@@ -884,7 +890,7 @@ fun! MyQuitWindow()
 
   if &bt == 'terminal'
     " 'confirm' does not work: https://github.com/neovim/neovim/issues/4651
-    bd!
+    q
   else
     confirm q
   endif
@@ -905,584 +911,581 @@ if has('autocmd')
 endif
 " }}}
 
-" Align/tabularize text.
-vmap <Enter> <Plug>(EasyAlign)
 
 
-if 1 " has('eval') / `let` may not be available.
-  " Close preview and quickfix windows.
-  nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
+" Close preview and quickfix windows.
+nnoremap <silent> <C-W>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 
-  " fzf.vim {{{
-  " Insert mode completion
-  imap <Leader><c-x><c-k> <plug>(fzf-complete-word)
-  imap <Leader><c-x><c-f> <plug>(fzf-complete-path)
-  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-  imap <Leader><c-x><c-l> <plug>(fzf-complete-line)
+" fzf.vim {{{
+" Insert mode completion
+imap <Leader><c-x><c-k> <plug>(fzf-complete-word)
+imap <Leader><c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <Leader><c-x><c-l> <plug>(fzf-complete-line)
 
-  let g:fzf_command_prefix = 'FZF'
-  let g:fzf_layout = { 'window': 'execute (tabpagenr()-1)."tabnew"' }
+let g:fzf_command_prefix = 'FZF'
+let g:fzf_layout = { 'window': 'execute (tabpagenr()-1)."tabnew"' }
 
-  " TODO: see /home/daniel/.dotfiles/vim/neobundles/fzf/plugin/fzf.vim
-  " let g:fzf_nvim_statusline = 0
-  function! s:fzf_statusline()
-    let bg_dim =  &bg == 'dark' ? 18 : 21
-    exec 'highlight fzf1 ctermfg=1 ctermbg='.bg_dim
-    exec 'highlight fzf2 ctermfg=2 ctermbg='.bg_dim
-    exec 'highlight fzf3 ctermfg=7 ctermbg='.bg_dim
-    setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
-  endfunction
+" TODO: see /home/daniel/.dotfiles/vim/neobundles/fzf/plugin/fzf.vim
+" let g:fzf_nvim_statusline = 0
+function! s:fzf_statusline()
+  let bg_dim =  &bg == 'dark' ? 18 : 21
+  exec 'highlight fzf1 ctermfg=1 ctermbg='.bg_dim
+  exec 'highlight fzf2 ctermfg=2 ctermbg='.bg_dim
+  exec 'highlight fzf3 ctermfg=7 ctermbg='.bg_dim
+  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+endfunction
 
-  augroup vimrc_quickfixsigns
-    au!
-    autocmd FileType help,fzf,ref-* let b:noquickfixsigns = 1
-    if exists('##TermOpen')
-      autocmd TermOpen * let b:noquickfixsigns = 1
+augroup vimrc_quickfixsigns
+  au!
+  autocmd FileType help,fzf,ref-* let b:noquickfixsigns = 1
+  if exists('##TermOpen')
+    autocmd TermOpen * let b:noquickfixsigns = 1
+  endif
+augroup END
+augroup vimrc_fzf
+  au!
+  autocmd User FzfStatusLine call <SID>fzf_statusline()
+augroup END
+" }}}
+
+let tmux_navigator_no_mappings = 1
+if has('vim_starting')
+  if &rtp =~ '\<tmux-navigator\>'
+    nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+    nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+    nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+    nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+    " nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
+  else
+    nnoremap <C-h> <c-w>h
+    nnoremap <C-j> <c-w>j
+    nnoremap <C-k> <c-w>k
+    nnoremap <C-l> <c-w>l
+    " nnoremap <C-\> <c-w>j
+  endif
+endif
+
+if exists(':tnoremap') && has('vim_starting')  " Neovim
+
+  " Exit.
+  tnoremap <Esc> <C-\><C-n>
+
+  " <c-space> does not work (https://github.com/neovim/neovim/issues/3101).
+  tnoremap <C-@> <C-\><C-n>:tab sp<cr>:startinsert<cr>
+
+  let g:terminal_scrollback_buffer_size = 100000  " current max
+
+  nnoremap <Leader>cx :sp \| :term p --testmon<cr>
+  nnoremap <Leader>cX :sp \| :term p -k
+
+  " Add :Term equivalent to :term, but with ":new" instead of ":enew".
+  fun! <SID>SplitTerm(...) abort
+    let cmd = ['zsh', '-i']
+    if a:0
+      let cmd += ['-c', join(a:000)]
     endif
-  augroup END
-  augroup vimrc_fzf
-    au!
-    autocmd User FzfStatusLine call <SID>fzf_statusline()
-  augroup END
-  " }}}
+    new
+    call termopen(cmd)
+    startinsert
+  endfun
+  com! -nargs=* -complete=shellcmd Term call <SID>SplitTerm(<f-args>)
 
-  let tmux_navigator_no_mappings = 1
-  if has('vim_starting')
-    if &rtp =~ '\<tmux-navigator\>'
-      nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-      nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-      nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-      nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-      " nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
+  " Open term in current file's dir.
+  nnoremap <Leader>gt :sp \| exe 'lcd' expand('%:p:h') \| :term<cr>
+endif
+
+let g:my_full_name = "Daniel Hahler"
+let g:snips_author = g:my_full_name
+
+" TAB is used for general completion.
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+let g:UltiSnipsListSnippets = "<c-b>"
+let g:UltiSnipsEditSplit='context'
+
+" let g:UltiSnips.always_use_first_snippet = 1
+augroup UltiSnipsConfig
+  au!
+  au FileType smarty UltiSnipsAddFiletypes smarty.html.javascript.php
+  au FileType html   UltiSnipsAddFiletypes html.javascript.php
+augroup END
+
+if !exists('g:UltiSnips') | let g:UltiSnips = {} | endif
+let g:UltiSnips.load_early = 1
+let g:UltiSnips.UltiSnips_ft_filter = {
+      \ 'default' : {'filetypes': ["FILETYPE", "all"] },
+      \ 'html'    : {'filetypes': ["html", "javascript", "all"] },
+      \ 'python'  : {'filetypes': ["python", "django", "all"] },
+      \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "all"] },
+      \ }
+let g:UltiSnips.snipmate_ft_filter = {
+      \ 'default' : {'filetypes': ["FILETYPE", "_"] },
+      \ 'html'    : {'filetypes': ["html", "javascript", "_"] },
+      \ 'python'  : {'filetypes': ["python", "django", "_"] },
+      \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "_"] },
+      \ }
+   "\ 'html'  : {'filetypes': ["html", "javascript"], 'dir-regex': '[._]vim$' },
+
+
+if has('win32') || has('win64')
+  " replace ~/vimfiles with ~/.vim in runtimepath
+  " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
+  let &runtimepath = substitute(&runtimepath, '\('.escape($HOME, '\').'\)vimfiles\>', '\1.vim', 'g')
+endif
+
+" Sparkup (insert mode) maps. Default: <c-e>/<c-n>, both used by Vim.
+let g:sparkupExecuteMapping = '<Leader><c-e>'
+" '<c-n>' by default!
+let g:sparkupNextMapping = '<Leader><c-n>'
+
+" Syntastic {{{2
+let g:syntastic_enable_signs=1
+let g:syntastic_check_on_wq=1  " Only for active filetypes.
+let g:syntastic_auto_loc_list=1
+let g:syntastic_always_populate_loc_list=1
+" let g:syntastic_echo_current_error=0 " TEST: faster?!
+let g:syntastic_mode_map = {
+      \ 'mode': 'passive',
+      \ 'active_filetypes': ['ruby', 'php', 'lua', 'python', 'sh', 'zsh'],
+      \ 'passive_filetypes': [] }
+let g:syntastic_error_symbol='✗'
+let g:syntastic_warning_symbol='⚠'
+let g:syntastic_aggregate_errors = 0
+let g:syntastic_python_checkers = ['python', 'frosted', 'flake8', 'pep8']
+
+" let g:syntastic_php_checkers = ['php']
+let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
+
+" See 'syntastic_quiet_messages' and 'syntastic_<filetype>_<checker>_quiet_messages'
+" let g:syntastic_quiet_messages = {
+"       \ "level": "warnings",
+"       \ "type":  "style",
+"       \ "regex": '\m\[C03\d\d\]',
+"       \ "file":  ['\m^/usr/include/', '\m\c\.h$'] }
+let g:syntastic_quiet_messages = { "level": [], "type": ["style"] }
+
+fun! SyntasticToggleQuiet(k, v, scope)
+  let varname = a:scope."syntastic_quiet_messages"
+  if !exists(varname) | exec 'let '.varname.' = { "level": [], "type": ["style"] }' | endif
+  exec 'let idx = index('.varname.'[a:k], a:v)'
+  if idx == -1
+    exec 'call add('.varname.'[a:k], a:v)'
+    echom 'Syntastic: '.a:k.':'.a:v.' disabled (filtered).'
+  else
+    exec 'call remove('.varname.'[a:k], idx)'
+    echom 'Syntastic: '.a:k.':'.a:v.' enabled (not filtered).'
+  endif
+endfun
+command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings', "g:")
+command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style', "g:")
+command! SyntasticToggleWarningsBuffer call SyntasticToggleQuiet('level', 'warnings', "b:")
+command! SyntasticToggleStyleBuffer    call SyntasticToggleQuiet('type', 'style', "b:")
+
+fun! MySyntasticCheckAll()
+  let save = g:syntastic_quiet_messages
+  let g:syntastic_quiet_messages = { "level": [], 'type': [] }
+  SyntasticCheck
+  let g:syntastic_quiet_messages = save
+endfun
+command! MySyntasticCheckAll call MySyntasticCheckAll()
+
+" Source: https://github.com/scrooloose/syntastic/issues/1361#issuecomment-82312541
+function! SyntasticDisableToggle()
+    if !exists('s:syntastic_disabled')
+        let s:syntastic_disabled = 0
+    endif
+    if !s:syntastic_disabled
+        let s:modemap_save = deepcopy(g:syntastic_mode_map)
+        let g:syntastic_mode_map['active_filetypes'] = []
+        let g:syntastic_mode_map['mode'] = 'passive'
+        let s:syntastic_disabled = 1
+        SyntasticReset
+        echom "Syntastic disabled."
     else
-      nnoremap <C-h> <c-w>h
-      nnoremap <C-j> <c-w>j
-      nnoremap <C-k> <c-w>k
-      nnoremap <C-l> <c-w>l
-      " nnoremap <C-\> <c-w>j
+        let g:syntastic_mode_map = deepcopy(s:modemap_save)
+        let s:syntastic_disabled = 0
+        echom "Syntastic enabled."
     endif
+endfunction
+command! SyntasticDisableToggle call SyntasticDisableToggle()
+
+" Neomake {{{
+let g:neomake_open_list = 2
+let g:neomake_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
+
+" let g:neomake_serialize = 1
+" let g:neomake_serialize_abort_on_error = 1
+
+" let g:neomake_vim_enabled_makers = []
+let g:neomake_c_enabled_makers = []
+augroup vimrc_neomake
+  au!
+  au BufReadPost ~/.dotfiles/vimrc let b:neomake_disabled = 1
+augroup END
+
+" shellcheck: ignore "Can't follow non-constant source."
+let $SHELLCHECK_OPTS='-e SC1090'
+
+" let g:neomake_verbose = 3
+fun! NeomakeToggleBuffer()
+  let b:neomake_disabled = !get(b:, 'neomake_disabled')
+  echom 'Neomake:' (b:neomake_disabled ? 'disabled.' : 'enabled.')
+  if b:neomake_disabled
+    call neomake#signs#ResetFile(bufnr("%"))
+    call neomake#signs#CleanAllOldSigns('file')
+  endif
+endfun
+com! NeomakeToggleBuffer call NeomakeToggleBuffer()
+
+fun! NeomakeToggle()
+  let g:neomake_disabled = !get(g:, 'neomake_disabled')
+  echom g:neomake_disabled ? 'Disabled.' : 'Enabled.'
+endfun
+
+com! NeomakeToggle call NeomakeToggle()
+com! NeomakeDisable let g:neomake_disabled=1
+com! NeomakeDisableBuffer let b:neomake_disabled=1
+com! NeomakeEnable let g:neomake_disabled=0
+com! NeomakeEnableBuffer let b:neomake_disabled=0
+nnoremap <Leader>cc :Neomake<CR>
+" Ref: https://github.com/neomake/neomake/issues/405
+let g:neomake_check_on_wq = 0
+fun! NeomakeCheck(fname)
+  if !get(g:, 'neomake_check_on_wq', 0) && get(w:, 'neomake_quitting_win', 0)
+    return
+  endif
+  if bufnr(a:fname) != bufnr('%')
+    " Not invoked for the current buffer.  This happens for ':w /tmp/foo'.
+    return
+  endif
+  if get(b:, 'neomake_disabled', get(g:, 'neomake_disabled', 0))
+    return
   endif
 
-  if exists(':tnoremap') && has('vim_starting')  " Neovim
-
-    " Exit.
-    tnoremap <Esc> <C-\><C-n>
-
-    " <c-space> does not work (https://github.com/neovim/neovim/issues/3101).
-    tnoremap <C-@> <C-\><C-n>:tab sp<cr>:startinsert<cr>
-
-    let g:terminal_scrollback_buffer_size = 100000  " current max
-
-    nnoremap <Leader>cx :sp \| :term p --testmon<cr>
-    nnoremap <Leader>cX :sp \| :term p -k
-
-    " Add :Term equivalent to :term, but with ":new" instead of ":enew".
-    fun! <SID>SplitTerm(...) abort
-      let cmd = ['zsh', '-i']
-      if a:0
-        let cmd += ['-c', join(a:000)]
+  let s:windows_before = [tabpagenr(), winnr('$')]
+  fun! s:callback(result)
+    " { 'status': <exit status of maker>,
+    " \ 'name': <maker name>,
+    " \ 'has_next': <true if another maker follows, false otherwise> }
+    " unsilent echom "callback" string(a:result)
+    " if a:result.status != 0
+      if exists('*airline#update_statusline')
+            \ && s:windows_before != [tabpagenr(), winnr('$')]
+        " echom "UPDATE"
+        call airline#update_statusline()
       endif
-      new
-      call termopen(cmd)
-      startinsert
-    endfun
-    com! -nargs=* -complete=shellcmd Term call <SID>SplitTerm(<f-args>)
+    " endif
+  endfun
+  call neomake#Make(1, [], function('s:callback'))
+endfun
+augroup neomake_check
+  au!
+  autocmd BufWritePost * call NeomakeCheck(expand('<afile>'))
+  autocmd QuitPre * if winnr('$') == 1 | let w:neomake_quitting_win = 1 | endif
+augroup END
+" }}}
 
-    " Open term in current file's dir.
-    nnoremap <Leader>gt :sp \| exe 'lcd' expand('%:p:h') \| :term<cr>
+" gist-vim {{{2
+let g:gist_detect_filetype = 1
+" }}}
+
+" tinykeymap: used to move between signs from quickfixsigns and useful by itself. {{{2
+let g:tinykeymap#mapleader = '<Leader>k'
+let g:tinykeymap#timeout = 0  " default: 5000s (ms)
+let g:tinykeymap#conflict = 1
+" Exit also with 'q'.
+let g:tinykeymap#break_key = 113
+" Default "*"; exluded "para_move" from tlib.
+" List: :echo globpath(&rtp, 'autoload/tinykeymap/map/*.vim')
+let g:tinykeymaps_default = [
+      \ 'buffers', 'diff', 'filter', 'lines', 'loc', 'qfl', 'tabs', 'undo',
+      \ 'windows', 'quickfixsigns',
+      \ ]
+      " \ 'para_move',
+" }}}
+
+" fontzoom {{{
+let g:fontzoom_no_default_key_mappings = 1
+nmap <A-+> <Plug>(fontzoom-larger)
+nmap <A--> <Plug>(fontzoom-smaller)
+" }}}
+
+" Call bcompare with current and alternate file.
+command! BC call system('bcompare '.shellescape(expand('%')).' '.shellescape(expand('#')).'&')
+
+
+" YouCompleteMe {{{
+" This needs to be the Python that YCM was built against.  (set in ~/.zshrc.local).
+if filereadable($PYTHON_YCM)
+  let g:ycm_path_to_python_interpreter = $PYTHON_YCM
+  " let g:ycm_path_to_python_interpreter = 'python-in-terminal'
+endif
+
+let g:ycm_filetype_blacklist = {
+      \ 'python' : 1,
+      \ 'ycmblacklisted': 1
+      \}
+let g:ycm_complete_in_comments = 1
+let g:ycm_complete_in_strings = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+let g:ycm_extra_conf_globlist = ['~/src/awesome/.ycm_extra_conf.py']
+
+" Jump mappings, overridden in Python mode with jedi-vim.
+nnoremap <leader>j :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>gj :YcmCompleter GoToDeclaration<CR>
+fun! MySetupPythonMappings()
+  nnoremap <buffer> <leader>j  :call jedi#goto_definitions()<CR>
+  nnoremap <buffer> <leader>gj :call jedi#goto_assignments()<CR>
+endfun
+augroup vimrc_jump_maps
+  au!
+  au FileType python call MySetupPythonMappings()
+augroup END
+
+" Deactivated: causes huge RAM usage (YCM issue 595)
+" let g:ycm_collect_identifiers_from_tags_files = 1
+
+" EXPERIMENTAL: auto-popups and experimenting with SuperTab
+" NOTE: this skips the following map setup (also for C-n):
+"       ' pumvisible() ? "\<C-p>" : "\' . key .'"'
+let g:ycm_key_list_select_completion = []
+let g:ycm_key_list_previous_completion = []
+
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.'],
+  \   'objc' : ['->', '.'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['->', '.', '::'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,d,vim,python,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \ }
+
+
+" Tags (configure this before easytags, except when using easytags_dynamic_files)
+" Look for tags file in parent directories, upto "/"
+set tags=./tags;/
+
+" CR and BS mapping: call various plugins manually. {{{
+let g:endwise_no_mappings = 1  " NOTE: must be unset instead of 0
+let g:cursorcross_no_map_CR = 1
+let g:cursorcross_no_map_BS = 1
+let g:delimitMate_expand_cr = 0
+let g:SuperTabCrMapping = 0  " Skip SuperTab CR map setup (skipped anyway for expr mapping)
+
+let g:cursorcross_mappings = 0  " No generic mappings for cursorcross.
+
+" Force delimitMate mapping (gets skipped if mapped already).
+fun! My_CR_map()
+  " "<CR>" via delimitMateCR
+  if len(maparg('<Plug>delimitMateCR', 'i'))
+    let r = "\<Plug>delimitMateCR"
+  else
+    let r = "\<CR>"
   endif
-
-  let g:my_full_name = "Daniel Hahler"
-  let g:snips_author = g:my_full_name
-
-  " TAB is used for general completion.
-  let g:UltiSnipsExpandTrigger="<c-j>"
-  let g:UltiSnipsJumpForwardTrigger="<c-j>"
-  let g:UltiSnipsJumpBackwardTrigger="<c-k>"
-  let g:UltiSnipsListSnippets = "<c-b>"
-  let g:UltiSnipsEditSplit='context'
-
-  " let g:UltiSnips.always_use_first_snippet = 1
-  augroup UltiSnipsConfig
-    au!
-    au FileType smarty UltiSnipsAddFiletypes smarty.html.javascript.php
-    au FileType html   UltiSnipsAddFiletypes html.javascript.php
-  augroup END
-
-  if !exists('g:UltiSnips') | let g:UltiSnips = {} | endif
-  let g:UltiSnips.load_early = 1
-  let g:UltiSnips.UltiSnips_ft_filter = {
-        \ 'default' : {'filetypes': ["FILETYPE", "all"] },
-        \ 'html'    : {'filetypes': ["html", "javascript", "all"] },
-        \ 'python'  : {'filetypes': ["python", "django", "all"] },
-        \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "all"] },
-        \ }
-  let g:UltiSnips.snipmate_ft_filter = {
-        \ 'default' : {'filetypes': ["FILETYPE", "_"] },
-        \ 'html'    : {'filetypes': ["html", "javascript", "_"] },
-        \ 'python'  : {'filetypes': ["python", "django", "_"] },
-        \ 'htmldjango'  : {'filetypes': ["python", "django", "html", "_"] },
-        \ }
-     "\ 'html'  : {'filetypes': ["html", "javascript"], 'dir-regex': '[._]vim$' },
-
-
-  if has('win32') || has('win64')
-    " replace ~/vimfiles with ~/.vim in runtimepath
-    " let &runtimepath = join( map( split(&rtp, ','), 'substitute(v:val, escape(expand("~/vimfiles"), "\\"), escape(expand("~/.vim"), "\\"), "g")' ), "," )
-    let &runtimepath = substitute(&runtimepath, '\('.escape($HOME, '\').'\)vimfiles\>', '\1.vim', 'g')
+  if len(maparg('<Plug>CursorCrossCR', 'i'))
+    " requires vim 704
+    let r .= "\<Plug>CursorCrossCR"
   endif
-
-  " Sparkup (insert mode) maps. Default: <c-e>/<c-n>, both used by Vim.
-  let g:sparkupExecuteMapping = '<Leader><c-e>'
-  " '<c-n>' by default!
-  let g:sparkupNextMapping = '<Leader><c-n>'
-
-  " Syntastic {{{2
-  let g:syntastic_enable_signs=1
-  let g:syntastic_check_on_wq=1  " Only for active filetypes.
-  let g:syntastic_auto_loc_list=1
-  let g:syntastic_always_populate_loc_list=1
-  " let g:syntastic_echo_current_error=0 " TEST: faster?!
-  let g:syntastic_mode_map = {
-        \ 'mode': 'passive',
-        \ 'active_filetypes': ['ruby', 'php', 'lua', 'python', 'sh', 'zsh'],
-        \ 'passive_filetypes': [] }
-  let g:syntastic_error_symbol='✗'
-  let g:syntastic_warning_symbol='⚠'
-  let g:syntastic_aggregate_errors = 0
-  let g:syntastic_python_checkers = ['python', 'frosted', 'flake8', 'pep8']
-
-  " let g:syntastic_php_checkers = ['php']
-  let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
-
-  " See 'syntastic_quiet_messages' and 'syntastic_<filetype>_<checker>_quiet_messages'
-  " let g:syntastic_quiet_messages = {
-  "       \ "level": "warnings",
-  "       \ "type":  "style",
-  "       \ "regex": '\m\[C03\d\d\]',
-  "       \ "file":  ['\m^/usr/include/', '\m\c\.h$'] }
-  let g:syntastic_quiet_messages = { "level": [], "type": ["style"] }
-
-  fun! SyntasticToggleQuiet(k, v, scope)
-    let varname = a:scope."syntastic_quiet_messages"
-    if !exists(varname) | exec 'let '.varname.' = { "level": [], "type": ["style"] }' | endif
-    exec 'let idx = index('.varname.'[a:k], a:v)'
-    if idx == -1
-      exec 'call add('.varname.'[a:k], a:v)'
-      echom 'Syntastic: '.a:k.':'.a:v.' disabled (filtered).'
-    else
-      exec 'call remove('.varname.'[a:k], idx)'
-      echom 'Syntastic: '.a:k.':'.a:v.' enabled (not filtered).'
-    endif
-  endfun
-  command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings', "g:")
-  command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style', "g:")
-  command! SyntasticToggleWarningsBuffer call SyntasticToggleQuiet('level', 'warnings', "b:")
-  command! SyntasticToggleStyleBuffer    call SyntasticToggleQuiet('type', 'style', "b:")
-
-  fun! MySyntasticCheckAll()
-    let save = g:syntastic_quiet_messages
-    let g:syntastic_quiet_messages = { "level": [], 'type': [] }
-    SyntasticCheck
-    let g:syntastic_quiet_messages = save
-  endfun
-  command! MySyntasticCheckAll call MySyntasticCheckAll()
-
-  " Source: https://github.com/scrooloose/syntastic/issues/1361#issuecomment-82312541
-  function! SyntasticDisableToggle()
-      if !exists('s:syntastic_disabled')
-          let s:syntastic_disabled = 0
-      endif
-      if !s:syntastic_disabled
-          let s:modemap_save = deepcopy(g:syntastic_mode_map)
-          let g:syntastic_mode_map['active_filetypes'] = []
-          let g:syntastic_mode_map['mode'] = 'passive'
-          let s:syntastic_disabled = 1
-          SyntasticReset
-          echom "Syntastic disabled."
-      else
-          let g:syntastic_mode_map = deepcopy(s:modemap_save)
-          let s:syntastic_disabled = 0
-          echom "Syntastic enabled."
-      endif
-  endfunction
-  command! SyntasticDisableToggle call SyntasticDisableToggle()
-
-  " Neomake {{{
-  let g:neomake_open_list = 2
-  let g:neomake_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
-
-  " let g:neomake_serialize = 1
-  " let g:neomake_serialize_abort_on_error = 1
-
-  " let g:neomake_vim_enabled_makers = []
-  let g:neomake_c_enabled_makers = []
-  augroup vimrc_neomake
-    au!
-    au BufReadPost ~/.dotfiles/vimrc let b:neomake_disabled = 1
-  augroup END
-
-  " shellcheck: ignore "Can't follow non-constant source."
-  let $SHELLCHECK_OPTS='-e SC1090'
-
-  " let g:neomake_verbose = 3
-  fun! NeomakeToggleBuffer()
-    let b:neomake_disabled = !get(b:, 'neomake_disabled')
-    echom 'Neomake:' (b:neomake_disabled ? 'disabled.' : 'enabled.')
-    if b:neomake_disabled
-      call neomake#signs#ResetFile(bufnr("%"))
-      call neomake#signs#CleanAllOldSigns('file')
-    endif
-  endfun
-  com! NeomakeToggleBuffer call NeomakeToggleBuffer()
-
-  fun! NeomakeToggle()
-    let g:neomake_disabled = !get(g:, 'neomake_disabled')
-    echom g:neomake_disabled ? 'Disabled.' : 'Enabled.'
-  endfun
-
-  com! NeomakeToggle call NeomakeToggle()
-  com! NeomakeDisable let g:neomake_disabled=1
-  com! NeomakeDisableBuffer let b:neomake_disabled=1
-  com! NeomakeEnable let g:neomake_disabled=0
-  com! NeomakeEnableBuffer let b:neomake_disabled=0
-  nnoremap <Leader>cc :Neomake<CR>
-  " Ref: https://github.com/neomake/neomake/issues/405
-  let g:neomake_check_on_wq = 0
-  fun! NeomakeCheck(fname)
-    if !get(g:, 'neomake_check_on_wq', 0) && get(w:, 'neomake_quitting_win', 0)
-      return
-    endif
-    if bufnr(a:fname) != bufnr('%')
-      " Not invoked for the current buffer.  This happens for ':w /tmp/foo'.
-      return
-    endif
-    if get(b:, 'neomake_disabled', get(g:, 'neomake_disabled', 0))
-      return
-    endif
-
-    let s:windows_before = [tabpagenr(), winnr('$')]
-    fun! s:callback(result)
-      " { 'status': <exit status of maker>,
-      " \ 'name': <maker name>,
-      " \ 'has_next': <true if another maker follows, false otherwise> }
-      " unsilent echom "callback" string(a:result)
-      " if a:result.status != 0
-        if exists('*airline#update_statusline')
-              \ && s:windows_before != [tabpagenr(), winnr('$')]
-          " echom "UPDATE"
-          call airline#update_statusline()
-        endif
-      " endif
-    endfun
-    call neomake#Make(1, [], function('s:callback'))
-  endfun
-  augroup neomake_check
-    au!
-    autocmd BufWritePost * call NeomakeCheck(expand('<afile>'))
-    autocmd QuitPre * if winnr('$') == 1 | let w:neomake_quitting_win = 1 | endif
-  augroup END
-  " }}}
-
-  " gist-vim {{{2
-  let g:gist_detect_filetype = 1
-  " }}}
-
-  " tinykeymap: used to move between signs from quickfixsigns and useful by itself. {{{2
-  let g:tinykeymap#mapleader = '<Leader>k'
-  let g:tinykeymap#timeout = 0  " default: 5000s (ms)
-  let g:tinykeymap#conflict = 1
-  " Exit also with 'q'.
-  let g:tinykeymap#break_key = 113
-  " Default "*"; exluded "para_move" from tlib.
-  " List: :echo globpath(&rtp, 'autoload/tinykeymap/map/*.vim')
-  let g:tinykeymaps_default = [
-        \ 'buffers', 'diff', 'filter', 'lines', 'loc', 'qfl', 'tabs', 'undo',
-        \ 'windows', 'quickfixsigns',
-        \ ]
-        " \ 'para_move',
-  " }}}
-
-  " fontzoom {{{
-  let g:fontzoom_no_default_key_mappings = 1
-  nmap <A-+> <Plug>(fontzoom-larger)
-  nmap <A--> <Plug>(fontzoom-smaller)
-  " }}}
-
-  " Call bcompare with current and alternate file.
-  command! BC call system('bcompare '.shellescape(expand('%')).' '.shellescape(expand('#')).'&')
-
-
-  " YouCompleteMe {{{
-  " This needs to be the Python that YCM was built against.  (set in ~/.zshrc.local).
-  if filereadable($PYTHON_YCM)
-    let g:ycm_path_to_python_interpreter = $PYTHON_YCM
-    " let g:ycm_path_to_python_interpreter = 'python-in-terminal'
+  if len(maparg('<Plug>DiscretionaryEnd', 'i'))
+    let r .= "\<Plug>DiscretionaryEnd"
   endif
+  return r
+endfun
+imap <expr> <CR> My_CR_map()
 
-  let g:ycm_filetype_blacklist = {
-        \ 'python' : 1,
-        \ 'ycmblacklisted': 1
-        \}
-  let g:ycm_complete_in_comments = 1
-  let g:ycm_complete_in_strings = 1
-  let g:ycm_collect_identifiers_from_comments_and_strings = 1
-  let g:ycm_extra_conf_globlist = ['~/src/awesome/.ycm_extra_conf.py']
-
-  " Jump mappings, overridden in Python mode with jedi-vim.
-  nnoremap <leader>j :YcmCompleter GoToDefinition<CR>
-  nnoremap <leader>gj :YcmCompleter GoToDeclaration<CR>
-  fun! MySetupPythonMappings()
-    nnoremap <buffer> <leader>j  :call jedi#goto_definitions()<CR>
-    nnoremap <buffer> <leader>gj :call jedi#goto_assignments()<CR>
-  endfun
-  augroup vimrc_jump_maps
-    au!
-    au FileType python call MySetupPythonMappings()
-  augroup END
-
-  " Deactivated: causes huge RAM usage (YCM issue 595)
-  " let g:ycm_collect_identifiers_from_tags_files = 1
-
-  " EXPERIMENTAL: auto-popups and experimenting with SuperTab
-  " NOTE: this skips the following map setup (also for C-n):
-  "       ' pumvisible() ? "\<C-p>" : "\' . key .'"'
-  let g:ycm_key_list_select_completion = []
-  let g:ycm_key_list_previous_completion = []
-
-  let g:ycm_semantic_triggers =  {
-    \   'c' : ['->', '.'],
-    \   'objc' : ['->', '.'],
-    \   'ocaml' : ['.', '#'],
-    \   'cpp,objcpp' : ['->', '.', '::'],
-    \   'perl' : ['->'],
-    \   'php' : ['->', '::'],
-    \   'cs,java,javascript,d,vim,python,perl6,scala,vb,elixir,go' : ['.'],
-    \   'ruby' : ['.', '::'],
-    \   'lua' : ['.', ':'],
-    \   'erlang' : [':'],
-    \ }
-
-
-  " Tags (configure this before easytags, except when using easytags_dynamic_files)
-  " Look for tags file in parent directories, upto "/"
-  set tags=./tags;/
-
-  " CR and BS mapping: call various plugins manually. {{{
-  let g:endwise_no_mappings = 1  " NOTE: must be unset instead of 0
-  let g:cursorcross_no_map_CR = 1
-  let g:cursorcross_no_map_BS = 1
-  let g:delimitMate_expand_cr = 0
-  let g:SuperTabCrMapping = 0  " Skip SuperTab CR map setup (skipped anyway for expr mapping)
-
-  let g:cursorcross_mappings = 0  " No generic mappings for cursorcross.
-
-  " Force delimitMate mapping (gets skipped if mapped already).
-  fun! My_CR_map()
-    " "<CR>" via delimitMateCR
-    if len(maparg('<Plug>delimitMateCR', 'i'))
-      let r = "\<Plug>delimitMateCR"
-    else
-      let r = "\<CR>"
-    endif
-    if len(maparg('<Plug>CursorCrossCR', 'i'))
-      " requires vim 704
-      let r .= "\<Plug>CursorCrossCR"
-    endif
-    if len(maparg('<Plug>DiscretionaryEnd', 'i'))
-      let r .= "\<Plug>DiscretionaryEnd"
-    endif
-    return r
-  endfun
-  imap <expr> <CR> My_CR_map()
-
-  fun! My_BS_map()
-    " "<BS>" via delimitMateBS
-    if len(maparg('<Plug>delimitMateBS', 'i'))
-      let r = "\<Plug>delimitMateBS"
-    else
-      let r = "\<BS>"
-    endif
-    if len(maparg('<Plug>CursorCrossBS', 'i'))
-      " requires vim 704
-      let r .= "\<Plug>CursorCrossBS"
-    endif
-    return r
-  endfun
-  imap <expr> <BS> My_BS_map()
-
-  " For endwise.
-  imap <C-X><CR> <CR><Plug>AlwaysEnd
-  " }}}
-
-  " github-issues
-  " Trigger API request(s) only when completion is used/invoked.
-  let g:gissues_lazy_load = 1
-
-  " Add tags from $VIRTUAL_ENV
-  if $VIRTUAL_ENV != ""
-    let &tags = $VIRTUAL_ENV.'/tags,' . &tags
+fun! My_BS_map()
+  " "<BS>" via delimitMateBS
+  if len(maparg('<Plug>delimitMateBS', 'i'))
+    let r = "\<Plug>delimitMateBS"
+  else
+    let r = "\<BS>"
   endif
+  if len(maparg('<Plug>CursorCrossBS', 'i'))
+    " requires vim 704
+    let r .= "\<Plug>CursorCrossBS"
+  endif
+  return r
+endfun
+imap <expr> <BS> My_BS_map()
 
-  " syntax mode setup
-  let php_sql_query = 1
-  let php_htmlInStrings = 1
-  " let php_special_functions = 0
-  " let php_alt_comparisons = 0
-  " let php_alt_assignByReference = 0
-  " let PHP_outdentphpescape = 1
-  let g:PHP_autoformatcomment = 0 " do not set formatoptions/comments automatically (php-indent bundle / vim runtime)
-  let g:php_noShortTags = 1
+" For endwise.
+imap <C-X><CR> <CR><Plug>AlwaysEnd
+" }}}
 
-  " always use Smarty comments in smarty files
-  " NOTE: for {php} it's useful
-  let g:tcommentGuessFileType_smarty = 0
+" github-issues
+" Trigger API request(s) only when completion is used/invoked.
+let g:gissues_lazy_load = 1
+
+" Add tags from $VIRTUAL_ENV
+if $VIRTUAL_ENV != ""
+  let &tags = $VIRTUAL_ENV.'/tags,' . &tags
+endif
+
+" syntax mode setup
+let php_sql_query = 1
+let php_htmlInStrings = 1
+" let php_special_functions = 0
+" let php_alt_comparisons = 0
+" let php_alt_assignByReference = 0
+" let PHP_outdentphpescape = 1
+let g:PHP_autoformatcomment = 0 " do not set formatoptions/comments automatically (php-indent bundle / vim runtime)
+let g:php_noShortTags = 1
+
+" always use Smarty comments in smarty files
+" NOTE: for {php} it's useful
+let g:tcommentGuessFileType_smarty = 0
 endif
 
 if &t_Co == 8
-  " Allow color schemes to do bright colors without forcing bold. (vim-sensible)
-  if $TERM !~# '^linux'
-    set t_Co=16
-  endif
-  " Fix t_Co: hack to enable 256 colors with e.g. "screen-bce" on CentOS 5.4;
-  " COLORTERM=lilyterm used for LilyTerm (set TERM=xterm).
-  " Do not match "screen" in Linux VT
-  " if (&term[0:6] == "screen-" || len($COLORTERM))
-  "   set t_Co=256
-  " endif
+" Allow color schemes to do bright colors without forcing bold. (vim-sensible)
+if $TERM !~# '^linux'
+  set t_Co=16
+endif
+" Fix t_Co: hack to enable 256 colors with e.g. "screen-bce" on CentOS 5.4;
+" COLORTERM=lilyterm used for LilyTerm (set TERM=xterm).
+" Do not match "screen" in Linux VT
+" if (&term[0:6] == "screen-" || len($COLORTERM))
+"   set t_Co=256
+" endif
 endif
 
 " Local dirs"{{{1
 set backupdir=~/.local/share/vim/backups
 if ! isdirectory(expand(&backupdir))
-  call mkdir( &backupdir, 'p', 0700 )
+call mkdir( &backupdir, 'p', 0700 )
 endif
 
 if 1
-  let s:xdg_cache_home = $XDG_CACHE_HOME
-  if !len(s:xdg_cache_home)
-    let s:xdg_cache_home = expand('~/.cache')
-  endif
-  let s:vimcachedir = s:xdg_cache_home . '/vim'
-  let g:tlib_cache = s:vimcachedir . '/tlib'
+let s:xdg_cache_home = $XDG_CACHE_HOME
+if !len(s:xdg_cache_home)
+  let s:xdg_cache_home = expand('~/.cache')
+endif
+let s:vimcachedir = s:xdg_cache_home . '/vim'
+let g:tlib_cache = s:vimcachedir . '/tlib'
 
-  let s:xdg_config_home = $XDG_CONFIG_HOME
-  if !len(s:xdg_config_home)
-    let s:xdg_config_home = expand('~/.config')
-  endif
-  let s:vimconfigdir = s:xdg_config_home . '/vim'
-  let g:session_directory = s:vimconfigdir . '/sessions'
+let s:xdg_config_home = $XDG_CONFIG_HOME
+if !len(s:xdg_config_home)
+  let s:xdg_config_home = expand('~/.config')
+endif
+let s:vimconfigdir = s:xdg_config_home . '/vim'
+let g:session_directory = s:vimconfigdir . '/sessions'
 
-  let g:startify_session_dir = g:session_directory
-  let g:startify_change_to_dir = 0
+let g:startify_session_dir = g:session_directory
+let g:startify_change_to_dir = 0
 
-  let s:xdg_data_home = $XDG_DATA_HOME
-  if !len(s:xdg_data_home)
-    let s:xdg_data_home = expand('~/.local/share')
-  endif
-  let s:vimsharedir = s:xdg_data_home . '/vim'
+let s:xdg_data_home = $XDG_DATA_HOME
+if !len(s:xdg_data_home)
+  let s:xdg_data_home = expand('~/.local/share')
+endif
+let s:vimsharedir = s:xdg_data_home . '/vim'
 
-  let g:yankring_history_dir = s:vimsharedir
-  let g:yankring_max_history = 500
-  " let g:yankring_min_element_length = 2 " more that 1 breaks e.g. `xp`
-  " Move yankring history from old location, if any..
-  let s:old_yankring = expand('~/yankring_history_v2.txt')
-  if filereadable(s:old_yankring)
-    execute '!mv -i '.s:old_yankring.' '.s:vimsharedir
-  endif
+let g:yankring_history_dir = s:vimsharedir
+let g:yankring_max_history = 500
+" let g:yankring_min_element_length = 2 " more that 1 breaks e.g. `xp`
+" Move yankring history from old location, if any..
+let s:old_yankring = expand('~/yankring_history_v2.txt')
+if filereadable(s:old_yankring)
+  execute '!mv -i '.s:old_yankring.' '.s:vimsharedir
+endif
 
-  " Transfer any old (default) tmru files db to new (default) location.
-  let g:tlib_persistent = s:vimsharedir
-  let s:old_tmru_file = expand('~/.cache/vim/tlib/tmru/files')
-  let s:global_tmru_file = s:vimsharedir.'/tmru/files'
-  let s:new_tmru_file_dir = fnamemodify(s:global_tmru_file, ':h')
-  if ! isdirectory(s:new_tmru_file_dir)
-    call mkdir(s:new_tmru_file_dir, 'p', 0700)
-  endif
-  if filereadable(s:old_tmru_file)
-    execute '!mv -i '.shellescape(s:old_tmru_file).' '.shellescape(s:global_tmru_file)
-    " execute '!rm -r '.shellescape(g:tlib_cache)
-  endif
+" Transfer any old (default) tmru files db to new (default) location.
+let g:tlib_persistent = s:vimsharedir
+let s:old_tmru_file = expand('~/.cache/vim/tlib/tmru/files')
+let s:global_tmru_file = s:vimsharedir.'/tmru/files'
+let s:new_tmru_file_dir = fnamemodify(s:global_tmru_file, ':h')
+if ! isdirectory(s:new_tmru_file_dir)
+  call mkdir(s:new_tmru_file_dir, 'p', 0700)
+endif
+if filereadable(s:old_tmru_file)
+  execute '!mv -i '.shellescape(s:old_tmru_file).' '.shellescape(s:global_tmru_file)
+  " execute '!rm -r '.shellescape(g:tlib_cache)
+endif
 end
 
 let s:check_create_dirs = [s:vimcachedir, g:tlib_cache, s:vimconfigdir, g:session_directory, s:vimsharedir, &directory]
 
 if has('persistent_undo')
-  let &undodir = s:vimsharedir . '/undo'
-  set undofile
-  call add(s:check_create_dirs, &undodir)
+let &undodir = s:vimsharedir . '/undo'
+set undofile
+call add(s:check_create_dirs, &undodir)
 endif
 
 for s:create_dir in s:check_create_dirs
-  " Remove trailing slashes, especially for &directory.
-  let s:create_dir = substitute(s:create_dir, '/\+$', '', '')
-  if ! isdirectory(s:create_dir)
-    if match(s:create_dir, ',') != -1
-      echohl WarningMsg | echom "WARN: not creating dir: ".s:create_dir | echohl None
-      continue
-    endif
-    echom "Creating dir: ".s:create_dir
-    call mkdir(s:create_dir, 'p', 0700 )
+" Remove trailing slashes, especially for &directory.
+let s:create_dir = substitute(s:create_dir, '/\+$', '', '')
+if ! isdirectory(s:create_dir)
+  if match(s:create_dir, ',') != -1
+    echohl WarningMsg | echom "WARN: not creating dir: ".s:create_dir | echohl None
+    continue
   endif
+  echom "Creating dir: ".s:create_dir
+  call mkdir(s:create_dir, 'p', 0700 )
+endif
 endfor
 " }}}
 
 if has("user_commands")
-  " Themes
-  " Airline:
-  let g:airline#extensions#disable_rtp_load = 1
-  let g:airline_extensions_add = ['neomake']
-  let g:airline_powerline_fonts = 1
-  " to test
-  let g:airline#extensions#branch#use_vcscommand = 1
-  let g:airline#extensions#branch#displayed_head_limit = 7
+" Themes
+" Airline:
+let g:airline#extensions#disable_rtp_load = 1
+let g:airline_extensions_add = ['neomake']
+let g:airline_powerline_fonts = 1
+" to test
+let g:airline#extensions#branch#use_vcscommand = 1
+let g:airline#extensions#branch#displayed_head_limit = 7
 
-  let g:airline#extensions#hunks#non_zero_only = 1
+let g:airline#extensions#hunks#non_zero_only = 1
 
-  let g:airline#extensions#tabline#enabled = 1
-  let g:airline#extensions#tabline#show_buffers = 0
-  let g:airline#extensions#tabline#tab_nr_type = '[__tabnr__.%{len(tabpagebuflist(__tabnr__))}]'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#tab_nr_type = '[__tabnr__.%{len(tabpagebuflist(__tabnr__))}]'
 
-  let g:airline#extensions#tmuxline#enabled = 1
-  let g:airline#extensions#whitespace#enabled = 0
+let g:airline#extensions#tmuxline#enabled = 1
+let g:airline#extensions#whitespace#enabled = 0
 
-  let g:airline#extensions#tagbar#enabled = 0
-  let g:airline#extensions#tagbar#flags = 'f'  " full hierarchy of tag (with scope), see tagbar-statusline
-  " see airline-predefined-parts
-  "   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
-  " function! AirlineInit()
-  "   "   let g:airline_section_a = airline#section#create(['mode', ' ', 'foo'])
-  "   "   let g:airline_section_b = airline#section#create_left(['ffenc','file'])
-  "   "   let g:airline_section_c = airline#section#create(['%{getcwd()}'])
-  " endfunction
-  " au VimEnter * call AirlineInit()
+let g:airline#extensions#tagbar#enabled = 0
+let g:airline#extensions#tagbar#flags = 'f'  " full hierarchy of tag (with scope), see tagbar-statusline
+" see airline-predefined-parts
+"   let r += ['%{ShortenFilename(fnamemodify(bufname("%"), ":~:."), winwidth(0)-50)}']
+" function! AirlineInit()
+"   "   let g:airline_section_a = airline#section#create(['mode', ' ', 'foo'])
+"   "   let g:airline_section_b = airline#section#create_left(['ffenc','file'])
+"   "   let g:airline_section_c = airline#section#create(['%{getcwd()}'])
+" endfunction
+" au VimEnter * call AirlineInit()
 
-  " jedi-vim (besides YCM with jedi library) {{{1
-  " let g:jedi#force_py_version = 3
-  let g:jedi#auto_vim_configuration = 0
-  let g:jedi#goto_assignments_command = ''  " dynamically done for ft=python.
-  let g:jedi#goto_definitions_command = ''  " dynamically done for ft=python.
-  let g:jedi#rename_command = 'cR'
-  let g:jedi#usages_command = 'gr'
-  let g:jedi#completions_enabled = 1
+" jedi-vim (besides YCM with jedi library) {{{1
+" let g:jedi#force_py_version = 3
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#goto_assignments_command = ''  " dynamically done for ft=python.
+let g:jedi#goto_definitions_command = ''  " dynamically done for ft=python.
+let g:jedi#rename_command = 'cR'
+let g:jedi#usages_command = 'gr'
+let g:jedi#completions_enabled = 1
 
-  " Unite/ref and pydoc are more useful.
-  let g:jedi#documentation_command = '<Leader>_K'
-  " Manually setup jedi's call signatures.
-  let g:jedi#show_call_signatures = 1
-  if &rtp =~ '\<jedi\>'
-    augroup JediSetup
-      au!
-      au FileType python call jedi#configure_call_signatures()
-    augroup END
-  endif
+" Unite/ref and pydoc are more useful.
+let g:jedi#documentation_command = '<Leader>_K'
+" Manually setup jedi's call signatures.
+let g:jedi#show_call_signatures = 1
+if &rtp =~ '\<jedi\>'
+  augroup JediSetup
+    au!
+    au FileType python call jedi#configure_call_signatures()
+  augroup END
+endif
 
-  let g:jedi#auto_close_doc = 1
-    " if g:jedi#auto_close_doc
-    "     " close preview if its still open after insert
-    "     autocmd InsertLeave <buffer> if pumvisible() == 0|pclose|endif
-    " end
-  " }}}1
+let g:jedi#auto_close_doc = 1
+  " if g:jedi#auto_close_doc
+  "     " close preview if its still open after insert
+  "     autocmd InsertLeave <buffer> if pumvisible() == 0|pclose|endif
+  " end
+" }}}1
 endif
 
 " Enable syntax {{{1
@@ -1490,290 +1493,290 @@ endif
 " Also switch on highlighting the last used search pattern.
 " if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
 if (&t_Co > 2 || has("gui_running"))
-  if !exists("syntax_on")
-    syntax on " after 'filetype plugin indent on' (?!), but not on reload.
-  endif
-  set nohlsearch
+if !exists("syntax_on")
+  syntax on " after 'filetype plugin indent on' (?!), but not on reload.
+endif
+set nohlsearch
 
-  " Improved syntax handling of TODO etc.
-  au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO|OPTIMIZE|XXX):/
-        \ containedin=.*Comment,vimCommentTitle
-  hi def link MyTodo Todo
+" Improved syntax handling of TODO etc.
+au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO|OPTIMIZE|XXX):/
+      \ containedin=.*Comment,vimCommentTitle
+hi def link MyTodo Todo
 endif
 
 if 1 " has('eval')
-  " Color scheme (after 'syntax on') {{{1
+" Color scheme (after 'syntax on') {{{1
 
-  " Use light/dark background based on day/night period (according to
-  " get-daytime-period (uses redshift))
-  fun! SetBgAccordingToShell(...)
-    let variant = a:0 ? a:1 : ""
-    if len(variant) && variant != "auto"
-      let bg = variant
-    elseif len($TMUX)
-      let bg = system('tmux show-env MY_X_THEME_VARIANT') == "MY_X_THEME_VARIANT=light\n" ? 'light' : 'dark'
-    elseif len($MY_X_THEME_VARIANT)
-      let bg = $MY_X_THEME_VARIANT
-    else
-      " let daytime = system('get-daytime-period')
-      let daytime_file = expand('/tmp/redshift-period')
-      if filereadable(daytime_file)
-        let daytime = readfile(daytime_file)[0]
-        if daytime == 'Daytime'
-          let bg = "light"
-        else
-          let bg = "dark"
-        endif
+" Use light/dark background based on day/night period (according to
+" get-daytime-period (uses redshift))
+fun! SetBgAccordingToShell(...)
+  let variant = a:0 ? a:1 : ""
+  if len(variant) && variant != "auto"
+    let bg = variant
+  elseif len($TMUX)
+    let bg = system('tmux show-env MY_X_THEME_VARIANT') == "MY_X_THEME_VARIANT=light\n" ? 'light' : 'dark'
+  elseif len($MY_X_THEME_VARIANT)
+    let bg = $MY_X_THEME_VARIANT
+  else
+    " let daytime = system('get-daytime-period')
+    let daytime_file = expand('/tmp/redshift-period')
+    if filereadable(daytime_file)
+      let daytime = readfile(daytime_file)[0]
+      if daytime == 'Daytime'
+        let bg = "light"
       else
         let bg = "dark"
       endif
-    endif
-    if bg != &bg
-      let &bg = bg
-      let $FZF_DEFAULT_OPTS = '--color 16,bg+:' . (bg == 'dark' ? '18' : '21')
-      doautocmd <nomodeline> ColorScheme
-    endif
-  endfun
-  command! -nargs=? Autobg call SetBgAccordingToShell(<q-args>)
-
-  fun! ToggleBg()
-    let &bg = &bg == 'dark' ? 'light' : 'dark'
-  endfun
-  nnoremap <Leader>sb :call ToggleBg()<cr>
-
-  " Colorscheme: prefer solarized with 16 colors (special palette).
-  let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
-  let g:solarized_menu=0
-
-  " Use corresponding theme from $BASE16_THEME, if set up in the shell.
-  " BASE16_THEME should be in sudoer's env_keep for "sudo vi".
-  if len($BASE16_THEME)
-    let base16colorspace=&t_Co
-    if $BASE16_THEME =~ '^solarized'
-      let s:use_colorscheme = 'solarized'
-      let g:solarized_base16=1
-      let g:airline_theme = 'solarized'
     else
-      let s:use_colorscheme = 'base16-'.substitute($BASE16_THEME, '\.\(dark\|light\)$', '', '')
+      let bg = "dark"
     endif
-    let g:solarized_termtrans=1
+  endif
+  if bg != &bg
+    let &bg = bg
+    let $FZF_DEFAULT_OPTS = '--color 16,bg+:' . (bg == 'dark' ? '18' : '21')
+    doautocmd <nomodeline> ColorScheme
+  endif
+endfun
+command! -nargs=? Autobg call SetBgAccordingToShell(<q-args>)
 
-  elseif has('gui_running')
+fun! ToggleBg()
+  let &bg = &bg == 'dark' ? 'light' : 'dark'
+endfun
+nnoremap <Leader>sb :call ToggleBg()<cr>
+
+" Colorscheme: prefer solarized with 16 colors (special palette).
+let g:solarized_hitrail=0  " using MyWhitespaceSetup instead.
+let g:solarized_menu=0
+
+" Use corresponding theme from $BASE16_THEME, if set up in the shell.
+" BASE16_THEME should be in sudoer's env_keep for "sudo vi".
+if len($BASE16_THEME)
+  let base16colorspace=&t_Co
+  if $BASE16_THEME =~ '^solarized'
+    let s:use_colorscheme = 'solarized'
+    let g:solarized_base16=1
+    let g:airline_theme = 'solarized'
+  else
+    let s:use_colorscheme = 'base16-'.substitute($BASE16_THEME, '\.\(dark\|light\)$', '', '')
+  endif
+  let g:solarized_termtrans=1
+
+elseif has('gui_running')
+  let s:use_colorscheme = "solarized"
+  let g:solarized_termcolors=256
+
+else
+  " Check for dumb terminal.
+  if ($TERM !~ '256color' )
+    let s:use_colorscheme = "default"
+  else
     let s:use_colorscheme = "solarized"
     let g:solarized_termcolors=256
-
-  else
-    " Check for dumb terminal.
-    if ($TERM !~ '256color' )
-      let s:use_colorscheme = "default"
-    else
-      let s:use_colorscheme = "solarized"
-      let g:solarized_termcolors=256
-    endif
   endif
+endif
 
-  " Airline: do not use powerline symbols with linux/screen terminal.
-  " NOTE: xterm-256color gets setup for tmux/screen with $DISPLAY.
-  if (index(["linux", "screen"], $TERM) != -1)
-    let g:airline_powerline_fonts = 0
-  endif
+" Airline: do not use powerline symbols with linux/screen terminal.
+" NOTE: xterm-256color gets setup for tmux/screen with $DISPLAY.
+if (index(["linux", "screen"], $TERM) != -1)
+  let g:airline_powerline_fonts = 0
+endif
 
-  fun! s:MySetColorscheme()
-    " Set s:use_colorscheme, called through GUIEnter for gvim.
-    try
-      exec 'NeoBundleSource colorscheme-'.s:use_colorscheme
-      exec 'colorscheme' s:use_colorscheme
-    catch
-      echom "Failed to load colorscheme: " v:exception
-    endtry
-  endfun
+fun! s:MySetColorscheme()
+  " Set s:use_colorscheme, called through GUIEnter for gvim.
+  try
+    exec 'NeoBundleSource colorscheme-'.s:use_colorscheme
+    exec 'colorscheme' s:use_colorscheme
+  catch
+    echom "Failed to load colorscheme: " v:exception
+  endtry
+endfun
 
-  if has('vim_starting')
-    call SetBgAccordingToShell($MY_X_THEME_VARIANT)
-  endif
+if has('vim_starting')
+  call SetBgAccordingToShell($MY_X_THEME_VARIANT)
+endif
 
-  if has('gui_running')
-    au GUIEnter * nested call s:MySetColorscheme()
-  else
-    call s:MySetColorscheme()
-  endif
+if has('gui_running')
+  au GUIEnter * nested call s:MySetColorscheme()
+else
+  call s:MySetColorscheme()
+endif
 endif
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd") " Autocommands {{{1
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
-  " Handle large files, based on LargeFile plugin.
-  let g:LargeFile = 5  " 5mb
-  autocmd BufWinEnter * if get(b:, 'LargeFile_mode') || line2byte(line("$") + 1) > 1000000
-        \ | echom "vimrc: handling large file."
-        \ | set syntax=off
-        \ | let &ft = &ft.".ycmblacklisted"
-        \ | endif
+" Put these in an autocmd group, so that we can delete them easily.
+augroup vimrcEx
+au!
+" Handle large files, based on LargeFile plugin.
+let g:LargeFile = 5  " 5mb
+autocmd BufWinEnter * if get(b:, 'LargeFile_mode') || line2byte(line("$") + 1) > 1000000
+      \ | echom "vimrc: handling large file."
+      \ | set syntax=off
+      \ | let &ft = &ft.".ycmblacklisted"
+      \ | endif
 
-  " Enable soft-wrapping for text files
-  au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
-  au FileType mail,markdown,gitcommit setlocal spell
-  au FileType json setlocal equalprg=json_pp
+" Enable soft-wrapping for text files
+au FileType text,markdown,html,xhtml,eruby,vim setlocal wrap linebreak nolist
+au FileType mail,markdown,gitcommit setlocal spell
+au FileType json setlocal equalprg=json_pp
 
-  " XXX: only works for whole files
-  " au FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
+" XXX: only works for whole files
+" au FileType css  setlocal equalprg=csstidy\ -\ --silent=true\ --template=default
 
-  " For all text files set 'textwidth' to 78 characters.
-  " au FileType text setlocal textwidth=78
+" For all text files set 'textwidth' to 78 characters.
+" au FileType text setlocal textwidth=78
 
-  " Follow symlinks when opening a file {{{
-  " NOTE: this happens with directory symlinks anyway (due to Vim's chdir/getcwd
-  "       magic when getting filenames).
-  " Sources:
-  "  - https://github.com/tpope/vim-fugitive/issues/147#issuecomment-7572351
-  "  - http://www.reddit.com/r/vim/comments/yhsn6/is_it_possible_to_work_around_the_symlink_bug/c5w91qw
-  function! MyFollowSymlink(...)
-    if exists('w:no_resolve_symlink') && w:no_resolve_symlink
-      return
-    endif
-    if &ft == 'help'
-      return
-    endif
-    let fname = a:0 ? a:1 : expand('%')
-    if fname =~ '^\w\+:/'
-      " Do not mess with 'fugitive://' etc.
-      return
-    endif
-    let fname = simplify(fname)
+" Follow symlinks when opening a file {{{
+" NOTE: this happens with directory symlinks anyway (due to Vim's chdir/getcwd
+"       magic when getting filenames).
+" Sources:
+"  - https://github.com/tpope/vim-fugitive/issues/147#issuecomment-7572351
+"  - http://www.reddit.com/r/vim/comments/yhsn6/is_it_possible_to_work_around_the_symlink_bug/c5w91qw
+function! MyFollowSymlink(...)
+  if exists('w:no_resolve_symlink') && w:no_resolve_symlink
+    return
+  endif
+  if &ft == 'help'
+    return
+  endif
+  let fname = a:0 ? a:1 : expand('%')
+  if fname =~ '^\w\+:/'
+    " Do not mess with 'fugitive://' etc.
+    return
+  endif
+  let fname = simplify(fname)
 
-    let resolvedfile = resolve(fname)
-    if resolvedfile == fname
-      return
-    endif
-    let resolvedfile = fnameescape(resolvedfile)
-    let sshm = &shm
-    set shortmess+=A  " silence ATTENTION message about swap file (would get displayed twice)
+  let resolvedfile = resolve(fname)
+  if resolvedfile == fname
+    return
+  endif
+  let resolvedfile = fnameescape(resolvedfile)
+  let sshm = &shm
+  set shortmess+=A  " silence ATTENTION message about swap file (would get displayed twice)
+  redraw  " Redraw now, to avoid hit-enter prompt.
+  exec 'file ' . resolvedfile
+  let &shm=sshm
+
+  unlet! b:git_dir
+  call fugitive#detect(resolvedfile)
+
+  if &modifiable
+    " Only display a note when editing a file, especially not for `:help`.
     redraw  " Redraw now, to avoid hit-enter prompt.
-    exec 'file ' . resolvedfile
-    let &shm=sshm
+    echomsg 'Resolved symlink: =>' resolvedfile
+  endif
+endfunction
+command! -bar FollowSymlink call MyFollowSymlink()
+command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
+au BufReadPost * nested call MyFollowSymlink(expand('%'))
 
-    unlet! b:git_dir
-    call fugitive#detect(resolvedfile)
+" Automatically load .vimrc source when saved
+au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
+au BufWritePost $MYGVIMRC,~/.dotfiles/gvimrc source $MYGVIMRC
 
-    if &modifiable
-      " Only display a note when editing a file, especially not for `:help`.
-      redraw  " Redraw now, to avoid hit-enter prompt.
-      echomsg 'Resolved symlink: =>' resolvedfile
-    endif
-  endfunction
-  command! -bar FollowSymlink call MyFollowSymlink()
-  command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
-  au BufReadPost * nested call MyFollowSymlink(expand('%'))
+" if (has("gui_running"))
+"   au FocusLost * stopinsert
+" endif
 
-  " Automatically load .vimrc source when saved
-  au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
-  au BufWritePost $MYGVIMRC,~/.dotfiles/gvimrc source $MYGVIMRC
+" autocommands for fugitive {{{2
+" Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
+au User Fugitive
+  \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)' |
+  \   nnoremap <buffer> .. :edit %:h<CR> |
+  \ endif
+au BufReadPost fugitive://* set bufhidden=delete
 
-  " if (has("gui_running"))
-  "   au FocusLost * stopinsert
-  " endif
+" Expand tabs for Debian changelog. This is probably not the correct way.
+au BufNewFile,BufRead */debian/changelog,changelog.dch set expandtab
 
-  " autocommands for fugitive {{{2
-  " Source: http://vimcasts.org/episodes/fugitive-vim-browsing-the-git-object-database/
-  au User Fugitive
-    \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)' |
-    \   nnoremap <buffer> .. :edit %:h<CR> |
-    \ endif
-  au BufReadPost fugitive://* set bufhidden=delete
+" Ignore certain files with vim-stay.
+au BufNewFile,BufRead */.git/addp-hunk-edit.diff let b:stay_ignore = 1
 
-  " Expand tabs for Debian changelog. This is probably not the correct way.
-  au BufNewFile,BufRead */debian/changelog,changelog.dch set expandtab
+" Python
+" irrelevant, using python-pep8-indent
+" let g:pyindent_continue = '&sw * 1'
+" let g:pyindent_open_paren = '&sw * 1'
+" let g:pyindent_nested_paren = '&sw'
 
-  " Ignore certain files with vim-stay.
-  au BufNewFile,BufRead */.git/addp-hunk-edit.diff let b:stay_ignore = 1
+" python-mode
+let g:pymode_options = 0              " do not change relativenumber
+let g:pymode_indent = 0               " use vim-python-pep8-indent (upstream of pymode)
+let g:pymode_lint = 0                 " prefer syntastic; pymode has problems when PyLint was invoked already before VirtualEnvActivate..!?!
+let g:pymode_virtualenv = 0           " use virtualenv plugin (required for pylint?!)
+let g:pymode_doc = 0                  " use pydoc
+let g:pymode_rope_completion = 0      " use YouCompleteMe instead (python-jedi)
+let g:pymode_syntax_space_errors = 0  " using MyWhitespaceSetup
+let g:pymode_trim_whitespaces = 0
+let g:pymode_debug = 0
+let g:pymode_rope = 0
 
-  " Python
-  " irrelevant, using python-pep8-indent
-  " let g:pyindent_continue = '&sw * 1'
-  " let g:pyindent_open_paren = '&sw * 1'
-  " let g:pyindent_nested_paren = '&sw'
+let g:pydoc_window_lines=0.5          " use 50% height
+let g:pydoc_perform_mappings=0
 
-  " python-mode
-  let g:pymode_options = 0              " do not change relativenumber
-  let g:pymode_indent = 0               " use vim-python-pep8-indent (upstream of pymode)
-  let g:pymode_lint = 0                 " prefer syntastic; pymode has problems when PyLint was invoked already before VirtualEnvActivate..!?!
-  let g:pymode_virtualenv = 0           " use virtualenv plugin (required for pylint?!)
-  let g:pymode_doc = 0                  " use pydoc
-  let g:pymode_rope_completion = 0      " use YouCompleteMe instead (python-jedi)
-  let g:pymode_syntax_space_errors = 0  " using MyWhitespaceSetup
-  let g:pymode_trim_whitespaces = 0
-  let g:pymode_debug = 0
-  let g:pymode_rope = 0
-
-  let g:pydoc_window_lines=0.5          " use 50% height
-  let g:pydoc_perform_mappings=0
-
-  " let python_space_error_highlight = 1  " using MyWhitespaceSetup
+" let python_space_error_highlight = 1  " using MyWhitespaceSetup
 
 
-  " C
-  au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r
-  fu! Select_c_style()
-    if search('^\t', 'n', 150)
-      setlocal shiftwidth=8 noexpandtab
-    el
-      setlocal shiftwidth=4 expandtab
-    en
-  endf
-  au FileType c call Select_c_style()
-  au FileType make setlocal noexpandtab
+" C
+au FileType C setlocal formatoptions-=c formatoptions-=o formatoptions-=r
+fu! Select_c_style()
+  if search('^\t', 'n', 150)
+    setlocal shiftwidth=8 noexpandtab
+  el
+    setlocal shiftwidth=4 expandtab
+  en
+endf
+au FileType c call Select_c_style()
+au FileType make setlocal noexpandtab
 
-  " Disable highlighting of markdownError (Ref: https://github.com/tpope/vim-markdown/issues/79).
-  autocmd FileType markdown hi link markdownError NONE
-  augroup END
+" Disable highlighting of markdownError (Ref: https://github.com/tpope/vim-markdown/issues/79).
+autocmd FileType markdown hi link markdownError NONE
+augroup END
 
-  " Trailing whitespace highlighting {{{2
-  " Map to toogle EOLWS syntax highlighting
-  noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
-        \:call MyAuGroupEOLWS(mode())<cr>
-  let g:MyAuGroupEOLWSactive = 0
-  function! MyAuGroupEOLWS(mode)
-    if g:MyAuGroupEOLWSactive && &buftype == ''
-      hi EOLWS ctermbg=red guibg=red
-      syn clear EOLWS
-      " match whitespace not preceded by a backslash
-      if a:mode == "i"
-        syn match EOLWS excludenl /[\\]\@<!\s\+\%#\@!$/ containedin=ALL
-      else
-        syn match EOLWS excludenl /[\\]\@<!\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
-      endif
+" Trailing whitespace highlighting {{{2
+" Map to toogle EOLWS syntax highlighting
+noremap <silent> <leader>se :let g:MyAuGroupEOLWSactive = (synIDattr(synIDtrans(hlID("EOLWS")), "bg", "cterm") == -1)<cr>
+      \:call MyAuGroupEOLWS(mode())<cr>
+let g:MyAuGroupEOLWSactive = 0
+function! MyAuGroupEOLWS(mode)
+  if g:MyAuGroupEOLWSactive && &buftype == ''
+    hi EOLWS ctermbg=red guibg=red
+    syn clear EOLWS
+    " match whitespace not preceded by a backslash
+    if a:mode == "i"
+      syn match EOLWS excludenl /[\\]\@<!\s\+\%#\@!$/ containedin=ALL
     else
-      syn clear EOLWS
-      hi clear EOLWS
+      syn match EOLWS excludenl /[\\]\@<!\s\+$\| \+\ze\t/ containedin=ALLBUT,gitcommitDiff |
     endif
-  endfunction
-  augroup vimrcExEOLWS
-    au!
-    " highlight EOLWS ctermbg=red guibg=red
-    " based on solarizedTrailingSpace
-    highlight EOLWS term=underline cterm=underline ctermfg=1
-    au InsertEnter * call MyAuGroupEOLWS("i")
-    " highlight trailing whitespace, space before tab and tab not at the
-    " beginning of the line (except in comments), only for normal buffers:
-    au InsertLeave,BufWinEnter * call MyAuGroupEOLWS("n")
-      " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
+  else
+    syn clear EOLWS
+    hi clear EOLWS
+  endif
+endfunction
+augroup vimrcExEOLWS
+  au!
+  " highlight EOLWS ctermbg=red guibg=red
+  " based on solarizedTrailingSpace
+  highlight EOLWS term=underline cterm=underline ctermfg=1
+  au InsertEnter * call MyAuGroupEOLWS("i")
+  " highlight trailing whitespace, space before tab and tab not at the
+  " beginning of the line (except in comments), only for normal buffers:
+  au InsertLeave,BufWinEnter * call MyAuGroupEOLWS("n")
+    " fails with gitcommit: filetype  | syn match EOLWS excludenl /[^\t]\zs\t\+/ containedin=ALLBUT,gitcommitComment
 
-    " add this for Python (via python_highlight_all?!):
-    " au FileType python
-    "       \ if g:MyAuGroupEOLWSactive |
-    "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
-    "       \ endif
-  augroup END "}}}
+  " add this for Python (via python_highlight_all?!):
+  " au FileType python
+  "       \ if g:MyAuGroupEOLWSactive |
+  "       \ syn match EOLWS excludenl /^\t\+/ containedin=ALL |
+  "       \ endif
+augroup END "}}}
 
-  " automatically save and reload viminfo across Vim instances
-  " Source: http://vimhelp.appspot.com/vim_faq.txt.html#faq-17.3
-  augroup viminfo_onfocus
-    au!
-    " au FocusLost   * wviminfo
-    " au FocusGained * rviminfo
-  augroup end
+" automatically save and reload viminfo across Vim instances
+" Source: http://vimhelp.appspot.com/vim_faq.txt.html#faq-17.3
+augroup viminfo_onfocus
+  au!
+  " au FocusLost   * wviminfo
+  " au FocusGained * rviminfo
+augroup end
 endif " has("autocmd") }}}
 
 " Statusline {{{
@@ -1783,170 +1786,170 @@ endif " has("autocmd") }}}
 let s:_cache_shorten_path = {}
 let s:_has_functional_shorten_path = 1
 fun! ShortenPath(path, ...)
-  if ! len(a:path) || ! s:_has_functional_shorten_path
-    return a:path
+if ! len(a:path) || ! s:_has_functional_shorten_path
+  return a:path
+endif
+let base = a:0 ? a:1 : ""
+let annotate = a:0 > 1 ? a:2 : 0
+let cache_key = base . ":" . a:path . ":" . annotate
+if ! exists('s:_cache_shorten_path[cache_key]')
+  let shorten_path = executable('shorten_path')
+        \ ? 'shorten_path'
+        \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
+        \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
+        \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
+  if annotate
+    let shorten_path .= ' -a'
   endif
-  let base = a:0 ? a:1 : ""
-  let annotate = a:0 > 1 ? a:2 : 0
-  let cache_key = base . ":" . a:path . ":" . annotate
-  if ! exists('s:_cache_shorten_path[cache_key]')
-    let shorten_path = executable('shorten_path')
-          \ ? 'shorten_path'
-          \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
-          \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
-          \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
-    if annotate
-      let shorten_path .= ' -a'
-    endif
-    let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
-    let s:_cache_shorten_path[cache_key] = system(cmd)
-    if v:shell_error
-      try
-        let tmpfile = tempname()
-        call system(cmd.' 2>'.tmpfile)
-        call MyWarningMsg("There was a problem running shorten_path: "
-              \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')')
-        let s:_has_functional_shorten_path = 0
-        return a:path
-      finally
-        call delete(tmpfile)
-      endtry
-    endif
+  let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
+  let s:_cache_shorten_path[cache_key] = system(cmd)
+  if v:shell_error
+    try
+      let tmpfile = tempname()
+      call system(cmd.' 2>'.tmpfile)
+      call MyWarningMsg("There was a problem running shorten_path: "
+            \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')')
+      let s:_has_functional_shorten_path = 0
+      return a:path
+    finally
+      call delete(tmpfile)
+    endtry
   endif
-  return s:_cache_shorten_path[cache_key]
+endif
+return s:_cache_shorten_path[cache_key]
 endfun
 
 " Shorten a given filename by truncating path segments.
 let g:_cache_shorten_filename = {}
 function! ShortenFilename(...)  " {{{
-  " Args: bufname ('%' for default), maxlength
-  " echomsg "ShortenFilename:" string(a:000)
+" Args: bufname ('%' for default), maxlength
+" echomsg "ShortenFilename:" string(a:000)
 
-  " get bufname from a:1, defaulting to bufname('%') {{{
-  if a:0 && a:1 != '%'
-    let bufname = a:1
-  else
-    let bufname = bufname("%")
-    if !len(bufname)
-      if &bt != '' && len(&ft)
-        " Use &ft for name (e.g. with 'startify' and quickfix windows).
-        let alt_name = expand('#')
-        if len(alt_name)
-          return '['.&ft.'] '.ShortenFilename(expand('#'))
+" get bufname from a:1, defaulting to bufname('%') {{{
+if a:0 && a:1 != '%'
+  let bufname = a:1
+else
+  let bufname = bufname("%")
+  if !len(bufname)
+    if &bt != '' && len(&ft)
+      " Use &ft for name (e.g. with 'startify' and quickfix windows).
+      let alt_name = expand('#')
+      if len(alt_name)
+        return '['.&ft.'] '.ShortenFilename(expand('#'))
+      else
+        return '['.&ft.']'
+      endif
+    else
+      " TODO: get Vim's original "[No Name]" somehow
+      return '[No Name]'
+    endif
+  end
+
+  if getbufvar(bufnr(bufname), '&filetype') == 'help'
+    return '[?] '.fnamemodify(bufname, ':t')
+  endif
+
+  if bufname =~ '^__'
+    return bufname
+  endif
+endif
+" }}}
+
+" Maxlen from a:2 (used for cache key) and caching. {{{
+let maxlen = a:0>1 ? a:2 : max([10, winwidth(0)-50])
+" echom maxlen a:0
+" if a:0>1 | echom a:2 | endif
+
+" Check for cache (avoiding fnamemodify):
+let cache_key = bufname.'::'.getcwd().'::'.maxlen
+if has_key(g:_cache_shorten_filename, cache_key)
+  return g:_cache_shorten_filename[cache_key]
+endif
+
+" Make path relative first, which might not work with the result from
+" `shorten_path`.
+let rel_path = fnamemodify(bufname, ":.")
+let bufname = ShortenPath(rel_path, getcwd(), 1)
+" }}}
+
+" Loop over all segments/parts, to mark symlinks.
+" XXX: symlinks get resolved currently anyway!?
+" NOTE: consider using another method like http://stackoverflow.com/questions/13165941/how-to-truncate-long-file-path-in-vim-powerline-statusline
+let maxlen_of_parts = 7 " including slash/dot
+let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
+
+let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
+let parts = split(bufname, '\ze['.escape(s:PS, '\').']')
+let i = 0
+let n = len(parts)
+let wholepath = '' " used for symlink check
+while i < n
+  let wholepath .= parts[i]
+  " Shorten part, if necessary:
+  if i < n-1 && len(bufname) > maxlen && len(parts[i]) > maxlen_of_parts
+    " Let's see if there are dots or hyphens to truncate at, e.g.
+    " 'vim-pkg-debian' => 'v-p-d…'
+    let w = split(parts[i], '\ze[._-]')
+    if len(w) > 1
+      let parts[i] = ''
+      for j in w
+        if len(j) > maxlen_of_subparts-1
+          let parts[i] .= j[0:maxlen_of_subparts-2]."…"
         else
-          return '['.&ft.']'
+          let parts[i] .= j
         endif
-      else
-        " TODO: get Vim's original "[No Name]" somehow
-        return '[No Name]'
-      endif
-    end
-
-    if getbufvar(bufnr(bufname), '&filetype') == 'help'
-      return '[?] '.fnamemodify(bufname, ':t')
-    endif
-
-    if bufname =~ '^__'
-      return bufname
+      endfor
+    else
+      let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
     endif
   endif
-  " }}}
-
-  " Maxlen from a:2 (used for cache key) and caching. {{{
-  let maxlen = a:0>1 ? a:2 : max([10, winwidth(0)-50])
-  " echom maxlen a:0
-  " if a:0>1 | echom a:2 | endif
-
-  " Check for cache (avoiding fnamemodify):
-  let cache_key = bufname.'::'.getcwd().'::'.maxlen
-  if has_key(g:_cache_shorten_filename, cache_key)
-    return g:_cache_shorten_filename[cache_key]
-  endif
-
-  " Make path relative first, which might not work with the result from
-  " `shorten_path`.
-  let rel_path = fnamemodify(bufname, ":.")
-  let bufname = ShortenPath(rel_path, getcwd(), 1)
-  " }}}
-
-  " Loop over all segments/parts, to mark symlinks.
-  " XXX: symlinks get resolved currently anyway!?
-  " NOTE: consider using another method like http://stackoverflow.com/questions/13165941/how-to-truncate-long-file-path-in-vim-powerline-statusline
-  let maxlen_of_parts = 7 " including slash/dot
-  let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
-
-  let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
-  let parts = split(bufname, '\ze['.escape(s:PS, '\').']')
-  let i = 0
-  let n = len(parts)
-  let wholepath = '' " used for symlink check
-  while i < n
-    let wholepath .= parts[i]
-    " Shorten part, if necessary:
-    if i < n-1 && len(bufname) > maxlen && len(parts[i]) > maxlen_of_parts
-      " Let's see if there are dots or hyphens to truncate at, e.g.
-      " 'vim-pkg-debian' => 'v-p-d…'
-      let w = split(parts[i], '\ze[._-]')
-      if len(w) > 1
-        let parts[i] = ''
-        for j in w
-          if len(j) > maxlen_of_subparts-1
-            let parts[i] .= j[0:maxlen_of_subparts-2]."…"
-          else
-            let parts[i] .= j
-          endif
-        endfor
-      else
-        let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
-      endif
-    endif
-    let i += 1
-  endwhile
-  let r = join(parts, '')
-  let g:_cache_shorten_filename[cache_key] = r
-  " echom "ShortenFilename" r
-  return r
+  let i += 1
+endwhile
+let r = join(parts, '')
+let g:_cache_shorten_filename[cache_key] = r
+" echom "ShortenFilename" r
+return r
 endfunction "}}}
 
 " Shorten filename, and append suffix(es), e.g. for modified buffers. {{{2
 fun! ShortenFilenameWithSuffix(...)
-  let r = call('ShortenFilename', a:000)
-  if &modified
-    let r .= ',+'
-  endif
-  return r
+let r = call('ShortenFilename', a:000)
+if &modified
+  let r .= ',+'
+endif
+return r
 endfun
 " }}}
 
 " Setup custom "file" part for airline, using a buffer-local var for caching
 " it (ref: https://github.com/bling/vim-airline/issues/658#issuecomment-64650886). {{{
 if &rtp =~ '\<airline\>'
-  " NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
-  fun! s:my_airline_clear_cache_file()
-    if exists('b:my_airline_file_cache')
-          \ && (!exists('b:my_airline_file_cache_key')
-          \    || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
-      let b:my_airline_file_cache_key = bufname('%').&modified.&ft
-      unlet! b:my_airline_file_cache
-    endif
-  endfun
-  augroup vimrc_airline
-    au!
-    " Invalidate cache on certain events.  TextChanged* might not exist in older Vim.
-    let s:autocmd = 'BufWritePost,BufEnter,CursorHold,InsertLeave,FileChangedShellPost'
-    if exists('##TextChanged')
-      let s:autocmd .= ",TextChanged,TextChangedI"
-    endif
-    exec 'au' s:autocmd '* call s:my_airline_clear_cache_file()'
-  augroup END
-  fun! ShortenFilenameForAirline()
-    if exists('b:my_airline_file_cache')
-      return b:my_airline_file_cache
-    endif
-    let b:my_airline_file_cache = ShortenFilenameWithSuffix()
+" NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
+fun! s:my_airline_clear_cache_file()
+  if exists('b:my_airline_file_cache')
+        \ && (!exists('b:my_airline_file_cache_key')
+        \    || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
+    let b:my_airline_file_cache_key = bufname('%').&modified.&ft
+    unlet! b:my_airline_file_cache
+  endif
+endfun
+augroup vimrc_airline
+  au!
+  " Invalidate cache on certain events.  TextChanged* might not exist in older Vim.
+  let s:autocmd = 'BufWritePost,BufEnter,CursorHold,InsertLeave,FileChangedShellPost'
+  if exists('##TextChanged')
+    let s:autocmd .= ",TextChanged,TextChangedI"
+  endif
+  exec 'au' s:autocmd '* call s:my_airline_clear_cache_file()'
+augroup END
+fun! ShortenFilenameForAirline()
+  if exists('b:my_airline_file_cache')
     return b:my_airline_file_cache
-  endfun
-  call airline#parts#define_function('file', 'ShortenFilenameForAirline')
+  endif
+  let b:my_airline_file_cache = ShortenFilenameWithSuffix()
+  return b:my_airline_file_cache
+endfun
+call airline#parts#define_function('file', 'ShortenFilenameForAirline')
 endif
 " }}}
 
@@ -1955,29 +1958,29 @@ endif
 
 " (gui)tablabel {{{
 function! GuiTabLabel()
-  let label = ''
-  let bufnrlist = tabpagebuflist(v:lnum)
+let label = ''
+let bufnrlist = tabpagebuflist(v:lnum)
 
-  let label .= tabpagenr().':'
+let label .= tabpagenr().':'
 
-  " Add '+' if one of the buffers in the tab page is modified
-  for bufnr in bufnrlist
-    if getbufvar(bufnr, "&modified")
-      let label .= '+'
-      break
-    endif
-  endfor
-
-  " Append the buffer name
-  " let label .= fnamemodify(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), ':~:.')
-  let label .= ShortenFilename(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), 20)
-
-  " Append the number of windows in the tab page if more than one
-  let wincount = tabpagewinnr(v:lnum, '$')
-  if wincount > 1
-    let label .= ' ('.wincount.')'
+" Add '+' if one of the buffers in the tab page is modified
+for bufnr in bufnrlist
+  if getbufvar(bufnr, "&modified")
+    let label .= '+'
+    break
   endif
-  return label
+endfor
+
+" Append the buffer name
+" let label .= fnamemodify(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), ':~:.')
+let label .= ShortenFilename(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), 20)
+
+" Append the number of windows in the tab page if more than one
+let wincount = tabpagewinnr(v:lnum, '$')
+if wincount > 1
+  let label .= ' ('.wincount.')'
+endif
+return label
 endfunction
 set guitablabel=%{GuiTabLabel()}
 " }}}
@@ -1990,11 +1993,11 @@ nnoremap <Leader>EE :sp <C-R>=expand("%:p:h") . "/" <CR>
 " gt: next tab or buffer (source: http://j.mp/dotvimrc)
 "     enhanced to support range (via v:count)
 fun! MyGotoNextTabOrBuffer(...)
-  let c = a:0 ? a:1 : v:count
-  exec (c ? c : '') . (tabpagenr('$') == 1 ? 'bn' : 'tabnext')
+let c = a:0 ? a:1 : v:count
+exec (c ? c : '') . (tabpagenr('$') == 1 ? 'bn' : 'tabnext')
 endfun
 fun! MyGotoPrevTabOrBuffer()
-  exec (v:count ? v:count : '') . (tabpagenr('$') == 1 ? 'bp' : 'tabprevious')
+exec (v:count ? v:count : '') . (tabpagenr('$') == 1 ? 'bp' : 'tabprevious')
 endfun
 nnoremap <silent> <Plug>NextTabOrBuffer :<C-U>call MyGotoNextTabOrBuffer()<CR>
 nnoremap <silent> <Plug>PrevTabOrBuffer :<C-U>call MyGotoPrevTabOrBuffer()<CR>
@@ -2034,17 +2037,17 @@ map <C-Tab>   <Plug>NextTabOrBuffer
 " Switch to most recently used tab.
 " Source: http://stackoverflow.com/a/2120168/15690
 fun! MyGotoMRUTab()
-  if !exists('g:mrutab')
-    let g:mrutab = 1
-  endif
-  if tabpagenr('$') == 1
-    echomsg "There is only one tab!"
-    return
-  endif
-  if g:mrutab > tabpagenr('$') || g:mrutab == tabpagenr()
-    let g:mrutab = tabpagenr() > 1 ? tabpagenr()-1 : tabpagenr('$')
-  endif
-  exe "tabn ".g:mrutab
+if !exists('g:mrutab')
+  let g:mrutab = 1
+endif
+if tabpagenr('$') == 1
+  echomsg "There is only one tab!"
+  return
+endif
+if g:mrutab > tabpagenr('$') || g:mrutab == tabpagenr()
+  let g:mrutab = tabpagenr() > 1 ? tabpagenr()-1 : tabpagenr('$')
+endif
+exe "tabn ".g:mrutab
 endfun
 " Overrides Vim's gh command (start select-mode, but I don't use that).
 " It can be simulated using v<C-g> also.
@@ -2052,45 +2055,45 @@ nnoremap <silent> gh  :call MyGotoMRUTab()<CR>
 " nnoremap °  :call MyGotoMRUTab()<CR>
 " nnoremap <C-^>  :call MyGotoMRUTab()<CR>
 augroup MyTL
-  au!
-  au TabLeave * let g:mrutab = tabpagenr()
+au!
+au TabLeave * let g:mrutab = tabpagenr()
 augroup END
 
 " Map <A-1> .. <A-9> to goto tab or buffer.
 for i in range(9)
-  exec 'nmap <M-' .(i+1).'> :call MyGotoNextTabOrBuffer('.(i+1).')<cr>'
+exec 'nmap <M-' .(i+1).'> :call MyGotoNextTabOrBuffer('.(i+1).')<cr>'
 endfor
 
 
 fun! MyGetNonDefaultServername()
-  " Not for gvim in general (uses v:servername by default), and the global
-  " server ("G").
-  let sname = v:servername
-  if len(sname)
-    if has('nvim')
-      if sname !~# '^/tmp/nvim'
-        let sname = substitute(fnamemodify(v:servername, ':t:r'), '^nvim-', '', '')
-        return sname
-      endif
-    elseif sname !~# '\v^GVIM.*' " && sname =~# '\v^G\d*$'
+" Not for gvim in general (uses v:servername by default), and the global
+" server ("G").
+let sname = v:servername
+if len(sname)
+  if has('nvim')
+    if sname !~# '^/tmp/nvim'
+      let sname = substitute(fnamemodify(v:servername, ':t:r'), '^nvim-', '', '')
       return sname
     endif
+  elseif sname !~# '\v^GVIM.*' " && sname =~# '\v^G\d*$'
+    return sname
   endif
-  return ''
+endif
+return ''
 endfun
 
 fun! MyGetSessionName()
-  " Use / auto-set g:MySessionName
-  if !len(get(g:, "MySessionName", ""))
-    if len(v:this_session)
-      let g:MySessionName = fnamemodify(v:this_session, ':t:r')
-    elseif len($TERM_INSTANCE_NAME)
-      let g:MySessionName = substitute($TERM_INSTANCE_NAME, '^vim-', '', '')
-    else
-      return ''
-    end
-  endif
-  return g:MySessionName
+" Use / auto-set g:MySessionName
+if !len(get(g:, "MySessionName", ""))
+  if len(v:this_session)
+    let g:MySessionName = fnamemodify(v:this_session, ':t:r')
+  elseif len($TERM_INSTANCE_NAME)
+    let g:MySessionName = substitute($TERM_INSTANCE_NAME, '^vim-', '', '')
+  else
+    return ''
+  end
+endif
+return g:MySessionName
 endfun
 
 " titlestring handling, with tmux support {{{
@@ -2099,78 +2102,78 @@ set title
 
 " Setup titlestring on BufEnter, when v:servername is available.
 fun! MySetupTitleString()
-  let title = '✐ '
+let title = '✐ '
 
-  let session_name = MyGetSessionName()
-  if len(session_name)
-    let title .= '['.session_name.'] '
-  else
-    " Add non-default servername to titlestring.
-    let sname = MyGetNonDefaultServername()
-    if len(sname)
-      let title .= '['.sname.'] '
-    endif
+let session_name = MyGetSessionName()
+if len(session_name)
+  let title .= '['.session_name.'] '
+else
+  " Add non-default servername to titlestring.
+  let sname = MyGetNonDefaultServername()
+  if len(sname)
+    let title .= '['.sname.'] '
   endif
+endif
 
-  " Call the function and use its result, rather than including it.
-  " (for performance reasons).
-  let title .= substitute(
-        \ ShortenFilenameWithSuffix('%', 15).' ('.ShortenPath(getcwd()).')',
-        \ '%', '%%', 'g')
+" Call the function and use its result, rather than including it.
+" (for performance reasons).
+let title .= substitute(
+      \ ShortenFilenameWithSuffix('%', 15).' ('.ShortenPath(getcwd()).')',
+      \ '%', '%%', 'g')
 
-  if len(s:my_context)
-    let title .= ' {'.s:my_context.'}'
+if len(s:my_context)
+  let title .= ' {'.s:my_context.'}'
+endif
+
+" Easier to type/find than the unicode symbol prefix.
+let title .= ' - vim'
+
+" Append $_TERM_TITLE_SUFFIX (e.g. user@host) to title (set via zsh, used
+" with SSH).
+if len($_TERM_TITLE_SUFFIX)
+  let title .= $_TERM_TITLE_SUFFIX
+endif
+
+" Setup tmux window name, see ~/.dotfiles/oh-my-zsh/lib/termsupport.zsh.
+if len($TMUX)
+      \ && (!len($_tmux_name_reset) || $_tmux_name_reset != $TMUX . '_' . $TMUX_PANE)
+  let tmux_auto_rename=systemlist('tmux show-window-options -t '.$TMUX_PANE.' -v automatic-rename 2>/dev/null')
+  " || $(tmux show-window-options -t $TMUX_PANE | grep '^automatic-rename' | cut -f2 -d\ )
+  " echom string(tmux_auto_rename)
+  if !len(tmux_auto_rename) || tmux_auto_rename[0] != "off"
+    " echom "Resetting tmux name to 0."
+    call system('tmux set-window-option -t '.$TMUX_PANE.' -q automatic-rename off')
+    call system('tmux rename-window -t '.$TMUX_PANE.' 0')
   endif
+endif
 
-  " Easier to type/find than the unicode symbol prefix.
-  let title .= ' - vim'
+let &titlestring = title
 
-  " Append $_TERM_TITLE_SUFFIX (e.g. user@host) to title (set via zsh, used
-  " with SSH).
-  if len($_TERM_TITLE_SUFFIX)
-    let title .= $_TERM_TITLE_SUFFIX
-  endif
-
-  " Setup tmux window name, see ~/.dotfiles/oh-my-zsh/lib/termsupport.zsh.
-  if len($TMUX)
-        \ && (!len($_tmux_name_reset) || $_tmux_name_reset != $TMUX . '_' . $TMUX_PANE)
-    let tmux_auto_rename=systemlist('tmux show-window-options -t '.$TMUX_PANE.' -v automatic-rename 2>/dev/null')
-    " || $(tmux show-window-options -t $TMUX_PANE | grep '^automatic-rename' | cut -f2 -d\ )
-    " echom string(tmux_auto_rename)
-    if !len(tmux_auto_rename) || tmux_auto_rename[0] != "off"
-      " echom "Resetting tmux name to 0."
-      call system('tmux set-window-option -t '.$TMUX_PANE.' -q automatic-rename off')
-      call system('tmux rename-window -t '.$TMUX_PANE.' 0')
-    endif
-  endif
-
-  let &titlestring = title
-
-  " Set icon text according to &titlestring (used for minimized windows).
-  let &iconstring = '(v) '.&titlestring
+" Set icon text according to &titlestring (used for minimized windows).
+let &iconstring = '(v) '.&titlestring
 endfun
 
 augroup vimrc_title
-  au!
-  " XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
-  autocmd BufEnter,BufWritePost,TextChanged * call MySetupTitleString()
+au!
+" XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
+autocmd BufEnter,BufWritePost,TextChanged * call MySetupTitleString()
 augroup END
 
 " Make Vim set the window title according to &titlestring.
 if !has('gui_running') && empty(&t_ts)
-  if len($TMUX)
-    let &t_ts = "\e]2;"
-    let &t_fs = "\007"
-  elseif &term =~ "^screen.*"
-    let &t_ts="\ek"
-    let &t_fs="\e\\"
-  endif
+if len($TMUX)
+  let &t_ts = "\e]2;"
+  let &t_fs = "\007"
+elseif &term =~ "^screen.*"
+  let &t_ts="\ek"
+  let &t_fs="\e\\"
+endif
 endif
 
 
 fun! MySetSessionName(name)
-  let g:MySessionName = a:name
-  call MySetupTitleString()
+let g:MySessionName = a:name
+call MySetupTitleString()
 endfun
 "}}}
 
@@ -2183,12 +2186,12 @@ nnoremap <Leader>cd :lcd <C-R>=expand('%:p:h')<CR><CR>
 
 " yankstack, see also unite's history/yank {{{1
 if &rtp =~ '\<yankstack\>'
-  " Do not map s/S (used by vim-sneak).
-  " let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
-  let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 'x', 'X', 'y', 'Y']
+" Do not map s/S (used by vim-sneak).
+" let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
+let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 'x', 'X', 'y', 'Y']
 
-  " Setup yankstack now to make yank/paste related mappings work.
-  call yankstack#setup()
+" Setup yankstack now to make yank/paste related mappings work.
+call yankstack#setup()
 endif
 
 

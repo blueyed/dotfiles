@@ -1385,6 +1385,8 @@ if !len(s:xdg_data_home)
 endif
 let s:vimsharedir = s:xdg_data_home . '/vim'
 
+let &viewdir = s:vimsharedir . '/views'
+
 let g:yankring_history_dir = s:vimsharedir
 let g:yankring_max_history = 500
 " let g:yankring_min_element_length = 2 " more that 1 breaks e.g. `xp`
@@ -2156,7 +2158,10 @@ endfun
 augroup vimrc_title
 au!
 " XXX: might not get called with fugitive buffers (title is the (closed) fugitive buffer).
-autocmd BufEnter,BufWritePost,TextChanged * call MySetupTitleString()
+autocmd BufEnter,BufWritePost * call MySetupTitleString()
+if exists('##TextChanged')
+  autocmd TextChanged * call MySetupTitleString()
+endif
 augroup END
 
 " Make Vim set the window title according to &titlestring.

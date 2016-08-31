@@ -3918,7 +3918,7 @@ fun! MyHandleSwapfile(filename)
   endif
 endfun
 
-let g:quickfixsign_protect_sign_rx = '^neomake_'
+let g:quickfixsigns_protect_sign_rx = '^neomake_'
 
 " Python setup for NeoVim. {{{
 " Defining it also skips auto-detecting it.

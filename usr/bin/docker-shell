@@ -6,17 +6,21 @@
 
 if [ -z $1 ]; then
 	container_or_image=$(docker ps -a | awk 'NR == 2 {print $1}')
+	if [ -z "$container_or_image" ]; then
+		echo "No last container found." >&2
+		exit 1
+	fi
 	echo "Using last container: $container_or_image"
 else
 	container_or_image=$1
 	shift
 fi
 
-_i=$(docker inspect $container_or_image | grep '^    "Image": "')
+_i=$(docker inspect $container_or_image | grep '^        "Image": "')
 if [ -n "$_i" ]; then
 	# Extract image ID.
 	_i=$(echo $_i | cut -f4 -d'"')
-	
+
 	echo "Running image of docker instance: $_i"
 	docker run -i -t --entrypoint=bash "$_i" "$@" --
 

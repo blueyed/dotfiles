@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+ids=($(docker ps | cut -f1 -d\  | sed 1d))
+[[ ${#ids[@]} = 0 ]] && exit
+
+echo "Stopping ${#ids[@]} containers.."
+docker stop "${ids[@]}"

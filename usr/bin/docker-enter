@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Stop on error.
+set -e
+
+if [ -z $1 ]; then
+	container_name_or_id=$(docker ps -a | awk 'NR == 2 {print $1}')
+	echo "Using last container: $container_name_or_id"
+else
+	container_name_or_id=$1
+	shift
+fi
+
+PID=$(docker inspect --format {{.State.Pid}} $container_name_or_id)
+
+# Fails with 'nsenter: cannot open /proc/18625/ns/ipc: Permission denied'.
+# nsenter --target $PID --mount --uts --ipc --net --pid
+
+cmd=${1:-bash}
+docker exec -ti $container_name_or_id $cmd

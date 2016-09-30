@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# postgres: tail postgresql logs, ensuring logging is enabled (with optional
+# restart and restore).
+
+conf=/var/lib/postgres/data/postgresql.conf
+restore=
+
+_restore() {
+  if [ -n "$restore" ]; then
+    sudo sed -i "s/log_statement = 'all'/# log_statement = 'all'/" "$conf"
+    sudo systemctl restart postgresql.service
+  fi
+}
+
+trap '_restore && exit $?' INT
+
+if ! sudo grep -q "^log_statement = 'all'" "$conf"; then
+  if ! sudo grep -q "^# log_statement = 'all'" "$conf"; then
+    echo "Expected log_statement line in $conf not found."
+    exit 1
+  fi
+  sudo sed -i "s/# log_statement = 'all'/log_statement = 'all'/" "$conf"
+  restore=1
+  sudo systemctl restart postgresql.service
+fi
+
+sudo journalctl -t postgres -f

@@ -884,7 +884,7 @@ fun! MyQuitWindow()
     lclose
   endif
   " Turn off diff mode for all other windows.
-  if &diff
+  if &diff && !exists('w:fugitive_diff_restore')
     WindoNodelay diffoff
   endif
 

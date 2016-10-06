@@ -4,25 +4,48 @@
 # restart and restore).
 
 conf=/var/lib/postgres/data/postgresql.conf
-restore=
 
-_restore() {
-  if [ -n "$restore" ]; then
-    sudo sed -i "s/log_statement = 'all'/# log_statement = 'all'/" "$conf"
+log_statement="log_statement = 'all'"
+if ! sudo grep -Eq "^(# )?$log_statement" "$conf"; then
+  echo "Expected log_statement line in $conf not found."
+  exit 1
+fi
+
+_on() {
+  if sudo grep -q "^# $log_statement" "$conf"; then
+    echo "Enabling log_statement."
+    sudo sed -i "s/# $log_statement/$log_statement/" "$conf"
     sudo systemctl restart postgresql.service
+    return 1
   fi
+  return 0
+}
+_off() {
+  if sudo grep -q "^$log_statement" "$conf"; then
+    echo "Disabling log_statement."
+    sudo sed -i "s/$log_statement/# $log_statement/" "$conf"
+    sudo systemctl restart postgresql.service
+    return 1
+  fi
+  return 0
 }
 
+if [ -n "$1" ]; then
+  if [ "$1" = 0 ] || [ "$1" = off ]; then
+    _off
+  else
+    _on
+  fi
+  exit 0
+fi
+
+restore=0
+_restore() {
+  [ "$restore" = 1 ] && _off
+}
 trap '_restore && exit $?' INT
 
-if ! sudo grep -q "^log_statement = 'all'" "$conf"; then
-  if ! sudo grep -q "^# log_statement = 'all'" "$conf"; then
-    echo "Expected log_statement line in $conf not found."
-    exit 1
-  fi
-  sudo sed -i "s/# log_statement = 'all'/log_statement = 'all'/" "$conf"
-  restore=1
-  sudo systemctl restart postgresql.service
-fi
+_on
+restore=$?
 
 sudo journalctl -t postgres -f

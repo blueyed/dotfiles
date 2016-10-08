@@ -3366,8 +3366,10 @@ endfunction
 
 " Maps related to version control (Git). {{{1
 " Toggle `:Gdiff`.
-nnoremap <Leader>gd :if !&diff \| Gdiff \| else \| call MyCloseDiff() \| endif <cr>
-nnoremap <Leader>gD :call MyCloseDiff()<cr>
+nnoremap <silent> <Leader>gd :if !&diff \|\| winnr('$') == 1 \| FollowSymlink \| Gdiff \| else \| call MyCloseDiff() \| endif <cr>
+nnoremap <Leader>gDm :Gdiff master:%<cr>
+nnoremap <Leader>gDom :Gdiff origin/master:%<cr>
+nnoremap <Leader>gDs :Gdiff stash:%<cr>
 " nnoremap <Leader>gD :Git difftool %
 nnoremap <Leader>gb :Gblame<cr>
 nnoremap <Leader>gl :Glog<cr>

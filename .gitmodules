@@ -62,3 +62,6 @@
 [submodule "lib/diff-so-fancy"]
 	path = lib/diff-so-fancy
 	url = https://github.com/so-fancy/diff-so-fancy.git
+[submodule "urxvt/ext/autocomplete-ALL-the-things.sm"]
+	path = urxvt/ext/autocomplete-ALL-the-things.sm
+	url = git://github.com/Vifon/autocomplete-ALL-the-things.git

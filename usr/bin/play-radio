@@ -7,12 +7,27 @@ if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
     name=$1
   else
-    name=radioparadise
+    names='radioparadise fluxfm radioeins groovesalad'
+    name="$(echo "$names" | rofi -dmenu -sep ' ' -p "Play which station?")"
+    if [ -z "$name" ]; then
+      exit
+    fi
   fi
 fi
 
+PIDFILE=/tmp/.play-radio.pid
+if [ -e "$PIDFILE" ]; then
+  pid="$(cat "$PIDFILE")"
+  if kill -0 "$pid"; then
+    echo "Killing already running instance.."
+    kill "$pid"
+  fi
+fi
+echo $$ > "$PIDFILE"
+
 player="mpg123 --timeout 30 --control"
 player_pl="mpg123 --timeout 30 --control -@"
+aac_player="mplayer"
 
 # shellcheck disable=SC2064
 trap "pkill -P $$" 0
@@ -26,6 +41,8 @@ case $name in
     $player_pl http://www.radioeins.de/live.m3u & ;;
   groovesalad)
     $player_pl http://somafm.com/groovesalad.pls & ;;
+  groovesalad_aac)
+    $aac_player http://ice2.somafm.com/groovesalad-128-aac & ;;
   *)
     if [ "$name#.pls" = "$name" ]; then
       $player "$name" &

@@ -7,7 +7,7 @@ if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
     name=$1
   else
-    names='radioparadise fluxfm radioeins groovesalad'
+    names='radioparadise fluxfm radioeins groovesalad OFF'
     name="$(echo "$names" | rofi -dmenu -sep ' ' -p "Play which station?")"
     if [ -z "$name" ]; then
       exit
@@ -18,10 +18,13 @@ fi
 PIDFILE=/tmp/.play-radio.pid
 if [ -e "$PIDFILE" ]; then
   pid="$(cat "$PIDFILE")"
-  if kill -0 "$pid"; then
+  if kill -0 "$pid" 2>/dev/null; then
     echo "Killing already running instance.."
     kill "$pid"
   fi
+fi
+if [ "$name" = OFF ]; then
+  exit
 fi
 echo $$ > "$PIDFILE"
 
@@ -29,27 +32,21 @@ player="mpg123 --timeout 30 --control"
 player_pl="mpg123 --timeout 30 --control -@"
 aac_player="mplayer"
 
-# shellcheck disable=SC2064
-trap "pkill -P $$" 0
-
 case $name in
   radioparadise)
-    $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u & ;;
+    exec $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u ;;
   fluxfm )
-    $player http://www.fluxfm.de/stream-berlin & ;;
+    exec $player http://www.fluxfm.de/stream-berlin ;;
   radioeins )
-    $player_pl http://www.radioeins.de/live.m3u & ;;
+    exec $player_pl http://www.radioeins.de/live.m3u ;;
   groovesalad)
-    $player_pl http://somafm.com/groovesalad.pls & ;;
+    exec $player_pl http://somafm.com/groovesalad.pls ;;
   groovesalad_aac)
-    $aac_player http://ice2.somafm.com/groovesalad-128-aac & ;;
+    exec $aac_player http://ice2.somafm.com/groovesalad-128-aac ;;
   *)
     if [ "$name#.pls" = "$name" ]; then
-      $player "$name" &
+      exec $player "$name"
     else
-      $player_pl "$name" &
+      exec $player_pl "$name"
     fi
 esac
-
-# Wait for child process (to make SIGTERM work with dash).
-wait $!

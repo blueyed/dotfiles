@@ -17,6 +17,7 @@ mkdir .git/tags_lock 2>/dev/null || {
 }
 (
   trap 'rmdir .git/tags_lock' EXIT
+  trap '' HUP
 
   gtags=~/.dotfiles/vim/neobundles/gutentags/plat/unix/update_tags.sh
   if ! [ -f "$gtags" ]; then

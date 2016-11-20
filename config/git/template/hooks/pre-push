@@ -12,8 +12,6 @@
 # 2: location of the remote
 # stdin: <local ref> SP <local sha1> SP <remote ref> SP <remote sha1> LF
 
-remote=$1
-
 # Which remote heads/branches to check?
 # (a regular expression for "grep -E").
 CHECK_REMOTE_HEADS='^(master|develop|production|staging)$'
@@ -34,7 +32,7 @@ debug "$0: $1 $2 ($#)"
 # Return status of the script.
 ret=0
 
-while read local_ref local_sha remote_ref remote_sha; do
+while read -r local_ref local_sha remote_ref remote_sha; do
   debug "Pushing: $local_ref ($local_sha) => $remote_ref ($remote_sha)"
 
   # Is this a new remote ref?
@@ -57,7 +55,7 @@ while read local_ref local_sha remote_ref remote_sha; do
   fi
 
   # Check for the bad log pattern.
-  log_cmd="git log --grep $BAD_LOG_PATTERN --color=always $log_arg"
+  log_cmd="git log --extended-regexp --grep $BAD_LOG_PATTERN --color=always $log_arg"
   log="$($log_cmd 2>&1)"
   log_ret=$?
   if [ "$log_ret" != 0 ]; then

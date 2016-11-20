@@ -26,10 +26,17 @@ if [ -n "$PIP_EXISTS_ACTION" ]; then
   else
     git --no-pager log -1 --pretty=format:"%C(green)pip-$pip_mode: $(git remote get-url origin)%n%C(blue) - %s%C(reset) (%cr, %h, %cN)" >&2
   fi
+  # Note: --no-pager does not add a newline.
+  echo
 
 else
-  git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)" >&2
-  .git/hooks/ctags post-checkout &
+  # Display last commit only when not checking out a file.
+  if [ "$1" != "$2" ]; then
+    git --no-pager log -1 --pretty=format:"Last commit: %C(blue)%s%C(reset) (%cr, %h, %cN)" >&2
+    # Note: --no-pager does not add a newline.
+    echo
+  fi
+  # Parse git-dir, for 'git-clone --recursive' and submodules.
+  gitdir="$(git rev-parse --git-dir)"
+  "$gitdir/hooks/ctags" post-checkout &
 fi
-# Note: --no-pager does not add a newline.
-echo

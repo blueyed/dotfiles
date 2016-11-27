@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Automatically create a fixup commit.
+#
+# This looks at the diff from the index, and then uses git-blame to find a
+# suitable commit to fix.
+# This is very rudimentary, and will only look for removed lines.
+
+fixup=
+while IFS=$'\t' read -r info file; do
+  diff_info=($info)
+  if [ "${diff_info[4]}" != M ]; then
+    echo "Skipping $file (not Modified).." >&2
+    continue
+  fi
+
+  in_hunk=0
+  while read -r line; do
+    if [[ "$line" == "@@"* ]]; then
+      from=$(echo "$line" | cut -d, -f1 | cut -d- -f2)
+      count=$(echo "$line" | cut -d, -f2 | cut -d\  -f1)
+      in_hunk=1
+
+    elif [[ "$in_hunk" = 1 ]]; then
+      if [[ "${line}" == -* ]]; then
+        # typeset -p line
+        removed+=("${line#-}")
+      fi
+    fi
+  done < <(HOME=/dev/null git diff --cached "$file")
+
+  # typeset -p removed
+  if (( ${#removed[@]} )); then
+    while IFS=$'\n' read -r blame; do
+      commit=$(echo "$blame" | cut -f1 -d\ )
+      line="$(echo "$blame" | cut -f3- -d\ )"
+
+      for l in "${removed[@]}"; do
+        if [[ "$line" == "$l" ]]; then
+          if [[ -z "$fixup" ]]; then
+            fixup="$commit"
+          elif [[ "$fixup" != "$commit" ]]; then
+            echo "Found multiple fixups: $fixup and $commit.  Aborting."
+            exit 1
+          fi
+        fi
+      done
+    done < <(HOME=/dev/null git blame -s -L "$from,+$count" HEAD "$file")
+  fi
+done < <(HOME=/dev/null git diff-index --cached HEAD)
+
+if [[ -z "${diff_info[@]}" ]]; then
+  echo "Nothing in the index.  Add files first." >&2
+  exit 1
+fi
+
+if [[ -z "$fixup" ]]; then
+  echo "No fixup found." >&2
+  exit 1
+fi
+git commit --fixup="$fixup"

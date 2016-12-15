@@ -11,17 +11,9 @@
 if [ -d ~/.pyenv ]; then
   export PYENV_ROOT="$HOME/.pyenv"
   PATH="$PYENV_ROOT/bin:$PATH"
-
-  # Setup pyenv function and completion.
-  # NOTE: moved from ~/.zshrc to fix YouCompleteMe/Python in gvim started from Firefox.
-  # XXX: probably not that lazy with this forking..
-  if ! type pyenv | grep -q function; then # only once!
-    if [ -n "$commands[pyenv]" ] ; then
-      eval "$($PYENV_ROOT/bin/pyenv init -)"
-    fi
-    # Unset PYENV_SHELL=lightdm-session.  It will use $SHELL then by default.
-    unset PYENV_SHELL
-  fi
+  eval "$("$PYENV_ROOT"/bin/pyenv init -)"
+  # Unset PYENV_SHELL=lightdm-session etc.  It will use $SHELL then by default.
+  unset PYENV_SHELL
 fi
 
 # Enable core files (if apport ignores the crash, e.g. for Vim).

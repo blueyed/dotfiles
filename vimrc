@@ -1781,211 +1781,312 @@ augroup viminfo_onfocus
 augroup end
 endif " has("autocmd") }}}
 
-" Statusline {{{
 
 " Shorten a given (absolute) file path, via external `shorten_path` script.
 " This mainly shortens entries from Zsh's `hash -d` list.
 let s:_cache_shorten_path = {}
 let s:_has_functional_shorten_path = 1
 fun! ShortenPath(path, ...)
-if ! len(a:path) || ! s:_has_functional_shorten_path
-  return a:path
-endif
-let base = a:0 ? a:1 : ""
-let annotate = a:0 > 1 ? a:2 : 0
-let cache_key = base . ":" . a:path . ":" . annotate
-if ! exists('s:_cache_shorten_path[cache_key]')
-  let shorten_path = executable('shorten_path')
-        \ ? 'shorten_path'
-        \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
-        \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
-        \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
-  if annotate
-    let shorten_path .= ' -a'
+  if ! len(a:path) || ! s:_has_functional_shorten_path
+    return a:path
   endif
-  let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
-  let s:_cache_shorten_path[cache_key] = system(cmd)
-  if v:shell_error
-    try
-      let tmpfile = tempname()
-      call system(cmd.' 2>'.tmpfile)
-      call MyWarningMsg("There was a problem running shorten_path: "
-            \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')')
-      let s:_has_functional_shorten_path = 0
-      return a:path
-    finally
-      call delete(tmpfile)
-    endtry
+  let base = a:0 ? a:1 : ""
+  let annotate = a:0 > 1 ? a:2 : 0
+  let cache_key = base . ":" . a:path . ":" . annotate
+  if ! exists('s:_cache_shorten_path[cache_key]')
+    let shorten_path = executable('shorten_path')
+          \ ? 'shorten_path'
+          \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
+          \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
+          \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
+    if annotate
+      let shorten_path .= ' -a'
+    endif
+    let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
+    let s:_cache_shorten_path[cache_key] = system(cmd.' 2>/dev/null')
+    if v:shell_error
+      try
+        let tmpfile = tempname()
+        call system(cmd.' 2>'.tmpfile)
+        if v:shell_error == 127
+          let s:_has_functional_shorten_path = 0
+        endif
+        throw "There was a problem running shorten_path: "
+              \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')'
+        return a:path
+      finally
+        call delete(tmpfile)
+      endtry
+    endif
   endif
-endif
-return s:_cache_shorten_path[cache_key]
+  return s:_cache_shorten_path[cache_key]
 endfun
+
+function! My_get_qfloclist_type(bufnr)
+  let isLoc = getbufvar(a:bufnr, 'isLoc', -1)  " via vim-qf.
+  if isLoc != -1
+    return isLoc ? 'll' : 'qf'
+  endif
+  " A hacky way to distinguish qf from loclist windows/buffers.
+  " https://github.com/vim-airline/vim-airline/blob/83b6dd11a8829bbd934576e76bfbda6559ed49e1/autoload/airline/extensions/quickfix.vim#L27-L43.
+  " Changes:
+  "  - Caching!
+  "  - Match opening square bracket at least.  Apart from that it could be
+  "    localized.
+  " if &ft !=# 'qf'
+  "   return ''
+  " endif
+  let type = getbufvar(a:bufnr, 'my_qfloclist_type', '')
+  if type != ''
+    return type
+  endif
+  redir => buffers
+  silent ls -
+  redir END
+  let type = 'unknown'
+  for buf in split(buffers, '\n')
+    if match(buf, '\v^\s*'.a:bufnr.'\s\S+\s+"\[') > -1
+      if match(buf, '\cQuickfix') > -1
+        let type = 'qf'
+        break
+      else
+        let type = 'll'
+        break
+      endif
+    endif
+  endfor
+  call setbufvar(a:bufnr, 'my_qfloclist_type', type)
+  return type
+endfunction
 
 " Shorten a given filename by truncating path segments.
 let g:_cache_shorten_filename = {}
+let g:_cache_shorten_filename_git = {}
+function! ShortenString(s, maxlen)
+  if len(a:s) <= a:maxlen
+    return a:s
+  endif
+  return a:s[0:a:maxlen-1] . '…'
+endfunction
 function! ShortenFilename(...)  " {{{
-" Args: bufname ('%' for default), maxlength
-" echomsg "ShortenFilename:" string(a:000)
+  " Args: bufname ('%' for default), maxlength, cwd
+  let cwd = a:0 > 2 ? a:3 : getcwd()
+  " Maxlen from a:2 (used for cache key) and caching.
+  let maxlen = a:0>1 ? a:2 : max([10, winwidth(0)-50])
 
-" get bufname from a:1, defaulting to bufname('%') {{{
-if a:0 && a:1 != '%'
-  let bufname = a:1
-else
-  let bufname = bufname("%")
-  if !len(bufname)
-    if &bt != '' && len(&ft)
-      " Use &ft for name (e.g. with 'startify' and quickfix windows).
-      let alt_name = expand('#')
-      if len(alt_name)
-        return '['.&ft.'] '.ShortenFilename(expand('#'))
-      else
-        return '['.&ft.']'
-      endif
+  " get bufname from a:1, defaulting to bufname('%') {{{
+  if a:0 && type(a:1) == type('') && a:1 !=# '%'
+    let bufname = expand(a:1)  " tilde-expansion.
+  else
+    if !a:0 || a:1 == '%'
+      let bufnr = bufnr('%')
     else
-      " TODO: get Vim's original "[No Name]" somehow
-      return '[No Name]'
+      let bufnr = a:1
     endif
-  end
-
-  if getbufvar(bufnr(bufname), '&filetype') == 'help'
-    return '[?] '.fnamemodify(bufname, ':t')
-  endif
-
-  if bufname =~ '^__'
-    return bufname
-  endif
-endif
-" }}}
-
-" Maxlen from a:2 (used for cache key) and caching. {{{
-let maxlen = a:0>1 ? a:2 : max([10, winwidth(0)-50])
-" echom maxlen a:0
-" if a:0>1 | echom a:2 | endif
-
-" Check for cache (avoiding fnamemodify):
-let cache_key = bufname.'::'.getcwd().'::'.maxlen
-if has_key(g:_cache_shorten_filename, cache_key)
-  return g:_cache_shorten_filename[cache_key]
-endif
-
-" Make path relative first, which might not work with the result from
-" `shorten_path`.
-let rel_path = fnamemodify(bufname, ":.")
-let bufname = ShortenPath(rel_path, getcwd(), 1)
-" }}}
-
-" Loop over all segments/parts, to mark symlinks.
-" XXX: symlinks get resolved currently anyway!?
-" NOTE: consider using another method like http://stackoverflow.com/questions/13165941/how-to-truncate-long-file-path-in-vim-powerline-statusline
-let maxlen_of_parts = 7 " including slash/dot
-let maxlen_of_subparts = 5 " split at dot/hypen/underscore; including split
-
-let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
-let parts = split(bufname, '\ze['.escape(s:PS, '\').']')
-let i = 0
-let n = len(parts)
-let wholepath = '' " used for symlink check
-while i < n
-  let wholepath .= parts[i]
-  " Shorten part, if necessary:
-  if i < n-1 && len(bufname) > maxlen && len(parts[i]) > maxlen_of_parts
-    " Let's see if there are dots or hyphens to truncate at, e.g.
-    " 'vim-pkg-debian' => 'v-p-d…'
-    let w = split(parts[i], '\ze[._-]')
-    if len(w) > 1
-      let parts[i] = ''
-      for j in w
-        if len(j) > maxlen_of_subparts-1
-          let parts[i] .= j[0:maxlen_of_subparts-2]."…"
-        else
-          let parts[i] .= j
+    let bufname = bufname(bufnr)
+    let ft = getbufvar(bufnr, '&filetype')
+    if !len(bufname)
+      if ft == 'qf'
+        let type = My_get_qfloclist_type(bufnr)
+        " XXX: uses current window.  Also not available after ":tab split".
+        let qf_title = get(w:, 'quickfix_title', '')
+        if qf_title != ''
+          return ShortenString('['.type.'] '.qf_title, maxlen)
+        elseif type == 'll'
+          let alt_name = expand('#')
+          " For location lists the alternate file is the corresponding buffer
+          " and the quickfix list does not have an alternate buffer
+          " (but not always)!?!
+          if len(alt_name)
+            return '[loc] '.ShortenFilename(alt_name, maxlen-5)
+          endif
+          return '[loc]'
         endif
-      endfor
-    else
-      let parts[i] = parts[i][0:maxlen_of_parts-2].'…'
+        return '[qf]'
+      else
+        let bt = getbufvar(bufnr, '&buftype')
+        if bt != '' && ft != ''
+          " Use &ft for name (e.g. with 'startify' and quickfix windows).
+          " if &ft == 'qf'
+          "   let alt_name = expand('#')
+          "   if len(alt_name)
+          "     return '[loc] '.ShortenFilename(alt_name)
+          "   else
+          "     return '[qf]'
+          "   endif
+          let alt_name = expand('#')
+          if len(alt_name)
+            return '['.&ft.'] '.ShortenFilename(expand('#'))
+          else
+            return '['.&ft.']'
+          endif
+        else
+          " TODO: get Vim's original "[No Name]" somehow
+          return '[No Name]'
+        endif
+      endif
+    end
+
+    if bufname =~# '^fugitive:///'
+      let [gitdir, fug_path] = split(bufname, '//')[1:2]
+
+      " Caching based on bufname and timestamp of gitdir.
+      let git_ftime = getftime(gitdir)
+      if exists('g:_cache_shorten_filename_git[bufname]')
+            \ && g:_cache_shorten_filename_git[bufname][0] == git_ftime
+        let [commit_name, fug_type, fug_path]
+              \ = g:_cache_shorten_filename_git[bufname][1:-1]
+      else
+        let fug_buffer = fugitive#buffer(bufname)
+        let fug_type = fug_buffer.type()
+
+        " if fug_path =~# '^\x\{7,40\}\>'
+        let commit = matchstr(fug_path, '\v\w*')
+        if len(commit) > 1
+          let git_argv = ['git', '--git-dir='.gitdir]
+          let commit = systemlist(git_argv + ['rev-parse', '--short', commit])[0]
+          let commit_name = systemlist(git_argv + ['name-rev', '--name-only', commit])[0]
+          if commit_name !=# 'undefined'
+            " Remove current branch name (master~4 => ~4).
+            let HEAD = get(systemlist(git_argv + ['symbolic-ref', '--quiet', '--short', 'HEAD']), 0, '')
+            let len_HEAD = len(HEAD)
+            if len_HEAD > len(commit_name) && commit_name[0:len_HEAD-1] == HEAD
+              let commit_name = commit_name[len_HEAD:-1]
+            endif
+            " let commit .= '('.commit_name.')'
+            let commit_name .= '('.commit.')'
+          else
+            let commit_name = commit
+          endif
+        else
+          let commit_name = commit
+        endif
+        " endif
+
+        if fug_type !=# 'commit'
+          let fug_path = substitute(fug_path, '\v\w*/', '', '')
+          if len(fug_path)
+            let fug_path = ShortenFilename(fug_buffer.repo().tree(fug_path))
+          endif
+        else
+          let fug_path = 'NOT_USED'
+        endif
+
+        " Set cache.
+        let g:_cache_shorten_filename_git[bufname]
+              \ = [git_ftime, commit_name, fug_type, fug_path]
+      endif
+
+      if fug_type ==# 'blob'
+        return 'λ:' . commit_name . ':' . fug_path
+      elseif fug_type ==# 'file'
+        return 'λ:' . fug_path . '@' . commit_name
+      elseif fug_type ==# 'commit'
+      " elseif fug_path =~# '^\x\{7,40\}\>'
+        let work_tree = fugitive#buffer(bufname).repo().tree()
+        if cwd[0:len(work_tree)-1] == work_tree
+          let rel_work_tree = ''
+        else
+          let rel_work_tree = ShortenPath(fnamemodify(work_tree.'/', ':.'))
+        endif
+        return 'λ:' . rel_work_tree . '@' . commit_name
+      endif
+      throw "fug_type: ".fug_type." not handled: ".fug_path
+    endif
+
+    if ft ==# 'help'
+      return '[?] '.fnamemodify(bufname, ':t')
+    endif
+    if bufname =~# '^__'
+      return bufname
+    endif
+    " '^\[ref-\w\+:.*\]$'
+    if bufname =~# '^\[.*\]$'
+      return bufname
     endif
   endif
-  let i += 1
-endwhile
-let r = join(parts, '')
-let g:_cache_shorten_filename[cache_key] = r
-" echom "ShortenFilename" r
-return r
+  " }}}
+
+  " Check for cache (avoiding fnamemodify): {{{
+  let cache_key = bufname.'::'.cwd.'::'.maxlen
+  if has_key(g:_cache_shorten_filename, cache_key)
+    return g:_cache_shorten_filename[cache_key]
+  endif
+
+  " Make path relative first, which might not work with the result from
+  " `shorten_path`.
+  let rel_path = fnamemodify(bufname, ":.")
+  let bufname = ShortenPath(rel_path, cwd, 1)
+  " }}}
+
+  " Loop over all segments/parts, to mark symlinks.
+  " XXX: symlinks get resolved currently anyway!?
+  " NOTE: consider using another method like http://stackoverflow.com/questions/13165941/how-to-truncate-long-file-path-in-vim-powerline-statusline
+  let maxlen_of_parts = 7 " including slash/dot
+  let maxlen_of_subparts = 1 " split at hypen/underscore; including split
+
+  let s:PS = exists('+shellslash') ? (&shellslash ? '/' : '\') : "/"
+  let parts = split(bufname, '\ze['.escape(s:PS, '\').']')
+  let i = 0
+  let n = len(parts)
+  let wholepath = '' " used for symlink check
+  while i < n
+    let wholepath .= parts[i]
+    " Shorten part, if necessary:
+    " TODO: use pathshorten(fnamemodify(path, ':~')) as fallback?!
+    if i < n-1 && len(bufname) > maxlen && len(parts[i]) > maxlen_of_parts
+      " Let's see if there are dots or hyphens to truncate at, e.g.
+      " 'vim-pkg-debian' => 'v-p-d…'
+      let w = split(parts[i], '\ze[_-]')
+      if len(w) > 1
+        let parts[i] = ''
+        for j in w
+          if len(j) > maxlen_of_subparts-1
+            let parts[i] .= j[0:max([maxlen_of_subparts-2, 1])]  "."…"
+          else
+            let parts[i] .= j
+          endif
+        endfor
+      else
+        let parts[i] = parts[i][0:max([maxlen_of_parts-2, 1])].'…'
+      endif
+    endif
+    let i += 1
+  endwhile
+  let r = join(parts, '')
+  if len(r) > maxlen
+    " echom len(r) maxlen
+    let i = 0
+    let n -= 1
+    while i < n && len(join(parts, '')) > maxlen
+      if i > 0 || parts[i][0] != '~'
+        let j = 0
+        let parts[i] = matchstr(parts[i], '.\{-}\w')
+        " if i == 0 && parts[i][0] != '/'
+        "   let parts[i] = parts[i][0]
+        " else
+        "   let parts[i] = matchstr(parts[i], 1)
+        " endif
+      endif
+      let i += 1
+    endwhile
+    let r = join(parts, '')
+  endif
+  let g:_cache_shorten_filename[cache_key] = r
+  " echom "ShortenFilename" r
+  return r
 endfunction "}}}
 
 " Shorten filename, and append suffix(es), e.g. for modified buffers. {{{2
 fun! ShortenFilenameWithSuffix(...)
-let r = call('ShortenFilename', a:000)
-if &modified
-  let r .= ',+'
-endif
-return r
+  let r = call('ShortenFilename', a:000)
+  if &modified
+    let r .= ',+'
+  endif
+  return r
 endfun
 " }}}
 
-" Setup custom "file" part for airline, using a buffer-local var for caching
-" it (ref: https://github.com/bling/vim-airline/issues/658#issuecomment-64650886). {{{
-if &rtp =~ '\<airline\>'
-" NOTE: does not work after writing with vim-gnupg (uses BufWriteCmd?!)
-fun! s:my_airline_clear_cache_file()
-  if exists('b:my_airline_file_cache')
-        \ && (!exists('b:my_airline_file_cache_key')
-        \    || b:my_airline_file_cache_key != bufname('%').&modified.&ft)
-    let b:my_airline_file_cache_key = bufname('%').&modified.&ft
-    unlet! b:my_airline_file_cache
-  endif
-endfun
-augroup vimrc_airline
-  au!
-  " Invalidate cache on certain events.  TextChanged* might not exist in older Vim.
-  let s:autocmd = 'BufWritePost,BufEnter,CursorHold,InsertLeave,FileChangedShellPost'
-  if exists('##TextChanged')
-    let s:autocmd .= ",TextChanged,TextChangedI"
-  endif
-  exec 'au' s:autocmd '* call s:my_airline_clear_cache_file()'
-augroup END
-fun! ShortenFilenameForAirline()
-  if exists('b:my_airline_file_cache')
-    return b:my_airline_file_cache
-  endif
-  let b:my_airline_file_cache = ShortenFilenameWithSuffix()
-  return b:my_airline_file_cache
-endfun
-call airline#parts#define_function('file', 'ShortenFilenameForAirline')
-endif
-" }}}
-
-"}}}
-
-
-" (gui)tablabel {{{
-function! GuiTabLabel()
-let label = ''
-let bufnrlist = tabpagebuflist(v:lnum)
-
-let label .= tabpagenr().':'
-
-" Add '+' if one of the buffers in the tab page is modified
-for bufnr in bufnrlist
-  if getbufvar(bufnr, "&modified")
-    let label .= '+'
-    break
-  endif
-endfor
-
-" Append the buffer name
-" let label .= fnamemodify(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), ':~:.')
-let label .= ShortenFilename(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]), 20)
-
-" Append the number of windows in the tab page if more than one
-let wincount = tabpagewinnr(v:lnum, '$')
-if wincount > 1
-  let label .= ' ('.wincount.')'
-endif
-return label
-endfunction
-set guitablabel=%{GuiTabLabel()}
-" }}}
 
 " Opens an edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>e
@@ -2428,10 +2529,6 @@ set wildmode=list:longest,list:full
 " NOTE: gets handled dynamically via cursorcross plugin.
 " set cursorline
 " highlight CursorLine guibg=lightblue ctermbg=lightgray
-
-" Make the current status line stand out, e.g. with xoria256 (using the
-" PreProc colors from there)
-" hi StatusLine      ctermfg=150 guifg=#afdf87
 
 " via http://www.reddit.com/r/programming/comments/7yk4i/vim_settings_per_directory/c07rk9d
 " :au! BufRead,BufNewFile *path/to/project/*.* setlocal noet

@@ -1927,73 +1927,6 @@ function! ShortenFilename(...)  " {{{
       endif
     end
 
-    if bufname =~# '^fugitive:///'
-      let [gitdir, fug_path] = split(bufname, '//')[1:2]
-
-      " Caching based on bufname and timestamp of gitdir.
-      let git_ftime = getftime(gitdir)
-      if exists('g:_cache_shorten_filename_git[bufname]')
-            \ && g:_cache_shorten_filename_git[bufname][0] == git_ftime
-        let [commit_name, fug_type, fug_path]
-              \ = g:_cache_shorten_filename_git[bufname][1:-1]
-      else
-        let fug_buffer = fugitive#buffer(bufname)
-        let fug_type = fug_buffer.type()
-
-        " if fug_path =~# '^\x\{7,40\}\>'
-        let commit = matchstr(fug_path, '\v\w*')
-        if len(commit) > 1
-          let git_argv = ['git', '--git-dir='.gitdir]
-          let commit = systemlist(git_argv + ['rev-parse', '--short', commit])[0]
-          let commit_name = systemlist(git_argv + ['name-rev', '--name-only', commit])[0]
-          if commit_name !=# 'undefined'
-            " Remove current branch name (master~4 => ~4).
-            let HEAD = get(systemlist(git_argv + ['symbolic-ref', '--quiet', '--short', 'HEAD']), 0, '')
-            let len_HEAD = len(HEAD)
-            if len_HEAD > len(commit_name) && commit_name[0:len_HEAD-1] == HEAD
-              let commit_name = commit_name[len_HEAD:-1]
-            endif
-            " let commit .= '('.commit_name.')'
-            let commit_name .= '('.commit.')'
-          else
-            let commit_name = commit
-          endif
-        else
-          let commit_name = commit
-        endif
-        " endif
-
-        if fug_type !=# 'commit'
-          let fug_path = substitute(fug_path, '\v\w*/', '', '')
-          if len(fug_path)
-            let fug_path = ShortenFilename(fug_buffer.repo().tree(fug_path))
-          endif
-        else
-          let fug_path = 'NOT_USED'
-        endif
-
-        " Set cache.
-        let g:_cache_shorten_filename_git[bufname]
-              \ = [git_ftime, commit_name, fug_type, fug_path]
-      endif
-
-      if fug_type ==# 'blob'
-        return 'λ:' . commit_name . ':' . fug_path
-      elseif fug_type ==# 'file'
-        return 'λ:' . fug_path . '@' . commit_name
-      elseif fug_type ==# 'commit'
-      " elseif fug_path =~# '^\x\{7,40\}\>'
-        let work_tree = fugitive#buffer(bufname).repo().tree()
-        if cwd[0:len(work_tree)-1] == work_tree
-          let rel_work_tree = ''
-        else
-          let rel_work_tree = ShortenPath(fnamemodify(work_tree.'/', ':.'))
-        endif
-        return 'λ:' . rel_work_tree . '@' . commit_name
-      endif
-      throw "fug_type: ".fug_type." not handled: ".fug_path
-    endif
-
     if ft ==# 'help'
       return '[?] '.fnamemodify(bufname, ':t')
     endif
@@ -2006,6 +1939,74 @@ function! ShortenFilename(...)  " {{{
     endif
   endif
   " }}}
+
+  " {{{ fugitive
+  if bufname =~# '^fugitive:///'
+    let [gitdir, fug_path] = split(bufname, '//')[1:2]
+
+    " Caching based on bufname and timestamp of gitdir.
+    let git_ftime = getftime(gitdir)
+    if exists('g:_cache_shorten_filename_git[bufname]')
+          \ && g:_cache_shorten_filename_git[bufname][0] == git_ftime
+      let [commit_name, fug_type, fug_path]
+            \ = g:_cache_shorten_filename_git[bufname][1:-1]
+    else
+      let fug_buffer = fugitive#buffer(bufname)
+      let fug_type = fug_buffer.type()
+
+      " if fug_path =~# '^\x\{7,40\}\>'
+      let commit = matchstr(fug_path, '\v\w*')
+      if len(commit) > 1
+        let git_argv = ['git', '--git-dir='.gitdir]
+        let commit = systemlist(git_argv + ['rev-parse', '--short', commit])[0]
+        let commit_name = systemlist(git_argv + ['name-rev', '--name-only', commit])[0]
+        if commit_name !=# 'undefined'
+          " Remove current branch name (master~4 => ~4).
+          let HEAD = get(systemlist(git_argv + ['symbolic-ref', '--quiet', '--short', 'HEAD']), 0, '')
+          let len_HEAD = len(HEAD)
+          if len_HEAD > len(commit_name) && commit_name[0:len_HEAD-1] == HEAD
+            let commit_name = commit_name[len_HEAD:-1]
+          endif
+          " let commit .= '('.commit_name.')'
+          let commit_name .= '('.commit.')'
+        else
+          let commit_name = commit
+        endif
+      else
+        let commit_name = commit
+      endif
+      " endif
+
+      if fug_type !=# 'commit'
+        let fug_path = substitute(fug_path, '\v\w*/', '', '')
+        if len(fug_path)
+          let fug_path = ShortenFilename(fug_buffer.repo().tree(fug_path))
+        endif
+      else
+        let fug_path = 'NOT_USED'
+      endif
+
+      " Set cache.
+      let g:_cache_shorten_filename_git[bufname]
+            \ = [git_ftime, commit_name, fug_type, fug_path]
+    endif
+
+    if fug_type ==# 'blob'
+      return 'λ:' . commit_name . ':' . fug_path
+    elseif fug_type ==# 'file'
+      return 'λ:' . fug_path . '@' . commit_name
+    elseif fug_type ==# 'commit'
+    " elseif fug_path =~# '^\x\{7,40\}\>'
+      let work_tree = fugitive#buffer(bufname).repo().tree()
+      if cwd[0:len(work_tree)-1] == work_tree
+        let rel_work_tree = ''
+      else
+        let rel_work_tree = ShortenPath(fnamemodify(work_tree.'/', ':.'))
+      endif
+      return 'λ:' . rel_work_tree . '@' . commit_name
+    endif
+    throw "fug_type: ".fug_type." not handled: ".fug_path
+  endif " }}}
 
   " Check for cache (avoiding fnamemodify): {{{
   let cache_key = bufname.'::'.cwd.'::'.maxlen

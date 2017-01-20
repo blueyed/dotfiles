@@ -2301,6 +2301,30 @@ let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 'x', 'X', 'y', 'Y']
 call yankstack#setup()
 endif
 
+" Command-line maps to act on the current search (with incsearch). {{{
+" E.g. '?foo$m' will move the matched line to where search started.
+" Source: http://www.reddit.com/r/vim/comments/1yfzg2/does_anyone_actually_use_easymotion/cfkaxw5
+" NOTE: with vim-oblique, '?' and '/' are mapped, and not in getcmdtype().
+fun! MyCmdMapNotForColon(from, to, ...)
+  let init = a:0 ? 0 : 1
+  if init
+    exec printf('cnoremap <expr> %s MyCmdMapNotForColon("%s", "%s", 1)',
+          \ a:from, a:from, a:to)
+    return
+  endif
+  if index([':', '>', '@', '-', '='], getcmdtype()) == 0
+    return a:from
+  endif
+  return a:to
+endfun
+call MyCmdMapNotForColon('$d', "<CR>:delete<CR>``")
+call MyCmdMapNotForColon('$m', "<CR>:move''<CR>")
+call MyCmdMapNotForColon('$c', "<CR>:copy''<CR>")
+call MyCmdMapNotForColon('$t', "<CR>:t''<CR>")  " synonym for :copy
+" Allow to quickly enter a single $.
+cnoremap $$ $
+" }}}
+
 
 " sneak {{{1
 " Overwrite yankstack with sneak maps.

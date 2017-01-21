@@ -101,8 +101,6 @@
 	untracked = cyan
 
 [core]
-	attributesfile = ~/.gitattributes.global
-	excludesfile = ~/.gitignore.global
 	# See also GIT_EDITOR.
 	editor = vim
 	# use default..

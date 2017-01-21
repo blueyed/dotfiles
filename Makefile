@@ -5,7 +5,7 @@ DEBUG=
 VERBOSE=1
 
 INSTALL_FILES := ackrc agignore aptitude/config ctags \
-	$(wildcard fonts/*) gemrc gitconfig gitattributes.global gitignore.global \
+	$(wildcard fonts/*) gemrc \
 	hgrc irbrc oh-my-zsh pdbrc pentadactyl \
 	pentadactylrc profile railsrc \
 	screenrc screenrc.common subversion/servers \
@@ -29,7 +29,7 @@ install_files: install_files_before_sm install_files_after_sm
 install: install_files_before_sm init_submodules install_files_after_sm
 
 # Migrate existing dotfiles setup
-migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.1 .stamps/submodules_rm.25
+migrate: .stamps .stamps/migrate_byobu.2 .stamps/dangling.2 .stamps/submodules_rm.25
 migrate: .stamps/neobundle.1
 migrate: .stamps/remove-byobu
 migrate: .stamps/remove-autojump
@@ -51,10 +51,21 @@ check_removed_files:
 	$(RM) ~/.byobu/keybindings ~/.byobu/profile ~/.byobu/profile.tmux ~/.byobu/status ~/.byobu/statusrc
 	$(RM) .stamps/migrate_byobu.*
 	touch $@
-.stamps/dangling.1:
-	for i in ~/.byobu ~/.byoburc ~/.sh ~/.bin ~/.vimperator ~/.vimperatorrc ~/.gitignore ; do \
-		test -h "$$i" && { test -e "$$i" || $(RM) "$$i" ; } || true ; \
-	done
+.stamps/dangling.2:
+	@echo "== Checking dangling/moved symlinks =="; \
+	  for f in ~/.byobu ~/.byoburc ~/.sh ~/.bin ~/.gitignore \
+	      ~/.gitattributes.global ~/.gitconfig ~/.gitignore.global; do \
+	    if [ -h "$$f" ]; then \
+	      if [ -e "$$f" ]; then \
+	        echo "Expected $$f to be a dangling symlink now.  Skipping."; \
+	      else \
+	        echo "Removing old symlink: $$f"; \
+	        $(RM) "$$f"; \
+	      fi \
+	    elif [ -f "$$f" ]; then \
+	      echo "Found old $$f, but it is not a symlink.  Please handle it manually."; \
+	    fi \
+	  done
 	touch $@
 .stamps/submodules_rm.25:
 	rm_bundles="vim/bundle/DBGp-Remote-Debugger-Interface vim/bundle/dbext vim/bundle/xdebug vim/bundle/taglist vim/bundle/autocomplpop vim/bundle/tplugin vim/bundle/powerline vim/bundle/snipmate-snippets vim/bundle/autoclose vim/bundle/zoomwin vim/bundle/snippets vim/bundle/outlook lib/git-meld vim/bundle/powerline-vim vim/bundle/occur vim/vendor/UltiSnips vim/bundle/colorscheme-gruvbox config/awesome/awpomodoro vim/bundle/isort vim/bundle/targets lib/legit lib/base16/base16-gnome-terminal lib/vimpager lib/powerline lib/sack lib/docker-zsh-completion"; \

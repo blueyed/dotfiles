@@ -6,7 +6,7 @@ VERBOSE=1
 
 INSTALL_FILES := ackrc agignore aptitude/config ctags \
 	$(wildcard fonts/*) gemrc \
-	hgrc irbrc oh-my-zsh pdbrc pentadactyl \
+	hgrc irbrc ignore oh-my-zsh pdbrc pentadactyl \
 	pentadactylrc profile railsrc \
 	screenrc screenrc.common subversion/servers \
 	terminfo tigrc tmux.conf vim vimrc Xresources \

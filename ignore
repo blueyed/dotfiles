@@ -1,0 +1,19 @@
+# Global ignore file for `ag` (/usr/local/src/the_silver_searcher/)
+# cache/
+# media/
+# asset/
+tags
+build/
+# node_modules
+
+# ag looks at those by default (maybe only to find out that they are binary, but still..!)
+*.gif
+*.jpg
+*.png
+
+*.min.css
+
+# IPython notebooks
+*.ipynb
+
+CMakeFiles/

@@ -9,7 +9,7 @@ for p in $(pgrep -x awesome); do
   if grep -q "^DISPLAY=$DISPLAY$" "/proc/$p/environ"; then
     echo "Found pid $p for DISPLAY=$DISPLAY."
     if [ -n "$awesome_pid" ]; then
-      echo "ERROR: found multiple pids!? ($awesome_pid, $p) - Aborting."
+      echo "ERROR: found multiple pids!? ($awesome_pid, $p) - aborting." >&2
       exit 1
     fi
     awesome_pid=$p
@@ -30,8 +30,10 @@ session_pid=$(ps -o ppid= "$awesome_pid")
 kill -USR1 "$session_pid"
 
 # Write args to a file that is read by ~/.dotfiles/usr/bin/session-run-awesome.sh.
+# This allows to use another config temporarily, e.g.:
+#   awesome-restart -c ~/src/awesome/awesomerc.lua
 args_file="/var/run/user/$(id -u)/awesome-restart-args"
-echo "$@" > $args_file
+echo "$@" > "$args_file"
 
 # echo "Sending TERM to awesome: pid=${awesome_pid}."
 kill -TERM "$awesome_pid"

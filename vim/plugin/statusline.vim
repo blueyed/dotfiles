@@ -418,7 +418,10 @@ function! MyStatusLine(winnr, active)
   " Current or next/prev conflict markers.
   let conflict_status = ''
   if show_file_info
-    if getbufvar(bufnr, 'stl_display_conflict', s:display_conflict_default())
+    if getbufvar(bufnr, 'stl_display_conflict', -1) == -1
+      call setbufvar(bufnr, 'stl_display_conflict', s:display_conflict_default())
+    endif
+    if getbufvar(bufnr, 'stl_display_conflict')
       let info = StatuslineGetConflictInfo()
       if len(info) && len(info.text)
         let text = info.text
@@ -982,14 +985,23 @@ function! StatuslineNeomakeCounts(bufnr, ...)
   return empty
 endfunction
 
-let s:neomake_stl_cache = [[-1, -1, -1], '']
+let s:neomake_stl_cache = {}
 function! StatuslineNeomakeStatus(bufnr, ...)
-  let cache_key = [a:bufnr, neomake#GetStatus().last_make_id, len(neomake#GetJobs())]
-  if s:neomake_stl_cache[0] == cache_key
-    return s:neomake_stl_cache[1]
+  let jobs = neomake#GetJobs()
+  let cache_key = [neomake#GetStatus().last_make_id, len(jobs)]
+  let cached = get(s:neomake_stl_cache, a:bufnr, [[-1, -1], ''])
+  if cached[0] == cache_key
+    return cached[1]
   endif
 
-  let running = StatuslineNeomakeStatusRunning(a:bufnr, a:0 ? a:1 : '…')
+  let running = ''
+  for j in jobs
+    if j.bufnr == a:bufnr
+      let running = a:0 ? a:1 : '…'
+      break
+    endif
+  endfor
+
   if running !=# ''
     let r = running
   else
@@ -1008,15 +1020,8 @@ function! StatuslineNeomakeStatus(bufnr, ...)
       endif
     endif
   endif
-  let s:neomake_stl_cache = [cache_key, r]
+  let s:neomake_stl_cache[a:bufnr] = [cache_key, r]
   return r
-endfunction
-
-function! StatuslineNeomakeStatusRunning(bufnr, ...)
-  if len(filter(copy(neomake#GetJobs()), 'v:val.bufnr == a:bufnr'))
-    return a:0 ? a:1 : '…'
-  endif
-  return ''
 endfunction
 
 function! StatuslineNeomakeStatusGood(bufnr, ...)

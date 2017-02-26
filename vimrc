@@ -3957,7 +3957,9 @@ execute "set <F12>=\e[24;*~"
 " Change cursor shape for terminal mode. {{{1
 " See also ~/.dotfiles/oh-my-zsh/themes/blueyed.zsh-theme.
 " Note: with neovim, this gets controlled via $NVIM_TUI_ENABLE_CURSOR_SHAPE.
-if !has('nvim') && exists('&t_SI')
+if has('nvim')
+  let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
+elseif exists('&t_SI')
   " 'start insert' and 'exit insert'.
   if $_USE_XTERM_CURSOR_CODES == 1
     " Reference: {{{

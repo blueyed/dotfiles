@@ -3,16 +3,19 @@
 # logfile containing any highlights.
 # For any new highlights/mentions a notification gets displayed (locally).
 
-DAEMON_RELAY=/run/user/$UID/weechat.relay
-LOCKFILE_CLIENT=/run/user/$UID/weechat.client$DISPLAY.lock
-LOCKFILE_DAEMON=/run/user/$UID/weechat.daemon.lock
+set -x
+
+uid="$(id -u)"
+DAEMON_RELAY="/run/user/$uid/weechat.relay"
+LOCKFILE_CLIENT="/run/user/$uid/weechat.client$DISPLAY.lock"
+LOCKFILE_DAEMON="/run/user/$uid/weechat.daemon.lock"
 
 log() {
-  echo "[$$/$DISPLAY/${FLOCKER##*-}] $(date +'%FT%T') $@"
+  echo "[$$/$DISPLAY/${FLOCKER##*-}] $(date +'%FT%T') $*"
 }
 
 # Wrap with flock (for daemon).
-mkdir -p "$(dirname $LOCKFILE_DAEMON)"
+mkdir -p "$(dirname "$LOCKFILE_DAEMON")"
 if [ -z "${FLOCKER}" ]; then
   log "Ensure that daemon is running.."
   env FLOCKER="${0}-daemon" flock -n -E 23 "$LOCKFILE_DAEMON" "$0" "$@" &
@@ -20,7 +23,7 @@ if [ -z "${FLOCKER}" ]; then
   env FLOCKER="${0}-client" flock -n -E 23 "$LOCKFILE_CLIENT" "$0" "$@"
   ret=$?
   if [ "$ret" = 23 ]; then
-    log "Client already running!"
+    log "Client already running: $LOCKFILE_CLIENT!"
   fi
   exit $ret
 fi
@@ -33,18 +36,20 @@ if [ "${FLOCKER%-daemon}" != "$FLOCKER" ]; then  # {{{1
   internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
   ssh_extra_config="$(dotfiles-decrypt 'U2FsdGVkX1/b6mo1MxltGbfTDs1xWhXRZEoLa/yx3iI2MaanXf0aKkwrGa0epC8ybDgU03Qc4JjXHz/6Q4U/ZA==')"  # remote port forwarding etc
 
-  # -o ExitOnForwardFailure=yes: Make autossh aware of port-forwarding failures, requires AUTOSSH_GATETIME=0.
-  # -o BatchMode=yes is required for ssh to not ask for a password (via tty).
-  ssh_extra_config="$ssh_extra_config -o ExitOnForwardFailure=yes -o IdentitiesOnly=yes -o BatchMode=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=2"
-
   # NOTE: sleep in 1 second steps to allow the process to be killed (via trap) when logging out.
   # This is required for it to be restarted anew on re-login for the new gnome-keyring-daemon.
   my_sleep() {
+    set +x
     log "Sleeping for $1 seconds.."
-    i=$(expr $1 + 1)
-    while i=$(expr $i - 1); do
+    i="$1"
+    while true; do
+      i="$((i - 1))"
+      if [ "$i" -eq 0 ]; then
+        break
+      fi
       sleep 1
     done
+    set -x
   }
 
   # Test for network.
@@ -59,22 +64,39 @@ if [ "${FLOCKER%-daemon}" != "$FLOCKER" ]; then  # {{{1
   tail_cmd="tail -n0 -F .weechat/logs/$(date +%Y)/perl.strmon.weechatlog"
   # '-t'/'-tt' was required for ssh killing its child process.
   # Not anymore with cat-trick (http://unix.stackexchange.com/questions/40023/get-ssh-to-forward-signals/196657#196657).
-  call_cmd="ssh $ssh_extra_config $userhost -- ssh $internalhost '$tail_cmd < <(cat; kill -INT 0)' <&1"
+  # But does not work (instantly at least) on lost network connection.
+  # TODO: re-add the killing of any existing port forwarding?!
+  # -o ExitOnForwardFailure=yes: Make autossh aware of port-forwarding failures, requires AUTOSSH_GATETIME=0.
+  # -o BatchMode=yes is required for ssh to not ask for a password (via tty).
+  # shellcheck disable=SC2089
+  call_cmd="ssh -o ExitOnForwardFailure=yes -o IdentitiesOnly=yes \
+    -o ControlMaster=no \
+    -o BatchMode=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=2 \
+    $ssh_extra_config  $userhost -- ssh $internalhost \
+    '$tail_cmd < <(cat; kill -INT 0)' <&1"
 
-  trap "pkill -TERM -P $$" 0
+  trap 'pkill -TERM -P $$' EXIT
 
+  max_sleep_failure=60
+  last_sleep_after_failure=0
   sleep_failure=5
-  max_sleep_failure=120
   while true ; do
     log "Running: $call_cmd"
-    $call_cmd > $DAEMON_RELAY
+    # shellcheck disable=SC2089,SC2090
+    $call_cmd > "$DAEMON_RELAY"
 
+    now="$(date +%s)"
+    if [ "$now" -lt "$((last_sleep_after_failure + 10))" ]; then
+      sleep_failure=$(( (sleep_failure+1) * 12 / 10 ))
+      if [ "$sleep_failure" -gt "$max_sleep_failure" ]; then
+        sleep_failure=$max_sleep_failure
+      fi
+    else
+      sleep_failure=5
+    fi
     log "Sleeping $sleep_failure seconds after read/ssh failure..."
     my_sleep $sleep_failure
-    sleep_failure=$(( (sleep_failure+1) * 12 / 10 ))
-    if (( sleep_failure > max_sleep_failure )); then
-      sleep_failure=$max_sleep_failure
-    fi
+    last_sleep_after_failure="$(date +%s)"
   done
 
 elif [ "${FLOCKER%-client}" != "$FLOCKER" ]; then  # {{{1
@@ -94,9 +116,10 @@ elif [ "${FLOCKER%-client}" != "$FLOCKER" ]; then  # {{{1
   if [ -z "$DISPLAY" ]; then
     # Grab the display and xauthority cookie.
     w=$(w -h -s | grep ':[0-9]\W' | head -1 | tr -s ' ')
-    export DISPLAY="$(echo $w | cut -d\  -f2)"
-    X_USER="$(echo $w | cut -d\  -f1)"
-    export XAUTHORITY="/home/$X_USER/.Xauthority"
+    DISPLAY="$(echo "$w" | cut -d\  -f2)"
+    X_USER="$(echo "$w" | cut -d\  -f1)"
+    XAUTHORITY="/home/$X_USER/.Xauthority"
+    export DISPLAY XAUTHORITY
   fi
   if [ -z "$DISPLAY" ]; then
     log "No DISPLAY available.  Aborting." >&2
@@ -105,13 +128,13 @@ elif [ "${FLOCKER%-client}" != "$FLOCKER" ]; then  # {{{1
 
   log "Watching/tailing $DAEMON_RELAY.."
   ts_last_read=0
-  tail -n0 -F $DAEMON_RELAY | while read date time number channel nick delim message; do
+  tail -n0 -F "$DAEMON_RELAY" | while read -r date time number channel nick delim message; do
     # sed -u 's/[<@&]//g' | \
 
     # Ignore Twitter rebooting its service, which would re-display the last X
     # Twitter highlights again.
     ts_this_read=$(date +%s)
-    if (( ts_this_read - ts_last_read <= 5 )); then
+    if [ $(( ts_this_read - ts_last_read )) -le 5 ]; then
       if [ "$channel" = "bitlbee.#twitter_blueyed" ]; then
         notify-send "weechat-notify: ignoring twitter reboot"
         continue
@@ -131,7 +154,7 @@ elif [ "${FLOCKER%-client}" != "$FLOCKER" ]; then  # {{{1
     # TODO: check for focused wchat window?!
     tty="$(sed 's/^tty//' /sys/class/tty/tty0/active)"
     if [ ":$tty" = "$DISPLAY" ]; then
-      if [[ -n "$sound_message" ]] && (( ts_this_read - ts_last_read > 5 )); then
+      if [ -n "$sound_message" ] && [ $((ts_this_read - ts_last_read)) -gt 5 ]; then
         if command -v play >/dev/null 2>&1 ; then
           log "Playing sound: $sound_message"
           # NOTE: amplified 5x to be hearable with music playing.

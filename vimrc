@@ -1056,7 +1056,7 @@ let g:syntastic_aggregate_errors = 0
 let g:syntastic_python_checkers = ['python', 'frosted', 'flake8', 'pep8']
 
 " let g:syntastic_php_checkers = ['php']
-let g:syntastic_loc_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
+let g:syntastic_loc_list_height = 1 " handled via qf-resize autocommand
 
 " See 'syntastic_quiet_messages' and 'syntastic_<filetype>_<checker>_quiet_messages'
 " let g:syntastic_quiet_messages = {
@@ -1113,7 +1113,7 @@ command! SyntasticDisableToggle call SyntasticDisableToggle()
 
 " Neomake {{{
 let g:neomake_open_list = 2
-let g:neomake_list_height = 1 " handled via qf autocommand: AdjustWindowHeight
+let g:neomake_list_height = 1 " handled via qf-resize autocommand
 
 " let g:neomake_serialize = 1
 " let g:neomake_serialize_abort_on_error = 1
@@ -2463,7 +2463,7 @@ augroup END
 
 fun! MyOnVimResized()
   noautocmd WindoNodelay call MyAutoSetNumberSettings()
-  call AdjustWindowHeights()
+  QfResizeWindows
 endfun
 nnoremap <silent> <c-w>= :wincmd =<cr>:call MyOnVimResized()<cr>
 
@@ -3137,129 +3137,6 @@ augroup vimrc_user
   endfor
 augroup END
 
-" Adjust height of quickfix windows automatically. {{{2
-" Based on http://vim.wikia.com/wiki/Automatically_fitting_a_quickfix_window_height
-" It is required to process all windows with vim-test/dispatch-neovim etc.
-augroup AdjustWindowHeight
-  au!
-  au User MyAfterWinClose call AdjustWindowHeights()
-  au FileType qf call AdjustWindowHeights()
-  au VimResized * call AdjustWindowHeights('VimResized')
-augroup END
-function! AdjustWindowHeights(...)
-  let event = a:0 ? a:1 : 'custom'
-  if has('vim_starting')
-    return
-  endif
-
-  let windows = []
-  for w in reverse(range(1, winnr('$')))
-    if getwinvar(w, '&ft') == 'qf'
-      let windows += [w]
-    endif
-  endfor
-
-  if !len(windows)
-    return
-  endif
-
-  let orig_winnr = winnr()
-  let orig_prev_winnr = winnr('#')
-  for w in windows
-    if &verbose
-      unsilent echom "Calling AdjustWindowHeight for" event "event, height:" winheight(w)
-    endif
-    noautocmd call AdjustWindowHeight(w)
-  endfor
-  " Go back to current window, restoring "wincmd p" functionality.
-  exe 'noautocmd' orig_prev_winnr 'wincmd w'
-  exe 'noautocmd' orig_winnr 'wincmd w'
-endfunction
-
-function! AdjustWindowHeight(...) abort
-  let winnr = get(a:000, 0, winnr())
-  let cur_height = winheight(winnr)
-
-  " Save (and restore) current window when no window was passed explicitly.
-  " (otherwise this is expected to be handled in the outer scope)
-  if !a:0
-    let orig_winnr = winnr
-    let orig_prev_winnr = winnr('#')
-  endif
-  if winnr != winnr()
-    exe 'noautocmd' winnr 'wincmd w'
-  endif
-
-  let window_above = 0
-  let minheight = 1
-  " Get max height based on height of non-qf window above.
-  while 1
-    let w = winnr()
-    noautocmd wincmd k
-    if w == winnr()
-      " No non-qf window found.
-      let maxheight = minheight
-      break
-    elseif &ft != 'qf'
-      let window_above = winnr()
-      let maxheight = min([10, float2nr(round((winheight(window_above)+winheight(winnr))/7.0))])
-      break
-    endif
-  endwhile
-  if winnr() != winnr
-    exe 'noautocmd' winnr 'wincmd w'
-  endif
-
-  let buf = winbufnr(winnr)
-  let lines = len(getbufline(buf, 1, '$'))  " TODO: https://github.com/vim/vim/issues/741
-  let newheight = max([min([lines, maxheight]), minheight])
-  let diff = newheight - cur_height
-  if diff == 0
-    if &verbose | echom "No diff" | endif
-  else
-    " Special handling for if there are windows below.
-    " (For example from "belowright copen")
-    " The size adjustment should be carried out to the windows above.
-    let windows_below = []
-    let w = winnr
-    while 1
-      noautocmd wincmd j
-      if w == winnr()
-        break
-      endif
-      let w = winnr()
-      if ! &winfixheight
-        let windows_below += [w]
-      endif
-    endwhile
-    if &verbose
-      echom "AdjustWindowHeight: windows_below" string(windows_below) "ft" &ft
-    endif
-
-    let has_window_abovebelow = len(windows_below) || window_above
-
-    if has_window_abovebelow
-      if window_above
-        exe window_above 'resize' (winheight(window_above) - diff)
-      endif
-
-      " Set height of window.
-      exe winnr 'resize' newheight
-
-      " " Unlock height of windows below.
-      " for w in windows_below
-      "   call setwinvar(w, '&winfixheight', 0)
-      " endfor
-    endif
-  endif
-
-  if get(l:, 'orig_winnr', 0)
-    " Go back to current window, restoring "wincmd p" functionality.
-    exe 'noautocmd' orig_prev_winnr 'wincmd w'
-    exe 'noautocmd' orig_winnr 'wincmd w'
-  endif
-endfunction
-" 2}}}
 endif " 1}}} eval guard
 
 " Mappings {{{1

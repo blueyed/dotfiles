@@ -611,6 +611,9 @@ set guioptions-=a  " do not mess with X selection when visual selecting text.
 set guioptions+=A  " make modeless selections available in the X clipboard.
 set guioptions+=c  " Use console dialogs instead of popup dialogs for simple choices.
 
+set guicursor&  " explicitly enable it for rxvt-unicode (not in Nvim's os_term_is_nice).
+set guicursor=a:blinkon0  " disable cursor blinking.
+
 set viminfo+=% " remember opened files and restore on no-args start (poor man's crash recovery)
 set viminfo+=! " keep global uppercase variables. Used by localvimrc.
 

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+VIM_BIN=nvim vim-profile "$@"

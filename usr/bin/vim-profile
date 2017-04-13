@@ -1,0 +1,13 @@
+#!/bin/sh
+
+: "${VIM_BIN:=vim}"
+
+logprofile=/tmp/${VIM_BIN}-profile.$$.log
+startuplog=/tmp/${VIM_BIN}-startup.$$.log
+
+$VIM_BIN --cmd "let g:profile='$logprofile'" --startuptime "$startuplog" "$@"
+
+echo "Logs: $startuplog $logprofile"
+
+# -+X: force smcup/rmcup (2nd screen).
+less -+X "$logprofile" "$startuplog"

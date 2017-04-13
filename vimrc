@@ -3742,7 +3742,7 @@ if has('autocmd')
           \ |   set nomodifiable readonly
           \ | endif
 
-    " Vim help files: modidiable (easier to edit for typo fixes); buflisted
+    " Vim help files: modifiable (easier to edit for typo fixes); buflisted
     " for easier switching to them.
     au FileType help setl modifiable buflisted
   augroup END

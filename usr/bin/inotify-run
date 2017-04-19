@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Wrapper around inotifywait for easier usage.
+
+usage() {
+  echo "$0 <dirs-or-files-to-watch> <cmd>.."
+}
+
+watch="$1"
+shift
+echo "Watching: $watch"
+
+title() {
+  printf '\e]1;%s\a' "$*"
+  printf '\e]2;%s\a' "$*"
+}
+
+# Recursively kill childs - required to get out of a running pdb.
+kill_with_childs() {
+  for p in $(pgrep -P "$1"); do
+    kill_with_childs "$p"
+  done
+  kill "$1"
+}
+
+pid=
+set -x
+while true; do
+  if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+    echo 'Killing previous run…'
+    kill_with_childs "$pid"
+  fi
+  title "… $*"
+
+  reset
+  ("$@" && title "✔ $*" || title "✘ $*") </dev/tty &
+  pid=$!
+
+  sleep 1
+  inotifywait -r -e close_write --exclude '/(__pycache__/|\.)' --format '%w/%f' $watch
+done

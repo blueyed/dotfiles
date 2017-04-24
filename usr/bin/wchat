@@ -7,7 +7,7 @@ export AUTOSSH_LOGFILE=/tmp/autossh-wchat.log
 # set -x
 # exec 2>/tmp/debug.log
 
-REMOTE="$(dotfiles-decrypt U2FsdGVkX1+Ov6RrOd4LbIh/x30bcWksTykyxtuDo/YiNJIHwD+qUObkQooofxJZ)"
+REMOTE="$(dotfiles-decrypt "U2FsdGVkX1/aZiTT7iSHgsp5HPUW7M/ZSkmpIN89MtrltLET+REUTA41NgiQG4I3wnYm+1A2r4sHcUdugGrhjQc9wb9j0RXq5SZwPAVf6MXnYGtifFeluf02COMQ/635")"
 if [ -z "$REMOTE" ]; then
   echo "Could not decrypt remote." >&2
   exit 1

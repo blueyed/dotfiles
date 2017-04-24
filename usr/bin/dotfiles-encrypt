@@ -33,9 +33,9 @@ fi
 
 case $basename in
   dotfiles-encrypt)
-    cmd="openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE" ;;
+    cmd="openssl enc -md sha256 -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE" ;;
   dotfiles-decrypt)
-    cmd="openssl enc -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE -d" ;;
+    cmd="openssl enc -md sha256 -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE -d" ;;
   *) echo "Unhandled basename: $basename." >&2; exit 64 ;;
 esac
 

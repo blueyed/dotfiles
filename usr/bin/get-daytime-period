@@ -51,7 +51,7 @@ fi
 
 # Try geoclue.
 if [ "$USE_GEOCLUE" = 1 ]; then
-  geoclue_period=$(timeout $GEOCLUE_TIMEOUT redshift -l geoclue -p 2>/dev/null)
+  geoclue_period=$(timeout $GEOCLUE_TIMEOUT redshift -l geoclue2 -p 2>/dev/null)
   timeout_ret=$?
   if [ "$timeout_ret" = 0 ]; then
     period=$(echo "$geoclue_period" | grep "^Period")
@@ -67,7 +67,7 @@ fi
 
 if [ -z "$period" ]; then
   # Default lat/lon when geoclue is not used.
-  DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX1/NlLsWEdS8MY8mX9OfGm1wVjRO1EvpjjIXPyxP4wrZx3EqFSIna4Gl)"
+  DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX1+9MhayyAjJUIlzNeAKcBtU+IgGZsfRRtQ=)"
 
   if [ -z "$DEFAULT_LATLON" ]; then
     echo "ERROR: $(basename $0): DEFAULT_LATLON is not defined." >&2

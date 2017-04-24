@@ -1,43 +1,47 @@
 #!/bin/sh
-export MOSH_TITLE_NOPREFIX=1
-
 export AUTOSSH_DEBUG=1
-export AUTOSSH_LOGFILE=/tmp/autossh-wchat.log
+export AUTOSSH_LOGFILE=/tmp/autossh-wchat$DISPLAY.$$.log
 
-# set -x
-# exec 2>/tmp/debug.log
+set -x
+# exec 2>$AUTOSSH_LOGFILE
 
 REMOTE="$(dotfiles-decrypt "U2FsdGVkX1/aZiTT7iSHgsp5HPUW7M/ZSkmpIN89MtrltLET+REUTA41NgiQG4I3wnYm+1A2r4sHcUdugGrhjQc9wb9j0RXq5SZwPAVf6MXnYGtifFeluf02COMQ/635")"
 if [ -z "$REMOTE" ]; then
   echo "Could not decrypt remote." >&2
   exit 1
 fi
+# shellcheck disable=SC2088
 REMOTE_CMD='~/bin/weechat'
 
-# Ask for key, if there is none in the keyring (uses ssh-askpass-gnome).
-if ! ssh-add -l > /dev/null 2>&1; then
-  ssh-add
-fi
-
-# NOTE: mosh and urxvt have problems with pasting special unicode symbols, e.g. 🐍 (<0001f40d>).
-
 # Start new instance.
+ssh="ssh -AX -tt"
 # if command -v mosh >/dev/null 2>&1; then
-# 	c="mosh --ssh='ssh -AX -tt' "$REMOTE" -- sh -c $REMOTE_CMD"
-# else
-c="ssh -AX -tt $REMOTE '$REMOTE_CMD'"
-if command -v autossh >/dev/null; then
-  # This is required to be set with Arch's / upstream(?) autossh.  Disable it for now.
-  # Debian/Ubuntu has a patch in that area, which seems to make this optional.
+#   # NOTE: mosh and urxvt have problems with pasting special unicode symbols, e.g. 🐍 (<0001f40d>).
+# 	cmd="mosh $cmd"
+if hash autossh >/dev/null; then
   export AUTOSSH_PORT=0
-  c="auto$c"
+  # ssh="auto$ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=1"
+  ssh="auto$ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=1"
 fi
-# fi
 
-# If not running in a terminal, or for TERM=dumb (with awesome's run prompt in Arch Linux).
-if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
-  urxvt -n weechat -icon /usr/share/icons/./Neu/scalable/apps/internet-group-chat.svg \
-    -e sh -c "$c"
-else
-  sh -c "$c"
+cmd="$ssh $REMOTE $REMOTE_CMD"
+
+icon=
+for i in /usr/share/icons/HighContrast/scalable/apps-extra/internet-group-chat.svg \
+  /usr/share/icons/Numix/64/categories/applications-chat.svg \
+  /usr/share/icons/Neu/scalable/apps/internet-group-chat.svg; do
+  if [ -e "$i" ]; then
+    icon=$i
+    break
+  fi
+done
+
+# If not in a terminal, or for TERM=dumb (with awesome's run prompt in Arch Linux).
+if [ "${TERM:-dumb}" = "dumb" ]; then
+  if [ -n "$icon" ]; then
+    # shellcheck disable=SC2086
+    exec urxvt -n weechat -icon "$icon" -e $cmd
+  fi
+  # shellcheck disable=SC2086
+  exec urxvt -n weechat -e $cmd
 fi

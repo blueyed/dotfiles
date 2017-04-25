@@ -7,6 +7,12 @@ set -e
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
+venv_options=
+while [ "${1#-}" != "$1" ]; do
+  venv_options="$venv_options $1"
+  shift
+done
+
 if [ -n "$1" ]; then
   pyenv_version="$1"
 else
@@ -23,10 +29,13 @@ pyenv virtualenv "${pyenv_version}" "${venv_name}"
 echo
 echo "Entering a new shell session with virtualenv '${venv_name}' (${pyenv_version})."
 echo "It will be removed when exiting (ctrl+d or 'exit')."
+echo "NOTE: to keep it just rename/move it while still in there."
 
 # export PYENV_DEBUG=1
 pyenv activate --force "$venv_name"
-$SHELL
+# NOTE: the shell will return the exit code from the last command, which might
+# have failed.
+$SHELL || true
 
 echo "Destroying temporary virtualenv '${venv_name}'."
 pyenv uninstall -f "${venv_name}"

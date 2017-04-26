@@ -24,7 +24,9 @@ kill_with_childs() {
 }
 
 pid=
+output=
 set -x
+set -e
 while true; do
   if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
     echo 'Killing previous run…'
@@ -33,9 +35,16 @@ while true; do
   title "… $*"
 
   reset
+  if [ -n "$output" ]; then
+    echo "$output"
+  fi
+  # shellcheck disable=SC2015
   ("$@" && title "✔ $*" || title "✘ $*") </dev/tty &
   pid=$!
 
   sleep 1
-  inotifywait -r -e close_write --exclude '/(__pycache__/|\.)' --format '%w/%f' $watch
+  # shellcheck disable=SC2086
+  output="$(inotifywait -r -e close_write \
+    --exclude '/(__pycache__/|\.)|.*\.neomaketmp_.*' \
+    --format '%w%f' $watch)"
 done

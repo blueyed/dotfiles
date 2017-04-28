@@ -26,5 +26,7 @@ mkdir .git/tags_lock 2>/dev/null || {
   fi
 
   export CTAGS="-L -"
-  git ls-files | "$gtags" -e ctags -t tags -p . >/dev/null
+  while IFS= read -r file; do
+    [[ -f "$file" ]] && echo "$file"
+  done < <(git ls-files) | "$gtags" -e ctags -t tags -p . >/dev/null
 ) &

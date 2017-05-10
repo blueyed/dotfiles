@@ -2397,9 +2397,9 @@ vmap P p :call setreg('"', getreg('0')) <CR>
 
 " imap <C-L> <Space>=><Space>
 
-" Toggle settings, mnemonic "set paste", "set color", ..
-" NOTE: see also unimpaired
-set pastetoggle=<leader>sp
+" Toggle settings (see also vim-unimpaired).
+" No pastetoggle: use `yo`/`yO` from unimpaired.  Triggers also Neovim issue #6716.
+" set pastetoggle=<leader>sp
 nnoremap <leader>sc :ColorToggle<cr>
 nnoremap <leader>sq :QuickfixsignsToggle<cr>
 nnoremap <leader>si :IndentGuidesToggle<cr>

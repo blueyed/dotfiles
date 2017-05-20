@@ -89,13 +89,13 @@ URxvt.iconFile: /usr/share/icons/gnome/32x32/apps/gnome-terminal.png
 
 ! Optimized for x220
 ! URxvt.font: xft:Ubuntu Mono derivative Powerline Plus Nerd File Types:size=9.14,xft:monospace,xft:Symbola
-URxvt.font: xft:Ubuntu Mono derivative Powerline Plus Nerd File Types Mono Plus Pomicons:size=8,xft:monospace,xft:Symbola
-
-URxvt*letterSpace: -1
+! Optimized for x250
+URxvt.font: xft:UbuntuMono:size=7.6,xft:DejaVu Sans Mono,xft:monospace,xft:Symbola,xft:FontAwesome,xft:UbuntuMonoDerivativePowerline Nerd Font:size=8
 
 URxvt.perl-ext-common: default,-matcher,urxvt-perls/url-select,urxvt-perls/keyboard-select,urxvt-font-size/font-size,bell-command
 
 ! font-size: https://github.com/majutsushi/urxvt-font-size
+URxvt.font-size.step: 0.5
 URxvt.keysym.C-A-plus:    perl:font-size:increase
 URxvt.keysym.C-A-minus:   perl:font-size:decrease
 URxvt.keysym.C-A-0:       perl:font-size:reset

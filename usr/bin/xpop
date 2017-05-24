@@ -15,13 +15,32 @@ windowpid="$(get-xwindow-pid "$windowid")"
 # Get interesting props from awesome-client.
 if hash awesome-client 2>/dev/null; then
   awesome_info=$(cat <<EOF |
+    local get_tag_names = function(c)
+      local names={}, t
+      for _,t in ipairs(c:tags()) do
+        table.insert(names, t.name)
+      end
+      return table.concat(names, ", ")
+    end
     for idx,c in ipairs(client.get()) do
       if c.window == $windowid then
         local r = ""
         for _,p in pairs({"class", "name", "instance", "border_width",
+          "sticky", "ontop", "screen.index", "screen.outputs", "tags",
           "type", "border_color", "urgent", "window", "floating",
-          "transient_for"}) do
-          r = r .. p .. ": " .. tostring(c[p]) .. "\n"
+          "_implicitly_floating", "maximized", "fullscreen", "fixed",
+          "transient_for", "x", "y", "height", "width"}) do
+          local v
+          if p == "tags" then
+            v = get_tag_names(c)
+          elseif p == "screen.index" then
+            v = c.screen.index
+          elseif p == "screen.outputs" then
+            v = table.concat(c.screen.outputs, ', ')
+          else
+            v = c[p]
+          end
+          r = r .. p .. ": " .. tostring(v) .. "\n"
         end
         r = r .. "client.get idx: " .. tostring(idx) .. "\n"
         return "\n" .. r .. "\n"

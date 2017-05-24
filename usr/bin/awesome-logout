@@ -6,4 +6,5 @@ if [ "$1" != '--force' ]; then
   fi
 fi
 
-echo 'awesome.quit()' | awesome-client
+# Use custom exit code to indicate ~/.dotfiles/usr/bin/session-run-awesome.sh to exit.
+echo 'awesome.quit(99)' | awesome-client

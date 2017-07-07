@@ -1118,44 +1118,42 @@ command! SyntasticDisableToggle call SyntasticDisableToggle()
 let g:neomake_open_list = 2
 let g:neomake_list_height = 1 " handled via qf-resize autocommand
 
-" let g:neomake_serialize = 1
-" let g:neomake_serialize_abort_on_error = 1
-
-" let g:neomake_vim_enabled_makers = []
+" let g:neomake_verbose = 3
+" let g:neomake_logfile = '/tmp/neomake.log'
+let g:neomake_tempfile_enabled = 1
+let g:neomake_vim_enabled_makers = ['vint']  " vimlint is slow and too picky(?).
+let g:neomake_python_enabled_makers = ['python', 'flake8']
 let g:neomake_c_enabled_makers = []
 augroup vimrc_neomake
   au!
   au BufReadPost ~/.dotfiles/vimrc let b:neomake_disabled = 1
+  au BufReadPost ~/.dotfiles/vimrc let b:neomake = extend(get(b:, 'neomake', {}), {'disabled': 1})
 augroup END
 
 " shellcheck: ignore "Can't follow non-constant source."
 let $SHELLCHECK_OPTS='-e SC1090'
 
-" let g:neomake_verbose = 3
-fun! NeomakeToggleBuffer()
-  let b:neomake_disabled = !get(b:, 'neomake_disabled')
-  echom 'Neomake:' (b:neomake_disabled ? 'disabled.' : 'enabled.')
-  if b:neomake_disabled
-    call neomake#signs#ResetFile(bufnr("%"))
-    call neomake#signs#CleanAllOldSigns('file')
-  endif
-endfun
-com! NeomakeToggleBuffer call NeomakeToggleBuffer()
 
-fun! NeomakeToggle()
-  let g:neomake_disabled = !get(g:, 'neomake_disabled')
-  echom g:neomake_disabled ? 'Disabled.' : 'Enabled.'
-endfun
-
-com! NeomakeToggle call NeomakeToggle()
-com! NeomakeDisable let g:neomake_disabled=1
-com! NeomakeDisableBuffer let b:neomake_disabled=1
-com! NeomakeEnable let g:neomake_disabled=0
-com! NeomakeEnableBuffer let b:neomake_disabled=0
 nnoremap <Leader>cc :Neomake<CR>
-" Ref: https://github.com/neomake/neomake/issues/405
-let g:neomake_check_on_wq = 0
-fun! NeomakeCheck(fname)
+
+" Setup automake (https://github.com/neomake/neomake/pull/1167).
+function! MyOnBattery()
+  return readfile('/sys/class/power_supply/AC/online') == ['0']
+endfunction
+try
+  let g:neomake = {
+        \ 'automake': {
+        \   'ignore_filetypes': ['startify'],
+        \ }}
+
+  if MyOnBattery()
+    call neomake#configure#automake('w', 500)
+  else
+    call neomake#configure#automake('nrw', 500)
+  endif
+catch
+  echom 'Neomake: failed to setup automake: '.v:exception
+function! NeomakeCheck(fname) abort
   if !get(g:, 'neomake_check_on_wq', 0) && get(w:, 'neomake_quitting_win', 0)
     return
   endif
@@ -1163,31 +1161,25 @@ fun! NeomakeCheck(fname)
     " Not invoked for the current buffer.  This happens for ':w /tmp/foo'.
     return
   endif
-  if get(b:, 'neomake_disabled', get(g:, 'neomake_disabled', 0))
+  if get(b:, 'neomake_disabled', get(t:, 'neomake_disabled', get(g:, 'neomake_disabled', 0)))
     return
   endif
 
   let s:windows_before = [tabpagenr(), winnr('$')]
-  fun! s:callback(result)
-    " { 'status': <exit status of maker>,
-    " \ 'name': <maker name>,
-    " \ 'has_next': <true if another maker follows, false otherwise> }
-    " unsilent echom "callback" string(a:result)
-    " if a:result.status != 0
-      if exists('*airline#update_statusline')
-            \ && s:windows_before != [tabpagenr(), winnr('$')]
-        " echom "UPDATE"
-        call airline#update_statusline()
-      endif
-    " endif
-  endfun
-  call neomake#Make(1, [], function('s:callback'))
+  if get(b:, '_my_neomake_checked_tick') == b:changedtick
+    return
+  endif
+  call neomake#Make(1, [])
+  let b:_my_neomake_checked_tick = b:changedtick
 endfun
 augroup neomake_check
   au!
   autocmd BufWritePost * call NeomakeCheck(expand('<afile>'))
-  autocmd QuitPre * if winnr('$') == 1 | let w:neomake_quitting_win = 1 | endif
+  if exists('##QuitPre')
+    autocmd QuitPre * if winnr('$') == 1 | let w:neomake_quitting_win = 1 | endif
+  endif
 augroup END
+endtry
 " }}}
 
 " gist-vim {{{2

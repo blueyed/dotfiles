@@ -88,7 +88,7 @@ abs_path=${p:a}
 
 # Keep relative dirs, which are not going back to below base/$PWD.
 if [[ $p = ../* ]] && [[ $abs_path != $PWD/* ]]; then
-  printf $p
+  printf %s "$p"
   return
 fi
 
@@ -118,11 +118,11 @@ if [ "$annotate" = 1 ] && [ "$path_short" != "/" ]; then
     fi
     p="$p$i"
     if [[ -h $~p ]]; then
-      printf "↬$i"
+      printf %s "↬$i"
     else
-      printf "$i"
+      printf %s "$i"
     fi
   done
 else
-  printf "$path_short"
+  printf %s "$path_short"
 fi

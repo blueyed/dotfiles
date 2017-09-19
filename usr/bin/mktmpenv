@@ -21,7 +21,8 @@ fi
 if [ -n "$2" ]; then
   venv_name="$2"
 else
-  venv_name=$(mktemp --dry-run -d "tmp-${pyenv_version}-${PWD##*/}-XXXXXX")
+  # Use -u (short for --dry-run) for compatibility (MacOS).
+  venv_name=$(mktemp -u -d "tmp-${pyenv_version}-${PWD##*/}-XXXXXX")
 fi
 
 pyenv virtualenv "${pyenv_version}" "${venv_name}"

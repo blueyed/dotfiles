@@ -400,16 +400,34 @@ function! MyStatusLine(winnr, active)
   let readonly_flag = getbufvar(bufnr, '&readonly') && ft !=# 'help' ? ' ‼' : ''
 
   " Neomake status.
-  let neomake_status_str = ''
-  if exists('*neomake#GetJobs')
-    if getbufvar(bufnr, 'neomake_disabled', 0)
-      let neomake_status_str .= ' b- '
-    elseif get(g:, 'neomake_disabled', 0)
-      let neomake_status_str .= ' g- '
+  if exists('*neomake#statusline#get')
+    let neomake_status_str = neomake#statusline#get(bufnr, {
+          \ 'format_running': '… ({{running_job_names}})',
+          \ 'format_ok': (a:active ? '%#NeomakeStatusGood#' : '%*').'✓',
+          \ 'format_quickfix_ok': '',
+          \ 'format_quickfix_issues': (a:active ? '%s' : ''),
+          \ 'format_status': '%%(%s'
+          \   .(a:active ? '%%#StatColorHi2#' : '%%*')
+          \   .'%%)',
+          \ })
+  else
+    let neomake_status_str = ''
+    if exists('*neomake#GetJobs')
+      if exists('*neomake#config#get_with_source')
+        " TODO: optimize! gets called often!
+        let [disabled, source] = neomake#config#get_with_source('disabled', -1, {'bufnr': bufnr})
+        if disabled != -1
+          if disabled
+            let neomake_status_str .= source[0].'-'
+          else
+            let neomake_status_str .= source[0].'+'
+          endif
+        endif
+      endif
+      let neomake_status_str .= '%('.StatuslineNeomakeStatus(bufnr, '…', '✓')
+            \ . (a:active ? '%#StatColorHi2#' : '%*')
+            \ . '%)'
     endif
-    let neomake_status_str .= '%('.StatuslineNeomakeStatus(bufnr, '…', '✓')
-          \ . (a:active ? '%#StatColorHi2#' : '%*')
-          \ . '%)'
   endif
 
   let bt = getbufvar(bufnr, '&buftype')

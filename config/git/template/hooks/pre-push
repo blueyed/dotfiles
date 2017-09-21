@@ -14,7 +14,7 @@
 
 # Which remote heads/branches to check?
 # (a regular expression for "grep -E").
-CHECK_REMOTE_HEADS='^(master|develop|production|staging)$'
+CHECK_REMOTE_HEADS='^(master|production|staging)$'
 
 # The log pattern to check.
 # (a regular expression for "git grep")

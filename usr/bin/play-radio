@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 unset http_proxy
 
@@ -7,10 +7,15 @@ if [ "$basename" = "play-radio" ]; then
   if [ -n "$1" ]; then
     name=$1
   else
-    names='radioparadise fluxfm radioeins groovesalad OFF'
-    name="$(echo "$names" | rofi -dmenu -sep ' ' -p "Play which station?")"
+    state_file=~/.cache/play-radio.last
+    last="$(<$state_file)"
+    names='radioparadise fluxfm radioeins groovesalad dronezone OFF'
+    name="$(echo "$names" | rofi -dmenu -sep ' ' -p "Play which station?" -select "$last")"
     if [ -z "$name" ]; then
       exit
+    fi
+    if [ "$name" != "OFF" ];then
+      echo "$name" > $state_file
     fi
   fi
 fi
@@ -32,17 +37,22 @@ player="mpg123 --timeout 30 --control"
 player_pl="mpg123 --timeout 30 --control -@"
 aac_player="mplayer"
 
+# shellcheck disable=SC2086
 case $name in
   radioparadise)
     exec $player_pl http://www.radioparadise.com/m3u/mp3-192.m3u ;;
   fluxfm )
     exec $player http://www.fluxfm.de/stream-berlin ;;
+  fluxfm-klubradio )
+    exec $player http://streams.fluxfm.de/klubradio/mp3-320/audio/ ;;
   radioeins )
     exec $player_pl http://www.radioeins.de/live.m3u ;;
   groovesalad)
     exec $player_pl http://somafm.com/groovesalad.pls ;;
   groovesalad_aac)
     exec $aac_player http://ice2.somafm.com/groovesalad-128-aac ;;
+  dronezone)
+    exec $aac_player http://ice3.somafm.com/dronezone-128-aac ;;
   *)
     if [ "$name#.pls" = "$name" ]; then
       exec $player "$name"

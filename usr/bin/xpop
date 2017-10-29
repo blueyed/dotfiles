@@ -12,6 +12,8 @@ xprop=$(xprop -id $windowid _NET_WM_PID WM_CLASS WM_NAME WM_WINDOW_ROLE \
 
 windowpid="$(get-xwindow-pid "$windowid")"
 
+set -x
+
 # Get interesting props from awesome-client.
 if hash awesome-client 2>/dev/null; then
   awesome_info=$(cat <<EOF |
@@ -26,7 +28,7 @@ if hash awesome-client 2>/dev/null; then
       if c.window == $windowid then
         local r = ""
         for _,p in pairs({"class", "name", "instance", "border_width",
-          "sticky", "ontop", "screen.index", "screen.outputs", "tags",
+          "type", "sticky", "ontop", "screen.index", "screen.outputs", "tags",
           "type", "border_color", "urgent", "window", "floating",
           "_implicitly_floating", "maximized", "fullscreen", "fixed",
           "transient_for", "x", "y", "height", "width"}) do
@@ -37,6 +39,8 @@ if hash awesome-client 2>/dev/null; then
             v = c.screen.index
           elseif p == "screen.outputs" then
             v = table.concat(c.screen.outputs, ', ')
+          -- elseif type(c[p]) == "function" then
+          --   v = c[p](c)
           else
             v = c[p]
           end
@@ -59,7 +63,8 @@ $awesome_info"
 if [ -n "$windowpid" ]; then
   text="$text
 ---
-pstree: $(pstree -aphus $windowpid)"
+pstree: $(pstree -apus "$windowpid")"
 fi
 
-zenity --info --no-markup --text "$text"
+# zenity --info --no-markup --text "$text"
+zenity --width=800 --info --text "<span font=\"8\">$text</span>"

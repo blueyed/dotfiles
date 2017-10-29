@@ -4,6 +4,7 @@ username = Daniel Hahler <hg@thequod.de>
 [extensions]
 hgext.patchbomb =
 graphlog =
+strip =
 # Disabled for now - may ship it with dotfiles as in: mercurial_keyring = ~/.dotfiles/lib/...
 # mercurial_keyring =
 progress =

@@ -6,18 +6,27 @@
 # When used as default browser, it will prefer a running instance of Chrome
 # instead of launching Firefox (default).
 
-default=firefox
-browsers="$default chromium google-chrome-stable google-chrome /opt/google/chrome/chrome"
+default=qutebrowser
+browsers="$default firefox chromium google-chrome-stable google-chrome /opt/google/chrome/chrome"
+
+this_tty=$(get-tty)
 
 for browser in $browsers; do
-  if pgrep -f -n "$browser" > /dev/null ; then
-    $browser "$@" &
+  for pid in $(pgrep -f "$browser"); do
+    pid_tty=$(get-tty $pid)
+    if [ "$pid_tty" = "$this_tty" ]; then
+      $browser "$@" &
 
-    if [ -n "$DESKTOP_STARTUP_ID" ] && hash awesome-client 2>/dev/null; then
-      echo "awesome.emit_signal('spawn::completed', {id='$DESKTOP_STARTUP_ID'})" | awesome-client
+      if [ "$(ps -o state= "$pid")" = T ]; then
+        kill -CONT "$pid"
+      fi
+
+      if [ -n "$DESKTOP_STARTUP_ID" ] && hash awesome-client 2>/dev/null; then
+        echo "awesome.emit_signal('spawn::completed', {id='$DESKTOP_STARTUP_ID'})" | awesome-client
+      fi
+      exit 0
     fi
-    exit 0
-  fi
+  done
 done
 
 exec $default "$@"

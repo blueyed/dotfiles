@@ -45,3 +45,8 @@ if [ "${TERM:-dumb}" = "dumb" ]; then
   # shellcheck disable=SC2086
   exec urxvt -n weechat -e $cmd
 fi
+$cmd || {
+  ret=$?
+  notify-send "Failed to start wchat."
+  exit $ret
+}

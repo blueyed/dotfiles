@@ -1,13 +1,20 @@
---fields=+l
+--fields=+ln
 --c-kinds=+p
 --c++-kinds=+p
---python-kinds=-iv
+# Python: v are class members?!  l are local vars.  (with universal-ctags)
+# --python-kinds=-iv
 --langmap=php:.engine.inc.module.theme.install.php.php3.php4.php5.phtml
 --langmap=sh:+(zshrc).zsh-theme
 --langmap=vim:+.vader
 --exclude=.tox
 --exclude=build
+--exclude=.build*
+# Arch package dirs.
+--exclude=pkg
 --languages=-json
+
+# Fails with --append?
+# --tag-relative=yes
 
 # Look for shebangs/modelines.
 --guess-language-eagerly

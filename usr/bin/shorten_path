@@ -6,13 +6,15 @@
 #
 # This is used from vimrc for ShortenPath.
 #
-# TODO: relative to $cdpath?!  (see also vim-flagship by tpope)
+# TODO:
+#  - relative to $cdpath?!  (see also vim-flagship by tpope)
+#  - indicate local path, e.g. "./~omz" when in ~df?!
 
 # Plain sh would be ~4x faster on startup, but with cat/sed etc similar slow/fast,
 # and needs a cache file.
 
 # Self-tests: run with '--test'. {{{
-if [ x$1 = 'x--test' ]; then
+if [[ $1 == '--test' ]]; then
   hash -d df=~/.dotfiles
 
   set -x -e
@@ -20,6 +22,7 @@ if [ x$1 = 'x--test' ]; then
   cd ~
   [[ $(shorten_path .) == '~' ]]
   [[ $(shorten_path ~/.dotfiles/vimrc) == '~df/vimrc' ]]
+  # shellcheck disable=SC2088
   [[ $(shorten_path '~/.dotfiles/vimrc') == '~/.dotfiles/vimrc' ]]
   [[ $(shorten_path .dotfiles/vimrc) == '~df/vimrc' ]]
   [[ $(shorten_path -a .vimrc) == '↬.vimrc' ]]
@@ -36,7 +39,7 @@ if [ x$1 = 'x--test' ]; then
 
   # With "base" dir.
   cd ~
-  [[ $(shorten_path .dotfiles/vimrc $PWD) == '~df/vimrc' ]]
+  [[ $(shorten_path .dotfiles/vimrc "$PWD") == '~df/vimrc' ]]
   [[ $(shorten_path vimrc .dotfiles) == 'vimrc' ]]
   [[ $(shorten_path ~/.dotfiles/vimrc /) == '~df/vimrc' ]]
   [[ $(shorten_path -a ~/.dotfiles/vimrc /) == '~df/vimrc' ]]
@@ -48,19 +51,19 @@ if [ x$1 = 'x--test' ]; then
   # Tests in temp dir.
   tmpdir="$(mktemp -d)"
   trap 'test -d "$tmpdir" && rm -rf "$tmpdir"' 0
-  cd $tmpdir
+  cd "$tmpdir"
   touch foo
   ln -s foo bar
   [[ $(shorten_path -a foo) == 'foo' ]]
   [[ $(shorten_path -a bar) == '↬bar' ]]
-  [[ $(shorten_path -a $tmpdir) == "$tmpdir" ]]
+  [[ $(shorten_path -a "$tmpdir") == "$tmpdir" ]]
   [[ $(shorten_path -a . /) == "/" ]]
-  [[ $(shorten_path -a $tmpdir /) == "$tmpdir" ]]
-  [[ $(shorten_path -a $tmpdir/bar ~) == "$tmpdir/↬bar" ]]
+  [[ $(shorten_path -a "$tmpdir" /) == "$tmpdir" ]]
+  [[ $(shorten_path -a "$tmpdir/bar" ~) == "$tmpdir/↬bar" ]]
 
   # Canonical path (removing empty segments).
   [[ $(shorten_path .dotfiles//vimrc ~) == '~df/vimrc' ]]
-  [[ $(shorten_path -a $tmpdir//bar ~) == "$tmpdir/↬bar" ]]
+  [[ $(shorten_path -a "$tmpdir//bar" ~) == "$tmpdir/↬bar" ]]
   [[ $(shorten_path -a ./bar) == '↬bar' ]]
 
   set +x
@@ -100,7 +103,7 @@ test -f ~/.dotfiles/oh-my-zsh/lib/hash_dirs.local.zsh && \
 pwd_short=${(D)PWD}/
 # NOTE: "(Q)" is required to remove escaping of e.g. "[" from the name.
 path_short=${(Q)${(D)abs_path}#$pwd_short}
-if [ "$annotate" = 1 ] && [ "$path_short" != "/" ]; then
+if (( annotate )) && [[ $path_short != "/" ]]; then
   # Annotate symlinks.
   p=
   for i in "${(s:/:)path_short}"; do

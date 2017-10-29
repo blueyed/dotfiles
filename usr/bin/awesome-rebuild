@@ -1,26 +1,36 @@
 #!/bin/sh
 
-set -e
+set -ex
 
-# Prefer using PKGBUILD/makepkg on Arch Linux.
-if [ -d ~/builds/awesome-git ]; then
-  cd ~/builds/awesome-git
+cd ~/src/awesome
 
-  cur_version=$(pacman -Qi awesome-git|grep -E 'Version|Build Date')
-  PKGEXT=.tar makepkg -srief
-  new_version=$(pacman -Qi awesome-git|grep -E 'Version|Build Date')
+if hash makepkg 2>/dev/null; then
+  ARCH_PACKAGE=awesome-luajit-git
+  cur_version=$(pacman -Qi "$ARCH_PACKAGE"|sed -n '/^Version/ s/.*: //p')
+  cur_date=$(pacman -Qi "$ARCH_PACKAGE"|sed -n '/^Build Date/ s/.*: //p')
 
-  if [ "$new_version" = "$cur_version" ]; then
+  git_version=$(git describe --dirty | sed 's/^v//;s/-/./g')
+
+  # PKGEXT=.tar makepkg -srief
+  pkgver=1
+  if [ "${git_version}-${pkgver}" = "$cur_version" ] && [ "${git_version%.dirty*}" != "$git_version" ]; then
+    # Dirty checkout: force rebuild.
+    PKGEXT=.tar makepkg -ief
+  else
+    PKGEXT=.tar makepkg -ie
+  fi
+
+  # new_version=$(pacman -Qi "$ARCH_PACKAGE"|grep -E 'Version|Build Date')
+  new_date=$(pacman -Qi "$ARCH_PACKAGE"|sed -n '/^Build Date/ s/.*: //p')
+  if [ "$new_date" = "$cur_date" ]; then
     echo "Version has not changed."
     exit 1
   fi
 
 else
-  cd ~/src/awesome
-
   # Handle migrations of Lua files to modules.
-  sudo rm -r .build-lenny.thequod.de-x86_64-linux-gnu-4.9.2/lib/beautiful* || true
-  sudo rm -r .build-lenny.thequod.de-x86_64-linux-gnu-4.9.2/lib/naughty* || true
+  sudo rm -r .build-*/lib/beautiful* || true
+  sudo rm -r .build-*/lib/naughty* || true
   sudo rm -r /usr/local/share/awesome/lib/beautiful* || true
   sudo rm -r /usr/local/share/awesome/lib/naughty* || true
 

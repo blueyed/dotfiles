@@ -37,3 +37,7 @@ echo "$@" > "$args_file"
 
 # echo "Sending TERM to awesome: pid=${awesome_pid}."
 kill -TERM "$awesome_pid"
+sleep 1
+if kill -0 "$awesome_pid" 2>/dev/null; then
+  kill -KILL "$awesome_pid"
+fi

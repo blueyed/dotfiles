@@ -35,7 +35,7 @@ echo $$ > "$PIDFILE"
 
 player="mpg123 --timeout 30 --control"
 player_pl="mpg123 --timeout 30 --control -@"
-aac_player="mplayer"
+aac_player="mplayer -quiet"
 
 # shellcheck disable=SC2086
 case $name in

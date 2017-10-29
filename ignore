@@ -1,12 +1,14 @@
-# Global ignore file for `ag` (/usr/local/src/the_silver_searcher/)
+# Global ignore file.
+# Used by ripgrep (rg) and linked to for The Silver Searcher (ag).
 # cache/
 # media/
 # asset/
 tags
-build/
+# build dirs, but used by e.g. luarocks as a module name!?
+# build/
 # node_modules
 
-# ag looks at those by default (maybe only to find out that they are binary, but still..!)
+# ag/rg look at them by default (only to find out that they are binary).
 *.gif
 *.jpg
 *.png
@@ -17,3 +19,14 @@ build/
 *.ipynb
 
 CMakeFiles/
+
+# coverage.py
+htmlcov*/
+
+# Useful with --hidden?!
+# .git/
+# .tox/
+
+# Do not exclude .travis.yml (hidden files are ignored by default).
+!.travis.yml
+!.circleci

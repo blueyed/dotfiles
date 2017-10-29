@@ -21,8 +21,11 @@
 #    - overflow (boolint)		: Highlight overflows? Defaults to 50 when enabled.
 #
 #   date
-#    - display (enum) [no|default|local|relative|short]
+#    - display (enum) [no|default|relative|relative-compact|custom]
 #					: Show dates?
+#    - local (bool)			: Show local dates?
+#    - format (string)			: Custom strftime(3) format
+#
 #   file-name
 #    - display (enum) [no|always|auto]	: Show file names?
 #
@@ -87,11 +90,17 @@ set reference-format		= [branch] <tag> {remote} ~replace~
 
 # Settings controlling how content is read from Git
 set commit-order		= auto		# Enum: auto, default, topo, date, reverse (main)
-set status-untracked-dirs	= yes		# Show files in untracked directories? (status)
+set status-show-untracked-dirs	= yes		# Show files in untracked directories? (status)
+set status-show-untracked-files = yes		# Show untracked files?
 set ignore-space		= no		# Enum: no, all, some, at-eol (diff)
 set show-notes			= yes		# When non-bool passed as `--show-notes=...` (diff)
 #set diff-context		= 3		# Number of lines to show around diff changes (diff)
 #set diff-options		= -C		# User-defined options for `tig show` (git-diff)
+# XXX: broken: just displays " [51;1H [?1049l  [?1l >" (2.2.1-1-g67240fc)
+#      When using "true" and diff-highlight is not in the path.
+set diff-highlight		= /usr/share/git/diff-highlight/diff-highlight		# String (or bool): Path to diff-highlight script,
+# set diff-highlight		= true		# String (or bool): Path to diff-highlight script,
+						#                   defaults to `diff-highlight`.
 #set blame-options		= -C -C -C	# User-defined options for `tig blame` (git-blame)
 #set log-options		= --pretty=raw	# User-defined options for `tig log` (git-log)
 #set main-options		= -n 1000	# User-defined options for `tig` (git-log)
@@ -100,7 +109,8 @@ set show-notes			= yes		# When non-bool passed as `--show-notes=...` (diff)
 # Misc
 set refresh-mode		= auto		# Enum: manual, auto, after-command, periodic
 set refresh-interval		= 10		# Interval in seconds between refreshes
-set ignore-case			= no		# Ignore case when searching?
+set ignore-case			= smart-case	# Enum: no, yes, smart-case
+                                                # Ignore case when searching? Smart-case option will
 set wrap-search			= yes		# Wrap around to top/bottom of view when searching
 set focus-child			= yes		# Move focus to child view when opened?
 set horizontal-scroll		= 50%		# Number of columns to scroll as % of width
@@ -150,10 +160,13 @@ set mouse-scroll		= 3		# Number of lines to scroll via the mouse
 
 bind main	C	?git cherry-pick %(commit)
 bind status	C	!git commit
+bind stash	A	?git stash apply %(stash)
+# TODO: refresh diff view when selected stash has changed (e.g. with "drop").
 bind stash	P	?git stash pop %(stash)
 bind stash	!	?git stash drop %(stash)
 bind refs	C	?git checkout %(branch)
 bind refs	!	?git branch -D %(branch)
+bind diff	C	?git checkout %(commit)
 
 # Normal commands
 # ---------------
@@ -176,6 +189,7 @@ bind generic	g	view-grep
 
 # View manipulation
 bind generic	<Enter>	enter			# Enter and open selected entry
+# TODO: open (from stash => open diff, but stay in stash list)
 bind generic	<Lt>	back			# Go back to the previous view state
 bind generic	<Down>	next			# Move to next
 bind generic	<C-N>	next
@@ -212,13 +226,11 @@ bind main	F	:toggle commit-title-refs  # Toggle reference display (tags/branches
 # Cursor navigation
 bind generic	j	move-down
 bind generic	k	move-up
-#bind generic	?	move-half-page-down
-#bind generic	?	move-half-page-up
+bind generic	<C-D>	move-half-page-down
+bind generic	<C-U>	move-half-page-up
 bind generic	<PgDown> move-page-down
-bind generic	<C-D>	move-page-down
 bind generic	<Space>	move-page-down
 bind generic	<PgUp>	move-page-up
-bind generic	<C-U>	move-page-up
 bind generic	-	move-page-up
 bind generic	<Home>	move-first-line
 bind generic	<End>	move-last-line
@@ -296,6 +308,7 @@ bind generic	v	show-version		# Show Tig version
 # Note the four leading spaces in the string to match. This is because
 # Git automatically indents commit messages by four spaces.
 
+color "---"			blue	default
 color "diff --"			yellow	default
 color "--- "			yellow	default
 color "+++ "			yellow	default
@@ -351,7 +364,8 @@ color file			default	default
 color grep.file			blue	default
 color file-size			default	default
 color line-number		cyan	default
-color title-blur		white	blue
+# Better focus on current and more readable.
+color title-blur		black	20
 color title-focus		white	blue	bold
 color main-commit		default	default
 color main-tag			magenta	default	bold
@@ -410,3 +424,14 @@ set git-colors = \
 	status.updated=stat-staged \
 	status.changed=stat-unstaged \
 	status.untracked=stat-untracked
+
+
+# Old config:
+# set mouse			= yes
+# set tab-size  = 8
+
+# set vertical-split = false
+
+# set main-view = id:yes,color
+set main-view	= line-number:no,interval=5 id:no date:default author:full commit-title:yes,graph,refs,overflow=no
+#    - display (enum) [no|full|abbreviated|email|email-user]

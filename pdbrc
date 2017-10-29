@@ -1,5 +1,15 @@
-# Aliases for the Python Debugger pdb
+# Aliases for the Python Debugger pdb.
+#
 # Print instance variables (usage "pi classInst")
-alias pi for k in %1.__dict__.keys(): print "%1.",k,"=",%1.__dict__[k]
+alias pi for k in %1.__dict__.keys(): print('%1.', k, '=', %1.__dict__[k])
 # Print instance variables in self
 alias ps pi self
+
+import os, sys
+
+fname = os.path.expanduser('~/.pdbrc.py')
+# fpdb = locals()['pdb'].__file__
+if 'pdb' in locals() and '_pdbpp_path_hack' not in locals()['pdb'].__file__: exec(compile(open(fname, 'rb').read(), fname, 'exec'))
+# if '_pdbpp_path_hack' not in locals()['pdb'].__file__: with os.path.expanduser('~/.pdbrc.py') as fname: exec(compile(open(fname, 'rb').read(), fname, 'exec'))
+# exec(compile(open(os.path.expanduser('~/.pdbrc.py')).read()), globals, locals)
+del fname

@@ -3727,7 +3727,7 @@ if has('autocmd')
     au BufNewFile * nested let fn = expand('<afile>') |
       \ if !filereadable(fn) |
       \   for pat in ['^\S/', '^\S\ze/'] |
-      \     let new_fn = substitute(fn, pat, '', '') | echom new_fn |
+      \     let new_fn = substitute(fn, pat, '', '') |
       \     if fn !=# new_fn && filereadable(new_fn) |
       \       exec 'edit '.new_fn |
       \       bdelete # |

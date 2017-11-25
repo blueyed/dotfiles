@@ -3724,7 +3724,19 @@ if has('autocmd')
     " Check if the new file (with git-diff prefix removed) is readable and
     " edit that instead (copy'n'paste from shell).
     " (for git diff: `[abiw]`).
-    au BufNewFile * nested let s:fn = expand('<afile>') | if ! filereadable(s:fn) | let s:fn = substitute(s:fn, '^\S\{-}/', '', '') | if filereadable(s:fn) | echomsg 'Editing' s:fn 'instead' | exec 'e '.s:fn.' | bd#' | endif | endif
+    au BufNewFile * nested let fn = expand('<afile>') |
+      \ if !filereadable(fn) |
+      \   for pat in ['^\S/', '^\S\ze/'] |
+      \     let new_fn = substitute(fn, pat, '', '') | echom new_fn |
+      \     if fn !=# new_fn && filereadable(new_fn) |
+      \       exec 'edit '.new_fn |
+      \       bdelete # |
+      \       redraw |
+      \       echomsg 'Got unreadable file, editing '.new_fn.' instead.' |
+      \       break |
+      \     endif |
+      \   endfor |
+      \ endif
 
     " Display a warning when editing foo.css, but foo.{scss,sass} exists.
     au BufRead *.css if &modifiable

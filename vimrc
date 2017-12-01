@@ -1,18 +1,25 @@
+" NOTE: this is not in sync currently with my local config currently.
+"       E.g. I am using vim-plug since a while since Neobundle.
 scriptencoding utf-8
 
+" Hack for left-over Vader Log commands.
+com! -nargs=+ Log call neomake#utils#DebugMessage(type(<args>) == 1 ? <args> : string(<args>))
+com! -nargs=* Assert echo
 
 if 1 " has('eval') / `let` may not be available.
   " Profiling. {{{
-  " Start profiling. Optional arg: logfile path.
+  " Start profiling. Optional args: logfile-path, copy-to-@*.
   fun! ProfileStart(...)
     if a:0 && a:1 != 1
-      let profile_file = a:1
+      let g:profile_file = a:1
     else
-      let profile_file = '/tmp/vim.'.getpid().'.'.reltimestr(reltime())[-4:].'profile.txt'
-      echom "Profiling into" profile_file
-      let @* = profile_file
+      let g:profile_file = '/tmp/vim.'.getpid().'.'.reltimestr(reltime())[-4:].'profile.txt'
+      echom "Profiling into" g:profile_file
+      if a:0 < 2 || a:2
+        let @* = g:profile_file
+      endif
     endif
-    exec 'profile start '.profile_file
+    exec 'profile start '.g:profile_file
     profile! file **
     profile  func *
   endfun
@@ -20,14 +27,21 @@ if 1 " has('eval') / `let` may not be available.
     call ProfileStart(g:profile)
   endif
   if 0
-  call ProfileStart()
+    call ProfileStart(1, 0)
   endif
   " }}}
 
-  fun! MyWarningMsg(msg)
-    redraw
+  fun! MyWarningMsg(msg, ...)
+    let redraw = a:0 ? a:1 : !has('vim_starting')
+    if redraw | redraw | endif
     echohl WarningMsg | echom a:msg | echohl None
   endfun
+
+  " Use both , and Space as leader, but not for imap.
+  let mapleader = ","
+  nmap <space> <Leader>
+  vmap <space> <Leader>
+  nmap <space><space> <C-d>
 
   " Try to init neobundle.
   try

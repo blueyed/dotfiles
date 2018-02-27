@@ -2858,7 +2858,8 @@ vnoremap ~ ygv"=TwiddleCase(@")<CR>Pgv
 " }}}2
 
 " Exit if the last window is a controlling one (NERDTree, qf). {{{2
-function! s:CloseIfOnlyControlWinLeft()
+" Note: vim-qf has something similar (but simpler).
+function! s:QuitIfOnlyControlWinLeft()
   if winnr("$") != 1
     return
   endif
@@ -2873,9 +2874,9 @@ function! s:CloseIfOnlyControlWinLeft()
     q
   endif
 endfunction
-augroup CloseIfOnlyControlWinLeft
+augroup my_QuitIfOnlyControlWinLeft
   au!
-  au BufEnter * call s:CloseIfOnlyControlWinLeft()
+  au BufEnter * nested call s:QuitIfOnlyControlWinLeft()
 augroup END
 " }}}2
 

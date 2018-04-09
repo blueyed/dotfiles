@@ -1795,33 +1795,39 @@ endif " has("autocmd") }}}
 " This mainly shortens entries from Zsh's `hash -d` list.
 let s:_cache_shorten_path = {}
 let s:_has_functional_shorten_path = 1
-fun! ShortenPath(path, ...)
-  if ! len(a:path) || ! s:_has_functional_shorten_path
+let s:shorten_path_exe = executable('shorten_path')
+      \ ? 'shorten_path'
+      \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
+      \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
+      \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
+function! ShortenPath(path, ...)
+  if !len(a:path) || !s:_has_functional_shorten_path
     return a:path
   endif
   let base = a:0 ? a:1 : ""
   let annotate = a:0 > 1 ? a:2 : 0
   let cache_key = base . ":" . a:path . ":" . annotate
-  if ! exists('s:_cache_shorten_path[cache_key]')
-    let shorten_path = executable('shorten_path')
-          \ ? 'shorten_path'
-          \ : filereadable(expand("$HOME/.dotfiles/usr/bin/shorten_path"))
-          \   ? expand("$HOME/.dotfiles/usr/bin/shorten_path")
-          \   : expand("/home/$SUDO_USER/.dotfiles/usr/bin/shorten_path")
+  if !exists('s:_cache_shorten_path[cache_key]')
+    let shorten_path = [s:shorten_path_exe]
     if annotate
-      let shorten_path .= ' -a'
+      let shorten_path += ['-a']
     endif
-    let cmd = shorten_path.' '.shellescape(a:path).' '.shellescape(base)
-    let s:_cache_shorten_path[cache_key] = system(cmd.' 2>/dev/null')
+    let cmd = shorten_path + [a:path, base]
+    let output = s:systemlist(cmd)
+    let lastline = empty(output) ? '' : output[-1]
+    let s:_cache_shorten_path[cache_key] = lastline
     if v:shell_error
       try
         let tmpfile = tempname()
-        call system(cmd.' 2>'.tmpfile)
+        let system_cmd = join(map(copy(cmd), 'fnameescape(v:val)'))
+        call system(system_cmd.' 2>'.tmpfile)
         if v:shell_error == 127
           let s:_has_functional_shorten_path = 0
         endif
-        throw "There was a problem running shorten_path: "
-              \ . join(readfile(tmpfile), "\n") . ' ('.v:shell_error.')'
+        echohl ErrorMsg
+        echom printf('There was a problem running %s: %s (%d)',
+              \ cmd, join(readfile(tmpfile), "\n"), v:shell_error)
+        echohl None
         return a:path
       finally
         call delete(tmpfile)

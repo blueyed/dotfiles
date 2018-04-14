@@ -25,7 +25,8 @@ else
   venv_name=$(mktemp -u -d "tmp-${pyenv_version}-${PWD##*/}-XXXXXX")
 fi
 
-pyenv virtualenv "${pyenv_version}" "${venv_name}"
+# shellcheck disable=SC2086
+pyenv virtualenv $venv_options "${pyenv_version}" "${venv_name}"
 
 echo
 echo "Entering a new shell session with virtualenv '${venv_name}' (${pyenv_version})."

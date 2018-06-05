@@ -30,9 +30,9 @@ ok_to_cache=1
 get_period_by_hour() {
   hour=$(date +%H)
   if [ "$hour" -gt 8 ] && [ "$hour" -lt 20 ]; then
-    echo -n "Daytime"
+    printf "Daytime"
   else
-    echo -n "Night"
+    printf "Night"
   fi
 }
 
@@ -43,7 +43,7 @@ if [ "$USE_REDSHIFT" = 0 ]; then
 fi
 
 if [ -e "$cachefile" ]; then
-  if [ `stat --format=%Y $cachefile` -gt $(( `date +%s` - $CACHE_SECONDS )) ]; then
+  if [ "$(stat --format=%Y $cachefile)" -gt $(( $(date +%s) - CACHE_SECONDS )) ]; then
     cat $cachefile
     exit
   fi
@@ -70,10 +70,10 @@ if [ -z "$period" ]; then
   DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX19nvkwAQ0jDg1/aA1DNhQuSu3024+/3hruhmpNKhmm0ymufkCmmhrwf)"
 
   if [ -z "$DEFAULT_LATLON" ]; then
-    echo "ERROR: $(basename $0): DEFAULT_LATLON is not defined." >&2
+    echo "ERROR: $(basename "$0"): DEFAULT_LATLON is not defined." >&2
     exit 1
   fi
-  period=$(redshift -l "$DEFAULT_LATLON" -p | grep "^Period")
+  period=$(redshift -l "$DEFAULT_LATLON" -p 2>/dev/null | grep "^Period")
 fi
 
 if [ -z "$period" ]; then
@@ -83,8 +83,8 @@ if [ -z "$period" ]; then
   exit
 fi
 
-period=$(echo $period | cut -d\  -f2)
+period="${period#Period: }"
 if [ "$ok_to_cache" = 1 ]; then
-  echo -n $period > $cachefile
+  printf '%s' "$period" > $cachefile
 fi
-echo -n $period
+printf '%s' "$period"

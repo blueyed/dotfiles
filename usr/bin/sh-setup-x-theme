@@ -14,7 +14,7 @@
 # TODO: query urxvt's current bg and use it for dircolors.
 #       see ~/bin/query-urxvt and ~/bin/xterm-bg.
 
-X_THEME_VARIANT_CONFIG_FILE=~/.config/x-theme-variant
+config_file=~/.config/x-theme-variant
 
 # set -x
 # date >>/tmp/debug-sh-setup-x-theme.log
@@ -34,11 +34,11 @@ get_variant_from_config() {
     debug "variant from tmux: $config_variant"
   fi
   if [ -z "$config_variant" ]; then
-    if [ -f $X_THEME_VARIANT_CONFIG_FILE ]; then
-      config_variant=$(cat $X_THEME_VARIANT_CONFIG_FILE)
+    if [ -f $config_file ]; then
+      config_variant=$(cat $config_file)
       debug "variant from cfg: $config_variant"
     else
-      debug "Config file ($X_THEME_VARIANT_CONFIG_FILE) does not exist."
+      debug "Config file ($config_file) does not exist."
     fi
     if [ -z "$config_variant" ]; then
       config_variant=auto
@@ -250,8 +250,8 @@ if [ "$SAVE_VARIANT" = 1 ]; then
     auto)
       if [ -n "$TMUX" ]; then
         tmux set-env -u MY_X_THEME_VARIANT
-      elif [ -f "$X_THEME_VARIANT_CONFIG_FILE" ]; then
-        rm "$X_THEME_VARIANT_CONFIG_FILE"
+      elif [ -f "$config_file" ]; then
+        rm "$config_file"
       fi
       ;;
     light|dark)
@@ -259,7 +259,7 @@ if [ "$SAVE_VARIANT" = 1 ]; then
         tmux set-env MY_X_THEME_VARIANT "$variant"
         echo "Saved variant=$1 in tmux." >&2
       else
-        echo "$1" > "$X_THEME_VARIANT_CONFIG_FILE"
+        echo "$1" > "$config_file"
         echo "Saved variant=$1." >&2
       fi
       ;;

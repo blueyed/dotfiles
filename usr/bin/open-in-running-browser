@@ -12,8 +12,8 @@ browsers="$default firefox chromium google-chrome-stable google-chrome /opt/goog
 this_tty=$(get-tty)
 
 for browser in $browsers; do
-  for pid in $(pgrep -f "$browser"); do
-    pid_tty=$(get-tty $pid)
+  for pid in $(pgrep "$browser"); do
+    pid_tty=$(get-tty "$pid")
     if [ "$pid_tty" = "$this_tty" ]; then
       $browser "$@" &
 

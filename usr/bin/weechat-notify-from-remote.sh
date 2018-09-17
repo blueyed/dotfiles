@@ -32,9 +32,9 @@ if [ "${FLOCKER%-daemon}" != "$FLOCKER" ]; then  # {{{1
   log "Starting daemon: PID: $$"
 
   # User and hosts information, encrypted.
-  userhost=$(dotfiles-decrypt 'U2FsdGVkX1+qm0Yw5PFoEgQ6dt77wSfKmpqSQXR/u8Fq1jot4M9SLmcInAuq1XGZ')
-  internalhost=$(dotfiles-decrypt 'U2FsdGVkX1+t47mSzfhcSOzSjC73h5kGVDPbDhbXzRk=')
-  ssh_extra_config="$(dotfiles-decrypt 'U2FsdGVkX1/b6mo1MxltGbfTDs1xWhXRZEoLa/yx3iI2MaanXf0aKkwrGa0epC8ybDgU03Qc4JjXHz/6Q4U/ZA==')"  # remote port forwarding etc
+  userhost=$(dotfiles-decrypt 'U2FsdGVkX18AauACIM8Mr+WbHUtnbSo2Nrrzb5ZfD7c8zR4MNQOCqxek5ReWskSe')
+  internalhost=$(dotfiles-decrypt 'U2FsdGVkX18AwDQM95e39Zrc28EYpQSeLiShk9rr5HM=%')
+  ssh_extra_config="$(dotfiles-decrypt 'U2FsdGVkX1+3AASjC7+TYOQiT2ljBzLz3GaATQqTXimyOdjdz/spgy4ozUcGbfA91iorN8ikeWncozyIpalwYA==%')"  # remote port forwarding etc
 
   # NOTE: sleep in 1 second steps to allow the process to be killed (via trap) when logging out.
   # This is required for it to be restarted anew on re-login for the new gnome-keyring-daemon.

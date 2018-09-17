@@ -37,12 +37,15 @@ else
   input="$@"
 fi
 
+cmd="openssl enc -md $md -aes-256-cbc -pbkdf2 -a -A -salt -pass file:$PASSWDFILE"
 case $basename in
   dotfiles-encrypt)
-    cmd="openssl enc -md $md -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE" ;;
+    ;;
   dotfiles-decrypt)
-    cmd="openssl enc -md $md -aes-256-cbc -a -A -salt -pass file:$PASSWDFILE -d" ;;
-  *) echo "Unhandled basename: $basename." >&2; exit 64 ;;
+    cmd="$cmd -d"
+    ;;
+  *) echo "Unhandled basename: $basename." >&2; exit 64
+    ;;
 esac
 
 if [ -n "$input" ]; then

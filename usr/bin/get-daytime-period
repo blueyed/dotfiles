@@ -67,7 +67,7 @@ fi
 
 if [ -z "$period" ]; then
   # Default lat/lon when geoclue is not used.
-  DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX19nvkwAQ0jDg1/aA1DNhQuSu3024+/3hruhmpNKhmm0ymufkCmmhrwf)"
+  DEFAULT_LATLON="$(dotfiles-decrypt U2FsdGVkX19+ff4P8pvhS2TzsJkKwrDGk/vD1IoXgdEbj3r9+4hfXsGpNfVqxkrR)"
 
   if [ -z "$DEFAULT_LATLON" ]; then
     echo "ERROR: $(basename "$0"): DEFAULT_LATLON is not defined." >&2

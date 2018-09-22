@@ -3717,22 +3717,6 @@ let g:html_indent_autotags = "br,input,img"
 if has('autocmd')
   augroup vimrc_late
     au!
-    " See also ~/.dotfiles/usr/bin/vim-for-git, which uses this setup and
-    " additionally splits the window.
-    fun! MySetupGitCommitMsg()
-      if bufname("%") == '.git/index'
-        " fugitive :Gstatus
-        return
-      endif
-      set foldmethod=syntax foldlevel=1
-      set nohlsearch nospell sw=4 scrolloff=0
-      silent! g/^# \(Changes not staged\|Untracked files\|Changes to be committed\|Changes not staged for commit\)/norm zc
-      normal! zt
-      set spell spl=en,de
-    endfun
-    au FileType gitcommit call MySetupGitCommitMsg()
-
-
     " Detect indent.
     au FileType mail,make,python let b:no_detect_indent=1
     au BufReadPost * if exists(':DetectIndent') |

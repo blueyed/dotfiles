@@ -24,3 +24,7 @@
 --langmap=NIX:.nix
 --regex-NIX=/(\S+)\s*=.*:/\1/f/
 --regex-NIX=/^\s*(\S+)\s*=/\1/v/
+
+# Look at .ctags for extra options.
+# This can be used to ignore certain files per repo.
+--options-maybe=./.ctags

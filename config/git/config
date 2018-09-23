@@ -101,8 +101,6 @@
 	untracked = cyan
 
 [core]
-	# See also GIT_EDITOR.
-	editor = vim
 	# use default..
 	# whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol,blank-at-eol
 

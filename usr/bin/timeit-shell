@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+"""
+Wrapper around Python's timeit to time a shell command.
+"""
+
+import sys
+import timeit
+
+timeit.main([
+    '--setup', 'import subprocess',
+    '--',
+    'subprocess.Popen(%r, stdout=subprocess.PIPE).communicate()' % (
+        sys.argv[1:],
+    )])

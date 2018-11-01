@@ -1875,9 +1875,10 @@ function! My_get_qfloclist_type(bufnr)
 endfunction
 
 function! s:systemlist(l) abort
-  let cmd = a:l
   if !has('nvim')
-    let cmd = join(map(copy(cmd), 'fnameescape(v:val)'))
+    let cmd = join(map(copy(a:l), 'fnameescape(v:val)'))
+  else
+    let cmd = a:l
   endif
   return systemlist(cmd)
 endfunction

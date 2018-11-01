@@ -1152,7 +1152,11 @@ nnoremap <Leader>cc :Neomake<CR>
 
 " Setup automake (https://github.com/neomake/neomake/pull/1167).
 function! MyOnBattery()
-  return readfile('/sys/class/power_supply/AC/online') == ['0']
+  try
+    return readfile('/sys/class/power_supply/AC/online') == ['0']
+  catch
+    return 1
+  endtry
 endfunction
 try
   let g:neomake = {
@@ -1160,8 +1164,8 @@ try
         \   'ignore_filetypes': ['startify'],
         \ }}
 
-  if MyOnBattery()
-    call neomake#configure#automake('w', 500)
+  if !has('timers') || MyOnBattery()
+    call neomake#configure#automake('w')
   else
     call neomake#configure#automake('nrw', 500)
   endif

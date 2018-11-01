@@ -1874,6 +1874,14 @@ function! My_get_qfloclist_type(bufnr)
   return type
 endfunction
 
+function! s:systemlist(l) abort
+  let cmd = a:l
+  if !has('nvim')
+    let cmd = join(map(copy(cmd), 'fnameescape(v:val)'))
+  endif
+  return systemlist(cmd)
+endfunction
+
 " Shorten a given filename by truncating path segments.
 let g:_cache_shorten_filename = {}
 let g:_cache_shorten_filename_git = {}

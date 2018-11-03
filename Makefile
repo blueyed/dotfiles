@@ -17,7 +17,7 @@ INSTALL_FILES := ackrc agignore aptitude/config ctags \
 	$(wildcard local/share/applications/*) \
 	$(patsubst %/,%,$(sort $(dir $(wildcard urxvt/ext/*/))))
 
-REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf vimpagerrc
+REMOVED_FILES:=pastebinit.xml config/lilyterm/default.conf vimpagerrc tmux.common.conf
 
 # zshrc needs to get installed after submodules have been initialized
 INSTALL_FILES_AFTER_SM := zshenv zshrc

@@ -225,16 +225,12 @@ function! s:RefreshStatus()
   endfor
 endfunction
 
+" Clear cache of corresponding real buffer when saving a fugitive buffer.
 function! StatuslineClearCacheFugitive(bufname)
-  " Clear cache of corresponding real buffer when saving a fugitive buffer.
-  if !exists('*fugitive#buffer')
+  if !exists('*FugitiveReal')
     return
   endif
-  let fug_buffer = fugitive#buffer()
-  let [gitdir, fug_path] = split(a:bufname, '//')[1:2]
-  let fug_path = substitute(fug_path, '\v\w*/', '', '')
-  let fug_path = fug_buffer.repo().tree(fug_path)
-  let bufnr = bufnr(fug_path)
+  let bufnr = bufnr(FugitiveReal())
   if bufnr != -1
     call StatuslineClearCache(bufnr)
 

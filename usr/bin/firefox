@@ -3,8 +3,9 @@
 
 # See also ./thunderbird.
 
-# XXX: get $program bin from after removing ourself from PATH.
 program="$(basename "$0")"
+# XXX: get $program bin from after removing ourself from PATH.
+target_program="/usr/bin/$program"
 
 if [ "$program" = thunderbird ]; then
   profile_root=~/.$program/
@@ -18,9 +19,6 @@ elif [ "$program" = firefox ]; then
 
   # Indicate to awesome that the client window should get raised and jumped to.
   echo "Firefox $(date +%s)" > /tmp/.awesome-raise-next-client
-
-  # # Continue any stopped processed (via sigstop-if-not-focused).
-  # pkill -CONT firefox
 else
   echo "$0: unexpected program basename: $program" >&2
 fi
@@ -34,14 +32,31 @@ for i; do
   esac
 done
 
+# Send SIGCONT to main PID(s) of program.
+# This is necessary for it to receive the open-url request etc.
+# Once it gets focused also its childs will be continued.
+continue_program() {
+  this_tty=$(get-tty)
+  for pid in $(pgrep "$program"); do
+    pid_tty=$(get-tty "$pid")
+    if [ "$pid_tty" = "$this_tty" ]; then
+      if [ "$(ps -o state= "$pid")" = T ]; then
+        echo "$0: continuing $pid" >&2
+        kill -CONT "$pid"
+      fi
+    fi
+  done
+}
+
 start_profile() {
   profile_dir="$(find "$profile_root" -name "*.$1")"
   shift
   if [ -z "$profile_dir" ]; then
-    echo "Could not find profile dir for $session_name." >&2
+    echo "$0: could not find profile dir for $session_name." >&2
     return 1
   else
-    exec "/usr/bin/$program" --profile "$profile_dir" "$@"
+    continue_program
+    exec "$target_program" --profile "$profile_dir" "$@"
   fi
 }
 
@@ -54,4 +69,6 @@ if [ "$auto_use_profile" = 1 ]; then
     fi
   fi
 fi
-exec "/usr/bin/$program" "$@"
+
+continue_program
+exec "$target_program" "$@"

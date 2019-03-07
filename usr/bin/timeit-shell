@@ -7,9 +7,14 @@ Wrapper around Python's timeit to time a shell command.
 import sys
 import timeit
 
+cmd = sys.argv[1:]
+if not cmd:
+    sys.stderr.write('%s: missing command\n' % sys.argv[0])
+    sys.exit(64)
+
 timeit.main([
+    '--verbose',
     '--setup', 'import subprocess',
     '--',
-    'subprocess.Popen(%r, stdout=subprocess.PIPE).communicate()' % (
-        sys.argv[1:],
-    )])
+    'subprocess.Popen(%r, stdout=subprocess.PIPE).communicate()' % cmd,
+])

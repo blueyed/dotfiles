@@ -2682,8 +2682,6 @@ endfunction
 command! FoldParagraphs call FoldParagraphs()
 " }}}
 
-" Sort Python imports.
-command! -range=% -nargs=* Isort :<line1>,<line2>! isort --lines 79 <args> -
 
 " Map S-Insert to insert the "*" register literally.
 if has('gui')

@@ -7,7 +7,7 @@
 #
 #     #!/bin/sh
 #     # Change to file's parent dir (POSIXly).
-#     cd -P -- "$(dirname -- "$0")/.."
+#     cd -P -- "$(dirname -- "$0")/.." || exit
 #     exec ptw-watch-tests source-dir -vv "$@"
 
 usage() {
@@ -31,6 +31,7 @@ for i; do
   if [ "x$i" = "x--" ]; then
     had_dashdash=1
   elif [ "$had_dashdash" = 1 ]; then
+    # XXX: needs to pass/use single arguments; use bash (array)?!
     pytest_args="$pytest_args $i"
   else
     ptw_args="$ptw_args $i"
@@ -41,18 +42,11 @@ if [ "$had_dashdash" = 0 ]; then
   ptw_args=
 fi
 
-# Get the current window-status-style option from tmux (window or global).
-# shellcheck disable=SC2015
-TMUX_FG_DEFAULT=$(a=$(tmux show -w window-status-style | cut -f2 -d\ ); \
-       [ -n "$a" ] && echo "$a" || tmux show -wg window-status-style | cut -f2 -d\ )
-# Remove ",italics" which I am currently using for any running command via
-# preexec.
-TMUX_FG_DEFAULT=${TMUX_FG_DEFAULT%,italics}
-
 # Template for printf.
 # shellcheck disable=SC2016,SC1004
 template_set_tmux_style='test -n "$TMUX_PANE" && { \
-  tmux set-window-option -q -t "$TMUX_PANE" window-status-style "%s"; } \
+  style="%s"; test -n "$style" \
+    && tmux set-window-option -q -t "$TMUX_PANE" window-status-style "$style"; } \
   ; { msg="%s"; test -n "$msg" && notify-send "$msg"; }'
 
 # Create a script to be executed via --afterrun.
@@ -65,19 +59,36 @@ if [ "\$1" = 0 ]; then
 elif [ "\$1" = 5 ]; then
   $(printf "$template_set_tmux_style" fg=green 'No tests collected.')
 elif [ "\$1" = 2 ]; then
-  $(printf "$template_set_tmux_style" fg=red 'Tests interrupted.')
+  $(printf "$template_set_tmux_style" '' 'Tests interrupted.')
 else
   $(printf "$template_set_tmux_style" fg=red 'Tests failed.')
 fi
 EOF
 
+# Get the current window-status-style option from tmux (window or global).
+# shellcheck disable=SC2015
+beforerun_script="$(mktemp)"
+chmod +x "$beforerun_script"
+cat > "$beforerun_script" <<EOF
+if [ -n "\$TMUX_PANE" ]; then
+  tmux_fg_default="\$(tmux show -w window-status-style | cut -f2 -d\ )"
+  if [ -z "\$tmux_fg_default" ]; then
+    tmux_fg_default="\$(tmux show -wg window-status-style | cut -f2 -d\ )"
+  fi
+  # Remove ",italics" which I am currently using for any running command via
+  # preexec.
+  tmux_fg_default=\${tmux_fg_default%,italics}
+  $(printf "$template_set_tmux_style" "\$tmux_fg_default,italics" '')
+fi
+EOF
+
 # shellcheck disable=SC2064
-trap "rm '$afterrun_script'" 0
+trap "rm '$afterrun_script' '$beforerun_script'" 0
 
 # Change to watch-dir to work around https://github.com/joeyespo/pytest-watch/issues/53.
 cd "$watch_src" || exit
 ptw $ptw_args \
-  --beforerun "$(printf "$template_set_tmux_style" "$TMUX_FG_DEFAULT,italics" '')" \
+  --beforerun "$beforerun_script" \
   --afterrun "$afterrun_script" \
   --onexit "echo ONEXIT; test -n '$TMUX_PANE' && tmux set-window-option -u -q \
           -t '$TMUX_PANE' window-status-style" \

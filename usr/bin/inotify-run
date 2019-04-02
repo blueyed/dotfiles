@@ -1,50 +1,157 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 # Wrapper around inotifywait for easier usage.
 
 usage() {
-  echo "$0 <dirs-or-files-to-watch> <cmd>.."
+  echo "$0 <inotifywait-args>... -- <cmd>..."
 }
 
-watch="$1"
+inotifywait_args=()
+while [[ -n "$1" && "$1" != "--" ]]; do
+  inotifywait_args+=("$1")
+  shift
+done
+if [[ "$1" != "--" ]]; then
+  echo "Missing command." >&2
+  usage
+  exit 64
+fi
 shift
-echo "Watching: $watch"
+cmd=("$@")
 
 title() {
   printf '\e]1;%s\a' "$*"
   printf '\e]2;%s\a' "$*"
 }
 
-# Recursively kill childs - required to get out of a running pdb.
-kill_with_childs() {
-  for p in $(pgrep -P "$1"); do
-    kill_with_childs "$p"
+# A FIFO to communicate the child pid from the sub-shell.
+child_pid_pipe=$(mktemp --dry-run)
+mkfifo "$child_pid_pipe"
+
+wrapper_pid=
+
+# Required to "wait" in EXIT handler, where pid is not considered to be part of
+# the shell with "wait" anymore.
+wait_for_pid() {
+  pid="$1"
+  if ! kill -0 "$pid" 2>/dev/null; then
+    return 0
+  fi
+  echo -n "Waiting for $pid to terminate" >&2
+  while kill -0 "$pid" 2>/dev/null; do
+    echo -n '.' >&2
+    sleep 0.5 || break
   done
-  kill "$1"
+  echo >&2
 }
 
-pid=
-output=
-set -x
-set -e
-while true; do
-  if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-    echo 'Killing previous run…'
-    kill_with_childs "$pid"
+kill_child() {
+  pid="$1"
+
+  # Send SIGTERM after 3s.
+  (
+    sleep 3
+    if kill -0 "$pid" 2>/dev/null; then
+      # Forcefully kill child after additional 3s.
+      (
+        sleep 3 || true
+        if kill -0 "$pid" 2>/dev/null; then
+          echo "Forcefully killing $pid" >&2
+          kill -KILL "$pid"
+        fi
+      ) &
+      wait_timeout_pid=$!
+
+      kill -TERM "$pid"
+      wait_for_pid "$pid"
+    else
+      wait_timeout_pid=
+    fi
+  ) &
+  wait_timeout_pid=$!
+  wait "$wait_timeout_pid"
+}
+
+sigint() {
+  ret=$?
+  if [[ "$got_sigint" == 1 ]]; then
+    exit "$ret"
   fi
+  got_sigint=1
+}
+cleanup() {
+  if [[ -n "$child_pid" ]]; then
+    kill_child "$child_pid"
+
+  elif [ -n "$wrapper_pid" ] && kill -0 "$wrapper_pid" 2>/dev/null; then
+    echo "Killing previous run (PID $wrapper_pid)"
+    kill "$wrapper_pid"
+    wait "$wrapper_pid"
+  fi
+
+  rm "$child_pid_pipe"
+  # rm "$child_ret_pipe"
+}
+
+trap 'sigint' INT
+trap 'cleanup' EXIT
+
+got_sigint=0
+while true; do
+  child_pid=
   title "… $*"
 
-  reset
-  if [ -n "$output" ]; then
-    echo "$output"
-  fi
-  # shellcheck disable=SC2015
-  ("$@" && title "✔ $*" || title "✘ $*") </dev/tty &
-  pid=$!
+  # Run command in subshell.
+  (
+    set +e
+    inner_ret=
 
-  sleep 1
+    inner_cleanup() {
+      if [[ -z "$inner_ret" ]]; then
+        kill_child "$child_pid"
+      fi
+      # Handle pdb.set_trace being killed.
+      # Ref: https://github.com/antocuni/pdb/issues/28#issuecomment-456385762
+      # At least for inner_ret=143 (SIGTERM).
+      reset -I
+    }
+    trap 'inner_cleanup' EXIT
+
+    echo "=== running: $*"
+    "${cmd[@]}" &
+    child_pid=$!
+
+    echo "$child_pid" > "$child_pid_pipe"
+    # echo "waiting for child pid: $child_pid"
+    wait $child_pid
+    inner_ret=$?
+    echo "child:exit:$inner_ret"
+
+    # if [[ "$inner_ret" != 143 ]]; then  # SIGTERM
+      if [ "$inner_ret" = 0 ]; then
+        title "✔ $*"
+      else
+        title "✘ $* (ret:$inner_ret)"
+      fi
+    # fi
+  ) </dev/tty &
+  wrapper_pid=$!
+
+  # Wait for child to have started.
+  child_pid=$(< "$child_pid_pipe")
+
   # shellcheck disable=SC2086
-  output="$(inotifywait -r -e close_write \
-    --exclude '/(__pycache__/|\.)|.*\.neomaketmp_.*' \
-    --format '%w%f' $watch)"
+  inotify_cmd=(inotifywait -e close_write \
+    --exclude '/(__pycache__/|\.)|.*@neomake_.*' \
+    --format '%w%f' "${inotifywait_args[*]}")  #| grep 'Watches established.'
+  echo "=== running: inotify_cmd: ${inotify_cmd[*]}" >&2
+  # shellcheck disable=SC2086
+  ${inotify_cmd[*]}
+
+  if kill -0 "$child_pid" 2>/dev/null; then
+    echo "=== killing/restarting child ($child_pid)"
+    kill_child "$child_pid"
+  fi
+
+  got_sigint=0
 done

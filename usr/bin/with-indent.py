@@ -7,18 +7,34 @@ Tests via ``pytest …/with-indent.py`` (the reason for the .py extension).
 
 Ref: https://github.com/ambv/black/issues/796
 """
-
 import textwrap
 import sys
 import subprocess
+
+
+def len_firstline(s):
+    return len(s.split("\n", 1)[0])
 
 
 def dedent(stdin):
     if not stdin:
         return 0, stdin
     dedented = textwrap.dedent(stdin)
-    indent = stdin.index("\n") - dedented.index("\n")
-    return indent, dedented
+    removed_indent = len_firstline(stdin) - len_firstline(dedented)
+    return removed_indent, dedented
+
+
+def prepare(stdin):
+    if stdin and stdin.startswith(" "):
+        removed_indent, dedented = dedent(stdin)
+        add_prefixes = max(1, removed_indent // 4)
+        prefix = ""
+        indent = " " * 4
+        for i in range(0, add_prefixes):
+            prefix += (indent * i) + "class wrappedforindent:\n"
+        stdin = prefix + stdin
+        return add_prefixes, stdin
+    return 0, stdin
 
 
 def main(argv):
@@ -26,23 +42,25 @@ def main(argv):
         sys.stderr.write("should be used with stdin, i.e. -\n")
         sys.exit(64)
 
-    stdin = sys.stdin.read()
-    indent, dedented = dedent(stdin)
+    orig_stdin = sys.stdin.read()
+    wrapped, dedented = prepare(orig_stdin)
 
     proc = subprocess.Popen(
-        argv,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
-    stdin = dedented.encode()
-    stdout, stderr = proc.communicate(stdin)
+    proc_stdin = dedented.encode()
+    stdout, stderr = proc.communicate(proc_stdin)
     stdout = stdout.decode("utf8")
     if proc.returncode == 0:
-        if indent:
-            prefix = " " * indent
-            stdout = "".join(prefix + line for line in stdout.splitlines(True))
-    sys.stdout.write(stdout)
+        while wrapped:
+            stdout = stdout[(stdout.index("\n") + 1) :]
+            wrapped -= 1
+        sys.stdout.write(stdout)
+    else:
+        # Output original input in case of error (similar to black does it, but
+        # we have changed it).
+        sys.stdout.write(orig_stdin)
+    sys.stdout.flush()
     sys.stderr.write(stderr.decode("utf8"))
     return proc.returncode
 
@@ -56,6 +74,20 @@ class Test:
         assert dedent("") == (0, "")
         assert dedent("  if True:\n    pass\n") == (2, "if True:\n  pass\n")
         assert dedent("  if True:\npass\n") == (0, "  if True:\npass\n")
+
+    def test_prepare(self):
+        assert prepare("") == (0, "")
+
+        wrap_prefix = "class wrappedforindent:\n"
+
+        in_ = "  if True:\n    pass\n"
+        assert prepare(in_) == (1, wrap_prefix + in_)
+
+        in_ = "  if True:\npass\n"
+        assert prepare(in_) == (1, wrap_prefix + in_)
+
+        in_ = "        pass\n"
+        assert prepare(in_) == (2, "{0}    {0}        pass\n".format(wrap_prefix))
 
     def test_main_with_black(self, monkeypatch, capsys):
         stdin = []
@@ -88,9 +120,23 @@ class Test:
         assert out.splitlines() == stdin
         assert err == ""
 
+        # Fixed def.
+        stdin = ["  def foo():", "    pass"]
+        assert run_black() == 0
+        out, err = capsys.readouterr()
+        assert out.splitlines() == ["    def foo():", "        pass"]
+        assert err == ""
+
+        # Multiple indents.
+        stdin = ["        pass"]
+        assert run_black() == 0
+        out, err = capsys.readouterr()
+        assert out.splitlines() == stdin
+        assert err == ""
+
         # Invalid.
         stdin = ["    if foo:", "pass"]
         assert run_black() == 123
         out, err = capsys.readouterr()
         assert out.splitlines() == stdin
-        assert err == "error: cannot format -: Cannot parse: 2:0: pass\n"
+        assert err == "error: cannot format -: Cannot parse: 3:0: pass\n"

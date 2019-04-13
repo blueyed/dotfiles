@@ -262,62 +262,68 @@ function! StatuslineClearCache(...)
   call setbufvar(bufnr, 'stl_cache_fugitive', [0, ''])
 endfun
 
-function! OnNeomakeCountsChanged()
-  let [ll_counts, qf_counts] = GetNeomakeCounts(g:neomake_hook_context.bufnr, 0)
-  let cmd = ''
-  let file_mode = get(get(g:, 'neomake_hook_context', {}), 'file_mode')
-  " let file_mode = get(get(g:, 'neomake_current_maker', {}), 'file_mode')
-  if file_mode
-    for [type, c] in items(ll_counts)
-      if type ==# 'E'
-        let cmd = 'lwindow'
-        break
-      endif
-    endfor
-  else
-    for [type, c] in items(qf_counts)
-      if type ==# 'E'
-        let cmd = 'cwindow'
-        break
-      endif
-    endfor
-  endif
-  if cmd !=# ''
-    let aw = winnr('#')
-    let pw = winnr()
-    exec cmd
-    if winnr() != pw
-      " Go back, maintaining the '#' window.
-      exec 'noautocmd ' . aw . 'wincmd w'
-      exec 'noautocmd ' . pw . 'wincmd w'
-    endif
-  else
-  endif
-endfunction
 
-function! OnNeomakeFinished()
+" Close empty lists when Neomake finished (manually with neomake_open_list=0).
+function! OnNeomakeFinished(...)
+  if exists('g:neomake_test_messages')
+    return
+  endif
+  if get(g:, 'neomake_open_list', 0)
+    return
+  endif
+
+  let context = a:0 ? a:1 : get(g:, 'neomake_hook_context', {})
+  let file_mode = context.options.file_mode
+
   " Close empty lists.
-  " echom 'statusline: OnNeomakeFinished'
-  if g:neomake_hook_context.file_mode
+  if file_mode
     if len(getloclist(0)) == 0
       lwindow
     endif
-  else
-    if len(getqflist()) == 0
-      cwindow
-    endif
+  elseif len(getqflist()) == 0
+    cwindow
   endif
+endfunction
+
+function! s:list_has_errors(list)
+  for e in a:list
+    if get(e, 'type', 'E') ==? 'E'
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+function! OnNeomakeJobFinished(...) abort
+  let context = a:0 ? a:1 : get(g:, 'neomake_hook_context', {})
+
+  let jobinfo = context.jobinfo
+  call neomake#log#debug('OnNeomakeJobFinished (user statusline): job: '.jobinfo.id)
+  let file_mode = jobinfo.file_mode
+  let make_info = neomake#GetMakeOptions(jobinfo.make_id)
+  let entries_list = make_info.entries_list
+
+  if entries_list.need_init
+    " This job has added no entries - do not open the previous list.
+    return
+  endif
+
+  let list = file_mode ? getloclist(0) : getqflist()
+  if s:list_has_errors(list)
+    " call neomake#_handle_list_display(jobinfo, min([10, len(list)]))
+    call neomake#_handle_list_display(jobinfo, list)
+  endif
+  call neomake#log#debug('OnNeomakeJobFinished (user statusline): job: '.jobinfo.id.' finished.')
+
   " XXX: brute-force
   call s:RefreshStatus()
+  call neomake#log#debug('OnNeomakeJobFinished (user statusline): job: '.jobinfo.id.' end.')
 endfunction
 
 augroup stl_neomake
   au!
-  " autocmd User NeomakeMakerFinished unlet! b:stl_cache_neomake
-  " autocmd User NeomakeListAdded unlet! b:stl_cache_neomake
-  autocmd User NeomakeCountsChanged call OnNeomakeCountsChanged()
-  autocmd User NeomakeFinished call OnNeomakeFinished()
-  " autocmd User NeomakeMakerFinished call OnNeomakeMakerFinished()
+  autocmd User NeomakeFinished nested call OnNeomakeFinished()
+  autocmd User NeomakeJobFinished nested call OnNeomakeJobFinished()
 augroup END
 
 function! s:setup_autocmds()

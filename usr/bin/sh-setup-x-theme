@@ -170,15 +170,6 @@ fi
 # Used in ~/.vimrc.
 echo "export MY_X_THEME_VARIANT=$variant;"
 
-# Configure colors for fzf.
-if hash fzf 2>/dev/null; then
-  if [ -z "$_FZF_DEFAULT_OPTS_BASE" ]; then
-    echo "export _FZF_DEFAULT_OPTS_BASE=\"\$FZF_DEFAULT_OPTS\""
-  fi
-  [ $variant = "light" ] && bg=21 || bg=18
-  echo "export FZF_DEFAULT_OPTS='$_FZF_DEFAULT_OPTS_BASE --color 16,bg+:$bg'"
-fi
-
 # Update tmux env, after sending escape codes eventually, which the
 # "tmux display" might prevent to work correctly (?!).  (might be obsolete)
 # This also inits it initially.

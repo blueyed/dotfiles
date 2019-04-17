@@ -1548,7 +1548,6 @@ fun! SetBgAccordingToShell(...)
   endif
   if bg != &bg
     let &bg = bg
-    let $FZF_DEFAULT_OPTS = '--color 16,bg+:' . (bg == 'dark' ? '18' : '21')
     doautocmd <nomodeline> ColorScheme
   endif
 endfun

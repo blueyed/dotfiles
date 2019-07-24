@@ -1682,7 +1682,8 @@ function! MyFollowSymlink(...)
 endfunction
 command! -bar FollowSymlink call MyFollowSymlink()
 command! ToggleFollowSymlink let w:no_resolve_symlink = !get(w:, 'no_resolve_symlink', 0) | echo "w:no_resolve_symlink =>" w:no_resolve_symlink
-au BufReadPost * nested call MyFollowSymlink(expand('%'))
+" au BufWinEnter * nested call MyFollowSymlink(expand('%'))
+nnoremap <Leader>gf :FollowSymlink<cr>
 
 " Automatically load .vimrc source when saved
 au BufWritePost $MYVIMRC,~/.dotfiles/vimrc,$MYVIMRC.local source $MYVIMRC
@@ -2772,13 +2773,20 @@ command! RRR ProjectRootCD
 " Follow symlink and lcd to root.
 fun! MyLCDToProjectRoot()
   let oldcwd = getcwd()
+  let oldldir = haslocaldir()
+  let oldtdir = haslocaldir(-1)
   FollowSymlink
-  ProjectRootLCD
-  if oldcwd != getcwd()
-    echom "lcd:" oldcwd "=>" getcwd()
+  call projectroot#cd('', a:cd)
+  if oldcwd != getcwd() || oldldir != haslocaldir() || oldtdir != haslocaldir(-1)
+    echom a:cd.' '.fnamemodify(getcwd(), ':~')
+          \ .' (from '.(oldldir ? 'local' : oldtdir ? 'tab-local' : 'global')
+          \ .(oldcwd != getcwd() ? ' '.fnamemodify(oldcwd, ':~') : '').')'
   endif
 endfun
-nnoremap <silent> <Leader>fr :call MyLCDToProjectRoot()<cr>
+nnoremap <silent> <Leader>cdr :call MyCDToProjectRoot('lcd')<cr>
+nnoremap <silent> <Leader>cdR :call MyCDToProjectRoot('tcd')<cr>
+" Change to current file's dir
+nnoremap <Leader>cdf :lcd <C-R>=expand('%:p:h')<CR><CR>
 
 
 " Toggle pattern (typically a char) at the end of line(s). {{{2

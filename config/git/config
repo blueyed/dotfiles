@@ -12,9 +12,10 @@
 	cp = cherry-pick
 	dd = !git difftool --no-prompt --tool=my-icdiff
 	dsf = !git diff --color $@ | diff-so-fancy
-	desc = describe --all --always
+	desc = describe --always
 	dv = !git diff -w "$@" | vim -R -
 	f = fetch
+	last-tag = describe --abbrev=0 --tags --first-parent
 	# Used (verbatim/resolved) for internal dirty status in shell theme (✗).
 	ls-untracked = ls-files --other --directory --exclude-standard
 	m = merge

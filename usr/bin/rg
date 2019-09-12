@@ -1,3 +1,10 @@
 #!/bin/sh
 
-exec /usr/bin/rg --smart-case "$@"
+# No extra args when --no-config is used.
+for i; do
+  if [ "$i" = "--no-config" ]; then
+    exec /usr/bin/rg "$@"
+  fi
+done
+
+exec /usr/bin/rg --smart-case --ignore-file "$HOME/.ignore" "$@"

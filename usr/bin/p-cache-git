@@ -1,0 +1,40 @@
+#!/bin/sh
+# Wrapper around git in .pytest_cache/v/cache.
+#
+# This is meant to be useful to stash/save/restore the cache, e.g. when using
+# the `--lf` (last-failed) mode etc.
+#
+# NOTE: you can also use `git -C .pytest_cache/v/cache …` directly, of course..
+#
+# TODO:
+# - short action names to stash/pop?
+# - completion (IIRC this requires fix for -C in zsh?)
+
+set -e
+# set -x
+
+error() {
+  echo "$@"
+  exit 64
+}
+
+root=".pytest_cache/v/cache"
+cdup="$(git rev-parse --show-cdup)"
+if [ -n "$cdup" ]; then
+  root="$cdup/$root"
+fi
+
+if ! [ -d "$root" ]; then
+  error "Directory $root does not exist"
+fi
+
+cd "$root"
+
+if ! [ -e ".git" ]; then
+  git init .
+  git commit --allow-empty -m "init"
+  git add --all .
+  git commit -m "initial state"
+fi
+
+git "$@"

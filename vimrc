@@ -2169,17 +2169,17 @@ map <C-Tab>   <Plug>NextTabOrBuffer
 " Switch to most recently used tab.
 " Source: http://stackoverflow.com/a/2120168/15690
 fun! MyGotoMRUTab()
-if !exists('g:mrutab')
-  let g:mrutab = 1
-endif
-if tabpagenr('$') == 1
-  echomsg "There is only one tab!"
-  return
-endif
-if g:mrutab > tabpagenr('$') || g:mrutab == tabpagenr()
-  let g:mrutab = tabpagenr() > 1 ? tabpagenr()-1 : tabpagenr('$')
-endif
-exe "tabn ".g:mrutab
+  if !exists('g:mrutab')
+    let g:mrutab = 1
+  endif
+  if tabpagenr('$') == 1
+    echomsg "There is only one tab!"
+    return
+  endif
+  if g:mrutab > tabpagenr('$') || g:mrutab == tabpagenr()
+    let g:mrutab = tabpagenr() > 1 ? tabpagenr()-1 : tabpagenr('$')
+  endif
+  exe "tabn ".g:mrutab
 endfun
 " Overrides Vim's gh command (start select-mode, but I don't use that).
 " It can be simulated using v<C-g> also.
@@ -2187,8 +2187,8 @@ nnoremap <silent> gh  :call MyGotoMRUTab()<CR>
 " nnoremap °  :call MyGotoMRUTab()<CR>
 " nnoremap <C-^>  :call MyGotoMRUTab()<CR>
 augroup MyTL
-au!
-au TabLeave * let g:mrutab = tabpagenr()
+  au!
+  au TabLeave * let g:mrutab = tabpagenr()
 augroup END
 
 " Map <A-1> .. <A-9> to goto tab or buffer.
